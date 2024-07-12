@@ -1,0 +1,4 @@
+[submodule "Config"]
+	path = Config
+	url = https://github.com/Yellobook/Config.git
+	branch = main

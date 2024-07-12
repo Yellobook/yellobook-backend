@@ -1,0 +1,44 @@
+dependencies {
+    implementation project(":yellobook-domain")
+    implementation project(":yellobook-common")
+
+    // spring
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // jwt
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+
+    // lombok (test)
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+    // h2 db
+    runtimeOnly 'com.h2database:h2'
+
+    //test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'com.h2database:h2'
+}
+
+processResources.dependsOn('copyConfig')
+
+// application*.yml 설정파일 복사
+tasks.register('copyConfig', Copy) {
+    from '../Config/yellobook-api/'
+    include "application*.yml"
+    into 'src/main/resources'
+}
+
+bootJar {
+    enabled = true
+}
+
+// 일반 jar 파일 생성 비활성화
+jar {
+    enabled = false
+}

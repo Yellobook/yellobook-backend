@@ -1,0 +1,2 @@
+rootProject.name = 'yellobook'
+include 'yellobook-api', 'yellobook-common', 'yellobook-domain'
