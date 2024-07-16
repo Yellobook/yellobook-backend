@@ -1,8 +1,9 @@
-package com.yellobook.domain.auth.jwt;
+package com.yellobook.domain.auth.security.filter;
 
 
-import com.yellobook.domain.auth.oauth2.dto.CustomOAuth2User;
-import com.yellobook.domain.auth.oauth2.dto.OAuth2UserDTO;
+import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
+import com.yellobook.domain.auth.security.oauth2.dto.OAuth2UserDTO;
+import com.yellobook.domain.auth.service.JwtService;
 import com.yellobook.domains.member.entity.Member;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,9 +28,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String accessToken = jwtService.resolveToken(request);
         OAuth2UserDTO oauth2UserDTO;
+
         // 로그인한 사용자
-        if(accessToken != null && !jwtService.isExpired(accessToken)) {
-            Member member = jwtService.getMemberFromToken(accessToken);
+        if(accessToken != null && !jwtService.isAccessTokenExpired(accessToken)) {
+            Member member = jwtService.getMemberFromAccessToken(accessToken);
             oauth2UserDTO = OAuth2UserDTO.from(member);
         // 로그인하지 않은 사용자
         } else {
