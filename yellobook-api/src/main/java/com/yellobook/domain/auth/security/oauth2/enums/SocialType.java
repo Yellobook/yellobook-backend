@@ -1,4 +1,4 @@
-package com.yellobook.domain.auth.oauth2.enums;
+package com.yellobook.domain.auth.security.oauth2.enums;
 
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 

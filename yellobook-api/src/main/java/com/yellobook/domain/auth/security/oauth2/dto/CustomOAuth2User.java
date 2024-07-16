@@ -1,4 +1,4 @@
-package com.yellobook.domain.auth.oauth2.dto;
+package com.yellobook.domain.auth.security.oauth2.dto;
 
 import com.yellobook.enums.MemberRole;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +40,9 @@ public class CustomOAuth2User implements OAuth2User {
     }
 
     // getAttribute 로 가져올 수 있지만 명시적으로 가져오기 위해 추가
+    public Long getMemberId() {
+        return oauth2UserDTO.getMemberId();
+    }
     public MemberRole getRole() {
         return oauth2UserDTO.getRole();
     }

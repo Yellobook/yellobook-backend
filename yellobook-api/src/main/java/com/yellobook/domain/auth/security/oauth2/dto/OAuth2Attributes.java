@@ -1,6 +1,6 @@
-package com.yellobook.domain.auth.oauth2.dto;
+package com.yellobook.domain.auth.security.oauth2.dto;
 
-import com.yellobook.domain.auth.oauth2.enums.SocialType;
+import com.yellobook.domain.auth.security.oauth2.enums.SocialType;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

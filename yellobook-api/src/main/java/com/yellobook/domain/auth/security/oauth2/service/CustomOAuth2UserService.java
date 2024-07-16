@@ -1,9 +1,9 @@
-package com.yellobook.domain.auth.oauth2.service;
+package com.yellobook.domain.auth.security.oauth2.service;
 
-import com.yellobook.domain.auth.oauth2.dto.CustomOAuth2User;
-import com.yellobook.domain.auth.oauth2.dto.OAuth2Attributes;
-import com.yellobook.domain.auth.oauth2.dto.OAuth2UserDTO;
-import com.yellobook.domain.auth.oauth2.enums.SocialType;
+import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
+import com.yellobook.domain.auth.security.oauth2.dto.OAuth2Attributes;
+import com.yellobook.domain.auth.security.oauth2.dto.OAuth2UserDTO;
+import com.yellobook.domain.auth.security.oauth2.enums.SocialType;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.member.repository.MemberRepository;
 import com.yellobook.enums.MemberRole;

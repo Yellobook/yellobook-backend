@@ -1,8 +1,8 @@
 package com.yellobook.config;
 
-import com.yellobook.domain.auth.jwt.JwtAuthFilter;
-import com.yellobook.domain.auth.oauth2.CustomSuccessHandler;
-import com.yellobook.domain.auth.oauth2.service.CustomOAuth2UserService;
+import com.yellobook.domain.auth.security.filter.JwtAuthFilter;
+import com.yellobook.domain.auth.security.oauth2.handler.CustomSuccessHandler;
+import com.yellobook.domain.auth.security.oauth2.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

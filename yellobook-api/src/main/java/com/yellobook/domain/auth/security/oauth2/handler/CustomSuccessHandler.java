@@ -1,8 +1,8 @@
-package com.yellobook.domain.auth.oauth2;
+package com.yellobook.domain.auth.security.oauth2.handler;
 
-import com.yellobook.domain.auth.jwt.JwtService;
-import com.yellobook.domain.auth.oauth2.dto.CustomOAuth2User;
-import com.yellobook.domain.auth.oauth2.utils.CookieUtil;
+import com.yellobook.domain.auth.service.JwtService;
+import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
+import com.yellobook.domain.auth.security.oauth2.utils.CookieUtil;
 import com.yellobook.enums.MemberRole;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,12 +28,13 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
-        String email = customUserDetails.getName();
+        Long memberId = customUserDetails.getMemberId();
         MemberRole role = customUserDetails.getRole();
         // jwt 생성
-        String accessToken = jwtService.createAccessToken(email, role);
-        // String refreshToken = jwtService.createRefreshToken(email);
+        String accessToken = jwtService.createAccessToken(memberId);
+        String refreshToken = jwtService.createRefreshToken(memberId);
         response.addCookie(cookieUtil.createAccessTokenCookie(accessToken));
+        response.addCookie(cookieUtil.createRefreshTokenCookie(refreshToken));
         response.sendRedirect(authRedirectUrl);
     }
 }
