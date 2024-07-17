@@ -40,8 +40,10 @@ out/
 /*/**/resources/*.yml
 
 ### postgres volumn
-postgres_volumn
-redis_volumn
+postgres_data
+
+### redis volumn
+redis_data
 
 ### .env
 .env
