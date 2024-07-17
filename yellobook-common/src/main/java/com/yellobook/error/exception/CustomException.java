@@ -1,6 +1,6 @@
-package com.yellobook.exception;
+package com.yellobook.error.exception;
 
-import com.yellobook.code.ErrorCode;
+import com.yellobook.error.code.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

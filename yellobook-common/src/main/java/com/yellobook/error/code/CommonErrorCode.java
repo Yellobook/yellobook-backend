@@ -1,4 +1,4 @@
-package com.yellobook.code;
+package com.yellobook.error.code;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

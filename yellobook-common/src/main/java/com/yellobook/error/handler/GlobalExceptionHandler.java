@@ -1,8 +1,8 @@
-package com.yellobook.handler;
+package com.yellobook.error.handler;
 
-import com.yellobook.code.CommonErrorCode;
-import com.yellobook.code.ErrorCode;
-import com.yellobook.exception.CustomException;
+import com.yellobook.error.code.CommonErrorCode;
+import com.yellobook.error.code.ErrorCode;
+import com.yellobook.error.exception.CustomException;
 import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.ValidationError;
 import jakarta.validation.ConstraintViolationException;

@@ -1,9 +1,9 @@
 package com.yellobook.domain.auth.service;
 
-import com.yellobook.code.AuthErrorCode;
+import com.yellobook.error.code.AuthErrorCode;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.member.repository.MemberRepository;
-import com.yellobook.exception.CustomException;
+import com.yellobook.error.exception.CustomException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
