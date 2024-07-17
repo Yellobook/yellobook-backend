@@ -1,4 +1,4 @@
-package com.yellobook.code;
+package com.yellobook.error.code;
 
 import org.springframework.http.HttpStatus;
 

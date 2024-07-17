@@ -1,6 +1,6 @@
 package com.yellobook.response;
 
-import com.yellobook.code.ErrorCode;
+import com.yellobook.error.code.ErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 

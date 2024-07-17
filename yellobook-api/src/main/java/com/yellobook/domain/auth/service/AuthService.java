@@ -1,8 +1,8 @@
 package com.yellobook.domain.auth.service;
 
-import com.yellobook.code.AuthErrorCode;
+import com.yellobook.error.code.AuthErrorCode;
 import com.yellobook.domain.auth.dto.TokenResponse;
-import com.yellobook.exception.CustomException;
+import com.yellobook.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
