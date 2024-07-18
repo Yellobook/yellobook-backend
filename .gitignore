@@ -41,9 +41,11 @@ out/
 
 ### volumns
 infrastructure/database/*_data
-
+infrastructure/monitoring/data
 ### .env
 infrastructure/database/.env
 
 ### application logs
 infrastructure/monitoring/logs/*
+
+### elasticsearch volumn
