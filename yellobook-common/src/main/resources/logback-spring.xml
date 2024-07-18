@@ -19,6 +19,12 @@
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>${LOG_PATTERN}</pattern>
         </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 매일 새로운 로그 파일 생성 -->
+            <fileNamePattern>./infrastructure/monitoring/logs/application-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- 로그 파일 최대 보관 기간 -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
     </appender>
 
     <root level="INFO">
