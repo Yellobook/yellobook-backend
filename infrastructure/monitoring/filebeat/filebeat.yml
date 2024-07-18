@@ -1,0 +1,13 @@
+filebeat.inputs:
+  - type: log
+    paths:
+      - /var/log/myapp/application.log
+    fields:
+      log_type: application_log
+    multiline.pattern: '^\d{4}-\d{2}-\d{2}'
+    multiline.negate: true
+    multiline.match: after
+
+
+output.logstash:
+  hosts: ["logstash:5044"]

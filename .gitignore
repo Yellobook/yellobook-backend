@@ -39,11 +39,13 @@ out/
 ### yml
 /*/**/resources/*.yml
 
-### postgres volumn
-postgres_data
-
-### redis volumn
-redis_data
-
+### volumns
+infrastructure/database/*_data
+infrastructure/monitoring/data
 ### .env
-.env
+infrastructure/database/.env
+
+### application logs
+infrastructure/monitoring/logs/*
+
+### elasticsearch volumn

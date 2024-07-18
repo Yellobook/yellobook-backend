@@ -3,17 +3,32 @@
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
-    <!-- Pattern -->
-    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %clr(%5level) [%15.15t] [%X{request_id}] %clr(%-40.40logger{39}){cyan} : %m%n%wEx"/>
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5level [%15.15t] [%X{request_id}] %-40.40logger{39} : %m%n%wEx"/>
 
-    <!-- Request Thread Console Appender -->
+    <!-- 콘솔에 로그 출력 -->
     <appender name="THREAD_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>${LOG_PATTERN}</pattern>
         </encoder>
     </appender>
 
+    <!-- 파일에 로그 출력 -->
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <!-- 로그 저장 폴더 위치 -->
+        <file>./infrastructure/monitoring/logs/application.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 매일 새로운 로그 파일 생성 -->
+            <fileNamePattern>./infrastructure/monitoring/logs/application-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- 로그 파일 최대 보관 기간 -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
     <root level="INFO">
+        <appender-ref ref="FILE"/>
         <appender-ref ref="THREAD_CONSOLE"/>
     </root>
 </configuration>
