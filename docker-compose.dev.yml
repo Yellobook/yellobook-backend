@@ -1,0 +1,12 @@
+services:
+  app:
+    image: ywoosang/yellobook-server:latest
+    container_name: yellobook-server
+    ports:
+      - "8080:8080"
+    networks:
+      - yellobook-network
+
+networks:
+  yellobook-network:
+    external: true

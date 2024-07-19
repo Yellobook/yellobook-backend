@@ -43,9 +43,14 @@ out/
 infrastructure/database/*_data
 infrastructure/monitoring/data
 ### .env
-infrastructure/database/.env
+.env
+/*/**/.env
 
 ### application logs
 infrastructure/monitoring/logs/*
 
-### elasticsearch volumn
+### spy
+*.log
+
+### key
+*.pem
