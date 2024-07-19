@@ -44,7 +44,7 @@ jobs:
 
       - name: 도커 이미지 빌드 후 Docker Hub 에 업로드
         run: |
-          docker build -t -f Dockerfile.dev ywoosang/yellobook-server:latest .
+          docker build -t ywoosang/yellobook-server:latest -f Dockerfile.dev .
           docker push ywoosang/yellobook-server:latest
   push:
     runs-on: ubuntu-latest
