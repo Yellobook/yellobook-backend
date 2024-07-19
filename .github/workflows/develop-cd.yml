@@ -67,7 +67,7 @@ jobs:
 
       - name: EC2 에서 docker-compose 실행
         # 공식문서 https://github.com/appleboy/ssh-action
-        uses: appleboy/ssh-action@1.0.3
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
