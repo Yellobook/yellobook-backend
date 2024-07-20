@@ -29,7 +29,7 @@ public class OAuth2UserDTO {
                     .build();
         }
         return OAuth2UserDTO.builder()
-                .memberId(member.getMemberId())
+                .memberId(member.getId())
                 .nickname(member.getNickname())
                 .email(member.getEmail())
                 .profileImage(member.getProfileImage())
