@@ -1,12 +1,8 @@
 package com.yellobook.domains.teamspace.entity;
 
 import com.yellobook.domains.common.entity.BaseEntity;
-import com.yellobook.domains.member.entity.Participant;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -31,9 +27,5 @@ public class Teamspace extends BaseEntity {
 
     @Column(nullable = false)
     private String address;
-
-    @OneToMany(mappedBy = "teamspace")
-    @Builder.Default
-    private List<Participant> participants = new ArrayList<>();
 
 }

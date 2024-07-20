@@ -6,8 +6,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Entity
@@ -45,10 +43,6 @@ public class Member extends BaseEntity {
 
     @Column
     private LocalDateTime deletedAt;
-
-    @OneToMany(mappedBy = "member")
-    @Builder.Default
-    private List<Participant> participants = new ArrayList<>();
 
     @Builder
     public Member(Long memberId, String nickname, String email, String profileImage, MemberRole role) {
