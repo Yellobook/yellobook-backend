@@ -12,6 +12,8 @@ services:
     ports:
       - "5433:5432"
     command: ["postgres", "-c", "client_encoding=UTF8"]
+    networks:
+      - yellobook-network
 
   redis:
     image: redis:7
@@ -20,8 +22,16 @@ services:
       - "6378:6379"
     volumes:
       - ./redis_data:/data
+    networks:
+      - yellobook-network
 
 
 volumes:
   postgres_data:
   redis_data:
+
+networks:
+  yellobook-network:
+    driver: bridge
+    # 식별을 위해 폴더 이름이 붙는 것을 방지
+    name: yellobook-network

@@ -27,8 +27,16 @@
         </rollingPolicy>
     </appender>
 
-    <root level="INFO">
-        <appender-ref ref="FILE"/>
-        <appender-ref ref="THREAD_CONSOLE"/>
-    </root>
+    <springProfile name="local, prod">
+        <root level="INFO">
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="THREAD_CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="dev">
+        <root level="INFO">
+            <appender-ref ref="THREAD_CONSOLE"/>
+        </root>
+    </springProfile>
 </configuration>
