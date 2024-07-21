@@ -39,7 +39,9 @@ public class SecurityConfig {
         return web -> web.ignoring().requestMatchers(
                 new AntPathRequestMatcher("/public/**"),
                 new AntPathRequestMatcher("/favicon.ico"),
-                new AntPathRequestMatcher("/css/**")
+                new AntPathRequestMatcher("/css/**"),
+                new AntPathRequestMatcher("/swagger-ui/**"),
+                new AntPathRequestMatcher("/v3/api-docs/**")
         );
     }
 
