@@ -39,7 +39,9 @@ public class SecurityConfig {
         return web -> web.ignoring().requestMatchers(
                 new AntPathRequestMatcher("/public/**"),
                 new AntPathRequestMatcher("/favicon.ico"),
-                new AntPathRequestMatcher("/css/**")
+                new AntPathRequestMatcher("/css/**"),
+                new AntPathRequestMatcher("/swagger-ui/**"),
+                new AntPathRequestMatcher("/v3/api-docs/**")
         );
     }
 
@@ -95,9 +97,9 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .addFilterAfter(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests((auth) -> auth
-                        // 관리자 권한이 필요
-                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                        // 이외 요청 모두 jwt 필터를 타도록 설정 -> 로그인하지 않았어도 GUEST 로 Context 저장
+                        // 헬스 체크 경로는 jwt 인증 비활성화
+                        .requestMatchers("/api/v1/","/api/v1/health").permitAll()
+                        // 이외 요청 모두 jwt 필터를 타도록 설정
                         .anyRequest().authenticated())
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
