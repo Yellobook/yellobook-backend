@@ -2,7 +2,6 @@ package com.yellobook.domains.product.entity;
 
 import com.yellobook.domains.common.entity.BaseEntity;
 import com.yellobook.domains.inventory.entity.Inventory;
-import com.yellobook.domains.teamspace.entity.Teamspace;
 import jakarta.persistence.*;
 import lombok.Getter;
 

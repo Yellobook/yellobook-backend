@@ -1,5 +1,6 @@
 package com.yellobook.domain.inventory.controller;
 
+import com.yellobook.domain.inventory.dto.GetProductsResponse;
 import com.yellobook.domain.inventory.dto.GetTotalInventoryResponse;
 import com.yellobook.domain.inventory.service.InventoryCommandService;
 import com.yellobook.domain.inventory.service.InventoryQueryService;
@@ -23,6 +24,16 @@ public class InventoryController {
             @RequestParam("size") Long size
     ){
         //inventoryQueryService.getTotalInventory(page, size, teamId);
+        return null;
+    }
+
+    // 특정 일자 재고현황 조회
+    @GetMapping("/{teamId}/{inventoryId}")
+    public ResponseEntity<GetProductsResponse> getOneInventory(
+            @PathVariable("teamId") Long teamId,
+            @PathVariable("inventoryId") Long inventoryId
+    ){
+        //inventoryQueryService.getOneInventory(teamId, inventoryId);
         return null;
     }
 }
