@@ -23,11 +23,6 @@ public class OAuth2UserDTO {
     }
 
     public static OAuth2UserDTO from(Member member) {
-        if(member == null) {
-            return OAuth2UserDTO.builder()
-                    .role(MemberRole.GUEST)
-                    .build();
-        }
         return OAuth2UserDTO.builder()
                 .memberId(member.getId())
                 .nickname(member.getNickname())
