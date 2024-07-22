@@ -1,18 +1,17 @@
 package com.yellobook.domain.inventory.controller;
 
+import com.yellobook.domain.inventory.dto.AddProductRequest;
 import com.yellobook.domain.inventory.dto.GetProductsResponse;
 import com.yellobook.domain.inventory.dto.GetTotalInventoryResponse;
-import com.yellobook.domain.inventory.dto.ModifyProductRequest;
+import com.yellobook.domain.inventory.dto.ModifyProductAmountRequest;
 import com.yellobook.domain.inventory.service.InventoryCommandService;
 import com.yellobook.domain.inventory.service.InventoryQueryService;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/inventory")
+@RequestMapping("/api/inventory/{teamId}")
 @RequiredArgsConstructor
 public class InventoryController {
 
@@ -20,7 +19,7 @@ public class InventoryController {
     private InventoryQueryService inventoryQueryService;
 
     // 전제 재고 현황 글 조회
-    @GetMapping("/{teamId}")
+    @GetMapping("")
     public ResponseEntity<GetTotalInventoryResponse> getTotalInventory(
             @PathVariable("teamId") Long teamId,
             @RequestParam("page") Long page,
@@ -31,7 +30,7 @@ public class InventoryController {
     }
 
     // 특정 일자 재고현황 조회
-    @GetMapping("/{teamId}/{inventoryId}")
+    @GetMapping("/{inventoryId}")
     public ResponseEntity<GetProductsResponse> getProductByInventory(
             @PathVariable("teamId") Long teamId,
             @PathVariable("inventoryId") Long inventoryId
@@ -41,7 +40,7 @@ public class InventoryController {
     }
 
     // 재고 검색 (관리자)
-    @GetMapping("/{teamId}/admin/{inventoryId}/search?keyword={keyword}")
+    @GetMapping("/admin/{inventoryId}/search?keyword={keyword}")
     public ResponseEntity<GetProductsResponse> getProductByKeywordAndInventory(
             @PathVariable("teamId") Long teamId,
             @PathVariable("inventoryId") Long inventoryId,
@@ -52,13 +51,23 @@ public class InventoryController {
     }
 
     // 재고 현황 수정 (관리자)
-    @PatchMapping("/{teamId}/admin/{productId}")
-    public ResponseEntity<?> modifyProduct(
+    @PutMapping("/admin/{productId}")
+    public ResponseEntity<?> modifyProductAmount(
             @PathVariable("teamId") Long teamId,
             @PathVariable("productId") Long productId,
-            @RequestBody ModifyProductRequest requestDTO
+            @RequestBody ModifyProductAmountRequest requestDTO
     ){
-        //inventoryCommandService.modifyProduct(teamId, productId, requestDTO);
+//        inventoryCommandService.modifyProductAmount(teamId, productId, requestDTO);
+        return null;
+    }
+
+    @PostMapping("/admin/{inventoryId}")
+    public ResponseEntity<?> addProduct(
+            @PathVariable("teamId") Long teamId,
+            @PathVariable("inventoryId") Long inventoryId,
+            @RequestBody AddProductRequest requestDTO
+    ){
+        //inventoryCommandService.addProduct(teamId, inventoryId, requestDTO);
         return null;
     }
 }

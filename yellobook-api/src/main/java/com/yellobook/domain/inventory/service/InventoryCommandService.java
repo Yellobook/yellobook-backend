@@ -1,7 +1,10 @@
 package com.yellobook.domain.inventory.service;
 
-import com.yellobook.domain.inventory.dto.ModifyProductRequest;
+import com.yellobook.domain.inventory.dto.AddProductRequest;
+import com.yellobook.domain.inventory.dto.ModifyProductAmountRequest;
 
 public interface InventoryCommandService {
-    void modifyProduct(Long teamId, Long productId, ModifyProductRequest requestDTO);
+    void modifyProductAmount(Long teamId, Long productId, ModifyProductAmountRequest requestDTO);
+
+    void addProduct(Long teamId, Long inventoryId, AddProductRequest requestDTO);
 }
