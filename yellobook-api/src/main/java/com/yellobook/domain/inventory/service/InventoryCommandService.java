@@ -8,5 +8,5 @@ public interface InventoryCommandService {
 
     void addProduct(Long teamId, Long inventoryId, AddProductRequest requestDTO);
 
-    void deleteProduct(Long teamId, Long inventoryId, Long productId);
+    void deleteProduct(Long teamId, Long productId);
 }
