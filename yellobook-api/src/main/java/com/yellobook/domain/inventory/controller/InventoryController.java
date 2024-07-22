@@ -2,8 +2,10 @@ package com.yellobook.domain.inventory.controller;
 
 import com.yellobook.domain.inventory.dto.GetProductsResponse;
 import com.yellobook.domain.inventory.dto.GetTotalInventoryResponse;
+import com.yellobook.domain.inventory.dto.ModifyProductRequest;
 import com.yellobook.domain.inventory.service.InventoryCommandService;
 import com.yellobook.domain.inventory.service.InventoryQueryService;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
@@ -46,6 +48,17 @@ public class InventoryController {
             @PathVariable("keyword") String keyword
     ){
         //inventoryQueryService.getProductByKeywordAndInventory(teamId, inventoryId, keyword);
+        return null;
+    }
+
+    // 재고 현황 수정 (관리자)
+    @PatchMapping("/{teamId}/admin/{productId}")
+    public ResponseEntity<?> modifyProduct(
+            @PathVariable("teamId") Long teamId,
+            @PathVariable("productId") Long productId,
+            @RequestBody ModifyProductRequest requestDTO
+    ){
+        //inventoryCommandService.modifyProduct(teamId, productId, requestDTO);
         return null;
     }
 }
