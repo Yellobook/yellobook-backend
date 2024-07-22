@@ -21,4 +21,6 @@ public class Inventory extends BaseEntity {
 
     @Column(nullable = false)
     private String title;
+
+    private Integer view;
 }
