@@ -33,18 +33,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if(accessToken != null && !jwtService.isAccessTokenExpired(accessToken)) {
             Member member = jwtService.getMemberFromAccessToken(accessToken);
             oauth2UserDTO = OAuth2UserDTO.from(member);
-        // 로그인하지 않은 사용자
-        } else {
-            // authenticated() 를 거쳐야 하니까 ContextHolder 에 GUEST 로 집어넣음
-            oauth2UserDTO = OAuth2UserDTO.from(null);
+            CustomOAuth2User customOAuth2User = new CustomOAuth2User(oauth2UserDTO);
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    customOAuth2User,
+                    null,
+                    customOAuth2User.getAuthorities()
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-        CustomOAuth2User customOAuth2User = new CustomOAuth2User(oauth2UserDTO);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                customOAuth2User,
-                null,
-                customOAuth2User.getAuthorities()
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        // 로그인하지 않은 사용자는 SecurityContext 에 없으므로 인증오류
         filterChain.doFilter(request, response);
     }
 }
