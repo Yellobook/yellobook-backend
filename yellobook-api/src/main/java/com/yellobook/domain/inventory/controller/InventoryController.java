@@ -70,4 +70,14 @@ public class InventoryController {
         //inventoryCommandService.addProduct(teamId, inventoryId, requestDTO);
         return null;
     }
+
+    @DeleteMapping("/admin/{inventoryId}/{productId}")
+    public ResponseEntity<?> deleteProduct(
+            @PathVariable("teamId") Long teamId,
+            @PathVariable("inventoryId") Long inventoryId,
+            @PathVariable("productId") Long productId
+    ){
+        //inventoryCommandService.deleteProduct(teamId, inventoryId, productId);
+        return null;
+    }
 }
