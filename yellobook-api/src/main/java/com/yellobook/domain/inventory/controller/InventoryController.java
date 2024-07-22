@@ -6,6 +6,7 @@ import com.yellobook.domain.inventory.service.InventoryCommandService;
 import com.yellobook.domain.inventory.service.InventoryQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,11 +30,22 @@ public class InventoryController {
 
     // 특정 일자 재고현황 조회
     @GetMapping("/{teamId}/{inventoryId}")
-    public ResponseEntity<GetProductsResponse> getOneInventory(
+    public ResponseEntity<GetProductsResponse> getProductByInventory(
             @PathVariable("teamId") Long teamId,
             @PathVariable("inventoryId") Long inventoryId
     ){
-        //inventoryQueryService.getOneInventory(teamId, inventoryId);
+        //inventoryQueryService.getProductByInventory(teamId, inventoryId);
+        return null;
+    }
+
+    // 재고 검색 (관리자)
+    @GetMapping("/{teamId}/admin/{inventoryId}/search?keyword={keyword}")
+    public ResponseEntity<GetProductsResponse> getProductByKeywordAndInventory(
+            @PathVariable("teamId") Long teamId,
+            @PathVariable("inventoryId") Long inventoryId,
+            @PathVariable("keyword") String keyword
+    ){
+        //inventoryQueryService.getProductByKeywordAndInventory(teamId, inventoryId, keyword);
         return null;
     }
 }
