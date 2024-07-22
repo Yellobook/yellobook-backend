@@ -1,15 +1,12 @@
 dependencies {
+    // swagger
+    api  'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+
+    // validation
     api 'org.springframework.boot:spring-boot-starter-validation'
+
     implementation 'org.springframework.boot:spring-boot-starter-web'
 }
-
-//tasks.register('copyConfig', Copy) {
-//    from '../Config/yellobook-common/'
-//    include "application*.yml"
-//    into 'src/main/resources'
-//}
-
-//processResources.dependsOn('copyConfig')
 
 bootJar {
     enabled = false
