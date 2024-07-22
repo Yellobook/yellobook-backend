@@ -1,6 +1,7 @@
 package com.yellobook.domains.product.entity;
 
 import com.yellobook.domains.common.entity.BaseEntity;
+import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.teamspace.entity.Teamspace;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -9,7 +10,7 @@ import lombok.Getter;
 @Getter
 @Table(name = "products",
         uniqueConstraints = {
-            @UniqueConstraint(name = "uc_teamspaceId_sku", columnNames = {"teamspace_id", "sku"})
+            @UniqueConstraint(name = "uc_inventoryId_sku", columnNames = {"inventory_id", "sku"})
         }
 )
 public class Product extends BaseEntity {
@@ -17,8 +18,8 @@ public class Product extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "teamspace_id", nullable = false)
-    private Teamspace teamspace;
+    @JoinColumn(name = "inventory_id", nullable = false)
+    private Inventory inventory;
 
     @Column(nullable = false, length = 30)
     private String name;

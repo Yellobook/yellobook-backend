@@ -18,7 +18,6 @@ public class Order extends Post{
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @Column(nullable = false)
     private Integer orderAmount;
 
     @Enumerated(EnumType.STRING)
