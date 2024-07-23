@@ -45,6 +45,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                             .email(oAuth2Attributes.getEmail())
                             .profileImage(oAuth2Attributes.getProfileImage())
                             .role(MemberRole.USER)
+                            .allowance(false)
                             .build();
 
                     log.info("사용자 가입 이메일: {}", newMember.getEmail());

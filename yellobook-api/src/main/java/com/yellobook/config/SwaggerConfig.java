@@ -11,6 +11,7 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.*;
+import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +31,11 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI OpenApiConfig() {
+        // Servers 에 표시되는 정보 설정
+        Server server = new Server();
+        server.setUrl(backendBaseURL);
+        server.setDescription("YelloBook Server API");
+
         String SOCIAL_TAG_NAME = "\uD83D\uDE80 소셜 로그인";
         return new OpenAPI()
                 .components(new Components().addSecuritySchemes("Bearer Token",
@@ -40,6 +46,8 @@ public class SwaggerConfig {
                 // 기본적으로 모든 엔드포인트에 대한 JWT 인증이 필요한 것으로 설정
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .info(getInfo())
+                // 서버 정보 추가
+                .servers(List.of(server))
                 .tags(List.of(new Tag().name(SOCIAL_TAG_NAME).description("Oauth2 Endpoint")))
                 .path("/oauth2/authorization/kakao", new PathItem()
                         .get(new Operation()

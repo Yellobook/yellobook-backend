@@ -1,7 +1,5 @@
 package com.yellobook.domain.auth.controller;
 
-
-import com.yellobook.common.anonotation.ApiV1Controller;
 import com.yellobook.domain.auth.dto.TokenResponse;
 import com.yellobook.domain.auth.service.AuthService;
 import com.yellobook.response.ResponseFactory;
@@ -12,9 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "\uD83D\uDD11 토큰", description = "Token API")
-@ApiV1Controller(value = "/token")
+@RestController(value = "/api/v1/token")
 @RequiredArgsConstructor
 public class TokenController {
     private final AuthService authService;
