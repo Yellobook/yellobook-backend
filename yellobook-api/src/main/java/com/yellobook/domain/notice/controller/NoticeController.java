@@ -1,5 +1,6 @@
 package com.yellobook.domain.notice.controller;
 
+import com.yellobook.domain.notice.service.NoticeCommandService;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Tag(name = " \uD83C\uDFE2 공지 & 업무" , description = "Announce & Work API")
 public class NoticeController {
+    private final NoticeCommandService noticeCommandService;
 
     @Operation(summary = "공지/업무 삭제")
     @DeleteMapping("/{noticeId}")
@@ -22,6 +24,7 @@ public class NoticeController {
             @PathVariable("teamId") Long teamId,
             @PathVariable("noticeId") Long noticeId
     ){
+        //noticeCommandService.deleteNotice(teamId, noticeId);
         return null;
     }
 
