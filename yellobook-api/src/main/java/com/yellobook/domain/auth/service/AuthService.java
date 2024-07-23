@@ -33,4 +33,16 @@ public class AuthService {
         String newAccessToken = jwtService.createAccessToken(memberId);
         return TokenResponse.builder().accessToken(newAccessToken).build();
     }
+
+    public void logout() {
+
+    }
+
+    public void deactivate() {
+        // 멤버 상태 비활성화 & dirty checking
+    }
+
+    public void agreeTerm() {
+        // 수정 & dirty checking
+    }
 }
