@@ -2,6 +2,8 @@ package com.yellobook.domain.inventory.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Builder
 @AllArgsConstructor
@@ -9,7 +11,7 @@ import lombok.*;
 public class GetTotalInventoryResponse {
     private Long page;
     private Long size;
-    private InventoryInfo inventories;
+    private List<InventoryInfo> inventories;
 
     @Getter
     @Builder

@@ -12,13 +12,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class InventoryQueryServiceImpl implements InventoryQueryService{
-    private InventoryRepository inventoryRepository;
-    private ProductRepository productRepository;
-
+    private final InventoryRepository inventoryRepository;
+    private final ProductRepository productRepository;
 
     @Override
-    public GetTotalInventoryResponse getTotalInventory(Long page, Long size, Long teamId) {
+    public GetTotalInventoryResponse getTotalInventory(Integer page, Integer size, Long teamId) {
         // querydsl 사용 + 페이징
+        // Pageable pageable = PageRequest.of(page-1, size);
         // inventoryRepository.getTotalInventory(pageable, teamId);
         return null;
     }

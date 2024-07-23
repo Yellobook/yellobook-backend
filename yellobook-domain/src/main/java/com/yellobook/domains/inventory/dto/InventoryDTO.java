@@ -6,7 +6,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class InventoryDto {
+public class InventoryDTO {
     private Long inventoryId;
     private String title;
     private String createdAt;

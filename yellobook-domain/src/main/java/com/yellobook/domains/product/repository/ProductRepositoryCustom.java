@@ -1,10 +1,10 @@
 package com.yellobook.domains.product.repository;
 
-import com.yellobook.domains.product.ProductDto;
+import com.yellobook.domains.product.dto.ProductDTO;
 
 import java.util.List;
 
 public interface ProductRepositoryCustom {
-    List<ProductDto> getProducts(Long inventoryId);
-    List<ProductDto> getProducts(Long inventoryId, String keyword);
+    List<ProductDTO> getProducts(Long inventoryId);
+    List<ProductDTO> getProducts(Long inventoryId, String keyword);
 }

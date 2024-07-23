@@ -1,4 +1,4 @@
-package com.yellobook.domains.product;
+package com.yellobook.domains.product.dto;
 
 import lombok.*;
 
@@ -6,7 +6,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProductDto {
+public class ProductDTO {
     private Long productId;
     private String name;
     private String subProduct;
