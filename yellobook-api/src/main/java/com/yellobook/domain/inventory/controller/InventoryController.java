@@ -1,6 +1,5 @@
 package com.yellobook.domain.inventory.controller;
 
-import com.yellobook.common.anonotation.ApiV1Controller;
 import com.yellobook.domain.inventory.dto.AddProductRequest;
 import com.yellobook.domain.inventory.dto.GetProductsResponse;
 import com.yellobook.domain.inventory.dto.GetTotalInventoryResponse;
