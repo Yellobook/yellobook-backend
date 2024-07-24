@@ -17,16 +17,16 @@ public class InventoryCommandService{
     private final ProductRepository productRepository;
 
 
-    public void addProduct(Long teamId, Long inventoryId, AddProductRequest requestDTO, CustomOAuth2User oAuth2User) {
+    public void addProduct(Long inventoryId, AddProductRequest requestDTO, CustomOAuth2User oAuth2User) {
         // 연관관계 추가하고, 제품 등록
         //productRepository.save(newProduct);
     }
 
-    public void modifyProductAmount(Long teamId, Long productId, ModifyProductAmountRequest requestDTO, CustomOAuth2User user) {
+    public void modifyProductAmount(Long productId, ModifyProductAmountRequest requestDTO, CustomOAuth2User user) {
         // 수정하고, dirty checking
     }
 
-    public void deleteProduct(Long teamId, Long productId, CustomOAuth2User user) {
+    public void deleteProduct(Long productId, CustomOAuth2User user) {
         //productRepository.deleteById(productId);
     }
 

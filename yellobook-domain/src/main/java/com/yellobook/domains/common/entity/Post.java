@@ -28,8 +28,8 @@ public abstract class Post extends BaseEntity {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_id", nullable = false)
-    private Team teamspace;
+    @JoinColumn(name = "team_id")
+    private Team team;
 
     @Column(nullable = false)
     private Integer view;
