@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class WorkService {
+public class WorkQueryServiceImpl {
     private final WorkRepository workRepository;
     private final WorkCommentRepository workCommentRepository;
 }
