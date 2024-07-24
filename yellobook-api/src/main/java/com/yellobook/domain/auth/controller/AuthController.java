@@ -51,13 +51,4 @@ public class AuthController {
         return null;
     }
 
-    @Operation(summary = "약관 동의")
-    @PatchMapping("/terms")
-    public ResponseEntity<SuccessResponse<String>> agreeTerm(
-            @AuthenticationPrincipal CustomOAuth2User oAuth2User
-    ){
-        authService.agreeTerm(oAuth2User);
-        return null;
-    }
-
 }

@@ -1,8 +1,8 @@
 package com.yellobook.domain.auth.service;
 
+import com.yellobook.domain.auth.dto.TokenResponse;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.error.code.AuthErrorCode;
-import com.yellobook.domain.auth.dto.TokenResponse;
 import com.yellobook.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +43,4 @@ public class AuthService {
         // 멤버 상태 비활성화 & dirty checking
     }
 
-    public void agreeTerm(CustomOAuth2User oAuth2User) {
-        // 수정 & dirty checking
-    }
 }
