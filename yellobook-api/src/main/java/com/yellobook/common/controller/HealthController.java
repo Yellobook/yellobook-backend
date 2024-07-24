@@ -5,10 +5,12 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
-@RestController("/api/v1")
+@RestController
+@RequestMapping("/api/v1")
 @SecurityRequirement(name = "")
 @Tag(name = "✅ 헬스체크", description = "Health Check Endpoint")
 public class HealthController {
