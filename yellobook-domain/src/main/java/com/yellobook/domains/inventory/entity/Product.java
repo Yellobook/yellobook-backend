@@ -1,6 +1,8 @@
 package com.yellobook.domains.inventory.entity;
 
 import com.yellobook.domains.common.entity.BaseEntity;
+import com.yellobook.domains.inventory.entity.Inventory;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 
