@@ -12,8 +12,18 @@ public class WorkResponse {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class PostWorkResponseDTO {
+    public static class CreateWorkResponseDTO {
         private Long workId;
         private LocalDateTime createdAt;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RemoveWorkResponseDTO {
+        private Long workId;
+    }
+
+
 }

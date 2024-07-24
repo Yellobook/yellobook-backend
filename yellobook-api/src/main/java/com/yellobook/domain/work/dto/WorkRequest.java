@@ -13,7 +13,7 @@ public class WorkRequest {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class PostWorkRequestDTO{
+    public static class CreateWorkRequestDTO {
         private String title;
         private String memo;
         private List<Long> mentioned;

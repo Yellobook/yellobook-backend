@@ -13,7 +13,15 @@ public class AnnounceResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class PostAnnounceResponseDTO {
-        private Long workId;
+        private Long AnnounceId;
         private LocalDateTime createdAt;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RemoveAnnounceResponseDTO {
+        private Long AnnounceId;
     }
 }

@@ -28,4 +28,14 @@ public class AnnounceController {
     ){
         return null;
     }
+
+    @DeleteMapping("/{teamId}/{announceId}")
+    @Operation(summary = "공지 삭제 API", description = "등록된 공지를 삭제하는 API 입니다.")
+    public ResponseEntity<SuccessResponse<AnnounceResponse.RemoveAnnounceResponseDTO>> removeAnnounce(
+            @PathVariable Long teamId,
+            @PathVariable Long announceId,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
+    ){
+        return null;
+    }
 }

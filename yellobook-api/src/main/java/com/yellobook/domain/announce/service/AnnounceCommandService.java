@@ -5,4 +5,5 @@ import com.yellobook.domains.announce.entity.Announce;
 
 public interface AnnounceCommandService {
     Announce createAnnounce(Long teamId, Long memberId, AnnounceRequest.PostAnnounceRequestDTO request);
+    Boolean deleteAnnounce(Long teamId, Long memberId, Long announceId);
 }
