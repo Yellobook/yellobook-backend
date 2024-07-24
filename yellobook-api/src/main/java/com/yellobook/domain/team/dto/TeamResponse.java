@@ -37,4 +37,13 @@ public class TeamResponse {
         @Schema(description = "나간 팀의 고유 id", example = "1234")
         private Long teamId;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class JoinTeamResponseDTO {
+        @Schema(description = "합류한 팀의 고유 id", example = "12345")
+        private Long teamId;
+    }
 }

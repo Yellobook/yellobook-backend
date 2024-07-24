@@ -29,4 +29,13 @@ public class TeamRequest {
         @Schema(description = "피초대자 권한", example = "VIEWER")
         private MemberTeamRole role;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class JoinTeamRequestDTO {
+        @Schema(description = "입장자의 역할", example = "VIEWER")
+        private MemberTeamRole role;
+    }
 }
