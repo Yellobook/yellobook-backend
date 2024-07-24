@@ -58,4 +58,13 @@ public class TeamController {
     ){
         return null;
     }
+
+    @GetMapping("/{teamId}")
+    @Operation(summary = "다른 팀 불러오기 API", description = "멤버가 다른 팀의 정보를 가지고 오는 API입니다.")
+    public ResponseEntity<SuccessResponse<TeamResponse.GetTeamResponseDTO>> getTeam(
+            @PathVariable Long teamId,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
+    ){
+        return null;
+    }
 }

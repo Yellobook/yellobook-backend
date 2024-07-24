@@ -46,4 +46,19 @@ public class TeamResponse {
         @Schema(description = "합류한 팀의 고유 id", example = "12345")
         private Long teamId;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class GetTeamResponseDTO {
+        @Schema(description = "가져오는 팀의 고유 id",example = "123")
+        private Long teamId;
+        @Schema(description = "가져오는 팀의 이름", example ="나이키")
+        private String name;
+        @Schema(description = "가져오는 팀의 전화번호", example ="012345678")
+        private String phone;
+        @Schema(description = "가져오는 팀의 주소", example ="서울특별시 강남구")
+        private String address;
+    }
 }
