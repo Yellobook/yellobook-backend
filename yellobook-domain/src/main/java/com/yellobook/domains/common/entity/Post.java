@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
 @Table(name = "posts")
@@ -22,7 +24,7 @@ public abstract class Post extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -34,4 +36,7 @@ public abstract class Post extends BaseEntity {
 
     @Column(length = 200)
     private String memo;
+
+    @Column(nullable = false)
+    private LocalDate date;
 }
