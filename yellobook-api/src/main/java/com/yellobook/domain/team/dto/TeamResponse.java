@@ -28,4 +28,13 @@ public class TeamResponse {
         @Schema(description = "팀 초대 링크 URL", example = "https://~")
         private String inviteUrl;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LeaveTeamResponseDTO {
+        @Schema(description = "나간 팀의 고유 id", example = "1234")
+        private Long teamId;
+    }
 }

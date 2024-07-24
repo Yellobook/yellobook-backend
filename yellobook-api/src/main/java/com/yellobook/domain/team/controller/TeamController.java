@@ -39,4 +39,13 @@ public class TeamController {
         teamCommandService.inviteTeam(request);
         return null;
     }
+
+    @DeleteMapping("{teamId}/leave")
+    @Operation(summary = "팀 나가기 API", description = "팀원이 본인이 속한 팀에서 나가기 위한 API입니다.")
+    public ResponseEntity<SuccessResponse<TeamResponse.LeaveTeamResponseDTO>> leaveTeam(
+            @PathVariable Long teamId,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
+    ){
+        return null;
+    }
 }
