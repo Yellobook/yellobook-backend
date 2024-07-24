@@ -20,4 +20,9 @@ public class MemberQueryServiceImpl implements MemberQueryService {
         return memberRepository.findById(memberId);
 
     }
+
+    @Override
+    public Boolean getAllowanceById(Long memberId) {
+        return memberRepository.findById(memberId).map(Member::getAllowance).orElse(false);
+    }
 }

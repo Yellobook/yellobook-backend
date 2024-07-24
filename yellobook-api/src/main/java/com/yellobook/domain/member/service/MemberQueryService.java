@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface MemberQueryService {
     Optional<Member> findById(Long memberId);
+    Boolean getAllowanceById(Long memberId);
 }

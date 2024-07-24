@@ -29,4 +29,13 @@ public class MemberController {
         memberQueryService.findById(customOAuth2User.getMemberId());
         return null;
     }
+
+    @GetMapping("/allowance")
+    @Operation(summary = "멤버의 약관 동의 여부 조회 API", description = "로그인을 한 멤버의 약관 동의 여부를 조회하는 API입니다.")
+    public ResponseEntity<SuccessResponse<MemberResponse.AllowanceResponseDTO>> getMemberAllowance(
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
+    ){
+        memberQueryService.getAllowanceById(customOAuth2User.getMemberId());
+        return null;
+    }
 }
