@@ -38,4 +38,14 @@ public class WorkController {
     ){
         return null;
     }
+
+    @GetMapping("/{teamId}/{workId}")
+    @Operation(summary = "업무 조회 API", description = "등록된 업무를 조회하는 API 입니다.")
+    public ResponseEntity<SuccessResponse<WorkResponse.GetWorkResponseDTO>> getWork(
+            @PathVariable Long teamId,
+            @PathVariable Long workId,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
+    ){
+        return null;
+    }
 }

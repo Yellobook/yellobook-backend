@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
 
 public class AnnounceResponse {
     @Builder
@@ -23,5 +25,17 @@ public class AnnounceResponse {
     @AllArgsConstructor
     public static class RemoveAnnounceResponseDTO {
         private Long AnnounceId;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class GetAnnounceResponseDTO {
+        private String title;
+        private String memo;
+        private int view;
+        private List<AnnounceCommentResponse.CommentResponseDTO> comments;
+        private Date date;
     }
 }

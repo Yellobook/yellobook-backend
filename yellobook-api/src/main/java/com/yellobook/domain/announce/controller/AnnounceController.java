@@ -38,4 +38,14 @@ public class AnnounceController {
     ){
         return null;
     }
+
+    @GetMapping("/{teamId}/{announceId}")
+    @Operation(summary = "공지 조회 API", description = "등록된 공지를 조회하는 API 입니다.")
+    public ResponseEntity<SuccessResponse<AnnounceResponse.GetAnnounceResponseDTO>> getAnnounce(
+            @PathVariable Long teamId,
+            @PathVariable Long announceId,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
+    ){
+        return null;
+    }
 }
