@@ -12,7 +12,7 @@ public class WorkCommandService {
     private final WorkRepository workRepository;
     private final WorkCommentRepository workCommentRepository;
 
-    public void deleteWork(Long teamId, Long workId, CustomOAuth2User oAuth2User) {
+    public void deleteWork(Long workId, CustomOAuth2User oAuth2User) {
 
         //workRepository.deleteById(workId);
     }

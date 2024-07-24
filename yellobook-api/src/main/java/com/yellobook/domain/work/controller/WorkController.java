@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/work/{teamId}")
+@RequestMapping("/api/v1/work")
 @Tag(name = "\uD83D\uDCBC 업무", description = "Work API")
 public class WorkController {
     private final WorkCommandService workCommandService;
@@ -23,11 +23,10 @@ public class WorkController {
     @Operation(summary = "업무 삭제")
     @DeleteMapping("/{workId}")
     public ResponseEntity<SuccessResponse<String>> deleteWork(
-            @PathVariable("teamId") Long teamId,
             @PathVariable("workId") Long workId,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
-        workCommandService.deleteWork(teamId, workId, oAuth2User);
+        workCommandService.deleteWork(workId, oAuth2User);
         return null;
     }
 }

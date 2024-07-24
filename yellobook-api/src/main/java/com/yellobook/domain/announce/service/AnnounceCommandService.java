@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AnnounceCommandService {
     private final AnnounceRepository announceRepository;
 
-    public void deleteAnnounce(Long teamId, Long announceId, CustomOAuth2User oAuth2User){
+    public void deleteAnnounce(Long announceId, CustomOAuth2User oAuth2User){
 
         //announceRepository.deleteById(announceId);
     }

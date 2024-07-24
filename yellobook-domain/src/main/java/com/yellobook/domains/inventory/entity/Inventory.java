@@ -28,4 +28,10 @@ public class Inventory extends BaseEntity {
      */
     @Column(nullable = false)
     private String title;
+
+    /**
+     * 조회수
+     */
+    @Column(nullable = false)
+    private Integer view;
 }

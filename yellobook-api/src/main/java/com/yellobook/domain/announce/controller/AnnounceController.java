@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/announce/{teamId}")
+@RequestMapping("/api/v1/announce")
 @Tag(name = "\uD83D\uDCE2 공지", description = "Announce API")
 public class AnnounceController {
     private final AnnounceCommandService announceCommandService;
@@ -23,11 +23,10 @@ public class AnnounceController {
     @Operation(summary = "공지 삭제")
     @DeleteMapping("/{announceId}")
     public ResponseEntity<SuccessResponse<String>> deleteAnnounce(
-            @PathVariable("teamId") Long teamId,
             @PathVariable("announceId") Long announceId,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
-        announceCommandService.deleteAnnounce(teamId, announceId, oAuth2User);
+        announceCommandService.deleteAnnounce(announceId, oAuth2User);
         return null;
     }
 
