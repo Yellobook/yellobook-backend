@@ -2,7 +2,7 @@ package com.yellobook.domain.auth.security.oauth2.handler;
 
 import com.yellobook.domain.auth.service.JwtService;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
-import com.yellobook.domain.auth.security.oauth2.utils.CookieUtil;
+import com.yellobook.domain.auth.service.CookieService;
 import com.yellobook.enums.MemberRole;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,7 +20,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final JwtService jwtService;
-    private final CookieUtil cookieUtil;
+    private final CookieService cookieService;
 
     @Value("${frontend.auth-redirect-url}")
     private String authRedirectUrl;
@@ -33,8 +33,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // jwt 생성
         String accessToken = jwtService.createAccessToken(memberId);
         String refreshToken = jwtService.createRefreshToken(memberId);
-        response.addCookie(cookieUtil.createAccessTokenCookie(accessToken));
-        response.addCookie(cookieUtil.createRefreshTokenCookie(refreshToken));
+        response.addCookie(cookieService.createAccessTokenCookie(accessToken));
+        response.addCookie(cookieService.createRefreshTokenCookie(refreshToken));
         response.sendRedirect(authRedirectUrl);
     }
 }

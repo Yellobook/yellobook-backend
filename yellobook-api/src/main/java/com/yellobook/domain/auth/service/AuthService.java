@@ -1,5 +1,6 @@
 package com.yellobook.domain.auth.service;
 
+import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.error.code.AuthErrorCode;
 import com.yellobook.domain.auth.dto.TokenResponse;
 import com.yellobook.error.exception.CustomException;
@@ -34,15 +35,15 @@ public class AuthService {
         return TokenResponse.builder().accessToken(newAccessToken).build();
     }
 
-    public void logout() {
-
+    public void logout(CustomOAuth2User oAuth2User) {
+        // 토큰 삭제
     }
 
-    public void deactivate() {
+    public void deactivate(CustomOAuth2User oAuth2User) {
         // 멤버 상태 비활성화 & dirty checking
     }
 
-    public void agreeTerm() {
+    public void agreeTerm(CustomOAuth2User oAuth2User) {
         // 수정 & dirty checking
     }
 }

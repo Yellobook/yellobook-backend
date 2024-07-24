@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 import java.util.Map;
@@ -79,16 +78,7 @@ public class SwaggerConfig {
                                                                 .type("object")
                                                                 .example(Map.of(
                                                                         "Set-Cookie", "accessToken=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c; Max-Age=3600; Path=/; Domain=yellobook.site; HttpOnly=false; Secure=false, refreshToken=dGhpcy1pcy1hLXRlc3QtcmVmcmVzaC10b2tlbg; Max-Age=3600; Path=/; Domain=yellobook.site; HttpOnly=false; Secure=false"
-                                                                )))))))))
-                // JWT 인증 좌물쇠 제거
-                .path("/api/v1/health", new PathItem()
-                        .get(new Operation().security(List.of()))
-                )
-                .path("/api/v1/", new PathItem()
-                        .get(new Operation().security(List.of())))
-                .path("/api/v1/reissue", new PathItem()
-                        .post(new Operation().security(List.of())))
-                ;
+                                                                )))))))));
     }
 
     private Info getInfo() {
