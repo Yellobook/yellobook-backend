@@ -14,6 +14,7 @@ import lombok.*;
 public class Inventory extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     /**
      * 재고현황 사용 팀
      */
@@ -27,4 +28,10 @@ public class Inventory extends BaseEntity {
      */
     @Column(nullable = false)
     private String title;
+
+    /**
+     * 조회수
+     */
+    @Column(nullable = false)
+    private Integer view;
 }

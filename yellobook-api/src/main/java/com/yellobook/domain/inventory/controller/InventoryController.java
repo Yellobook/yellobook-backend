@@ -1,8 +1,10 @@
 package com.yellobook.domain.inventory.controller;
 
+import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.inventory.dto.AddProductRequest;
 import com.yellobook.domain.inventory.dto.GetProductsResponse;
 import com.yellobook.domain.inventory.dto.GetTotalInventoryResponse;
+import com.yellobook.domain.inventory.dto.ModifyProductAmountRequest;
 import com.yellobook.domain.inventory.service.InventoryCommandService;
 import com.yellobook.domain.inventory.service.InventoryQueryService;
 import com.yellobook.response.SuccessResponse;
@@ -10,11 +12,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/inventories/{teamId}")
-@Tag(name = " \uD83D\uDCE6 재고현황", description = "Inventory API")
+@RequestMapping("api/v1/inventories/{teamId}")
+@Tag(name = " \uD83D\uDCE6 재고현황", description = "Inventory & Product API")
 @RequiredArgsConstructor
 public class InventoryController {
 
@@ -26,7 +29,8 @@ public class InventoryController {
     public ResponseEntity<SuccessResponse<GetTotalInventoryResponse>> getTotalInventory(
             @PathVariable("teamId") Long teamId,
             @RequestParam("page") Integer page,
-            @RequestParam("size") Integer size
+            @RequestParam("size") Integer size,
+            @AuthenticationPrincipal CustomOAuth2User user
     ){
         inventoryQueryService.getTotalInventory(page, size, teamId);
         return null;
@@ -36,7 +40,8 @@ public class InventoryController {
     @GetMapping("/{inventoryId}")
     public ResponseEntity<SuccessResponse<GetProductsResponse>> getProductsByInventory(
             @PathVariable("teamId") Long teamId,
-            @PathVariable("inventoryId") Long inventoryId
+            @PathVariable("inventoryId") Long inventoryId,
+            @AuthenticationPrincipal CustomOAuth2User user
     ){
         inventoryQueryService.getProductsByInventory(teamId, inventoryId);
         return null;
@@ -47,9 +52,10 @@ public class InventoryController {
     public ResponseEntity<SuccessResponse<GetProductsResponse>> getProductByKeywordAndInventory(
             @PathVariable("teamId") Long teamId,
             @PathVariable("inventoryId") Long inventoryId,
-            @RequestParam("keyword") String keyword
+            @RequestParam("keyword") String keyword,
+            @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
-        inventoryQueryService.getProductByKeywordAndInventory(teamId, inventoryId, keyword);
+        inventoryQueryService.getProductByKeywordAndInventory(teamId, inventoryId, keyword, oAuth2User);
         return null;
     }
 
@@ -58,9 +64,33 @@ public class InventoryController {
     public ResponseEntity<SuccessResponse<String>> addProduct(
             @PathVariable("teamId") Long teamId,
             @PathVariable("inventoryId") Long inventoryId,
-            @RequestBody AddProductRequest requestDTO
+            @RequestBody AddProductRequest requestDTO,
+            @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
-        inventoryCommandService.addProduct(teamId, inventoryId, requestDTO);
+        inventoryCommandService.addProduct(teamId, inventoryId, requestDTO, oAuth2User);
+        return null;
+    }
+
+    @Operation(summary = "[관리자] 특정 제품 수량 수정")
+    @PutMapping("/products/{productId}")
+    public ResponseEntity<SuccessResponse<String>> modifyProductAmount(
+            @PathVariable("teamId") Long teamId,
+            @PathVariable("productId") Long productId,
+            @RequestBody ModifyProductAmountRequest requestDTO,
+            @AuthenticationPrincipal CustomOAuth2User oAuth2User
+    ){
+        inventoryCommandService.modifyProductAmount(teamId, productId, requestDTO, oAuth2User);
+        return null;
+    }
+
+    @Operation(summary = "[관리자] 특정 제품 삭제")
+    @DeleteMapping("/products/{productId}")
+    public ResponseEntity<SuccessResponse<String>> deleteProduct(
+            @PathVariable("teamId") Long teamId,
+            @PathVariable("productId") Long productId,
+            @AuthenticationPrincipal CustomOAuth2User oAuth2User
+    ){
+        inventoryCommandService.deleteProduct(teamId, productId, oAuth2User);
         return null;
     }
 }
