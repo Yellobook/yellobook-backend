@@ -1,7 +1,7 @@
 package com.yellobook.domain.product.service;
 
 import com.yellobook.domain.inventory.dto.ModifyProductAmountRequest;
-import com.yellobook.domains.product.repository.ProductRepository;
+import com.yellobook.domains.inventory.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

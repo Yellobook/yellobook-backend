@@ -3,7 +3,7 @@ package com.yellobook.domain.inventory.service;
 import com.yellobook.domain.inventory.dto.GetProductsResponse;
 import com.yellobook.domain.inventory.dto.GetTotalInventoryResponse;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
-import com.yellobook.domains.product.repository.ProductRepository;
+import com.yellobook.domains.inventory.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
