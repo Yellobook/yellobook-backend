@@ -1,6 +1,7 @@
 package com.yellobook.domain.work.service;
 
 import com.yellobook.domains.work.entity.Work;
+import com.yellobook.domains.work.entity.WorkComment;
 import com.yellobook.domains.work.repository.WorkCommentRepository;
 import com.yellobook.domains.work.repository.WorkRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,11 @@ public class WorkQueryServiceImpl implements WorkQueryService {
 
     @Override
     public Work getWorkById(Long workId){
+        return null;
+    }
+
+    @Override
+    public WorkComment getWorkCommentById(Long workId){
         return null;
     }
 }

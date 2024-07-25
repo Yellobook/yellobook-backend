@@ -60,4 +60,13 @@ public class WorkController {
             ){
         return null;
     }
+
+    @GetMapping("{workId}/comment")
+    @Operation(summary = "댓글 가져오기 API", description = "작성된 댓글을 가져오는 API입니다.")
+    public ResponseEntity<SuccessResponse<WorkCommentResponse.CommentResponseDTO>> getComment(
+            @PathVariable("workId") Long workId,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
+    ){
+        return null;
+    }
 }

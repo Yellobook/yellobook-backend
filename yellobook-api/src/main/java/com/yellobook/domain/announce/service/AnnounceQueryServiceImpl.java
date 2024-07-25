@@ -1,6 +1,7 @@
 package com.yellobook.domain.announce.service;
 
 import com.yellobook.domains.announce.entity.Announce;
+import com.yellobook.domains.announce.entity.AnnounceComment;
 import com.yellobook.domains.announce.repository.AnnounceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,11 @@ public class AnnounceQueryServiceImpl implements AnnounceQueryService {
 
     @Override
     public Announce findById(Long announceId){
+        return null;
+    }
+
+    @Override
+    public AnnounceComment findCommentById(Long announceId){
         return null;
     }
 }
