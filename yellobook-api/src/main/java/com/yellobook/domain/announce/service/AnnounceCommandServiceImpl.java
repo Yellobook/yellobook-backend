@@ -1,6 +1,7 @@
 package com.yellobook.domain.announce.service;
 
 import com.yellobook.domain.announce.dto.AnnounceRequest;
+import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.announce.entity.Announce;
 import com.yellobook.domains.announce.repository.AnnounceRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ public class AnnounceCommandServiceImpl implements AnnounceCommandService {
     }
 
     @Override
-    public Boolean deleteAnnounce(Long memberId, Long announceId){
-        return null;
+    public void deleteAnnounce(Long memberId, CustomOAuth2User oauth2User){
+
     }
 }

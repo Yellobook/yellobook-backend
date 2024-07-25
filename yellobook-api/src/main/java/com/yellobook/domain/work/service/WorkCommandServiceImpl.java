@@ -1,5 +1,6 @@
 package com.yellobook.domain.work.service;
 
+import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.work.dto.WorkRequest;
 import com.yellobook.domains.work.entity.Work;
 import com.yellobook.domains.work.repository.WorkRepository;
@@ -18,7 +19,7 @@ public class WorkCommandServiceImpl implements WorkCommandService {
     }
 
     @Override
-    public Boolean deleteWork(Long memberId, Long workId){
-        return null;
+    public void deleteWork(Long workId, CustomOAuth2User oAuth2User){
+
     }
 }
