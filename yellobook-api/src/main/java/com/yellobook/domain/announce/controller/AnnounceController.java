@@ -63,7 +63,7 @@ public class AnnounceController {
     @Operation(summary = "댓글 가져오기 API", description = "작성된 댓글을 가져오는 API입니다.")
     public ResponseEntity<SuccessResponse<AnnounceResponse.GetAnnounceResponseDTO>> getAnnounceComment(
             @PathVariable("announceId") Long announceId,
-            @AuthenticationPrincipal CustomOAuth2User oAuth2User,
+            @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
         return null;
     }
