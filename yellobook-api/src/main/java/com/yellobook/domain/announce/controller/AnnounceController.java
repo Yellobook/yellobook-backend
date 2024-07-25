@@ -1,5 +1,6 @@
 package com.yellobook.domain.announce.controller;
 
+import com.yellobook.domain.announce.dto.AnnounceCommentRequest;
 import com.yellobook.domain.announce.dto.AnnounceRequest;
 import com.yellobook.domain.announce.dto.AnnounceResponse;
 import com.yellobook.domain.announce.service.AnnounceCommandService;
@@ -45,6 +46,16 @@ public class AnnounceController {
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
         announceCommandService.deleteAnnounce(announceId, oAuth2User);
+        return null;
+    }
+
+    @Operation(summary = "댓글 작성 API", description = "댓글을 작성하는 API입니다.")
+    @PostMapping("/{announceId}/comment")
+    public ResponseEntity<SuccessResponse<AnnounceResponse.PostAnnounceResponseDTO>> postAnnounceComment(
+            @PathVariable("announceId") Long announceId,
+            @AuthenticationPrincipal CustomOAuth2User oAuth2User,
+            @RequestBody AnnounceCommentRequest.PostCommentRequestDTO request
+    ){
         return null;
     }
 }

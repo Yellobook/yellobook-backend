@@ -1,6 +1,8 @@
 package com.yellobook.domain.work.controller;
 
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
+import com.yellobook.domain.work.dto.WorkCommentRequest;
+import com.yellobook.domain.work.dto.WorkCommentResponse;
 import com.yellobook.domain.work.dto.WorkRequest;
 import com.yellobook.domain.work.dto.WorkResponse;
 import com.yellobook.domain.work.service.WorkCommandService;
@@ -46,6 +48,16 @@ public class WorkController {
             @PathVariable("workId") Long workId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
+        return null;
+    }
+
+    @PostMapping("/{workId}/comment")
+    @Operation(summary = "댓글 작성 API", description = "댓글을 작성하는 API입니다.")
+    public ResponseEntity<SuccessResponse<WorkCommentResponse.PostCommentResponseDTO>> createComment(
+            @PathVariable("workId") Long workId,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+            @RequestBody WorkCommentRequest.PostCommentRequestDTO request
+            ){
         return null;
     }
 }

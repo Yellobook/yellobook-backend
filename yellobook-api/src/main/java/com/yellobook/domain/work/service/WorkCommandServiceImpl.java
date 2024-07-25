@@ -1,8 +1,10 @@
 package com.yellobook.domain.work.service;
 
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
+import com.yellobook.domain.work.dto.WorkCommentRequest;
 import com.yellobook.domain.work.dto.WorkRequest;
 import com.yellobook.domains.work.entity.Work;
+import com.yellobook.domains.work.entity.WorkComment;
 import com.yellobook.domains.work.repository.WorkRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,5 +23,10 @@ public class WorkCommandServiceImpl implements WorkCommandService {
     @Override
     public void deleteWork(Long workId, CustomOAuth2User oAuth2User){
 
+    }
+
+    @Override
+    public WorkComment createComment(Long memberId, CustomOAuth2User oauth2User, WorkCommentRequest.PostCommentRequestDTO request){
+        return null;
     }
 }
