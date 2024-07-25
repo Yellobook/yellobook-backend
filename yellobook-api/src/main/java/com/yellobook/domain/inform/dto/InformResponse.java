@@ -1,5 +1,6 @@
 package com.yellobook.domain.inform.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,10 +33,17 @@ public class InformResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class GetInformResponseDTO {
+        @Schema(description = "가지고 오는 글의 제목")
         private String title;
+        @Schema(description = "가지고 오는 글에 있는 메모")
         private String memo;
+        @Schema(description = "함께 하는 멤버")
+        private List<Long> mentioned;
+        @Schema(description = "조회수")
         private int view;
+        @Schema(description = "댓글")
         private List<InformCommentResponse.CommentResponseDTO> comments;
+        @Schema(description = "날짜")
         private Date date;
     }
 
