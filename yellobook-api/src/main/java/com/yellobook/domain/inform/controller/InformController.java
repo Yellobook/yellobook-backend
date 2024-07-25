@@ -24,7 +24,7 @@ public class InformController {
     private final InformCommandService informCommandService;
 
     @PostMapping("/")
-    @Operation(summary = "업무 작성 API", description = "업무를 생성하는 API 입니다.")
+    @Operation(summary = "업무 및 공지 작성 API", description = "업무 및 공지를 생성하는 API 입니다.")
     public ResponseEntity<SuccessResponse<InformResponse.CreateInformResponseDTO>> createInform(
             @RequestBody InformRequest.CreateInformRequestDTO request,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
@@ -32,7 +32,7 @@ public class InformController {
         return null;
     }
 
-    @Operation(summary = "업무 삭제")
+    @Operation(summary = "업무(공지) 삭제")
     @DeleteMapping("/{informId}")
     public ResponseEntity<SuccessResponse<String>> deleteInform(
             @PathVariable("informId") Long informId,
@@ -43,7 +43,7 @@ public class InformController {
     }
 
     @GetMapping("/{informId}")
-    @Operation(summary = "업무 조회 API", description = "등록된 업무를 조회하는 API 입니다.")
+    @Operation(summary = "업무(공지) 조회 API", description = "등록된 업무(공지)를 조회하는 API 입니다.")
     public ResponseEntity<SuccessResponse<InformResponse.GetInformResponseDTO>> getInform(
             @PathVariable("informId") Long informId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
