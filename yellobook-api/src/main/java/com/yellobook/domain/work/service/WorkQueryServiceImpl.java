@@ -15,7 +15,7 @@ public class WorkQueryServiceImpl implements WorkQueryService {
     private final WorkCommentRepository workCommentRepository;
 
     @Override
-    public Work getWorkById(Long teamId, Long workId){
+    public Work getWorkById(Long workId){
         return null;
     }
 }

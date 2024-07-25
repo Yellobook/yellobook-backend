@@ -13,7 +13,7 @@ public class AnnounceQueryServiceImpl implements AnnounceQueryService {
     private final AnnounceRepository announceRepository;
 
     @Override
-    public Announce findById(Long teamId, Long announceId){
+    public Announce findById(Long announceId){
         return null;
     }
 }
