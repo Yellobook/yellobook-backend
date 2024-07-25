@@ -13,12 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class WorkCommandServiceImpl implements WorkCommandService {
     private final WorkRepository workRepository;
     @Override
-    public Work createWork(Long teamId, Long memberId, WorkRequest.CreateWorkRequestDTO request){
+    public Work createWork(Long memberId, WorkRequest.CreateWorkRequestDTO request){
         return null;
     }
 
     @Override
-    public Boolean deleteWork(Long teamId, Long memberId, Long workId){
+    public Boolean deleteWork(Long memberId, Long workId){
         return null;
     }
 }

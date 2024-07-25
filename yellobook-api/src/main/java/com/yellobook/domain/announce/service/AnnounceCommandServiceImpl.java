@@ -14,12 +14,12 @@ public class AnnounceCommandServiceImpl implements AnnounceCommandService {
     private final AnnounceRepository announceRepository;
 
     @Override
-    public Announce createAnnounce(Long teamId, Long memberId, AnnounceRequest.PostAnnounceRequestDTO request){
+    public Announce createAnnounce(Long memberId, AnnounceRequest.PostAnnounceRequestDTO request){
         return null;
     }
 
     @Override
-    public Boolean deleteAnnounce(Long teamId, Long memberId, Long announceId){
+    public Boolean deleteAnnounce(Long memberId, Long announceId){
         return null;
     }
 }

@@ -19,30 +19,27 @@ import org.springframework.web.bind.annotation.*;
 public class AnnounceController {
     private final AnnounceRepository announceRepository;
 
-    @PostMapping("/{teamId}")
+    @PostMapping("/")
     @Operation(summary = "공지 작성 API", description = "공지를 생성하는 API 입니다.")
     public ResponseEntity<SuccessResponse<AnnounceResponse.PostAnnounceResponseDTO>> postAnnounce(
-            @PathVariable Long teamId,
             @RequestBody AnnounceRequest.PostAnnounceRequestDTO request,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
         return null;
     }
 
-    @DeleteMapping("/{teamId}/{announceId}")
+    @DeleteMapping("/{announceId}")
     @Operation(summary = "공지 삭제 API", description = "등록된 공지를 삭제하는 API 입니다.")
     public ResponseEntity<SuccessResponse<AnnounceResponse.RemoveAnnounceResponseDTO>> removeAnnounce(
-            @PathVariable Long teamId,
             @PathVariable Long announceId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
         return null;
     }
 
-    @GetMapping("/{teamId}/{announceId}")
+    @GetMapping("/{announceId}")
     @Operation(summary = "공지 조회 API", description = "등록된 공지를 조회하는 API 입니다.")
     public ResponseEntity<SuccessResponse<AnnounceResponse.GetAnnounceResponseDTO>> getAnnounce(
-            @PathVariable Long teamId,
             @PathVariable Long announceId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
