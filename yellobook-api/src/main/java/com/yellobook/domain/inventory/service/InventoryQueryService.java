@@ -10,8 +10,6 @@ import com.yellobook.domains.inventory.dto.InventoryDTO;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
 import com.yellobook.enums.MemberTeamRole;
-import com.yellobook.error.code.AuthErrorCode;
-import com.yellobook.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

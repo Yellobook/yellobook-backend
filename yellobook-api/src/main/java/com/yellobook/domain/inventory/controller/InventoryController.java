@@ -3,10 +3,7 @@ package com.yellobook.domain.inventory.controller;
 import com.yellobook.common.annotation.ExistInventory;
 import com.yellobook.common.annotation.ExistProduct;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
-import com.yellobook.domain.inventory.dto.AddProductRequest;
-import com.yellobook.domain.inventory.dto.GetProductsResponse;
-import com.yellobook.domain.inventory.dto.GetTotalInventoryResponse;
-import com.yellobook.domain.inventory.dto.ModifyProductAmountRequest;
+import com.yellobook.domain.inventory.dto.*;
 import com.yellobook.domain.inventory.service.InventoryCommandService;
 import com.yellobook.domain.inventory.service.InventoryQueryService;
 import com.yellobook.response.ResponseFactory;
@@ -36,7 +33,7 @@ public class InventoryController {
             @RequestParam("size") Integer size,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
-        //log.info("memberId: {}", oAuth2User.getMemberId());
+        log.info("memberId: {}", oAuth2User.getMemberId());
         GetTotalInventoryResponse response = inventoryQueryService.getTotalInventory(page, size, oAuth2User);
         return ResponseFactory.success(response);
     }
@@ -64,13 +61,13 @@ public class InventoryController {
 
     @Operation(summary = "[관리자] 제품 추가")
     @PostMapping("/{inventoryId}")
-    public ResponseEntity<SuccessResponse<String>> addProduct(
+    public ResponseEntity<SuccessResponse<AddProductResponse>> addProduct(
             @ExistInventory @PathVariable("inventoryId") Long inventoryId,
             @RequestBody AddProductRequest requestDTO,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
-        inventoryCommandService.addProduct(inventoryId, requestDTO, oAuth2User);
-        return null;
+        AddProductResponse response = inventoryCommandService.addProduct(inventoryId, requestDTO, oAuth2User);
+        return ResponseFactory.success(response);
     }
 
     @Operation(summary = "[관리자] 특정 제품 수량 수정")
@@ -81,7 +78,7 @@ public class InventoryController {
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
         inventoryCommandService.modifyProductAmount(productId, requestDTO, oAuth2User);
-        return null;
+        return ResponseFactory.success("제품의 수량을 성공적으로 수정했습니다");
     }
 
     @Operation(summary = "[관리자] 특정 제품 삭제")
@@ -91,6 +88,6 @@ public class InventoryController {
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
         inventoryCommandService.deleteProduct(productId, oAuth2User);
-        return null;
+        return ResponseFactory.success("제품을 성공적으로 삭제했습니다.");
     }
 }

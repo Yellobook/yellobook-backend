@@ -3,7 +3,11 @@ package com.yellobook.domain.inventory.service;
 import com.yellobook.common.utils.TeamUtil;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.inventory.dto.AddProductRequest;
+import com.yellobook.domain.inventory.dto.AddProductResponse;
 import com.yellobook.domain.inventory.dto.ModifyProductAmountRequest;
+import com.yellobook.domain.inventory.mapper.ProductCustomMapper;
+import com.yellobook.domain.inventory.mapper.ProductMapper;
+import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
@@ -25,24 +29,31 @@ public class InventoryCommandService{
     private final ProductRepository productRepository;
     private final InventoryAuthQueryService inventoryAuthQueryService;
     private final TeamUtil teamUtil;
-
+    private final ProductMapper productMapper;
 
     /**
      * 제품 추가 (관리자)
      */
-    public void addProduct(Long inventoryId, AddProductRequest requestDTO, CustomOAuth2User oAuth2User) {
+    public AddProductResponse addProduct(Long inventoryId, AddProductRequest requestDTO, CustomOAuth2User oAuth2User) {
         Long memberId = oAuth2User.getMemberId();
         Long teamId  = teamUtil.getCurrentTeam(memberId);
         MemberTeamRole role = inventoryAuthQueryService.getMemberTeamRole(teamId, memberId);
         inventoryAuthQueryService.forbidViewer(role);
         inventoryAuthQueryService.forbidOrderer(role);
 
-        // SKU 중복 확인
+        // SKU 중복 확인 (inventory & sku)
+        if(productRepository.existsByInventoryIdAndSku(inventoryId, requestDTO.getSku())){
+            throw new CustomException(InventoryErrorCode.SKU_ALREADY_EXISTS);
+        }
 
-
-
-        //Product newProduct = Product.
-        //productRepository.save(newProduct);
+        Optional<Inventory> inventoryOptional = inventoryRepository.findById(inventoryId);
+        if(inventoryOptional.isEmpty()){
+            throw new CustomException(InventoryErrorCode.INVENTORY_NOT_FOUND);
+        }
+        Product newProduct = productMapper.INSTANCE.toProduct(requestDTO);
+        newProduct.modifyInventory(inventoryOptional.get());
+        Long productId = productRepository.save(newProduct).getId();
+        return AddProductResponse.builder().productId(productId).build();
     }
 
     /**

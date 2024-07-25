@@ -4,7 +4,11 @@ import com.yellobook.domains.common.entity.BaseEntity;
 import com.yellobook.domains.inventory.entity.Inventory;
 
 import jakarta.persistence.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
@@ -14,6 +18,7 @@ import lombok.Getter;
             @UniqueConstraint(name = "uc_inventory_sku", columnNames = {"inventory_id", "sku"})
         }
 )
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Product extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -61,7 +66,21 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     private Integer amount;
 
+    @Builder
+    public Product(String name, String subProduct, Integer sku, Integer purchasePrice, Integer salePrice, Integer amount){
+        this.name = name;
+        this.subProduct = subProduct;
+        this.sku = sku;
+        this.purchasePrice = purchasePrice;
+        this.salePrice = salePrice;
+        this.amount = amount;
+    }
+
     public void modifyAmount(Integer amount){
         this.amount = amount;
+    }
+
+    public void modifyInventory(Inventory inventory){
+        this.inventory = inventory;
     }
 }

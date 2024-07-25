@@ -17,11 +17,12 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom{
     }
 
     private final JPAQueryFactory queryFactory;
-    QProduct product = QProduct.product;
-    QInventory inventory = QInventory.inventory;
 
     @Override
     public List<ProductDTO> getProducts(Long inventoryId) {
+        QProduct product = QProduct.product;
+        QInventory inventory = QInventory.inventory;
+
         return queryFactory.select(Projections.constructor(ProductDTO.class,
                     product.id.as("productId"),
                     product.name,
@@ -32,14 +33,16 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom{
                     product.amount
                 ))
                 .from(product)
-                .join(product.inventory).fetchJoin()
-                .where(inventory.id.eq(inventoryId))
+                .where(product.inventory.id.eq(inventoryId))
                 .orderBy(product.name.asc())
                 .fetch();
     }
 
     @Override
     public List<ProductDTO> getProducts(Long inventoryId, String keyword) {
+        QProduct product = QProduct.product;
+        QInventory inventory = QInventory.inventory;
+
         return queryFactory.select(Projections.constructor(ProductDTO.class,
                         product.id.as("productId"),
                         product.name,
@@ -50,8 +53,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom{
                         product.amount
                 ))
                 .from(product)
-                .join(product.inventory).fetchJoin()
-                .where(inventory.id.eq(inventoryId), product.name.contains(keyword))
+                .where(product.inventory.id.eq(inventoryId), product.name.contains(keyword))
                 .orderBy(product.name.asc())
                 .fetch();
     }

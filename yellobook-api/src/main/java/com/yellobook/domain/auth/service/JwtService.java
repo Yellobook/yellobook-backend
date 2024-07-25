@@ -27,7 +27,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtService {
     private final RedisService redisService;
-    MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
 
     @Value("${jwt.access.secret}")
     private String accessTokenSecret;
