@@ -1,4 +1,4 @@
-package com.yellobook.domain.work.dto;
+package com.yellobook.domain.inform.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,13 +9,13 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
-public class WorkResponse {
+public class InformResponse {
     @Builder
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateWorkResponseDTO {
-        private Long workId;
+    public static class CreateInformResponseDTO {
+        private Long informId;
         private LocalDateTime createdAt;
     }
 
@@ -23,19 +23,19 @@ public class WorkResponse {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class RemoveWorkResponseDTO {
-        private Long workId;
+    public static class RemoveInformResponseDTO {
+        private Long informId;
     }
 
     @Builder
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class GetWorkResponseDTO {
+    public static class GetInformResponseDTO {
         private String title;
         private String memo;
         private int view;
-        private List<WorkCommentResponse.CommentResponseDTO> comments;
+        private List<InformCommentResponse.CommentResponseDTO> comments;
         private Date date;
     }
 

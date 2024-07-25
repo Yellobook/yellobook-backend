@@ -1,11 +1,11 @@
-package com.yellobook.domain.work.dto;
+package com.yellobook.domain.inform.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
-public class WorkCommentResponse {
+public class InformCommentResponse {
     @Builder
     @Getter
     @AllArgsConstructor

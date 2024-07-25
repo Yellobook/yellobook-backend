@@ -1,4 +1,4 @@
-package com.yellobook.domain.work.dto;
+package com.yellobook.domain.inform.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,12 +8,10 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 import java.util.List;
 
-public class WorkRequest {
-    @Builder
+public class InformRequest {
     @Getter
-    @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateWorkRequestDTO {
+    public static class CreateInformRequestDTO {
         private String title;
         private String memo;
         private List<Long> mentioned;
