@@ -7,10 +7,13 @@ import com.yellobook.domain.inventory.dto.GetTotalInventoryResponse;
 import com.yellobook.domain.inventory.dto.ModifyProductAmountRequest;
 import com.yellobook.domain.inventory.service.InventoryCommandService;
 import com.yellobook.domain.inventory.service.InventoryQueryService;
+import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/v1/inventories")
 @Tag(name = " \uD83D\uDCE6 재고", description = "Inventory API")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "Bearer Token")
+@Slf4j
 public class InventoryController {
 
     private final InventoryCommandService inventoryCommandService;
@@ -29,17 +34,18 @@ public class InventoryController {
     public ResponseEntity<SuccessResponse<GetTotalInventoryResponse>> getTotalInventory(
             @RequestParam("page") Integer page,
             @RequestParam("size") Integer size,
-            @AuthenticationPrincipal CustomOAuth2User user
+            @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
-        inventoryQueryService.getTotalInventory(page, size, user);
-        return null;
+        log.info("memberId: {}", oAuth2User.getMemberId());
+        GetTotalInventoryResponse response = inventoryQueryService.getTotalInventory(page, size, oAuth2User);
+        return ResponseFactory.success(response);
     }
 
     @Operation(summary = "특정 일자 재고 현황 상세 조회")
     @GetMapping("/{inventoryId}")
     public ResponseEntity<SuccessResponse<GetProductsResponse>> getProductsByInventory(
             @PathVariable("inventoryId") Long inventoryId,
-            @AuthenticationPrincipal CustomOAuth2User user
+            @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
         inventoryQueryService.getProductsByInventory(inventoryId);
         return null;
