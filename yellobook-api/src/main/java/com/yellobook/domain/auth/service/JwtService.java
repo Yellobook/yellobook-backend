@@ -33,13 +33,13 @@ public class JwtService {
     private String accessTokenSecret;
 
     @Value("${jwt.access.expires-in}")
-    private int accessTokenExpiresIn;
+    private long accessTokenExpiresIn;
 
     @Value("${jwt.refresh.secret}")
     private String refreshTokenSecret;
 
     @Value("${jwt.refresh.expires-in}")
-    private int refreshTokenExpiresIn;
+    private long refreshTokenExpiresIn;
 
     private SecretKey accessTokenSecretKey;
     private SecretKey refreshTokenSecretKey;
@@ -125,11 +125,11 @@ public class JwtService {
         }
     }
 
-    private String createToken(Long memberId, int expiresIn, SecretKey secretKey) {
+    private String createToken(Long memberId, long expiresIn, SecretKey secretKey) {
         return Jwts.builder()
                 .claim("memberId", memberId)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiresIn))
+                .expiration(new Date(System.currentTimeMillis() + expiresIn * 1000))
                 .signWith(secretKey, Jwts.SIG.HS256)
                 .compact();
     }

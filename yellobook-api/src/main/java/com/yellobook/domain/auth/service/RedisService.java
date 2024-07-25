@@ -11,7 +11,7 @@ import java.time.Duration;
 public class RedisService {
     private final StringRedisTemplate stringRedisTemplate;
 
-    public void setRefreshToken(Long memberId , String value, int expiresIn) {
+    public void setRefreshToken(Long memberId , String value, long expiresIn) {
         ValueOperations<String, String> valueOps = stringRedisTemplate.opsForValue();
         String key = generateRefreshTokenKey(memberId);
         valueOps.set(key, value, Duration.ofSeconds(expiresIn));
