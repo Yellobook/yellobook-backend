@@ -60,4 +60,8 @@ public class Product extends BaseEntity {
      */
     @Column(nullable = false)
     private Integer amount;
+
+    public void modifyAmount(Integer amount){
+        this.amount = amount;
+    }
 }
