@@ -1,4 +1,4 @@
-package com.yellobook.domains.order.entity;
+package com.yellobook.domains.inform.entity;
 
 import com.yellobook.domains.common.entity.BaseEntity;
 import com.yellobook.domains.member.entity.Member;
@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "order_comments")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class OrderComment extends BaseEntity {
+@Table(name = "inform_comments")
+public class InformComment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,12 +26,12 @@ public class OrderComment extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
-    private Order order;
+    private Inform inform;
 
     @Builder
-    private OrderComment(String content, Member member, Order order) {
+    private InformComment(String content, Member member, Inform inform) {
         this.content = content;
         this.member = member;
-        this.order = order;
+        this.inform = inform;
     }
 }
