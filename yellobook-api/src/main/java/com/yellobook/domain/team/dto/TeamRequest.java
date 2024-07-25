@@ -8,9 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 public class TeamRequest {
-    @Builder
     @Getter
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateTeamRequestDTO {
         @Schema(description = "회사/매장명", example ="나이키")
@@ -21,18 +19,14 @@ public class TeamRequest {
         private String address;
     }
 
-    @Builder
     @Getter
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class InviteTeamRequestDTO {
         @Schema(description = "피초대자 권한", example = "VIEWER")
         private MemberTeamRole role;
     }
 
-    @Builder
     @Getter
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class JoinTeamRequestDTO {
         @Schema(description = "입장자의 역할", example = "VIEWER")
