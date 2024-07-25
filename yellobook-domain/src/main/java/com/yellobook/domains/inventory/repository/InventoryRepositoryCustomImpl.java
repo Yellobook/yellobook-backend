@@ -3,13 +3,8 @@ package com.yellobook.domains.inventory.repository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yellobook.domains.inventory.dto.InventoryDTO;
-import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.entity.QInventory;
-import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -18,6 +13,7 @@ import java.util.List;
 @Repository
 public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom{
     private final JPAQueryFactory queryFactory;
+    QInventory inventory = QInventory.inventory;
 
     public InventoryRepositoryCustomImpl(EntityManager em){
         this.queryFactory = new JPAQueryFactory(em);
@@ -25,7 +21,6 @@ public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom{
 
     @Override
     public List<InventoryDTO> getTotalInventory(Long teamId, Pageable page) {
-        QInventory inventory = QInventory.inventory;
         return queryFactory.select(Projections.constructor(InventoryDTO.class,
                         inventory.id.as("inventoryId"),
                         inventory.title,

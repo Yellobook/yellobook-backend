@@ -5,10 +5,12 @@ import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.inventory.dto.GetProductsResponse;
 import com.yellobook.domain.inventory.dto.GetTotalInventoryResponse;
 import com.yellobook.domain.inventory.mapper.InventoryMapper;
+import com.yellobook.domain.inventory.mapper.ProductMapper;
 import com.yellobook.domains.inventory.dto.InventoryDTO;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
 import com.yellobook.error.code.AuthErrorCode;
+import com.yellobook.error.code.InventoryErrorCode;
 import com.yellobook.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +28,7 @@ public class InventoryQueryService{
     private final ProductRepository productRepository;
     private final InventoryAuthQueryService inventoryAuthQueryService;
     private final InventoryMapper inventoryMapper;
+    private final ProductMapper productMapper;
     private final TeamUtil teamUtil;
 
     /**
@@ -49,11 +52,19 @@ public class InventoryQueryService{
     /**
      * 특정 제고 일자 현황 조회 (관리자, 주문자)
      */
-    public GetProductsResponse getProductsByInventory(Long inventoryId) {
+    public GetProductsResponse getProductsByInventory(Long inventoryId, CustomOAuth2User oAuth2User) {
         // 존재하는 재고 인지 확인, 접근 권환 확인
         // 제품 이름 순으로 정렬해서 보여주기 (페이징 X)
-         productRepository.getProducts(inventoryId);
-        return null;
+        Long memberId = oAuth2User.getMemberId();
+        Long teamId  = teamUtil.getCurrentTeam(memberId);
+        if(inventoryRepository.existsById(inventoryId)){
+            throw new CustomException(InventoryErrorCode.INVENTORY_NOT_FOUND);
+        }
+        if(inventoryAuthQueryService.isViewer(teamId, memberId)){
+            throw new CustomException(AuthErrorCode.VIEWER_NOT_ALLOWED);
+        }
+        List<GetProductsResponse.ProductInfo> content = productMapper.toProductInfo(productRepository.getProducts(inventoryId));
+        return GetProductsResponse.builder().products(content).build();
     }
 
     /**
@@ -62,7 +73,16 @@ public class InventoryQueryService{
     public GetProductsResponse getProductByKeywordAndInventory(Long inventoryId, String keyword, CustomOAuth2User oAuth2User) {
         // 존재하는 재고인지 확인, 접근 권한 확인
         // 제품 이름 순으로 정렬해서 보여주기 (페이징 X)
-        productRepository.getProducts(inventoryId, keyword);
-        return null;
+        Long memberId = oAuth2User.getMemberId();
+        Long teamId  = teamUtil.getCurrentTeam(memberId);
+        if(inventoryRepository.existsById(inventoryId)){
+            throw new CustomException(InventoryErrorCode.INVENTORY_NOT_FOUND);
+        }
+        if(inventoryAuthQueryService.isViewer(teamId, memberId)){
+            throw new CustomException(AuthErrorCode.VIEWER_NOT_ALLOWED);
+        }
+        List<GetProductsResponse.ProductInfo> content = productMapper.toProductInfo(productRepository.getProducts(inventoryId, keyword));
+        return GetProductsResponse.builder().products(content).build();
     }
+
 }

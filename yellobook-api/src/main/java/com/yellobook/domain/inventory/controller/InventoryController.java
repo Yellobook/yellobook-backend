@@ -36,7 +36,7 @@ public class InventoryController {
             @RequestParam("size") Integer size,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
-        log.info("memberId: {}", oAuth2User.getMemberId());
+        //log.info("memberId: {}", oAuth2User.getMemberId());
         GetTotalInventoryResponse response = inventoryQueryService.getTotalInventory(page, size, oAuth2User);
         return ResponseFactory.success(response);
     }
@@ -47,8 +47,8 @@ public class InventoryController {
             @PathVariable("inventoryId") Long inventoryId,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
-        inventoryQueryService.getProductsByInventory(inventoryId);
-        return null;
+        GetProductsResponse response = inventoryQueryService.getProductsByInventory(inventoryId, oAuth2User);
+        return ResponseFactory.success(response);
     }
 
     @Operation(summary = "[관리자] 재고 검색")
@@ -58,8 +58,8 @@ public class InventoryController {
             @RequestParam("keyword") String keyword,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
-        inventoryQueryService.getProductByKeywordAndInventory(inventoryId, keyword, oAuth2User);
-        return null;
+        GetProductsResponse response = inventoryQueryService.getProductByKeywordAndInventory(inventoryId, keyword, oAuth2User);
+        return ResponseFactory.success(response);
     }
 
     @Operation(summary = "[관리자] 제품 추가")

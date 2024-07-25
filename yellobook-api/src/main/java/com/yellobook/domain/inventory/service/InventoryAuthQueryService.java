@@ -3,6 +3,8 @@ package com.yellobook.domain.inventory.service;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.repository.ParticipantRepository;
 import com.yellobook.enums.MemberTeamRole;
+import com.yellobook.error.code.TeamErrorCode;
+import com.yellobook.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +39,7 @@ public class InventoryAuthQueryService {
     private Participant getParticipant(Long teamId, Long memberId){
         Optional<Participant> optionalParticipant = participantRepository.findByTeamIdAndMemberId(teamId, memberId);
         if(optionalParticipant.isEmpty()){
-            //TODO throw new CustomException();
+            throw new CustomException(TeamErrorCode.USER_NOT_IN_THAT_TEAM);
         }
         return optionalParticipant.get();
     }
