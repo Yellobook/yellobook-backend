@@ -1,8 +1,8 @@
 package com.yellobook.domain.order.service;
 
-import com.yellobook.domain.order.dto.AddOrderComment;
 import com.yellobook.domain.order.dto.AddOrderCommentRequest;
 import com.yellobook.domain.order.dto.AddOrderCommentResponse;
+import com.yellobook.domain.order.dto.MakeOrderRequest;
 import com.yellobook.domain.order.mapper.OrderMapper;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.member.repository.MemberRepository;
@@ -12,6 +12,7 @@ import com.yellobook.domains.order.repository.OrderCommentRepository;
 import com.yellobook.domains.order.repository.OrderMentionRepository;
 import com.yellobook.domains.order.repository.OrderRepository;
 import com.yellobook.enums.OrderStatus;
+import com.yellobook.error.code.MemberErrorCode;
 import com.yellobook.error.code.OrderErrorCode;
 import com.yellobook.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -86,16 +87,28 @@ public class OrderCommandService{
      */
     public AddOrderCommentResponse addOrderComment(Long orderId, Long memberId, AddOrderCommentRequest requestDTO) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new CustomException(OrderErrorCode.ORDER_NOT_FOUND));
-        // TODO
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomException(OrderErrorCode.ORDER_NOT_FOUND));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
         // 접근 권한 확인 : 해당 글의 주문자 인지 확인, 해당 글의 관리자 인지 확인(언급된 사람)
         if(memberId.equals(order.getMember().getId()) || orderMentionRepository.existsByMemberIdAndOrderId(memberId, orderId)){
-            // 댓글 추가 & 양방향 매핑
+            // 댓글 추가 (단방향)
             OrderComment comment = orderMapper.toOrderComment(requestDTO, member, order);
             Long commentId = orderCommentRepository.save(comment).getId();
             return orderMapper.toAddOrderCommentResponse(commentId);
         }else{
             throw new CustomException(OrderErrorCode.ORDER_ACCESS_DENIED);
         }
+    }
+
+
+    /**
+     * 주문 생성
+     */
+    public void makeOrder(MakeOrderRequest requestDTO, Long memberId) {
+        // 관리자, 뷰어 주문 불가능
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        // mapstruct로 주문 생성 - 작성자, 팀, 제품 FK
+        // 함께하는 사용자 테이블 추가
+        // save
     }
 }

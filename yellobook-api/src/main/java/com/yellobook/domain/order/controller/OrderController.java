@@ -5,6 +5,7 @@ import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.order.dto.*;
 import com.yellobook.domain.order.service.OrderCommandService;
 import com.yellobook.domain.order.service.OrderQueryService;
+import com.yellobook.domain.order.dto.GetOrderCommentsResponse;
 import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,24 +13,25 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
 @Tag(name = " \uD83E\uDDD9\uD83C\uDFFB\u200D 주문" , description = "Order API")
+@Validated
 public class OrderController {
     private final OrderQueryService orderQueryService;
     private final OrderCommandService orderCommandService;
 
-    // TODO : DTO 수정 필요
     @Operation(summary = "[주문자] 주문 작성")
     @PostMapping("")
     public ResponseEntity<SuccessResponse<MakeOrderResponse>> makeOrder(
             @RequestBody MakeOrderRequest requestDTO,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
-        orderQueryService.makeOrder(requestDTO, oAuth2User.getMemberId());
+        orderCommandService.makeOrder(requestDTO, oAuth2User.getMemberId());
         return null;
     }
 
@@ -55,14 +57,13 @@ public class OrderController {
 
     @Operation(summary = "[주문자, 관리자] 주문 댓글 조회")
     @GetMapping("/{orderId}/comment")
-    public ResponseEntity<SuccessResponse<GetOrderComments>> getOrderComments(
+    public ResponseEntity<SuccessResponse<GetOrderCommentsResponse>> getOrderComments(
             @ExistOrder @PathVariable("orderId") Long orderId,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
-
-        return null;
+        GetOrderCommentsResponse response = orderQueryService.getOrderComments(orderId, oAuth2User.getMemberId());
+        return ResponseFactory.success(response);
     }
-
 
     @Operation(summary = "[관리자] 주문 정정 요청")
     @PatchMapping("/{orderId}/correction")

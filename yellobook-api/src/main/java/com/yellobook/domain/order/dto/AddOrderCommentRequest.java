@@ -1,14 +1,10 @@
 package com.yellobook.domain.order.dto;
 
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class AddOrderCommentRequest {
     private String content;
-
-    @Builder
-    private AddOrderCommentRequest(String content){
-        this.content = content;
-    }
 }

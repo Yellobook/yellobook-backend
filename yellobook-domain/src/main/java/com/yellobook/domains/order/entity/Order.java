@@ -62,9 +62,6 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "team_id")
     private Team team;
 
-    @OneToMany(mappedBy = "order")
-    private List<OrderComment> orderComments;
-
     @Builder
     private Order(Integer view, String memo, LocalDate date, OrderStatus orderStatus, Integer orderAmount, Product product, Member member, Team team) {
         // 필수 필드 검증 추가할 것
@@ -77,7 +74,6 @@ public class Order extends BaseEntity {
         this.product = product;
         this.member = member;
         this.team = team;
-        this.orderComments = new ArrayList<>();
     }
 
     public void requestModifyOrder(){
@@ -87,4 +83,5 @@ public class Order extends BaseEntity {
     public void confirmOrder(){
         this.orderStatus = OrderStatus.CONFIRMED;
     }
+
 }

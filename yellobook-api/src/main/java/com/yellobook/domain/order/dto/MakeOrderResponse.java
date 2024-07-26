@@ -8,7 +8,7 @@ public class MakeOrderResponse {
     private Long orderId;
 
     @Builder
-    public MakeOrderResponse(Long orderId){
+    private MakeOrderResponse(Long orderId){
         this.orderId = orderId;
     }
 }

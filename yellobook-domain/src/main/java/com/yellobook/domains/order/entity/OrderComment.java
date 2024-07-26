@@ -33,7 +33,6 @@ public class OrderComment extends BaseEntity {
         this.content = content;
         this.member = member;
         this.order = order;
-        order.getOrderComments().add(this);
     }
 
 }
