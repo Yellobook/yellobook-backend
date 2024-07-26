@@ -7,6 +7,7 @@ import com.yellobook.domain.inform.dto.InformRequest;
 import com.yellobook.domain.inform.dto.InformResponse;
 import com.yellobook.domain.inform.service.InformCommandService;
 import com.yellobook.domain.inform.service.InformQueryService;
+import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,7 +30,8 @@ public class InformController {
             @RequestBody InformRequest.CreateInformRequestDTO request,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
-        return null;
+        InformResponse.CreateInformResponseDTO response = informCommandService.createInform(customOAuth2User, request);
+        return ResponseFactory.created(response);
     }
 
     @Operation(summary = "업무(공지) 삭제")
