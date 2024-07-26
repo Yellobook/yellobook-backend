@@ -1,5 +1,6 @@
 package com.yellobook.domain.inventory.service;
 
+import com.yellobook.common.utils.ParticipantUtil;
 import com.yellobook.common.utils.TeamUtil;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.inventory.dto.GetProductsResponse;
@@ -24,7 +25,7 @@ import java.util.List;
 public class InventoryQueryService{
     private final InventoryRepository inventoryRepository;
     private final ProductRepository productRepository;
-    private final InventoryAuthQueryService inventoryAuthQueryService;
+    private final ParticipantUtil participantUtil;
     private final InventoryMapper inventoryMapper;
     private final ProductMapper productMapper;
     private final TeamUtil teamUtil;
@@ -35,8 +36,8 @@ public class InventoryQueryService{
     public GetTotalInventoryResponse getTotalInventory(Integer page, Integer size, CustomOAuth2User oAuth2User) {
         Long memberId = oAuth2User.getMemberId();
         Long teamId  = teamUtil.getCurrentTeam(memberId);
-        MemberTeamRole role = inventoryAuthQueryService.getMemberTeamRole(teamId, memberId);
-        inventoryAuthQueryService.forbidViewer(role);
+        MemberTeamRole role = participantUtil.getMemberTeamRole(teamId, memberId);
+        participantUtil.forbidViewer(role);
 
         Pageable pageable = PageRequest.of(page-1, size);
         List<InventoryDTO> content = inventoryRepository.getTotalInventory(teamId, pageable);
@@ -54,8 +55,8 @@ public class InventoryQueryService{
         // 제품 이름 순으로 정렬해서 보여주기 (페이징 X)
         Long memberId = oAuth2User.getMemberId();
         Long teamId  = teamUtil.getCurrentTeam(memberId);
-        MemberTeamRole role = inventoryAuthQueryService.getMemberTeamRole(teamId, memberId);
-        inventoryAuthQueryService.forbidViewer(role);
+        MemberTeamRole role = participantUtil.getMemberTeamRole(teamId, memberId);
+        participantUtil.forbidViewer(role);
 
         List<GetProductsResponse.ProductInfo> content = productMapper.toProductInfo(productRepository.getProducts(inventoryId));
         return GetProductsResponse.builder().products(content).build();
@@ -69,9 +70,9 @@ public class InventoryQueryService{
         // 제품 이름 순으로 정렬해서 보여주기 (페이징 X)
         Long memberId = oAuth2User.getMemberId();
         Long teamId  = teamUtil.getCurrentTeam(memberId);
-        MemberTeamRole role = inventoryAuthQueryService.getMemberTeamRole(teamId, memberId);
-        inventoryAuthQueryService.forbidViewer(role);
-        inventoryAuthQueryService.forbidOrderer(role);
+        MemberTeamRole role = participantUtil.getMemberTeamRole(teamId, memberId);
+        participantUtil.forbidViewer(role);
+        participantUtil.forbidOrderer(role);
 
         List<GetProductsResponse.ProductInfo> content = productMapper.toProductInfo(productRepository.getProducts(inventoryId, keyword));
         return GetProductsResponse.builder().products(content).build();

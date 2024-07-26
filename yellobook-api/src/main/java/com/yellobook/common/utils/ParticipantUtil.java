@@ -1,4 +1,4 @@
-package com.yellobook.domain.inventory.service;
+package com.yellobook.common.utils;
 
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.repository.ParticipantRepository;
@@ -10,23 +10,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class InventoryAuthQueryService {
+public class ParticipantUtil {
     private final ParticipantRepository participantRepository;
 
     /**
      * 권한 가져오기 + 팀에 해당하지 않는 멤버는 에러 반환
      */
     public MemberTeamRole getMemberTeamRole(Long teamId, Long memberId){
-        Optional<Participant> optionalParticipant = participantRepository.findByTeamIdAndMemberId(teamId, memberId);
-        if(optionalParticipant.isEmpty()){
-            throw new CustomException(TeamErrorCode.USER_NOT_IN_THAT_TEAM);
-        }
-        return optionalParticipant.get().getRole();
+        Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId).orElseThrow(()
+        -> new CustomException(TeamErrorCode.USER_NOT_IN_THAT_TEAM));
+        return participant.getRole();
     }
 
     /**

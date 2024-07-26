@@ -1,18 +1,17 @@
 package com.yellobook.domain.inventory.service;
 
+import com.yellobook.common.utils.ParticipantUtil;
 import com.yellobook.common.utils.TeamUtil;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.inventory.dto.AddProductRequest;
 import com.yellobook.domain.inventory.dto.AddProductResponse;
 import com.yellobook.domain.inventory.dto.ModifyProductAmountRequest;
-import com.yellobook.domain.inventory.mapper.ProductCustomMapper;
 import com.yellobook.domain.inventory.mapper.ProductMapper;
 import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
 import com.yellobook.enums.MemberTeamRole;
-import com.yellobook.error.code.AuthErrorCode;
 import com.yellobook.error.code.InventoryErrorCode;
 import com.yellobook.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,7 @@ import java.util.Optional;
 public class InventoryCommandService{
     private final InventoryRepository inventoryRepository;
     private final ProductRepository productRepository;
-    private final InventoryAuthQueryService inventoryAuthQueryService;
+    private final ParticipantUtil participantUtil;
     private final TeamUtil teamUtil;
     private final ProductMapper productMapper;
 
@@ -37,21 +36,18 @@ public class InventoryCommandService{
     public AddProductResponse addProduct(Long inventoryId, AddProductRequest requestDTO, CustomOAuth2User oAuth2User) {
         Long memberId = oAuth2User.getMemberId();
         Long teamId  = teamUtil.getCurrentTeam(memberId);
-        MemberTeamRole role = inventoryAuthQueryService.getMemberTeamRole(teamId, memberId);
-        inventoryAuthQueryService.forbidViewer(role);
-        inventoryAuthQueryService.forbidOrderer(role);
+        MemberTeamRole role = participantUtil.getMemberTeamRole(teamId, memberId);
+        participantUtil.forbidViewer(role);
+        participantUtil.forbidOrderer(role);
 
         // SKU 중복 확인 (inventory & sku)
         if(productRepository.existsByInventoryIdAndSku(inventoryId, requestDTO.getSku())){
             throw new CustomException(InventoryErrorCode.SKU_ALREADY_EXISTS);
         }
 
-        Optional<Inventory> inventoryOptional = inventoryRepository.findById(inventoryId);
-        if(inventoryOptional.isEmpty()){
-            throw new CustomException(InventoryErrorCode.INVENTORY_NOT_FOUND);
-        }
-        Product newProduct = productMapper.INSTANCE.toProduct(requestDTO);
-        newProduct.modifyInventory(inventoryOptional.get());
+        Inventory inventory = inventoryRepository.findById(inventoryId).orElseThrow(() -> new CustomException(InventoryErrorCode.INVENTORY_NOT_FOUND) );
+        Product newProduct = productMapper.toProduct(requestDTO);
+        newProduct.modifyInventory(inventory);
         Long productId = productRepository.save(newProduct).getId();
         return AddProductResponse.builder().productId(productId).build();
     }
@@ -62,9 +58,9 @@ public class InventoryCommandService{
     public void modifyProductAmount(Long productId, ModifyProductAmountRequest requestDTO, CustomOAuth2User oAuth2User) {
         Long memberId = oAuth2User.getMemberId();
         Long teamId  = teamUtil.getCurrentTeam(memberId);
-        MemberTeamRole role = inventoryAuthQueryService.getMemberTeamRole(teamId, memberId);
-        inventoryAuthQueryService.forbidViewer(role);
-        inventoryAuthQueryService.forbidOrderer(role);
+        MemberTeamRole role = participantUtil.getMemberTeamRole(teamId, memberId);
+        participantUtil.forbidViewer(role);
+        participantUtil.forbidOrderer(role);
 
         Optional<Product> productOptional = productRepository.findById(productId);
         if(productOptional.isEmpty()){
@@ -79,9 +75,9 @@ public class InventoryCommandService{
     public void deleteProduct(Long productId, CustomOAuth2User oAuth2User) {
         Long memberId = oAuth2User.getMemberId();
         Long teamId  = teamUtil.getCurrentTeam(memberId);
-        MemberTeamRole role = inventoryAuthQueryService.getMemberTeamRole(teamId, memberId);
-        inventoryAuthQueryService.forbidViewer(role);
-        inventoryAuthQueryService.forbidOrderer(role);
+        MemberTeamRole role = participantUtil.getMemberTeamRole(teamId, memberId);
+        participantUtil.forbidViewer(role);
+        participantUtil.forbidOrderer(role);
 
         productRepository.deleteById(productId);
     }

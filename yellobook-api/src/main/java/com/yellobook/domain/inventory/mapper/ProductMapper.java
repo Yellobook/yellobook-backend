@@ -13,7 +13,6 @@ import java.util.List;
 @Component
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
-    ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
     List<GetProductsResponse.ProductInfo> toProductInfo(List<ProductDTO> productDTOList);
     Product toProduct(AddProductRequest addProductRequest);
 }

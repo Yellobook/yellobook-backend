@@ -11,7 +11,7 @@ public class AddProductResponse {
     private Long productId;
 
     @Builder
-    public AddProductResponse(Long productId){
+    private AddProductResponse(Long productId){
         this.productId = productId;
     }
 }

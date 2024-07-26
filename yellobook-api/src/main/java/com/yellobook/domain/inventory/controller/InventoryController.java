@@ -14,12 +14,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/inventories")
 @Tag(name = " \uD83D\uDCE6 재고", description = "Inventory API")
 @RequiredArgsConstructor
+@Validated
 @Slf4j
 public class InventoryController {
 

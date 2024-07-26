@@ -1,15 +1,13 @@
 package com.yellobook.domain.inventory.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
 
 import java.util.List;
 
 @Schema(description = "전체 재고 현황 글 조회 - 응답 DTO")
 @Getter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GetTotalInventoryResponse {
     @Schema(description = "페이지 번호 (1번부터 시작)")
     private Integer page;
@@ -18,10 +16,14 @@ public class GetTotalInventoryResponse {
     @Schema(description = "재고 현황 게시글")
     private List<InventoryInfo> inventories;
 
-    @Getter
     @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    private GetTotalInventoryResponse(Integer page, Integer size, List<InventoryInfo> inventories){
+        this.page = page;
+        this.size = size;
+        this.inventories = inventories;
+    }
+
+    @Getter
     public static class InventoryInfo{
         @Schema(description = "재고 현황 id")
         private Long inventoryId;
@@ -33,5 +35,15 @@ public class GetTotalInventoryResponse {
         private String updatedAt;
         @Schema(description = "조회수")
         private Integer view;
+
+        @Builder
+        private InventoryInfo(Long inventoryId, String title, String createdAt, String updatedAt, Integer view){
+            this.inventoryId = inventoryId;
+            this.title = title;
+            this.updatedAt = updatedAt;
+            this.createdAt = createdAt;
+            this.view = view;
+        }
     }
+
 }
