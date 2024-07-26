@@ -1,17 +1,19 @@
 package com.yellobook.domain.order.service;
 
-import com.yellobook.common.utils.TeamUtil;
-import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.order.dto.AddOrderComment;
+import com.yellobook.domain.order.dto.AddOrderCommentRequest;
+import com.yellobook.domain.order.dto.AddOrderCommentResponse;
+import com.yellobook.domain.order.mapper.OrderMapper;
+import com.yellobook.domains.member.entity.Member;
+import com.yellobook.domains.member.repository.MemberRepository;
 import com.yellobook.domains.order.entity.Order;
+import com.yellobook.domains.order.entity.OrderComment;
 import com.yellobook.domains.order.repository.OrderCommentRepository;
 import com.yellobook.domains.order.repository.OrderMentionRepository;
 import com.yellobook.domains.order.repository.OrderRepository;
-import com.yellobook.enums.MemberTeamRole;
 import com.yellobook.enums.OrderStatus;
 import com.yellobook.error.code.OrderErrorCode;
 import com.yellobook.error.exception.CustomException;
-import io.netty.resolver.InetNameResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,8 @@ public class OrderCommandService{
     private final OrderRepository orderRepository;
     private final OrderCommentRepository orderCommentRepository;
     private final OrderMentionRepository orderMentionRepository;
+    private final MemberRepository memberRepository;
+    private final OrderMapper orderMapper;
 
     /**
      * 주문 정정 요청 (관리자)
@@ -80,9 +84,18 @@ public class OrderCommandService{
     /**
      * 주문 댓글 추가 (관리자, 주문자)
      */
-    public void addOrderComment(Long orderId, Long memberId, AddOrderComment requestDTO) {
-        // 권한 확인(팀 존재 확인, 해당 글의 주문자 인지 확인, 해당 글의 관리자 인지 확인)
-
-
+    public AddOrderCommentResponse addOrderComment(Long orderId, Long memberId, AddOrderCommentRequest requestDTO) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new CustomException(OrderErrorCode.ORDER_NOT_FOUND));
+        // TODO
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomException(OrderErrorCode.ORDER_NOT_FOUND));
+        // 접근 권한 확인 : 해당 글의 주문자 인지 확인, 해당 글의 관리자 인지 확인(언급된 사람)
+        if(memberId.equals(order.getMember().getId()) || orderMentionRepository.existsByMemberIdAndOrderId(memberId, orderId)){
+            // 댓글 추가 & 양방향 매핑
+            OrderComment comment = orderMapper.toOrderComment(requestDTO, member, order);
+            Long commentId = orderCommentRepository.save(comment).getId();
+            return orderMapper.toAddOrderCommentResponse(commentId);
+        }else{
+            throw new CustomException(OrderErrorCode.ORDER_ACCESS_DENIED);
+        }
     }
 }

@@ -2,12 +2,10 @@ package com.yellobook.domain.order.controller;
 
 import com.yellobook.common.annotation.ExistOrder;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
-import com.yellobook.domain.order.dto.AddOrderComment;
-import com.yellobook.domain.order.dto.GetOrderComments;
-import com.yellobook.domain.order.dto.MakeOrderRequest;
-import com.yellobook.domain.order.dto.MakeOrderResponse;
+import com.yellobook.domain.order.dto.*;
 import com.yellobook.domain.order.service.OrderCommandService;
 import com.yellobook.domain.order.service.OrderQueryService;
+import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,7 +35,7 @@ public class OrderController {
 
     @Operation(summary = "[주문자, 관리자] 주문 조회")
     @GetMapping("/{orderId}")
-    public ResponseEntity<SuccessResponse<>> getOrder(
+    public ResponseEntity<SuccessResponse<?>> getOrder(
             @ExistOrder @PathVariable("orderId") Long orderId,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
@@ -46,13 +44,13 @@ public class OrderController {
 
     @Operation(summary = "[주문자, 관리자] 주문에 댓글 달기")
     @PostMapping("/{orderId}/comment")
-    public ResponseEntity<SuccessResponse<AddOrderComment>> addOrderComment(
+    public ResponseEntity<SuccessResponse<AddOrderCommentResponse>> addOrderComment(
             @ExistOrder @PathVariable("orderId") Long orderId,
-            @RequestBody AddOrderComment requestDTO,
+            @RequestBody AddOrderCommentRequest requestDTO,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
-        orderCommandService.addOrderComment(orderId, oAuth2User.getMemberId(), requestDTO);
-        return null;
+        AddOrderCommentResponse response = orderCommandService.addOrderComment(orderId, oAuth2User.getMemberId(), requestDTO);
+        return ResponseFactory.success(response);
     }
 
     @Operation(summary = "[주문자, 관리자] 주문 댓글 조회")
@@ -73,17 +71,17 @@ public class OrderController {
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
             ) {
         orderCommandService.modifyRequestOrder(orderId, oAuth2User.getMemberId());
-        return null;
+        return ResponseFactory.success("주문의 정정 요청을 완료했습니다.");
     }
 
-    @Operation(summary = "[관리자] 주문 확인")
+    @Operation(summary = "[관리자] 주문 확정")
     @PatchMapping("/{orderId}/confirm")
     public ResponseEntity<SuccessResponse<String>> confirmOrder(
             @ExistOrder @PathVariable("orderId") Long orderId,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ) {
         orderCommandService.confirmOrder(orderId, oAuth2User.getMemberId());
-        return null;
+        return ResponseFactory.success("주문의 확정을 완료했습니다.");
     }
 
     @Operation(summary = "[주문자] 주문 취소")
@@ -93,7 +91,7 @@ public class OrderController {
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ) {
         orderCommandService.cancelOrder(orderId, oAuth2User.getMemberId());
-        return null;
+        return ResponseFactory.success("주문 최소를 완료했습니다.");
     }
 
 }
