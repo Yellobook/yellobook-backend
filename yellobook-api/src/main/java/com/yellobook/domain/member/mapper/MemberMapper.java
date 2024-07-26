@@ -1,6 +1,8 @@
 package com.yellobook.domain.member.mapper;
 
 import com.yellobook.domain.member.dto.MemberResponse;
+import com.yellobook.domain.member.dto.MemberResponse.AllowanceResponseDTO;
+import com.yellobook.domain.member.dto.MemberResponse.ProfileResponseDTO;
 import com.yellobook.domains.member.entity.Member;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,5 +15,7 @@ import java.util.List;
 public interface MemberMapper {
     @Mapping(source = "member.id", target = "memberId")
     @Mapping(source= "participantInfos", target = "teams")
-    MemberResponse.ProfileResponseDTO toProfileResponseDTO(Member member, List<MemberResponse.ParticipantInfo> participantInfos);
+    ProfileResponseDTO toProfileResponseDTO(Member member, List<MemberResponse.ParticipantInfo> participantInfos);
+
+    AllowanceResponseDTO toAllowanceResponseDTO(Boolean allowance);
 }

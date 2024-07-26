@@ -2,6 +2,8 @@ package com.yellobook.domain.member.controller;
 
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.member.dto.MemberResponse;
+import com.yellobook.domain.member.dto.MemberResponse.AllowanceResponseDTO;
+import com.yellobook.domain.member.dto.MemberResponse.ProfileResponseDTO;
 import com.yellobook.domain.member.service.MemberCommandService;
 import com.yellobook.domain.member.service.MemberQueryService;
 import com.yellobook.response.ResponseFactory;
@@ -27,19 +29,19 @@ public class MemberController {
 
     @GetMapping("/profile")
     @Operation(summary = "멤버의 마이프로필 조회 API", description ="로그인을 한 멤버가 마이프로필을 조회하는 API입니다.")
-    public ResponseEntity<SuccessResponse<MemberResponse.ProfileResponseDTO>> getMemberProfile(
+    public ResponseEntity<SuccessResponse<ProfileResponseDTO>> getMemberProfile(
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
-        MemberResponse.ProfileResponseDTO response = memberQueryService.getMemberProfile(customOAuth2User.getMemberId());
+        ProfileResponseDTO response = memberQueryService.getMemberProfile(customOAuth2User.getMemberId());
         return ResponseFactory.success(response);
     }
 
     @Operation(summary = "멤버의 약관 동의 여부 조회 API", description = "로그인을 한 멤버의 약관 동의 여부를 조회하는 API입니다.")
     @GetMapping("/terms")
-    public ResponseEntity<SuccessResponse<MemberResponse.AllowanceResponseDTO>> getMemberAllowance(
+    public ResponseEntity<SuccessResponse<AllowanceResponseDTO>> getMemberAllowance(
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
-        MemberResponse.AllowanceResponseDTO response = memberQueryService.getAllowanceById(customOAuth2User.getMemberId());
+        AllowanceResponseDTO response = memberQueryService.getAllowanceById(customOAuth2User.getMemberId());
         return ResponseFactory.success(response);
     }
 
