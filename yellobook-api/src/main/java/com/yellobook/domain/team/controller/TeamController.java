@@ -54,14 +54,14 @@ public class TeamController {
         return ResponseFactory.success(response);
     }
 
-    @PostMapping("/{teamId}/join")
+    @PostMapping("/join")
     @Operation(summary = "팀 참가하기 API", description = "멤버가 팀에 참가하는 API입니다.")
     public ResponseEntity<SuccessResponse<TeamResponse.JoinTeamResponseDTO>> joinTeam(
-            @PathVariable Long teamId,
-            @RequestBody TeamRequest.JoinTeamRequestDTO request,
-            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+            @RequestBody TeamRequest.JoinTeamRequestDTO request
     ){
-        return null;
+        TeamResponse.JoinTeamResponseDTO response = teamCommandService.joinTeam(customOAuth2User, request);
+        return ResponseFactory.success(response);
     }
 
     @GetMapping("/{teamId}")

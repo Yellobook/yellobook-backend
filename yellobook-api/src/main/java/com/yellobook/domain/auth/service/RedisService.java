@@ -1,6 +1,9 @@
 package com.yellobook.domain.auth.service;
 
+import com.yellobook.domain.auth.dto.InvitationResponse;
 import com.yellobook.enums.MemberTeamRole;
+import com.yellobook.error.code.TeamErrorCode;
+import com.yellobook.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -35,9 +38,22 @@ public class RedisService {
         return "https://www.yellobook.site/invitation/" + key;
     }
 
-    public String getInvitationInfo(String key) {
-        ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
-        return ops.get(key);
+    public InvitationResponse getInvitationInfo(String key) {
+        String value = stringRedisTemplate.opsForValue().get(key);
+        if (value == null) {
+            throw new CustomException(TeamErrorCode.INVITATION_NOT_FOUND);
+        }
+
+        // value 형식이 "teamId:role" 인지 확인하고 분리
+        String[] parts = value.split(":");
+        if (parts.length != 2) {
+            throw new CustomException(TeamErrorCode.INVALID_INVITATION);
+        }
+
+        Long teamId = Long.parseLong(parts[0]);
+        MemberTeamRole role = MemberTeamRole.valueOf(parts[1]);
+
+        return new InvitationResponse(teamId, role);
     }
 
     public void deleteValue(Long memberId) {

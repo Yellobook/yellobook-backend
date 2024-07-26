@@ -19,5 +19,5 @@ public interface TeamMapper {
     TeamResponse.LeaveTeamResponseDTO toLeaveTeamResponseDTO(Long teamId);
 
     TeamResponse.InvitationCodeResponseDTO toInvitationCodeResponseDTO(String inviteUrl);
-
+    TeamResponse.JoinTeamResponseDTO toJoinTeamResponseDTO(Team team);
 }

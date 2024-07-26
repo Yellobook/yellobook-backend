@@ -6,7 +6,6 @@ import com.yellobook.domain.team.dto.TeamResponse;
 
 public interface TeamCommandService {
     TeamResponse.CreateTeamResponseDTO createTeam(TeamRequest.CreateTeamRequestDTO request, CustomOAuth2User customOAuth2User);
-
     TeamResponse.LeaveTeamResponseDTO leaveTeam(Long teamId, CustomOAuth2User customOAuth2User);
-    TeamResponse.JoinTeamResponseDTO joinTeam(Long teamId, TeamRequest.JoinTeamRequestDTO request);
+    TeamResponse.JoinTeamResponseDTO joinTeam(CustomOAuth2User customOAuth2User, TeamRequest.JoinTeamRequestDTO request);
 }

@@ -29,7 +29,7 @@ public class TeamRequest {
     @Getter
     @AllArgsConstructor
     public static class JoinTeamRequestDTO {
-        @Schema(description = "입장자의 역할", example = "VIEWER")
-        private MemberTeamRole role;
+        @Schema(description = "초대받은 팀의 URL", example = "https://www.~~")
+        private String url;
     }
 }

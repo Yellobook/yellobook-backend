@@ -68,7 +68,10 @@ public class TeamQueryServiceImpl implements TeamQueryService {
     }
 
     @Override
-    public Team findByTeamId(Long teamId, Long memberId){
+    public Team findByTeamId(Long teamId, CustomOAuth2User customOAuth2User){
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+
         return null;
     }
 }

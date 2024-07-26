@@ -1,6 +1,8 @@
 package com.yellobook.domain.team.service;
 
+import com.yellobook.domain.auth.dto.InvitationResponse;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
+import com.yellobook.domain.auth.service.RedisService;
 import com.yellobook.domain.team.dto.TeamRequest;
 import com.yellobook.domain.team.dto.TeamResponse;
 import com.yellobook.domain.team.mapper.ParticipantMapper;
@@ -11,6 +13,7 @@ import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
 import com.yellobook.domains.team.repository.ParticipantRepository;
 import com.yellobook.domains.team.repository.TeamRepository;
+import com.yellobook.enums.MemberTeamRole;
 import com.yellobook.error.code.TeamErrorCode;
 import com.yellobook.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,7 @@ public class TeamCommandServiceImpl implements TeamCommandService {
     private final MemberRepository memberRepository;
     private final TeamMapper teamMapper;
     private final ParticipantMapper participantMapper;
+    private final RedisService redisService;
 
     @Override
     public TeamResponse.CreateTeamResponseDTO createTeam(TeamRequest.CreateTeamRequestDTO request, CustomOAuth2User customOAuth2User){
@@ -67,8 +71,39 @@ public class TeamCommandServiceImpl implements TeamCommandService {
     }
 
     @Override
-    public TeamResponse.JoinTeamResponseDTO joinTeam(Long teamId, TeamRequest.JoinTeamRequestDTO request) {
-        return null;
+    public TeamResponse.JoinTeamResponseDTO joinTeam(CustomOAuth2User customOAuth2User, TeamRequest.JoinTeamRequestDTO request) {
+
+        InvitationResponse invitationData = redisService.getInvitationInfo(request.getUrl());
+        Long teamId = invitationData.getTeamId();
+        MemberTeamRole role = invitationData.getRole();
+        Long memberId = customOAuth2User.getMemberId();
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> {
+                    log.error("Member not found: {}", memberId);
+                    return new CustomException(TeamErrorCode.MEMBER_NOT_FOUND);
+                });
+
+        //팀이 유효한가?
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+
+        if (participantRepository.findByTeamIdAndMemberId(teamId, memberId).isPresent()){
+            log.error("Member {} already on the team {}", memberId, teamId);
+            throw new CustomException(TeamErrorCode.MEMBER_ALREADY_EXIST);
+        }
+        // ADMIN이 있는가?
+        if (role == MemberTeamRole.ADMIN) {
+            participantRepository.findByTeamIdAndRole(teamId, MemberTeamRole.ADMIN).ifPresent(
+                    admin -> {
+                        log.error("Admin already exists in team {}", teamId);
+                        throw new CustomException(TeamErrorCode.ADMIN_EXISTS);
+                    });
+        }
+        participantRepository.save(participantMapper.toParticipant(role, team, member));
+        log.info("Participant added: Team ID = {}, Role = {}, Member ID = {}", teamId, role, memberId);
+
+        return teamMapper.toJoinTeamResponseDTO(team);
     }
 
 }
