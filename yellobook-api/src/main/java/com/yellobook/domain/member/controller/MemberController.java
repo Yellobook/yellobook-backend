@@ -31,7 +31,7 @@ public class MemberController {
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
         MemberResponse.ProfileResponseDTO response = memberQueryService.getMemberProfile(customOAuth2User.getMemberId());
-        return null;
+        return ResponseFactory.success(response);
     }
 
     @Operation(summary = "멤버의 약관 동의 여부 조회 API", description = "로그인을 한 멤버의 약관 동의 여부를 조회하는 API입니다.")

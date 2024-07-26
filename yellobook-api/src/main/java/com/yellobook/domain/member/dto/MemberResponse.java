@@ -1,17 +1,16 @@
 package com.yellobook.domain.member.dto;
 
-import com.yellobook.enums.MemberRole;
+import com.yellobook.domains.team.dto.MemberJoinTeamDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 public class MemberResponse {
-    @Builder
     @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
     public static class ProfileResponseDTO{
 
         @Schema(description = "멤버의 고유 키 값", example ="123")
@@ -23,11 +22,38 @@ public class MemberResponse {
         @Schema(description = "프로필 이미지의 URL", example ="http://example.com/image.jpg")
         private String profileImage;
 
-        @Schema(description = "멤버의 역할", example ="ADMIN")
-        private MemberRole memberRole;
-
         @Schema(description = "멤버의 이메일 주소", example ="example@example.com")
         private String email;
+
+        @Schema(description = "멤버의 역할", example ="ADMIN")
+        private List<ParticipantInfo> teams;
+
+        @Builder
+        public ProfileResponseDTO(Long memberId, String nickname, String profileImage, String email, List<ParticipantInfo> teams){
+            this.memberId = memberId;
+            this.nickname = nickname;
+            this.profileImage = profileImage;
+            this.email = email;
+            this.teams = teams;
+        }
+
+    }
+
+    @Getter
+    public static class ParticipantInfo{
+        private final String role;
+        private final String teamName;
+
+        @Builder
+        public ParticipantInfo(String role, String teamName){
+            this.role = role;
+            this.teamName = teamName;
+        }
+
+        public ParticipantInfo(MemberJoinTeamDTO memberJoinTeamDTO){
+            this.role = memberJoinTeamDTO.getRole().getDescription();
+            this.teamName = memberJoinTeamDTO.getTeamName();
+        }
     }
 
     @Getter
