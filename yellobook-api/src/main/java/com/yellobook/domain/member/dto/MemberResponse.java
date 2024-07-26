@@ -30,13 +30,15 @@ public class MemberResponse {
         private String email;
     }
 
-    @Builder
     @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
     public static class AllowanceResponseDTO {
         @Schema(description = "해당 멤버의 약관 동의 여부", example ="true")
-        private boolean allowance;
+        private final boolean allowance;
+
+        @Builder
+        public AllowanceResponseDTO(boolean allowance){
+            this.allowance = allowance;
+        }
     }
 }
 
