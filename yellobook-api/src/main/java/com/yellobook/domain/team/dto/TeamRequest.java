@@ -3,9 +3,7 @@ package com.yellobook.domain.team.dto;
 import com.yellobook.enums.MemberTeamRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 public class TeamRequest {
     @Getter
@@ -23,7 +21,7 @@ public class TeamRequest {
 
     @Getter
     @AllArgsConstructor
-    public static class InviteTeamRequestDTO {
+    public static class InvitationCodeRequestDTO {
         @Schema(description = "피초대자 권한", example = "VIEWER")
         private MemberTeamRole role;
     }

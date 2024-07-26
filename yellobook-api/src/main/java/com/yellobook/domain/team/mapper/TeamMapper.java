@@ -18,4 +18,6 @@ public interface TeamMapper {
     @Mapping(target = "teamId", source = "teamId")
     TeamResponse.LeaveTeamResponseDTO toLeaveTeamResponseDTO(Long teamId);
 
+    TeamResponse.InvitationCodeResponseDTO toInvitationCodeResponseDTO(String inviteUrl);
+
 }

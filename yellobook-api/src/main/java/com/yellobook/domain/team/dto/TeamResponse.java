@@ -24,7 +24,7 @@ public class TeamResponse {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class InviteTeamResponseDTO {
+    public static class InvitationCodeResponseDTO {
         @Schema(description = "팀 초대 링크 URL", example = "https://~")
         private String inviteUrl;
     }

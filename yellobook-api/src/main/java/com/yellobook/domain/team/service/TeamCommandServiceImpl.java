@@ -18,8 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -50,11 +48,6 @@ public class TeamCommandServiceImpl implements TeamCommandService {
         log.info("Participant added: Member ID = {}, Team ID = {}", member.getId(), newTeam.getId());
 
         return teamMapper.toCreateTeamResponseDTO(newTeam);
-    }
-
-    @Override
-    public String inviteTeam(TeamRequest.InviteTeamRequestDTO request){
-        return null;
     }
 
     @Override

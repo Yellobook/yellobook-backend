@@ -12,7 +12,9 @@ public enum TeamErrorCode implements ErrorCode {
     TEAM_NOT_FOUND(HttpStatus.NOT_FOUND, "TEAM-002", "팀을 찾을 수 없습니다."),
     USER_NOT_IN_THAT_TEAM(HttpStatus.FORBIDDEN, "TEAM-003", "유저는 해당 팀에 속하지 않습니다."),
     TEAM_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "TEAM-004", "팀 생성에 실패하였습니다."),
-    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "TEAM-005", "해당 유저를 찾을 수 없습니다.")
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "TEAM-005", "해당 유저를 찾을 수 없습니다."),
+    VIEWER_CANNOT_INVITE(HttpStatus.FORBIDDEN, "TEAM-006", "뷰어는 초대권한이 없습니다."),
+    ADMIN_EXISTS(HttpStatus.FORBIDDEN, "TEAM-007", "관리자가 이미 존재합니다.")
     ;
 
     private final HttpStatus httpStatus;

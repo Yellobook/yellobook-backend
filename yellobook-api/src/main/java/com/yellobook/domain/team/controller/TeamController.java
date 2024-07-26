@@ -4,8 +4,7 @@ import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.team.dto.TeamRequest;
 import com.yellobook.domain.team.dto.TeamResponse;
 import com.yellobook.domain.team.service.TeamCommandService;
-import com.yellobook.domains.team.entity.Team;
-import com.yellobook.error.code.CommonErrorCode;
+import com.yellobook.domain.team.service.TeamQueryService;
 import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "\uD83D\uDC65 팀", description = "Team API")
 public class TeamController {
     private final TeamCommandService teamCommandService;
+    private final TeamQueryService teamQueryService;
 
     @PostMapping("/")
     @Operation(summary = "팀 만들기 API", description ="새로운 팀을 생성하는 API입니다.")
@@ -35,13 +35,13 @@ public class TeamController {
 
     @PostMapping("/{teamId}/invite")
     @Operation(summary = "팀 초대하기 API", description = "팀원이 다른 구성원을 초대하기 위해 URL을 생성하는 API입니다.")
-    public ResponseEntity<SuccessResponse<TeamResponse.InviteTeamResponseDTO>> inviteTeam(
+    public ResponseEntity<SuccessResponse<TeamResponse.InvitationCodeResponseDTO>> inviteTeam(
             @PathVariable Long teamId,
-            @RequestBody TeamRequest.InviteTeamRequestDTO request,
+            @RequestBody TeamRequest.InvitationCodeRequestDTO request,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
-        teamCommandService.inviteTeam(request);
-        return null;
+        TeamResponse.InvitationCodeResponseDTO response = teamQueryService.makeInvitationCode(teamId, request, customOAuth2User);
+        return ResponseFactory.created(response);
     }
 
     @DeleteMapping("/{teamId}/leave")
