@@ -50,7 +50,8 @@ public class TeamController {
             @PathVariable Long teamId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
-        return null;
+        TeamResponse.LeaveTeamResponseDTO response = teamCommandService.leaveTeam(teamId, customOAuth2User);
+        return ResponseFactory.success(response);
     }
 
     @PostMapping("/{teamId}/join")

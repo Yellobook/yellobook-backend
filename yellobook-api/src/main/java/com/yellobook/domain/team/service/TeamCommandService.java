@@ -10,5 +10,5 @@ public interface TeamCommandService {
     TeamResponse.CreateTeamResponseDTO createTeam(TeamRequest.CreateTeamRequestDTO request, CustomOAuth2User customOAuth2User);
     String inviteTeam(TeamRequest.InviteTeamRequestDTO request);
     TeamResponse.LeaveTeamResponseDTO leaveTeam(Long teamId, CustomOAuth2User customOAuth2User);
-    Participant joinTeam(Long teamId, TeamRequest.JoinTeamRequestDTO request);
+    TeamResponse.JoinTeamResponseDTO joinTeam(Long teamId, TeamRequest.JoinTeamRequestDTO request);
 }

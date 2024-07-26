@@ -59,11 +59,22 @@ public class TeamCommandServiceImpl implements TeamCommandService {
 
     @Override
     public TeamResponse.LeaveTeamResponseDTO leaveTeam(Long teamId, CustomOAuth2User customOAuth2User) {
-        return null;
+        Long memberId = customOAuth2User.getMemberId();
+
+        Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)
+                .orElseThrow(() -> {
+                    log.error("Participant not found for Member ID = {} and Team ID = {}", memberId, teamId);
+                    return new CustomException(TeamErrorCode.USER_NOT_IN_THAT_TEAM);
+                });
+
+        participantRepository.delete(participant);
+        log.info("Participant (Member ID = {}, Team ID = {}) is deleted", memberId, teamId);
+
+        return teamMapper.toLeaveTeamResponseDTO(teamId);
     }
 
     @Override
-    public Participant joinTeam(Long teamId, TeamRequest.JoinTeamRequestDTO request) {
+    public TeamResponse.JoinTeamResponseDTO joinTeam(Long teamId, TeamRequest.JoinTeamRequestDTO request) {
         return null;
     }
 

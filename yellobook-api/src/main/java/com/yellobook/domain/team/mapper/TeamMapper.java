@@ -15,4 +15,7 @@ public interface TeamMapper {
     Team toTeam(TeamRequest.CreateTeamRequestDTO request);
     TeamResponse.CreateTeamResponseDTO toCreateTeamResponseDTO(Team team);
 
+    @Mapping(target = "teamId", source = "teamId")
+    TeamResponse.LeaveTeamResponseDTO toLeaveTeamResponseDTO(Long teamId);
+
 }
