@@ -5,6 +5,8 @@ import com.yellobook.domain.team.dto.TeamRequest;
 import com.yellobook.domain.team.dto.TeamResponse;
 import com.yellobook.domain.team.service.TeamCommandService;
 import com.yellobook.domains.team.entity.Team;
+import com.yellobook.error.code.CommonErrorCode;
+import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,14 +22,16 @@ import org.springframework.web.bind.annotation.*;
 public class TeamController {
     private final TeamCommandService teamCommandService;
 
-    @PostMapping("")
+    @PostMapping("/")
     @Operation(summary = "팀 만들기 API", description ="새로운 팀을 생성하는 API입니다.")
     public ResponseEntity<SuccessResponse<TeamResponse.CreateTeamResponseDTO>> createTeam(
-            @RequestBody TeamRequest.CreateTeamRequestDTO request
+            @RequestBody TeamRequest.CreateTeamRequestDTO request,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
-        Team team = teamCommandService.createTeam(request);
-        return null;
+        TeamResponse.CreateTeamResponseDTO response = teamCommandService.createTeam(request, customOAuth2User);
+        return ResponseFactory.created(response);
     }
+
 
     @PostMapping("/{teamId}/invite")
     @Operation(summary = "팀 초대하기 API", description = "팀원이 다른 구성원을 초대하기 위해 URL을 생성하는 API입니다.")
