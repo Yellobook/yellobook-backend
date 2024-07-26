@@ -13,11 +13,10 @@ public interface TeamMapper {
 
     @Mapping(target = "id", ignore = true)
     Team toTeam(TeamRequest.CreateTeamRequestDTO request);
+
     TeamResponse.CreateTeamResponseDTO toCreateTeamResponseDTO(Team team);
-
-    @Mapping(target = "teamId", source = "teamId")
     TeamResponse.LeaveTeamResponseDTO toLeaveTeamResponseDTO(Long teamId);
-
     TeamResponse.InvitationCodeResponseDTO toInvitationCodeResponseDTO(String inviteUrl);
     TeamResponse.JoinTeamResponseDTO toJoinTeamResponseDTO(Team team);
+    TeamResponse.GetTeamResponseDTO toGetTeamResponseDTO(Team team);
 }

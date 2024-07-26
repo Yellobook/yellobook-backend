@@ -70,6 +70,7 @@ public class TeamController {
             @PathVariable Long teamId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
-        return null;
+        TeamResponse.GetTeamResponseDTO response = teamQueryService.findByTeamId(teamId, customOAuth2User);
+        return ResponseFactory.success(response);
     }
 }

@@ -40,7 +40,7 @@ public class TeamQueryServiceImpl implements TeamQueryService {
 
         Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)
                 .orElseThrow(() -> {
-                    log.error("Participant not found: Member ID = {}, Team ID = {}", memberId, teamId);
+                    log.error("Cannot make invitation: Member ID = {}, Team ID = {}", memberId, teamId);
                     return new CustomException(TeamErrorCode.USER_NOT_IN_THAT_TEAM);
                 });
 
@@ -68,10 +68,18 @@ public class TeamQueryServiceImpl implements TeamQueryService {
     }
 
     @Override
-    public Team findByTeamId(Long teamId, CustomOAuth2User customOAuth2User){
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+    public TeamResponse.GetTeamResponseDTO findByTeamId(Long teamId, CustomOAuth2User customOAuth2User){
 
-        return null;
+        Long memberId = customOAuth2User.getMemberId();
+
+        Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)
+                .orElseThrow(() ->{
+                    log.error("Cannot get team: Member ID = {}, Team ID = {}", memberId, teamId);
+                    return new CustomException(TeamErrorCode.USER_NOT_IN_THAT_TEAM);
+                });
+
+        Team team = teamRepository.getReferenceById(teamId);
+
+        return teamMapper.toGetTeamResponseDTO(team);
     }
 }
