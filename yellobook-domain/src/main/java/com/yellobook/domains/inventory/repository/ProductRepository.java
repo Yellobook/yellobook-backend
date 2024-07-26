@@ -7,5 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long>, ProductRepositoryCustom {
     void deleteById(Long productId);
+    boolean existsByInventoryIdAndSku(Long inventoryId, Integer sku);
 
 }

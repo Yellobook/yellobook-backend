@@ -31,17 +31,18 @@ public class OrderController {
             @RequestBody MakeOrderRequest requestDTO,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
-        orderCommandService.makeOrder(requestDTO, oAuth2User.getMemberId());
-        return null;
+        MakeOrderResponse response = orderCommandService.makeOrder(requestDTO, oAuth2User.getMemberId());
+        return ResponseFactory.success(response);
     }
 
     @Operation(summary = "[주문자, 관리자] 주문 조회")
     @GetMapping("/{orderId}")
-    public ResponseEntity<SuccessResponse<?>> getOrder(
+    public ResponseEntity<SuccessResponse<GetOrderResponse>> getOrder(
             @ExistOrder @PathVariable("orderId") Long orderId,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
-        return null;
+        GetOrderResponse response = orderQueryService.getOrder(orderId, oAuth2User.getMemberId());
+        return ResponseFactory.success(response);
     }
 
     @Operation(summary = "[주문자, 관리자] 주문에 댓글 달기")

@@ -1,23 +1,37 @@
 package com.yellobook.domain.order.service;
 
+import com.yellobook.common.utils.ParticipantUtil;
+import com.yellobook.common.utils.TeamUtil;
 import com.yellobook.domain.order.dto.AddOrderCommentRequest;
 import com.yellobook.domain.order.dto.AddOrderCommentResponse;
 import com.yellobook.domain.order.dto.MakeOrderRequest;
+import com.yellobook.domain.order.dto.MakeOrderResponse;
 import com.yellobook.domain.order.mapper.OrderMapper;
+import com.yellobook.domains.inventory.entity.Product;
+import com.yellobook.domains.inventory.repository.ProductRepository;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.member.repository.MemberRepository;
 import com.yellobook.domains.order.entity.Order;
 import com.yellobook.domains.order.entity.OrderComment;
+import com.yellobook.domains.order.entity.OrderMention;
 import com.yellobook.domains.order.repository.OrderCommentRepository;
 import com.yellobook.domains.order.repository.OrderMentionRepository;
 import com.yellobook.domains.order.repository.OrderRepository;
+import com.yellobook.domains.team.entity.Participant;
+import com.yellobook.domains.team.entity.Team;
+import com.yellobook.domains.team.repository.TeamRepository;
+import com.yellobook.enums.MemberTeamRole;
 import com.yellobook.enums.OrderStatus;
+import com.yellobook.error.code.InventoryErrorCode;
 import com.yellobook.error.code.MemberErrorCode;
 import com.yellobook.error.code.OrderErrorCode;
+import com.yellobook.error.code.TeamErrorCode;
 import com.yellobook.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -28,6 +42,10 @@ public class OrderCommandService{
     private final OrderMentionRepository orderMentionRepository;
     private final MemberRepository memberRepository;
     private final OrderMapper orderMapper;
+    private final TeamRepository teamRepository;
+    private final ProductRepository productRepository;
+    private final ParticipantUtil participantUtil;
+    private final TeamUtil teamUtil;
 
     /**
      * 주문 정정 요청 (관리자)
@@ -59,7 +77,12 @@ public class OrderCommandService{
         if(order.getOrderStatus().equals(OrderStatus.PENDING_MODIFY)){
             throw new CustomException(OrderErrorCode.ORDER_PENDING_MODIFY_CANT_CONFIRM);
         }
-        // 수정 & dirty checking
+        // 제품 수량 마이너스
+        if(order.getOrderAmount() > order.getProduct().getAmount()){
+            throw new CustomException(OrderErrorCode.ORDER_AMOUNT_EXCEED);
+        }else{
+            order.getProduct().reduceAmount(order.getOrderAmount());
+        }
         order.confirmOrder();
     }
 
@@ -99,16 +122,35 @@ public class OrderCommandService{
         }
     }
 
-
     /**
      * 주문 생성
      */
-    public void makeOrder(MakeOrderRequest requestDTO, Long memberId) {
-        // 관리자, 뷰어 주문 불가능
+    public MakeOrderResponse makeOrder(MakeOrderRequest requestDTO, Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
-
+        Long teamId = teamUtil.getCurrentTeam(memberId);
+        Team team = teamRepository.findById(teamId).orElseThrow(() -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+        MemberTeamRole role = participantUtil.getMemberTeamRole(teamId, member.getId());
+        // 관리자, 뷰어 주문 불가능
+        participantUtil.forbidAdmin(role);
+        participantUtil.forbidViewer(role);
+        // 관리자 없으면 주문자 주문 불가능
+        Optional<Participant> optionalParticipant = participantUtil.findAdminByTeamIdAndRole(teamId);
+        if(optionalParticipant.isEmpty()){
+            throw new CustomException(OrderErrorCode.ORDER_CREATION_NOT_ALLOWED);
+        }
+        Member admin = optionalParticipant.get().getMember();
+        // 존재하는 제품인지 확인
+        Product product = productRepository.findById(requestDTO.getProductId()).orElseThrow(() -> new CustomException(InventoryErrorCode.PRODUCT_NOT_FOUND));
+        // 수량 비교
+        if(product.getAmount() < requestDTO.getOrderAmount()){
+            throw new CustomException(OrderErrorCode.ORDER_AMOUNT_EXCEED);
+        }
         // mapstruct로 주문 생성 - 작성자, 팀, 제품 FK
-        // 함께하는 사용자 테이블 추가
-        // save
+        Order order = orderMapper.toOrder(requestDTO, member, team, product);
+        // 함께하는 사용자 테이블에 관리자 추가
+        OrderMention orderMention = orderMapper.toOrderMention(order, admin);
+        Long orderId = orderRepository.save(order).getId();
+        orderMentionRepository.save(orderMention);
+        return orderMapper.toMakeOrderResponse(orderId);
     }
 }

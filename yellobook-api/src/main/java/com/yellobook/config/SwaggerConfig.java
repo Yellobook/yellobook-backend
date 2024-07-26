@@ -43,7 +43,7 @@ public class SwaggerConfig {
                                 .scheme("bearer")
                                 .bearerFormat("JWT")))
                 // 기본적으로 모든 엔드포인트에 대한 JWT 인증이 필요한 것으로 설정
-                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+                .addSecurityItem(new SecurityRequirement().addList("Bearer Token"))
                 .info(getInfo())
                 // 서버 정보 추가
                 .servers(List.of(server))
