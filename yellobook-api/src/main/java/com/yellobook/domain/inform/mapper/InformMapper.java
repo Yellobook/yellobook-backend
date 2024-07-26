@@ -14,6 +14,4 @@ public interface InformMapper {
     Inform toInform(InformRequest.CreateInformRequestDTO request, Member member, Team team);
 
     InformResponse.CreateInformResponseDTO toCreateInformResponseDTO(Inform inform);
-
-
 }

@@ -9,6 +9,6 @@ import com.yellobook.domains.inform.entity.InformComment;
 
 public interface InformCommandService {
     InformResponse.CreateInformResponseDTO createInform(CustomOAuth2User oAuth2User, InformRequest.CreateInformRequestDTO request);
-    void deleteInform(Long informId, CustomOAuth2User oAuth2User);
+    InformResponse.RemoveInformResponseDTO deleteInform(Long informId, CustomOAuth2User oAuth2User);
     InformComment createComment(Long memberId, CustomOAuth2User oauth2User, InformCommentRequest.PostCommentRequestDTO request);
 }

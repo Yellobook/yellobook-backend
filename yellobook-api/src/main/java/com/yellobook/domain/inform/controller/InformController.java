@@ -36,12 +36,12 @@ public class InformController {
 
     @Operation(summary = "업무(공지) 삭제")
     @DeleteMapping("/{informId}")
-    public ResponseEntity<SuccessResponse<String>> deleteInform(
+    public ResponseEntity<SuccessResponse<InformResponse.RemoveInformResponseDTO>> deleteInform(
             @PathVariable("informId") Long informId,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
-        informCommandService.deleteInform(informId, oAuth2User);
-        return null;
+        InformResponse.RemoveInformResponseDTO response = informCommandService.deleteInform(informId, oAuth2User);
+        return ResponseFactory.success(response);
     }
 
     @GetMapping("/{informId}")

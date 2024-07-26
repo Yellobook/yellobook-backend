@@ -13,6 +13,7 @@ import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
 import com.yellobook.domains.team.repository.ParticipantRepository;
+import com.yellobook.error.code.InformErrorCode;
 import com.yellobook.error.code.TeamErrorCode;
 import com.yellobook.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -51,8 +52,24 @@ public class InformCommandServiceImpl implements InformCommandService {
     }
 
     @Override
-    public void deleteInform(Long informId, CustomOAuth2User oAuth2User){
+    public InformResponse.RemoveInformResponseDTO deleteInform(Long informId, CustomOAuth2User oAuth2User){
+        Long memberId = oAuth2User.getMemberId();
 
+        Inform removeInform = informRepository.findById(informId).orElseThrow(()->{
+            log.error("inform {} is not found.", informId);
+            return new CustomException(InformErrorCode.INFORM_NOT_FOUND);
+                });
+
+        //inform삭제할 때, inform에 등록된 member가 내가 맞냐 확인하고 삭제
+        if(!removeInform.getMember().getId().equals(memberId)){
+            log.error("inform {}'s author is not member {}.", informId, memberId);
+            throw new CustomException(InformErrorCode.INFORM_MEMBER_NOT_MATCH);
+        }
+
+        log.info("Delete inform {}", removeInform.getId());
+        informRepository.deleteById(informId);
+
+        return InformResponse.RemoveInformResponseDTO.builder().informId(informId).build();
     }
 
     @Override
