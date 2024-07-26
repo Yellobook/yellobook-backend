@@ -73,4 +73,12 @@ public class Order extends BaseEntity {
         this.member = member;
         this.team = team;
     }
+
+    public void requestModifyOrder(){
+        this.orderStatus = OrderStatus.PENDING_MODIFY;
+    }
+
+    public void confirmOrder(){
+        this.orderStatus = OrderStatus.CONFIRMED;
+    }
 }

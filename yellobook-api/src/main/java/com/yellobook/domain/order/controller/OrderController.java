@@ -1,7 +1,13 @@
 package com.yellobook.domain.order.controller;
 
+import com.yellobook.common.annotation.ExistOrder;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
+import com.yellobook.domain.order.dto.AddOrderComment;
+import com.yellobook.domain.order.dto.GetOrderComments;
+import com.yellobook.domain.order.dto.MakeOrderRequest;
+import com.yellobook.domain.order.dto.MakeOrderResponse;
 import com.yellobook.domain.order.service.OrderCommandService;
+import com.yellobook.domain.order.service.OrderQueryService;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,35 +21,78 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Tag(name = " \uD83E\uDDD9\uD83C\uDFFB\u200D 주문" , description = "Order API")
 public class OrderController {
+    private final OrderQueryService orderQueryService;
     private final OrderCommandService orderCommandService;
+
+    // TODO : DTO 수정 필요
+    @Operation(summary = "[주문자] 주문 작성")
+    @PostMapping("")
+    public ResponseEntity<SuccessResponse<MakeOrderResponse>> makeOrder(
+            @RequestBody MakeOrderRequest requestDTO,
+            @AuthenticationPrincipal CustomOAuth2User oAuth2User
+    ){
+        orderQueryService.makeOrder(requestDTO, oAuth2User.getMemberId());
+        return null;
+    }
+
+    @Operation(summary = "[주문자, 관리자] 주문 조회")
+    @GetMapping("/{orderId}")
+    public ResponseEntity<SuccessResponse<>> getOrder(
+            @ExistOrder @PathVariable("orderId") Long orderId,
+            @AuthenticationPrincipal CustomOAuth2User oAuth2User
+    ){
+        return null;
+    }
+
+    @Operation(summary = "[주문자, 관리자] 주문에 댓글 달기")
+    @PostMapping("/{orderId}/comment")
+    public ResponseEntity<SuccessResponse<AddOrderComment>> addOrderComment(
+            @ExistOrder @PathVariable("orderId") Long orderId,
+            @RequestBody AddOrderComment requestDTO,
+            @AuthenticationPrincipal CustomOAuth2User oAuth2User
+    ){
+        orderCommandService.addOrderComment(orderId, oAuth2User.getMemberId(), requestDTO);
+        return null;
+    }
+
+    @Operation(summary = "[주문자, 관리자] 주문 댓글 조회")
+    @GetMapping("/{orderId}/comment")
+    public ResponseEntity<SuccessResponse<GetOrderComments>> getOrderComments(
+            @ExistOrder @PathVariable("orderId") Long orderId,
+            @AuthenticationPrincipal CustomOAuth2User oAuth2User
+    ){
+
+        return null;
+    }
+
 
     @Operation(summary = "[관리자] 주문 정정 요청")
     @PatchMapping("/{orderId}/correction")
     public ResponseEntity<SuccessResponse<String>> modifyRequestOrder(
-            @PathVariable("orderId") Long orderId,
+            @ExistOrder @PathVariable("orderId") Long orderId,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
             ) {
-        orderCommandService.modifyRequestOrder(orderId, oAuth2User);
+        orderCommandService.modifyRequestOrder(orderId, oAuth2User.getMemberId());
         return null;
     }
 
     @Operation(summary = "[관리자] 주문 확인")
     @PatchMapping("/{orderId}/confirm")
     public ResponseEntity<SuccessResponse<String>> confirmOrder(
-            @PathVariable("orderId") Long orderId,
+            @ExistOrder @PathVariable("orderId") Long orderId,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ) {
-        orderCommandService.confirmOrder(orderId, oAuth2User);
+        orderCommandService.confirmOrder(orderId, oAuth2User.getMemberId());
         return null;
     }
 
     @Operation(summary = "[주문자] 주문 취소")
     @DeleteMapping("/{orderId}")
     public ResponseEntity<SuccessResponse<String>> cancelOrder(
-            @PathVariable("orderId") Long orderId,
+            @ExistOrder @PathVariable("orderId") Long orderId,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ) {
-        orderCommandService.cancelOrder(orderId, oAuth2User);
+        orderCommandService.cancelOrder(orderId, oAuth2User.getMemberId());
         return null;
     }
 
