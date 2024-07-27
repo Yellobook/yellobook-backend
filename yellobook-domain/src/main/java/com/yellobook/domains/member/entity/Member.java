@@ -1,7 +1,7 @@
 package com.yellobook.domains.member.entity;
 
 import com.yellobook.domains.common.entity.BaseEntity;
-import com.yellobook.enums.MemberRole;
+import com.yellobook.common.enums.MemberRole;
 import jakarta.persistence.*;
 import lombok.*;
 

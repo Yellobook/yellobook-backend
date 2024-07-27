@@ -1,6 +1,6 @@
 package com.yellobook.domain.member.dto;
 
-import com.yellobook.enums.MemberRole;
+import com.yellobook.common.enums.MemberRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
