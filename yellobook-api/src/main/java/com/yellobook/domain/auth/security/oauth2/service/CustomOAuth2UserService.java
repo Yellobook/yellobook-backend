@@ -6,7 +6,7 @@ import com.yellobook.domain.auth.security.oauth2.dto.OAuth2UserDTO;
 import com.yellobook.domain.auth.security.oauth2.enums.SocialType;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.member.repository.MemberRepository;
-import com.yellobook.enums.MemberRole;
+import com.yellobook.common.enums.MemberRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
