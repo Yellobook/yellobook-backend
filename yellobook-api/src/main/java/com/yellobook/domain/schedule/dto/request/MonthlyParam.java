@@ -7,14 +7,12 @@ import org.springdoc.core.annotations.ParameterObject;
 
 @Getter
 @ParameterObject
-@Schema(description = "월 일정 조회를 위한 파라미터")
-public class SearchScheduleParam {
+@Schema(description = "월별 일정 조회를 위한 파라미터")
+public class MonthlyParam {
     @Parameter(description = "년", example = "2024")
     private int year;
 
     @Parameter(description = "월", example = "7")
     private int month;
-
-    @Parameter(description = "검색 키워드", example = "근무")
-    private String keyword;
 }
+

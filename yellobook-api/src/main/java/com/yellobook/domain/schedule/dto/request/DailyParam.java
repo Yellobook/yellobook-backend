@@ -8,7 +8,7 @@ import org.springdoc.core.annotations.ParameterObject;
 @Getter
 @ParameterObject
 @Schema(description = "일일 일정 조회를 위한 파라미터")
-public class DailyScheduleParam {
+public class DailyParam {
     @Parameter(description = "년", example = "2024")
     private int year;
 
