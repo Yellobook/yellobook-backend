@@ -1,5 +1,6 @@
 package com.yellobook.domain.schedule;
 
+import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.config.TestConfig;
 import com.yellobook.domains.schedule.dto.MonthlyScheduleDTO;
 import com.yellobook.domains.schedule.dto.ScheduleDTO;
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
@@ -30,26 +32,36 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Sql(scripts = "classpath:cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD) // 모든 테스트 후에 한 번 실행
 @DisplayName("PostRepository 테스트")
 public class ScheduleRepositoryTest {
-    @Autowired
     private ScheduleRepository scheduleRepository;
+    // 오늘 날짜
+    private final LocalDate today;
+    // 서비스 사용자
+    private final TeamMemberVO admin;
+    private final TeamMemberVO orderer;
+    private final TeamMemberVO viewer;
+    private final Long INVALID_VALUE = 999999L;
 
-    // today 를 고정해야 sql 파일 데이터를 반영할 수 있다.
-    // date.after(today) 를 사용하기 때문에 now() 로 하면 시간에 따라 결과가 바뀐다.
-    private final LocalDate today = LocalDate.of(2024, 7, 25);
+    @Autowired
+    public ScheduleRepositoryTest(ScheduleRepository scheduleRepository) {
+        this.scheduleRepository = scheduleRepository;
+        // today 를 고정해야 sql 파일 데이터 반영 가능
+        this.today = LocalDate.of(2024, 7, 25);
+        this.admin = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
+        this.orderer = TeamMemberVO.of(2L, 1L, MemberTeamRole.ORDERER);
+        this.viewer = TeamMemberVO.of(3L, 1L, MemberTeamRole.VIEWER);
+    }
 
     @Nested
     @DisplayName("findEarliestOrder 는")
     class FindEarliestOrderTests {
 
         @Test
-        @DisplayName("주문자가 자신의 팀에 속한 자신이 주문한 가장 이른 주문을 가져온다")
+        @DisplayName("주문자라면 팀에서 자신이 주문한 주문 중 내일부터 가장 이른 주문을 가져와야 한다.")
         void testFindEarliestOrderForOrderer() {
             // given
-            Long teamId = 1L;
-            Long ordererId = 2L;
-
+            TeamMemberVO teamMember = orderer;
             // when
-            Optional<UpcomingScheduleDTO> result = scheduleRepository.findEarliestOrder(today, MemberTeamRole.ORDERER, teamId, ordererId);
+            Optional<UpcomingScheduleDTO> result = scheduleRepository.findEarliestOrder(today, teamMember);
 
             // then
             assertThat(result).isPresent();
@@ -60,14 +72,13 @@ public class ScheduleRepositoryTest {
         }
 
         @Test
-        @DisplayName("관리자가 자신의 팀에 속한 가장 이른 주문을 가져온다")
+        @DisplayName("관리자라면 팀에서 모든 주문 중 내일부터 가장 이른 주문을 가져와야 한다.")
         void testFindEarliestOrderForAdmin() {
             // given
-            Long teamId = 1L;
-            Long adminId = 1L;
+            TeamMemberVO teamMember = admin;
 
             // when
-            Optional<UpcomingScheduleDTO> result = scheduleRepository.findEarliestOrder(today, MemberTeamRole.ADMIN, teamId, adminId);
+            Optional<UpcomingScheduleDTO> result = scheduleRepository.findEarliestOrder(today, teamMember);
 
             // then
             assertThat(result).isPresent();
@@ -78,28 +89,28 @@ public class ScheduleRepositoryTest {
         }
 
         @Test
-        @DisplayName("팀이 존재하지 않는다면 결과가 비어 있어야 한다")
+        @DisplayName("팀이 존재하지 않는다면 결과가 비어 있어야 한다.")
         void testFindEarliestOrderWithInvalidTeamId() {
             // given
-            Long invalidTeamId = 999L;
-            Long memberId = 1L;
+            Long invalidTeamId = INVALID_VALUE;
+            TeamMemberVO teamMember = TeamMemberVO.of(1L, invalidTeamId, MemberTeamRole.VIEWER);
 
             // when
-            Optional<UpcomingScheduleDTO> result = scheduleRepository.findEarliestOrder(today, MemberTeamRole.ORDERER, invalidTeamId, memberId);
+            Optional<UpcomingScheduleDTO> result = scheduleRepository.findEarliestOrder(today, teamMember);
 
             // then
             assertThat(result).isEmpty();
         }
 
         @Test
-        @DisplayName("사용자가 존재하지 않는다면 결과가 비어 있어야 한다")
+        @DisplayName("없는 주문자라면 결과가 비어 있어야 한다.")
         void testFindEarliestOrderWithInvalidMemberId() {
             // given
-            Long teamId = 1L;
-            Long invalidMemberId = 999L;
+            Long invalidMemberId = INVALID_VALUE;
+            TeamMemberVO teamMember = TeamMemberVO.of(invalidMemberId, 1L, MemberTeamRole.ORDERER);
 
             // when
-            Optional<UpcomingScheduleDTO> result = scheduleRepository.findEarliestOrder(today, MemberTeamRole.ORDERER, teamId, invalidMemberId);
+            Optional<UpcomingScheduleDTO> result = scheduleRepository.findEarliestOrder(today, teamMember);
 
             // then
             assertThat(result).isEmpty();
@@ -110,16 +121,14 @@ public class ScheduleRepositoryTest {
     @DisplayName("findEarliestInform 는")
     class findEarliestInformTests {
 
-
         @Test
-        @DisplayName("자신에게 관련된 가장 이른 공지 및 일정 을 가져온다")
+        @DisplayName("사용자와 관련된 가장 이른 공지 및 일정 을 가져와야 한다.")
         void testFindEarliestInformForMember() {
             // given
-            Long teamId = 1L;
-            Long memberId = 1L;
+            TeamMemberVO teamMember = admin;
 
             // when
-            Optional<UpcomingScheduleDTO> result = scheduleRepository.findEarliestInform(today, teamId, memberId);
+            Optional<UpcomingScheduleDTO> result = scheduleRepository.findEarliestInform(today, teamMember);
 
             // then
             assertThat(result).isPresent();
@@ -130,28 +139,27 @@ public class ScheduleRepositoryTest {
         }
 
         @Test
-        @DisplayName("팀 구성원이 아닌 경우 결과가 없어야 한다")
+        @DisplayName("팀 구성원이 아닌 경우 결과가 없어야 한다.")
         void testFindEarliestInformForNonTeamMember() {
             // given
-            Long teamId = 1L;
-            Long memberId = 999L;
+            Long invalidTeamMemberId = INVALID_VALUE;
+            TeamMemberVO teamMember = TeamMemberVO.of(invalidTeamMemberId, 1L, MemberTeamRole.ADMIN);
 
             // when
-            Optional<UpcomingScheduleDTO> result = scheduleRepository.findEarliestInform(today, teamId, memberId);
+            Optional<UpcomingScheduleDTO> result = scheduleRepository.findEarliestInform(today, teamMember);
 
             // then
             assertThat(result).isNotPresent();
         }
 
         @Test
-        @DisplayName("태그된 일정이 존재하면 해당 일정도 가져온다")
+        @DisplayName("태그된 일정이 존재하면 해당 일정도 가져와야 한다.")
         void testFindEarliestInformForMentionedMember() {
             // given
-            Long teamId = 1L;
-            Long memberId = 2L;
+            TeamMemberVO teamMember = orderer;
 
             // when
-            Optional<UpcomingScheduleDTO> result = scheduleRepository.findEarliestInform(today, teamId, memberId);
+            Optional<UpcomingScheduleDTO> result = scheduleRepository.findEarliestInform(today, teamMember);
 
             // then
             assertThat(result).isPresent();
@@ -171,14 +179,12 @@ public class ScheduleRepositoryTest {
         void testSearchMonthlyOrdersForMember() {
             // given
             String keyword = "제품";
-            MemberTeamRole role = MemberTeamRole.ORDERER;
-            Long teamId = 1L;
-            Long memberId = 1L;
+            TeamMemberVO teamMember = admin;
             int year = 2024;
             int month = 7;
 
             // when
-            List<ScheduleDTO> result = scheduleRepository.searchMonthlyOrders(keyword, role, teamId, memberId, year, month);
+            List<ScheduleDTO> result = scheduleRepository.searchMonthlyOrders(keyword, year, month, teamMember);
 
             // then
             assertThat(result.size()).isGreaterThan(0);
@@ -193,14 +199,12 @@ public class ScheduleRepositoryTest {
         void testSearchMonthlyOrdersWithNonExistentKeyword() {
             // given
             String keyword = "없는 키워드";
-            MemberTeamRole role = MemberTeamRole.ORDERER;
-            Long teamId = 1L;
-            Long memberId = 1L;
+            TeamMemberVO teamMember = admin;
             int year = 2024;
             int month = 7;
 
             // when
-            List<ScheduleDTO> result = scheduleRepository.searchMonthlyOrders(keyword, role, teamId, memberId, year, month);
+            List<ScheduleDTO> result = scheduleRepository.searchMonthlyOrders(keyword, year, month, teamMember);
 
             // then
             assertThat(result).isEmpty();
@@ -211,14 +215,12 @@ public class ScheduleRepositoryTest {
         void testSearchMonthlyOrdersSortedOrder() {
             // given
             String keyword = "제품";
-            MemberTeamRole role = MemberTeamRole.ORDERER;
-            Long teamId = 1L;
-            Long memberId = 1L;
+            TeamMemberVO teamMember = admin;
             int year = 2024;
             int month = 7;
 
             // when
-            List<ScheduleDTO> result = scheduleRepository.searchMonthlyOrders(keyword, role, teamId, memberId, year, month);
+            List<ScheduleDTO> result = scheduleRepository.searchMonthlyOrders(keyword, year, month, teamMember);
 
             // then
             assertThat(result).isNotEmpty();
@@ -228,20 +230,19 @@ public class ScheduleRepositoryTest {
 
     @Nested
     @DisplayName("searchMonthlyInforms는")
-    class SearchMonthlyInformsTests {
+    class searchMonthlyInformsTests {
 
         @Test
-        @DisplayName("자신이 작성한 일정을 검색할 수 있다")
+        @DisplayName("자신이 작성한 일정을 검색할 수 있어야 한다.")
         void testSearchMonthlyInformsForOwn() {
             // given
             String keyword = "일정";
-            Long teamId = 1L;
-            Long memberId = 1L;
+            TeamMemberVO teamMember = admin;
             int year = 2024;
             int month = 7;
 
             // when
-            List<ScheduleDTO> schedules = scheduleRepository.searchMonthlyInforms(keyword, MemberTeamRole.ADMIN, teamId, memberId, year, month);
+            List<ScheduleDTO> schedules = scheduleRepository.searchMonthlyInforms(keyword, year, month, teamMember);
 
             // then
             assertThat(schedules).isNotEmpty();
@@ -250,17 +251,16 @@ public class ScheduleRepositoryTest {
         }
 
         @Test
-        @DisplayName("자신이 태그된 일정을 검색할 수 있다")
+        @DisplayName("자신이 태그된 일정을 검색할 수 있다.")
         void testSearchMonthlyInformsForTagged() {
             // given
             String keyword = "일정";
-            Long teamId = 1L;
-            Long memberId = 1L;
+            TeamMemberVO teamMember = admin;
             int year = 2024;
             int month = 7;
 
             // when
-            List<ScheduleDTO> schedules = scheduleRepository.searchMonthlyInforms(keyword, MemberTeamRole.ADMIN, teamId, memberId, year, month);
+            List<ScheduleDTO> schedules = scheduleRepository.searchMonthlyInforms(keyword, year, month, teamMember);
 
             // then
             assertThat(schedules).isNotEmpty();
@@ -269,34 +269,32 @@ public class ScheduleRepositoryTest {
         }
 
         @Test
-        @DisplayName("키워드에 해당하는 글이 없을 경우 빈 리스트를 반환한다")
+        @DisplayName("키워드에 해당하는 글이 없을 경우 빈 리스트를 반환한다.")
         void testSearchMonthlyInformsWithNoKeyword() {
             // given
             String keyword = "[][[][][][][]";
-            Long teamId = 1L;
-            Long memberId = 1L;
+            TeamMemberVO teamMember = admin;
             int year = 2024;
             int month = 8;
 
             // when
-            List<ScheduleDTO> schedules = scheduleRepository.searchMonthlyInforms(keyword, MemberTeamRole.ORDERER, teamId, memberId, year, month);
+            List<ScheduleDTO> schedules = scheduleRepository.searchMonthlyInforms(keyword, year, month, teamMember);
 
             // then
             assertThat(schedules).isEmpty();
         }
 
         @Test
-        @DisplayName("해당 월에 속하지 않는 일정을 검색하지 않는다")
+        @DisplayName("해당 월에 속하지 않는 일정을 검색하지 않는다.")
         void testSearchMonthlyInformsWithDifferentMonth() {
             // given
             String keyword = "내용";
-            Long teamId = 1L;
-            Long memberId = 1L;
+            TeamMemberVO teamMember = admin;
             int year = 2024;
             int month = 6;
 
             // when
-            List<ScheduleDTO> schedules = scheduleRepository.searchMonthlyInforms(keyword, MemberTeamRole.ORDERER, teamId, memberId, year, month);
+            List<ScheduleDTO> schedules = scheduleRepository.searchMonthlyInforms(keyword, year, month, teamMember);
 
             // then
             assertThat(schedules).isEmpty();
@@ -305,21 +303,20 @@ public class ScheduleRepositoryTest {
 
 
     @Nested
-    @DisplayName("findMonthlyOrders 메서드는")
+    @DisplayName("findMonthlyOrders 는")
     class FindMonthlyOrdersTests {
 
         @Test
-        @DisplayName("관리자일 경우 팀의 해당 월의 주문을 모두 가져온다")
+        @DisplayName("관리자일 경우 팀의 해당 월의 주문을 모두 가져와야 한다.")
         void testFindMonthlyOrdersAdmin() {
             // given
-            Long teamId = 1L;
-            Long memberId = 1L;
+            TeamMemberVO teamMember = admin;
             int year = 2024;
             int month = 7;
             MemberTeamRole role = MemberTeamRole.ADMIN;
 
             // when
-            List<MonthlyScheduleDTO> schedules = scheduleRepository.findMonthlyOrders(role, teamId, memberId, year, month);
+            List<MonthlyScheduleDTO> schedules = scheduleRepository.findMonthlyOrders(year, month, teamMember);
 
             // then
             assertThat(schedules).isNotEmpty();
@@ -334,17 +331,16 @@ public class ScheduleRepositoryTest {
         }
 
         @Test
-        @DisplayName("주문자일 경우 팀의 해당 월의 주문을 모두 가져온다")
+        @DisplayName("주문자일 경우 팀의 해당 월의 주문을 모두 가져와야 한다.")
         void testFindMonthlyOrdersOrderer() {
             // given
-            Long teamId = 1L;
-            Long memberId = 2L;
+            TeamMemberVO teamMember = orderer;
             int year = 2024;
             int month = 7;
             MemberTeamRole role = MemberTeamRole.ORDERER;
 
             // when
-            List<MonthlyScheduleDTO> schedules = scheduleRepository.findMonthlyOrders(role, teamId, memberId, year, month);
+            List<MonthlyScheduleDTO> schedules = scheduleRepository.findMonthlyOrders(year, month, teamMember);
 
             // then
             assertThat(schedules).isNotEmpty();
@@ -357,8 +353,34 @@ public class ScheduleRepositoryTest {
         }
     }
 
+    @Nested
+    @DisplayName("findMonthlyInforms 는")
+    class FindMonthlyInformsTests {
 
+        @Test
+        @DisplayName("사용자와 연관된 월의 공지 및 일정을 모두 가져와야 한다.")
+        void testFindMonthlyOrdersAdmin() {
+            // given
+            TeamMemberVO teamMember = admin;
+            int year = 2024;
+            int month = 7;
+            MemberTeamRole role = MemberTeamRole.ADMIN;
 
+            // when
+            List<MonthlyScheduleDTO> schedules = scheduleRepository.findMonthlyOrders(year, month, teamMember);
+
+            // then
+            assertThat(schedules).isNotEmpty();
+            assertThat(schedules).extracting("title").contains(
+                    "제품 A 서브제품1 10개",
+                    "제품 A 서브제품1 5개",
+                    "제품 B 서브제품2 20개",
+                    "제품 A 서브제품1 12개",
+                    "제품 B 서브제품2 8개",
+                    "제품 A 서브제품1 18개");
+            assertThat(schedules).extracting("date").allMatch(date -> ((LocalDate) date).getYear() == year && ((LocalDate) date).getMonthValue() == month);
+        }
+    }
 
 
     @Nested
@@ -366,17 +388,16 @@ public class ScheduleRepositoryTest {
     class FindDailyInformsTests {
 
         @Test
-        @DisplayName("특정 날짜의 일정을 가져온다")
+        @DisplayName("특정 날짜의 일정을 가져와야 한다.")
         void testFindDailyInforms() {
             // given
             int year = 2024;
             int month = 7;
             int day = 26;
-            Long memberId = 1L;
-            Long teamId = 1L;
+            TeamMemberVO teamMember = admin;
 
             // when
-            List<ScheduleDTO> schedules = scheduleRepository.findDailyInforms(MemberTeamRole.ADMIN, teamId, memberId, year, month, day);
+            List<ScheduleDTO> schedules = scheduleRepository.findDailyInforms(year, month, day, teamMember);
 
             // then
             assertThat(schedules).isNotEmpty();
@@ -391,27 +412,21 @@ public class ScheduleRepositoryTest {
     class FindDailyOrdersTests {
 
         @Test
-        @DisplayName("특정 날짜의 주문을 가져온다")
+        @DisplayName("특정 날짜의 주문을 가져와야 한다.")
         void testFindDailyOrders() {
             // given
             int year = 2024;
             int month = 7;
             int day = 26;
-            Long memberId = 1L;
-            Long teamId = 1L;
+            TeamMemberVO teamMember = admin;
 
             // when
-            List<ScheduleDTO> schedules = scheduleRepository.findDailyOrders(MemberTeamRole.ADMIN, teamId, memberId, year, month, day);
+            List<ScheduleDTO> schedules = scheduleRepository.findDailyOrders(year, month, day, teamMember);
 
             // then
             assertThat(schedules).isNotEmpty();
         }
     }
-
-
-
-
-
 
 
 
