@@ -5,9 +5,7 @@ import lombok.*;
 
 @Schema(description = "제품 추가 - 요청 DTO")
 @Getter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class AddProductRequest {
     @Schema(description = "제품명")
     private String name;

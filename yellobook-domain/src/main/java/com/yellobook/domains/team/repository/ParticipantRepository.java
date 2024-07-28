@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface ParticipantRepository extends JpaRepository<Participant, Long>, ParticipantCustomRepository {
     Optional<Participant> findFirstByMemberIdOrderByCreatedAtAsc(Long memberId);
+    Optional<Participant> findByTeamIdAndMemberId(Long teamId, Long memberId);
+
 }

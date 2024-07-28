@@ -1,15 +1,27 @@
 package com.yellobook.domains.inventory.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Getter
-@Builder
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class InventoryDTO {
     private Long inventoryId;
     private String title;
-    private String createdAt;
-    private String updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private Integer view;
+
+//    @QueryProjection
+//    public InventoryDTO(Long inventoryId, String title, String createdAt, String updatedAt, Integer view){
+//        this.inventoryId = inventoryId;
+//        this.title = title;
+//        this.createdAt = createdAt;
+//        this.updatedAt = updatedAt;
+//        this.view = view;
+//    }
 }

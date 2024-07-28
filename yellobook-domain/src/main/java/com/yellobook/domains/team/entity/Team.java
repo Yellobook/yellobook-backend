@@ -22,7 +22,7 @@ public class Team extends BaseEntity {
     @Column(nullable = false, length = 40)
     private String name;
 
-    @Column(nullable = false, length = 11)
+    @Column(nullable = false, length = 20)
     private String phoneNumber;
 
     @Column(nullable = false)
