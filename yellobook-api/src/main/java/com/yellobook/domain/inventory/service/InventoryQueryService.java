@@ -1,5 +1,6 @@
 package com.yellobook.domain.inventory.service;
 
+import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.utils.ParticipantUtil;
 import com.yellobook.common.utils.TeamUtil;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
@@ -10,7 +11,6 @@ import com.yellobook.domain.inventory.mapper.ProductMapper;
 import com.yellobook.domains.inventory.dto.InventoryDTO;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
-import com.yellobook.enums.MemberTeamRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
