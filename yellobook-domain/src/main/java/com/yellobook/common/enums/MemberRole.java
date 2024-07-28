@@ -1,4 +1,4 @@
-package com.yellobook.enums;
+package com.yellobook.common.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

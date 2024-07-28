@@ -1,16 +1,14 @@
 package com.yellobook.domains.schedule.dto;
 
-
+import com.yellobook.common.enums.ScheduleType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
 import java.time.LocalDate;
 
 @Getter
 @AllArgsConstructor
-public class ScheduleDto {
-    private Integer id;
+public class QueryUpcomingScheduleDTO {
     private String title;
-    private LocalDate date;
-    private String postType;
+    private LocalDate day;
+    private ScheduleType scheduleType;
 }
