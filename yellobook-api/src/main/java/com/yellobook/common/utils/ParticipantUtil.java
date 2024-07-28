@@ -1,8 +1,8 @@
 package com.yellobook.common.utils;
 
+import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.repository.ParticipantRepository;
-import com.yellobook.enums.MemberTeamRole;
 import com.yellobook.error.code.AuthErrorCode;
 import com.yellobook.error.code.TeamErrorCode;
 import com.yellobook.error.exception.CustomException;

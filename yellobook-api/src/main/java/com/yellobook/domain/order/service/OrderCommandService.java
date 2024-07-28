@@ -1,5 +1,7 @@
 package com.yellobook.domain.order.service;
 
+import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.OrderStatus;
 import com.yellobook.common.utils.ParticipantUtil;
 import com.yellobook.common.utils.TeamUtil;
 import com.yellobook.domain.order.dto.AddOrderCommentRequest;
@@ -20,8 +22,6 @@ import com.yellobook.domains.order.repository.OrderRepository;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
 import com.yellobook.domains.team.repository.TeamRepository;
-import com.yellobook.enums.MemberTeamRole;
-import com.yellobook.enums.OrderStatus;
 import com.yellobook.error.code.InventoryErrorCode;
 import com.yellobook.error.code.MemberErrorCode;
 import com.yellobook.error.code.OrderErrorCode;

@@ -4,7 +4,7 @@ import com.yellobook.domains.common.entity.BaseEntity;
 import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.team.entity.Team;
-import com.yellobook.enums.OrderStatus;
+import com.yellobook.common.enums.OrderStatus;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

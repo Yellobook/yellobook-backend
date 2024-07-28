@@ -1,4 +1,4 @@
-package com.yellobook.enums;
+package com.yellobook.common.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,3 +12,4 @@ public enum MemberTeamRole {
 
     private final String description;
 }
+

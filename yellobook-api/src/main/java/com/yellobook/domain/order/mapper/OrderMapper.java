@@ -1,5 +1,7 @@
 package com.yellobook.domain.order.mapper;
 
+import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.OrderStatus;
 import com.yellobook.domain.order.dto.*;
 import com.yellobook.domain.order.dto.GetOrderCommentsResponse.CommentInfo;
 import com.yellobook.domains.inventory.entity.Product;
@@ -10,8 +12,7 @@ import com.yellobook.domains.order.entity.Order;
 import com.yellobook.domains.order.entity.OrderComment;
 import com.yellobook.domains.order.entity.OrderMention;
 import com.yellobook.domains.team.entity.Team;
-import com.yellobook.enums.MemberTeamRole;
-import com.yellobook.enums.OrderStatus;
+
 import org.mapstruct.*;
 import org.springframework.stereotype.Component;
 

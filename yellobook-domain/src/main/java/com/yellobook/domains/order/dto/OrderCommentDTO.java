@@ -1,6 +1,6 @@
 package com.yellobook.domains.order.dto;
 
-import com.yellobook.enums.MemberTeamRole;
+import com.yellobook.common.enums.MemberTeamRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
