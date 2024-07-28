@@ -6,10 +6,8 @@ import java.time.LocalDate;
 
 @Getter
 @AllArgsConstructor
-public class ScheduleDTO {
-    private Long id;
+public class QueryUpcomingScheduleDTO {
     private String title;
-    private LocalDate date;
+    private LocalDate day;
     private String scheduleType;
 }
-

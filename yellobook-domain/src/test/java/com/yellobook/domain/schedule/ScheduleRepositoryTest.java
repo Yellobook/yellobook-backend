@@ -2,9 +2,9 @@ package com.yellobook.domain.schedule;
 
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.config.TestConfig;
-import com.yellobook.domains.schedule.dto.MonthlyScheduleDTO;
-import com.yellobook.domains.schedule.dto.ScheduleDTO;
-import com.yellobook.domains.schedule.dto.UpcomingScheduleDTO;
+import com.yellobook.domains.schedule.dto.QueryMonthlyScheduleDTO;
+import com.yellobook.domains.schedule.dto.QueryScheduleDTO;
+import com.yellobook.domains.schedule.dto.QueryUpcomingScheduleDTO;
 import com.yellobook.domains.schedule.repository.ScheduleRepository;
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.enums.ScheduleType;
@@ -61,11 +61,11 @@ public class ScheduleRepositoryTest {
             // given
             TeamMemberVO teamMember = orderer;
             // when
-            Optional<UpcomingScheduleDTO> result = scheduleRepository.findEarliestOrder(today, teamMember);
+            Optional<QueryUpcomingScheduleDTO> result = scheduleRepository.findEarliestOrder(today, teamMember);
 
             // then
             assertThat(result).isPresent();
-            UpcomingScheduleDTO schedule = result.get();
+            QueryUpcomingScheduleDTO schedule = result.get();
             assertThat(schedule.getTitle()).isEqualTo("제품 A 서브제품1 5개");
             assertThat(schedule.getDay()).isEqualTo("2024-07-27");
             assertThat(schedule.getScheduleType()).isEqualTo(ScheduleType.ORDER.getValue());
@@ -78,11 +78,11 @@ public class ScheduleRepositoryTest {
             TeamMemberVO teamMember = admin;
 
             // when
-            Optional<UpcomingScheduleDTO> result = scheduleRepository.findEarliestOrder(today, teamMember);
+            Optional<QueryUpcomingScheduleDTO> result = scheduleRepository.findEarliestOrder(today, teamMember);
 
             // then
             assertThat(result).isPresent();
-            UpcomingScheduleDTO schedule = result.get();
+            QueryUpcomingScheduleDTO schedule = result.get();
             assertThat(schedule.getTitle()).isEqualTo("제품 A 서브제품1 10개");
             assertThat(schedule.getDay()).isEqualTo("2024-07-26");
             assertThat(schedule.getScheduleType()).isEqualTo(ScheduleType.ORDER.getValue());
@@ -96,7 +96,7 @@ public class ScheduleRepositoryTest {
             TeamMemberVO teamMember = TeamMemberVO.of(1L, invalidTeamId, MemberTeamRole.VIEWER);
 
             // when
-            Optional<UpcomingScheduleDTO> result = scheduleRepository.findEarliestOrder(today, teamMember);
+            Optional<QueryUpcomingScheduleDTO> result = scheduleRepository.findEarliestOrder(today, teamMember);
 
             // then
             assertThat(result).isEmpty();
@@ -110,7 +110,7 @@ public class ScheduleRepositoryTest {
             TeamMemberVO teamMember = TeamMemberVO.of(invalidMemberId, 1L, MemberTeamRole.ORDERER);
 
             // when
-            Optional<UpcomingScheduleDTO> result = scheduleRepository.findEarliestOrder(today, teamMember);
+            Optional<QueryUpcomingScheduleDTO> result = scheduleRepository.findEarliestOrder(today, teamMember);
 
             // then
             assertThat(result).isEmpty();
@@ -128,11 +128,11 @@ public class ScheduleRepositoryTest {
             TeamMemberVO teamMember = admin;
 
             // when
-            Optional<UpcomingScheduleDTO> result = scheduleRepository.findEarliestInform(today, teamMember);
+            Optional<QueryUpcomingScheduleDTO> result = scheduleRepository.findEarliestInform(today, teamMember);
 
             // then
             assertThat(result).isPresent();
-            UpcomingScheduleDTO schedule = result.get();
+            QueryUpcomingScheduleDTO schedule = result.get();
             assertThat(schedule.getTitle()).isEqualTo("공지 및 일정1");
             assertThat(schedule.getDay()).isEqualTo(LocalDate.of(2024, 7, 26));
             assertThat(schedule.getScheduleType()).isEqualTo(ScheduleType.INFORM.getValue());
@@ -146,7 +146,7 @@ public class ScheduleRepositoryTest {
             TeamMemberVO teamMember = TeamMemberVO.of(invalidTeamMemberId, 1L, MemberTeamRole.ADMIN);
 
             // when
-            Optional<UpcomingScheduleDTO> result = scheduleRepository.findEarliestInform(today, teamMember);
+            Optional<QueryUpcomingScheduleDTO> result = scheduleRepository.findEarliestInform(today, teamMember);
 
             // then
             assertThat(result).isNotPresent();
@@ -159,11 +159,11 @@ public class ScheduleRepositoryTest {
             TeamMemberVO teamMember = orderer;
 
             // when
-            Optional<UpcomingScheduleDTO> result = scheduleRepository.findEarliestInform(today, teamMember);
+            Optional<QueryUpcomingScheduleDTO> result = scheduleRepository.findEarliestInform(today, teamMember);
 
             // then
             assertThat(result).isPresent();
-            UpcomingScheduleDTO schedule = result.get();
+            QueryUpcomingScheduleDTO schedule = result.get();
             assertThat(schedule.getTitle()).isEqualTo("공지 및 일정1");
             assertThat(schedule.getDay()).isEqualTo(LocalDate.of(2024, 7, 26));
             assertThat(schedule.getScheduleType()).isEqualTo(ScheduleType.INFORM.getValue());
@@ -184,7 +184,7 @@ public class ScheduleRepositoryTest {
             int month = 7;
 
             // when
-            List<ScheduleDTO> result = scheduleRepository.searchMonthlyOrders(keyword, year, month, teamMember);
+            List<QueryScheduleDTO> result = scheduleRepository.searchMonthlyOrders(keyword, year, month, teamMember);
 
             // then
             assertThat(result.size()).isGreaterThan(0);
@@ -204,7 +204,7 @@ public class ScheduleRepositoryTest {
             int month = 7;
 
             // when
-            List<ScheduleDTO> result = scheduleRepository.searchMonthlyOrders(keyword, year, month, teamMember);
+            List<QueryScheduleDTO> result = scheduleRepository.searchMonthlyOrders(keyword, year, month, teamMember);
 
             // then
             assertThat(result).isEmpty();
@@ -220,11 +220,11 @@ public class ScheduleRepositoryTest {
             int month = 7;
 
             // when
-            List<ScheduleDTO> result = scheduleRepository.searchMonthlyOrders(keyword, year, month, teamMember);
+            List<QueryScheduleDTO> result = scheduleRepository.searchMonthlyOrders(keyword, year, month, teamMember);
 
             // then
             assertThat(result).isNotEmpty();
-            assertThat(result).isSortedAccordingTo(Comparator.comparing(ScheduleDTO::getDate));
+            assertThat(result).isSortedAccordingTo(Comparator.comparing(QueryScheduleDTO::getDate));
         }
     }
 
@@ -242,7 +242,7 @@ public class ScheduleRepositoryTest {
             int month = 7;
 
             // when
-            List<ScheduleDTO> schedules = scheduleRepository.searchMonthlyInforms(keyword, year, month, teamMember);
+            List<QueryScheduleDTO> schedules = scheduleRepository.searchMonthlyInforms(keyword, year, month, teamMember);
 
             // then
             assertThat(schedules).isNotEmpty();
@@ -260,7 +260,7 @@ public class ScheduleRepositoryTest {
             int month = 7;
 
             // when
-            List<ScheduleDTO> schedules = scheduleRepository.searchMonthlyInforms(keyword, year, month, teamMember);
+            List<QueryScheduleDTO> schedules = scheduleRepository.searchMonthlyInforms(keyword, year, month, teamMember);
 
             // then
             assertThat(schedules).isNotEmpty();
@@ -278,7 +278,7 @@ public class ScheduleRepositoryTest {
             int month = 8;
 
             // when
-            List<ScheduleDTO> schedules = scheduleRepository.searchMonthlyInforms(keyword, year, month, teamMember);
+            List<QueryScheduleDTO> schedules = scheduleRepository.searchMonthlyInforms(keyword, year, month, teamMember);
 
             // then
             assertThat(schedules).isEmpty();
@@ -294,7 +294,7 @@ public class ScheduleRepositoryTest {
             int month = 6;
 
             // when
-            List<ScheduleDTO> schedules = scheduleRepository.searchMonthlyInforms(keyword, year, month, teamMember);
+            List<QueryScheduleDTO> schedules = scheduleRepository.searchMonthlyInforms(keyword, year, month, teamMember);
 
             // then
             assertThat(schedules).isEmpty();
@@ -316,7 +316,7 @@ public class ScheduleRepositoryTest {
             MemberTeamRole role = MemberTeamRole.ADMIN;
 
             // when
-            List<MonthlyScheduleDTO> schedules = scheduleRepository.findMonthlyOrders(year, month, teamMember);
+            List<QueryMonthlyScheduleDTO> schedules = scheduleRepository.findMonthlyOrders(year, month, teamMember);
 
             // then
             assertThat(schedules).isNotEmpty();
@@ -340,7 +340,7 @@ public class ScheduleRepositoryTest {
             MemberTeamRole role = MemberTeamRole.ORDERER;
 
             // when
-            List<MonthlyScheduleDTO> schedules = scheduleRepository.findMonthlyOrders(year, month, teamMember);
+            List<QueryMonthlyScheduleDTO> schedules = scheduleRepository.findMonthlyOrders(year, month, teamMember);
 
             // then
             assertThat(schedules).isNotEmpty();
@@ -367,7 +367,7 @@ public class ScheduleRepositoryTest {
             MemberTeamRole role = MemberTeamRole.ADMIN;
 
             // when
-            List<MonthlyScheduleDTO> schedules = scheduleRepository.findMonthlyOrders(year, month, teamMember);
+            List<QueryMonthlyScheduleDTO> schedules = scheduleRepository.findMonthlyOrders(year, month, teamMember);
 
             // then
             assertThat(schedules).isNotEmpty();
@@ -397,7 +397,7 @@ public class ScheduleRepositoryTest {
             TeamMemberVO teamMember = admin;
 
             // when
-            List<ScheduleDTO> schedules = scheduleRepository.findDailyInforms(year, month, day, teamMember);
+            List<QueryScheduleDTO> schedules = scheduleRepository.findDailyInforms(year, month, day, teamMember);
 
             // then
             assertThat(schedules).isNotEmpty();
@@ -421,7 +421,7 @@ public class ScheduleRepositoryTest {
             TeamMemberVO teamMember = admin;
 
             // when
-            List<ScheduleDTO> schedules = scheduleRepository.findDailyOrders(year, month, day, teamMember);
+            List<QueryScheduleDTO> schedules = scheduleRepository.findDailyOrders(year, month, day, teamMember);
 
             // then
             assertThat(schedules).isNotEmpty();
