@@ -8,9 +8,9 @@ import com.yellobook.domain.schedule.dto.request.MonthlySearchParam;
 import com.yellobook.domain.schedule.dto.response.CalendarScheduleDTO;
 import com.yellobook.domain.schedule.dto.response.DailyScheduleDTO;
 import com.yellobook.domain.schedule.dto.response.SearchMonthlyScheduleDTO;
+import com.yellobook.domain.schedule.dto.response.UpcomingScheduleDTO;
 import com.yellobook.domain.schedule.service.strategy.ScheduleStrategy;
 import com.yellobook.domain.schedule.service.strategy.ScheduleStrategyFactory;
-import com.yellobook.domains.schedule.dto.UpcomingScheduleDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
