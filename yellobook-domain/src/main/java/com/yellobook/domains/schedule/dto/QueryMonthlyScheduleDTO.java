@@ -1,5 +1,6 @@
 package com.yellobook.domains.schedule.dto;
 
+import com.yellobook.common.enums.ScheduleType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import java.time.LocalDate;
@@ -12,5 +13,5 @@ public class QueryMonthlyScheduleDTO {
     private String title;
     private LocalDate date;
     private LocalDateTime createdAt;
-    private String scheduleType;
+    private ScheduleType scheduleType;
 }

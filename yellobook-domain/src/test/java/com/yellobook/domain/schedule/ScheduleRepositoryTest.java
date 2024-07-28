@@ -68,7 +68,7 @@ public class ScheduleRepositoryTest {
             QueryUpcomingScheduleDTO schedule = result.get();
             assertThat(schedule.getTitle()).isEqualTo("제품 A 서브제품1 5개");
             assertThat(schedule.getDay()).isEqualTo("2024-07-27");
-            assertThat(schedule.getScheduleType()).isEqualTo(ScheduleType.ORDER.getValue());
+            assertThat(schedule.getScheduleType()).isEqualTo(ScheduleType.ORDER);
         }
 
         @Test
@@ -85,7 +85,7 @@ public class ScheduleRepositoryTest {
             QueryUpcomingScheduleDTO schedule = result.get();
             assertThat(schedule.getTitle()).isEqualTo("제품 A 서브제품1 10개");
             assertThat(schedule.getDay()).isEqualTo("2024-07-26");
-            assertThat(schedule.getScheduleType()).isEqualTo(ScheduleType.ORDER.getValue());
+            assertThat(schedule.getScheduleType()).isEqualTo(ScheduleType.ORDER);
         }
 
         @Test
@@ -133,9 +133,10 @@ public class ScheduleRepositoryTest {
             // then
             assertThat(result).isPresent();
             QueryUpcomingScheduleDTO schedule = result.get();
+
             assertThat(schedule.getTitle()).isEqualTo("공지 및 일정1");
             assertThat(schedule.getDay()).isEqualTo(LocalDate.of(2024, 7, 26));
-            assertThat(schedule.getScheduleType()).isEqualTo(ScheduleType.INFORM.getValue());
+            assertThat(schedule.getScheduleType()).isEqualTo(ScheduleType.INFORM);
         }
 
         @Test
@@ -166,7 +167,7 @@ public class ScheduleRepositoryTest {
             QueryUpcomingScheduleDTO schedule = result.get();
             assertThat(schedule.getTitle()).isEqualTo("공지 및 일정1");
             assertThat(schedule.getDay()).isEqualTo(LocalDate.of(2024, 7, 26));
-            assertThat(schedule.getScheduleType()).isEqualTo(ScheduleType.INFORM.getValue());
+            assertThat(schedule.getScheduleType()).isEqualTo(ScheduleType.INFORM);
         }
     }
 
@@ -189,9 +190,13 @@ public class ScheduleRepositoryTest {
             // then
             assertThat(result.size()).isGreaterThan(0);
             assertThat(result).isNotEmpty();
-            assertThat(result).extracting("title").contains("제품 A 서브제품1 10개", "제품 B 서브제품2 20개", "제품 A 서브제품1 18개");
-            assertThat(result).extracting("scheduleType").containsOnly(ScheduleType.ORDER.getValue());
-            assertThat(result).extracting("date").allMatch(date -> ((LocalDate) date).getYear() == year && ((LocalDate) date).getMonthValue() == month);
+            result.forEach(schedule -> {
+                assertThat(schedule.getTitle()).contains(keyword);
+                assertThat(schedule.getScheduleType()).isEqualTo(ScheduleType.ORDER);
+                assertThat(schedule.getDate().getYear()).isEqualTo(year);
+                assertThat(schedule.getDate().getMonthValue()).isEqualTo(month);
+            });
+
         }
 
         @Test

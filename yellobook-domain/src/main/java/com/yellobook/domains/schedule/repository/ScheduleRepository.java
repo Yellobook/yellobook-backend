@@ -231,7 +231,7 @@ public class ScheduleRepository {
                                 order.id,
                                 orderTitle.as("title"),
                                 order.date,
-                                Expressions.constant(Expressions.constant(ScheduleType.INFORM))
+                                Expressions.constant(ScheduleType.INFORM)
                         )
                 )
                 .from(order)
