@@ -1,5 +1,6 @@
 package com.yellobook.domain.team.controller;
 
+import com.yellobook.common.annotation.ExistTeam;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.team.dto.TeamRequest;
 import com.yellobook.domain.team.dto.TeamResponse;
@@ -36,7 +37,7 @@ public class TeamController {
     @PostMapping("/{teamId}/invite")
     @Operation(summary = "팀 초대하기 API", description = "팀원이 다른 구성원을 초대하기 위해 URL을 생성하는 API입니다.")
     public ResponseEntity<SuccessResponse<TeamResponse.InvitationCodeResponseDTO>> inviteTeam(
-            @PathVariable Long teamId,
+            @ExistTeam @PathVariable Long teamId,
             @RequestBody TeamRequest.InvitationCodeRequestDTO request,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
@@ -47,7 +48,7 @@ public class TeamController {
     @DeleteMapping("/{teamId}/leave")
     @Operation(summary = "팀 나가기 API", description = "팀원이 본인이 속한 팀에서 나가기 위한 API입니다.")
     public ResponseEntity<SuccessResponse<TeamResponse.LeaveTeamResponseDTO>> leaveTeam(
-            @PathVariable Long teamId,
+            @ExistTeam @PathVariable Long teamId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
         TeamResponse.LeaveTeamResponseDTO response = teamCommandService.leaveTeam(teamId, customOAuth2User);
@@ -67,7 +68,7 @@ public class TeamController {
     @GetMapping("/{teamId}")
     @Operation(summary = "다른 팀 불러오기 API", description = "멤버가 다른 팀의 정보를 가지고 오는 API입니다.")
     public ResponseEntity<SuccessResponse<TeamResponse.GetTeamResponseDTO>> getTeam(
-            @PathVariable Long teamId,
+            @ExistTeam @PathVariable Long teamId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
         TeamResponse.GetTeamResponseDTO response = teamQueryService.findByTeamId(teamId, customOAuth2User);

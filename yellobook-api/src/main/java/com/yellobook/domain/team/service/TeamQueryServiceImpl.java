@@ -69,7 +69,8 @@ public class TeamQueryServiceImpl implements TeamQueryService {
 
     @Override
     public TeamResponse.GetTeamResponseDTO findByTeamId(Long teamId, CustomOAuth2User customOAuth2User){
-
+        //팀 id를 가지고 팀에 대한 정보 가져오기
+        
         Long memberId = customOAuth2User.getMemberId();
 
         Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)
@@ -81,5 +82,9 @@ public class TeamQueryServiceImpl implements TeamQueryService {
         Team team = teamRepository.getReferenceById(teamId);
 
         return teamMapper.toGetTeamResponseDTO(team);
+    }
+
+    public boolean existsByTeamId(Long teamId) {
+        return teamRepository.existsById(teamId);
     }
 }

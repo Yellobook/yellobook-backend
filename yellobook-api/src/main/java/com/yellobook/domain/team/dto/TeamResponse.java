@@ -61,4 +61,6 @@ public class TeamResponse {
         @Schema(description = "가져오는 팀의 주소", example ="서울특별시 강남구")
         private String address;
     }
+    
+
 }
