@@ -1,7 +1,7 @@
 package com.yellobook.domains.team.repository;
 
-import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.domains.team.entity.Participant;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
