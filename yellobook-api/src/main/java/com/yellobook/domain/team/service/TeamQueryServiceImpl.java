@@ -45,8 +45,9 @@ public class TeamQueryServiceImpl implements TeamQueryService {
                 });
 
         validateInvitationPermission(participant, role, teamId);
+        String invitationUrl = redisService.generateInvitationUrl(teamId, role);
 
-        return teamMapper.toInvitationCodeResponseDTO(redisService.generateInvitationLink(teamId, role));
+        return teamMapper.toInvitationCodeResponseDTO(invitationUrl);
     }
 
     private void validateInvitationPermission(Participant participant, MemberTeamRole requestedRole, Long teamId) {

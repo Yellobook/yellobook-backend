@@ -31,7 +31,7 @@ public class RedisService {
         return valueOps.get(key);
     }
 
-    public String generateInvitationLink(Long teamId, MemberTeamRole role) {
+    public String generateInvitationUrl(Long teamId, MemberTeamRole role) {
         String code = UUID.randomUUID().toString();
         String key = generateInvitaionKey(code);
         String value = teamId + ":" + role;
@@ -39,10 +39,9 @@ public class RedisService {
         // 15분 간 유효한 링크 설정
         //호스트 별로 다르게!
         //키를 도메인에 맞춰서
-        //
-
         stringRedisTemplate.opsForValue().set(key, value, 15, TimeUnit.MINUTES);
-        return request.getRequestURL() + "?code=" + value;
+        String invitationUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        return invitationUrl + "/api/v1/invitation?code=" + key;
     }
 
     public InvitationResponse getInvitationInfo(String key) {

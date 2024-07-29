@@ -4,6 +4,7 @@ import com.yellobook.common.enums.MemberTeamRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 public class TeamRequest {
     @Getter
@@ -15,21 +16,15 @@ public class TeamRequest {
         private String phoneNumber;
         @Schema(description = "회사/매장 주소", example ="서울특별시 강남구")
         private String address;
-        @Schema(description = "팀을 생성한 사람의 권한", example = "VIEWER")
+        @Schema(description = "팀을 생성한 사람의 권한", example = "ADMIN")
         private MemberTeamRole role;
     }
 
     @Getter
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class InvitationCodeRequestDTO {
         @Schema(description = "피초대자 권한", example = "VIEWER")
         private MemberTeamRole role;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    public static class JoinTeamRequestDTO {
-        @Schema(description = "초대받은 팀의 URL", example = "https://www.~~")
-        private String url;
     }
 }

@@ -2,6 +2,7 @@ package com.yellobook.domain.team.controller;
 
 import com.yellobook.common.annotation.ExistTeam;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
+import com.yellobook.domain.auth.service.RedisService;
 import com.yellobook.domain.team.dto.TeamRequest;
 import com.yellobook.domain.team.dto.TeamResponse;
 import com.yellobook.domain.team.service.TeamCommandService;
@@ -10,6 +11,7 @@ import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -55,13 +57,14 @@ public class TeamController {
         return ResponseFactory.success(response);
     }
 
-    @PostMapping("/join")
+    @GetMapping("/invitation")
     @Operation(summary = "팀 참가하기 API", description = "멤버가 팀에 참가하는 API입니다.")
     public ResponseEntity<SuccessResponse<TeamResponse.JoinTeamResponseDTO>> joinTeam(
+            @RequestParam("code") String code,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
-            @RequestBody TeamRequest.JoinTeamRequestDTO request
+            HttpServletResponse res
     ){
-        TeamResponse.JoinTeamResponseDTO response = teamCommandService.joinTeam(customOAuth2User, request);
+        TeamResponse.JoinTeamResponseDTO response = teamCommandService.joinTeam(customOAuth2User, code);
         return ResponseFactory.success(response);
     }
 

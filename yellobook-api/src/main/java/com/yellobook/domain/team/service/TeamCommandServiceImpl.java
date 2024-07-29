@@ -43,7 +43,7 @@ public class TeamCommandServiceImpl implements TeamCommandService {
                     return new CustomException(TeamErrorCode.MEMBER_NOT_FOUND);
                 });
 
-        Team newTeam = teamMapper.toTeam(request);
+        Team newTeam = teamMapper.INSTANCE.toTeam(request);
         teamRepository.save(newTeam);
         log.info("New team created: {}", newTeam.getId());
 
@@ -71,9 +71,9 @@ public class TeamCommandServiceImpl implements TeamCommandService {
     }
 
     @Override
-    public TeamResponse.JoinTeamResponseDTO joinTeam(CustomOAuth2User customOAuth2User, TeamRequest.JoinTeamRequestDTO request) {
+    public TeamResponse.JoinTeamResponseDTO joinTeam(CustomOAuth2User customOAuth2User, String code) {
 
-        InvitationResponse invitationData = redisService.getInvitationInfo(request.getUrl());
+        InvitationResponse invitationData = redisService.getInvitationInfo(code);
         Long teamId = invitationData.getTeamId();
         MemberTeamRole role = invitationData.getRole();
         Long memberId = customOAuth2User.getMemberId();
