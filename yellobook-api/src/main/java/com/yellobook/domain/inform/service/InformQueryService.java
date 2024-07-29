@@ -7,4 +7,5 @@ import com.yellobook.domains.inform.entity.InformComment;
 public interface InformQueryService {
     Inform getInformById(Long informId);
     InformComment getCommentByInformId(Long informId);
+    boolean existInformById(Long informId);
 }

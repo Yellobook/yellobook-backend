@@ -1,5 +1,6 @@
 package com.yellobook.domain.inform.controller;
 
+import com.yellobook.common.annotation.ExistInform;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.inform.dto.InformCommentRequest;
 import com.yellobook.domain.inform.dto.InformCommentResponse;
@@ -37,7 +38,7 @@ public class InformController {
     @Operation(summary = "업무(공지) 삭제")
     @DeleteMapping("/{informId}")
     public ResponseEntity<SuccessResponse<InformResponse.RemoveInformResponseDTO>> deleteInform(
-            @PathVariable("informId") Long informId,
+            @ExistInform @PathVariable("informId") Long informId,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ){
         InformResponse.RemoveInformResponseDTO response = informCommandService.deleteInform(informId, oAuth2User);
@@ -47,7 +48,7 @@ public class InformController {
     @GetMapping("/{informId}")
     @Operation(summary = "업무(공지) 조회 API", description = "등록된 업무(공지)를 조회하는 API 입니다.")
     public ResponseEntity<SuccessResponse<InformResponse.GetInformResponseDTO>> getInform(
-            @PathVariable("informId") Long informId,
+            @ExistInform @PathVariable("informId") Long informId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
         return null;
@@ -56,7 +57,7 @@ public class InformController {
     @PostMapping("/{informId}/comment")
     @Operation(summary = "댓글 작성 API", description = "댓글을 작성하는 API입니다.")
     public ResponseEntity<SuccessResponse<InformCommentResponse.PostCommentResponseDTO>> addComment(
-            @PathVariable("informId") Long informId,
+            @ExistInform @PathVariable("informId") Long informId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
             @RequestBody InformCommentRequest.PostCommentRequestDTO request
     ){
@@ -66,7 +67,7 @@ public class InformController {
     @GetMapping("{informId}/comment")
     @Operation(summary = "댓글 가져오기 API", description = "작성된 댓글을 가져오는 API입니다.")
     public ResponseEntity<SuccessResponse<InformCommentResponse.CommentResponseDTO>> getComment(
-            @PathVariable("informId") Long informId,
+            @ExistInform @PathVariable("informId") Long informId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
         return null;

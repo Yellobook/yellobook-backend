@@ -24,4 +24,9 @@ public class InformQueryServiceImpl implements InformQueryService {
     public InformComment getCommentByInformId(Long informId){
         return null;
     }
+
+    @Override
+    public boolean existInformById(Long informId) {
+        return informRepository.existsById(informId);
+    }
 }

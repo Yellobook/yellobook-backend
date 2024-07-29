@@ -13,5 +13,6 @@ public interface InformMapper {
     @Mapping(source = "request.memo", target = "content")
     Inform toInform(InformRequest.CreateInformRequestDTO request, Member member, Team team);
 
+    @Mapping(source = "inform.id", target = "informId")
     InformResponse.CreateInformResponseDTO toCreateInformResponseDTO(Inform inform);
 }
