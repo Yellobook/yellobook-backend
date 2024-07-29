@@ -3,15 +3,23 @@ package com.yellobook.domains.inventory.dto;
 import lombok.*;
 
 @Getter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProductDTO {
-    private Long productId;
-    private String name;
-    private String subProduct;
-    private Integer sku;
-    private Integer purchasePrice;
-    private Integer salePrice;
-    private Integer amount;
+    private final Long productId;
+    private final String name;
+    private final String subProduct;
+    private final Integer sku;
+    private final Integer purchasePrice;
+    private final Integer salePrice;
+    private final Integer amount;
+
+    public ProductDTO(Long productId, String name, String subProduct, Integer sku, Integer purchasePrice, Integer salePrice, Integer amount){
+        this.productId = productId;
+        this.name = name;
+        this.subProduct = subProduct;
+        this.sku = sku;
+        this.purchasePrice = purchasePrice;
+        this.salePrice = salePrice;
+        this.amount = amount;
+    }
+
 }

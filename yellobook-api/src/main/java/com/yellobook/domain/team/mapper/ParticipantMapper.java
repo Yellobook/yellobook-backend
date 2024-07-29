@@ -3,7 +3,7 @@ package com.yellobook.domain.team.mapper;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
-import com.yellobook.enums.MemberTeamRole;
+import com.yellobook.common.enums.MemberTeamRole;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

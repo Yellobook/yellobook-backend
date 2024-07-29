@@ -1,7 +1,7 @@
 package com.yellobook.domain.auth.security.oauth2.dto;
 
 import com.yellobook.domains.member.entity.Member;
-import com.yellobook.enums.MemberRole;
+import com.yellobook.common.enums.MemberRole;
 import lombok.Builder;
 import lombok.Getter;
 

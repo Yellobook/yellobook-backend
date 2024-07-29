@@ -1,9 +1,10 @@
 package com.yellobook.domain.auth.service;
 
 import com.yellobook.domain.auth.dto.InvitationResponse;
-import com.yellobook.enums.MemberTeamRole;
+import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.error.code.TeamErrorCode;
 import com.yellobook.error.exception.CustomException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class RedisService {
     private final StringRedisTemplate stringRedisTemplate;
+    private final HttpServletRequest request;
 
     public void setRefreshToken(Long memberId , String value, long expiresIn) {
         ValueOperations<String, String> valueOps = stringRedisTemplate.opsForValue();
@@ -30,12 +32,17 @@ public class RedisService {
     }
 
     public String generateInvitationLink(Long teamId, MemberTeamRole role) {
-        String key = "invitation:" + UUID.randomUUID().toString();
+        String code = UUID.randomUUID().toString();
+        String key = generateInvitaionKey(code);
         String value = teamId + ":" + role;
 
         // 15분 간 유효한 링크 설정
+        //호스트 별로 다르게!
+        //키를 도메인에 맞춰서
+        //
+
         stringRedisTemplate.opsForValue().set(key, value, 15, TimeUnit.MINUTES);
-        return "https://www.yellobook.site/invitation/" + key;
+        return request.getRequestURL() + "?code=" + value;
     }
 
     public InvitationResponse getInvitationInfo(String key) {
@@ -61,7 +68,11 @@ public class RedisService {
         stringRedisTemplate.delete(key);
     }
 
-    public String generateRefreshTokenKey(Long memberId) {
+    private String generateRefreshTokenKey(Long memberId) {
         return "auth:refresh:" + memberId;
+    }
+
+    private String generateInvitaionKey(String code){
+        return "team:invite:" + code;
     }
 }

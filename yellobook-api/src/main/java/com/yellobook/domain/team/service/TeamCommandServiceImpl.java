@@ -13,7 +13,7 @@ import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
 import com.yellobook.domains.team.repository.ParticipantRepository;
 import com.yellobook.domains.team.repository.TeamRepository;
-import com.yellobook.enums.MemberTeamRole;
+import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.error.code.TeamErrorCode;
 import com.yellobook.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -39,15 +39,15 @@ public class TeamCommandServiceImpl implements TeamCommandService {
 
         Member member = memberRepository.findById(customOAuth2User.getMemberId())
                 .orElseThrow(() -> {
-                    log.error("Member not found: {}", customOAuth2User.getMemberId());
+                    log.error("Member {} not found.", customOAuth2User.getMemberId());
                     return new CustomException(TeamErrorCode.MEMBER_NOT_FOUND);
                 });
 
-        Team newTeam = teamMapper.INSTANCE.toTeam(request);
+        Team newTeam = teamMapper.toTeam(request);
         teamRepository.save(newTeam);
         log.info("New team created: {}", newTeam.getId());
 
-        Participant founder = participantMapper.INSTANCE.toParticipant(request.getRole(),newTeam, member);
+        Participant founder = participantMapper.toParticipant(request.getRole(),newTeam, member);
         participantRepository.save(founder);
         log.info("Participant added: Member ID = {}, Team ID = {}", member.getId(), newTeam.getId());
 

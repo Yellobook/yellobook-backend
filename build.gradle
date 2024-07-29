@@ -36,6 +36,11 @@ subprojects {
 		// lombok
 		compileOnly 'org.projectlombok:lombok'
 		annotationProcessor 'org.projectlombok:lombok'
+
+		// mapstruct (lombok 보다 뒤에 있어야 함)
+		implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+		annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
 		// spring boot test
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	}
