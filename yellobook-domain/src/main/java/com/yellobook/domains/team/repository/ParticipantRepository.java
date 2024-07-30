@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface ParticipantRepository extends JpaRepository<Participant, Long> {
+public interface ParticipantRepository extends JpaRepository<Participant, Long>, ParticipantCustomRepository {
     Optional<Participant> findFirstByMemberIdOrderByCreatedAtAsc(Long memberId);
     Optional<Participant> findByTeamIdAndMemberId(Long teamId, Long memberId);
 
