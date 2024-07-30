@@ -19,40 +19,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final RedisAuthService redisAuthService;
 
-    private static final List<String> EXCLUDE_URLS = Arrays.asList(
-            "/api/v1/",
-            "/api/v1/health",
-            "/api/v1/auth/terms"
-    );
-
-    // 필터를 타지 않도록
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        // 쿼리파라미터를 포함하지 않은 URI 경로를 반환
-        String requestURI = request.getRequestURI();
-        return EXCLUDE_URLS.stream().anyMatch(url -> url.equals(requestURI));
-    }
-
-    //
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String accessToken = jwtService.resolveToken(request);
-        log.info(accessToken);
+        String accessToken = jwtService.resolveAccessToken(request);
         OAuth2UserDTO oauth2UserDTO;
 
         // 로그인한 사용자
@@ -85,7 +65,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private void handleCustomException(HttpServletResponse response, CustomException e) throws IOException {
         ResponseEntity<Object> errorResponse = ResponseFactory.failure(e.getErrorCode());
-        // charset=UTF-8 을 붙이지 않으면 message 가 ??? 로 깨져서 표시
+        /**
+         *  charset=UTF-8 을 붙이지 않으면 message 가 ??? 로 깨져서 표시된다.
+         */
         response.setContentType("application/json; charset=UTF-8");
         response.setStatus(errorResponse.getStatusCode().value());
         response.getWriter().write(new ObjectMapper().writeValueAsString(errorResponse.getBody()));
