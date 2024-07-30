@@ -1,7 +1,9 @@
 package com.yellobook.domain.inventory.controller;
 
-import com.yellobook.common.annotation.ExistInventory;
-import com.yellobook.common.annotation.ExistProduct;
+import com.yellobook.common.annotation.TeamMember;
+import com.yellobook.common.validation.annotation.ExistInventory;
+import com.yellobook.common.validation.annotation.ExistProduct;
+import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.inventory.dto.*;
 import com.yellobook.domain.inventory.service.InventoryCommandService;
@@ -29,14 +31,13 @@ public class InventoryController {
     private final InventoryQueryService inventoryQueryService;
 
     @Operation(summary = "전체 재고 현황 글 조회")
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<SuccessResponse<GetTotalInventoryResponse>> getTotalInventory(
             @RequestParam("page") Integer page,
             @RequestParam("size") Integer size,
-            @AuthenticationPrincipal CustomOAuth2User oAuth2User
-    ){
-        log.info("memberId: {}", oAuth2User.getMemberId());
-        GetTotalInventoryResponse response = inventoryQueryService.getTotalInventory(page, size, oAuth2User);
+            @TeamMember TeamMemberVO teamMember
+            ){
+        GetTotalInventoryResponse response = inventoryQueryService.getTotalInventory(page, size, teamMember);
         return ResponseFactory.success(response);
     }
 
@@ -44,9 +45,9 @@ public class InventoryController {
     @GetMapping("/{inventoryId}")
     public ResponseEntity<SuccessResponse<GetProductsResponse>> getProductsByInventory(
             @ExistInventory @PathVariable("inventoryId") Long inventoryId,
-            @AuthenticationPrincipal CustomOAuth2User oAuth2User
+            @TeamMember TeamMemberVO teamMember
     ){
-        GetProductsResponse response = inventoryQueryService.getProductsByInventory(inventoryId, oAuth2User);
+        GetProductsResponse response = inventoryQueryService.getProductsByInventory(inventoryId, teamMember);
         return ResponseFactory.success(response);
     }
 
@@ -55,9 +56,9 @@ public class InventoryController {
     public ResponseEntity<SuccessResponse<GetProductsResponse>> getProductByKeywordAndInventory(
             @ExistInventory @PathVariable("inventoryId") Long inventoryId,
             @RequestParam("keyword") String keyword,
-            @AuthenticationPrincipal CustomOAuth2User oAuth2User
+            @TeamMember TeamMemberVO teamMember
     ){
-        GetProductsResponse response = inventoryQueryService.getProductByKeywordAndInventory(inventoryId, keyword, oAuth2User);
+        GetProductsResponse response = inventoryQueryService.getProductByKeywordAndInventory(inventoryId, keyword, teamMember);
         return ResponseFactory.success(response);
     }
 
@@ -66,30 +67,30 @@ public class InventoryController {
     public ResponseEntity<SuccessResponse<AddProductResponse>> addProduct(
             @ExistInventory @PathVariable("inventoryId") Long inventoryId,
             @RequestBody AddProductRequest requestDTO,
-            @AuthenticationPrincipal CustomOAuth2User oAuth2User
+            @TeamMember TeamMemberVO teamMember
     ){
-        AddProductResponse response = inventoryCommandService.addProduct(inventoryId, requestDTO, oAuth2User);
+        AddProductResponse response = inventoryCommandService.addProduct(inventoryId, requestDTO, teamMember);
         return ResponseFactory.success(response);
     }
 
     @Operation(summary = "[관리자] 특정 제품 수량 수정")
     @PutMapping("/products/{productId}")
-    public ResponseEntity<SuccessResponse<String>> modifyProductAmount(
+    public ResponseEntity<Void> modifyProductAmount(
             @ExistProduct @PathVariable("productId") Long productId,
             @RequestBody ModifyProductAmountRequest requestDTO,
-            @AuthenticationPrincipal CustomOAuth2User oAuth2User
+            @TeamMember TeamMemberVO teamMember
     ){
-        inventoryCommandService.modifyProductAmount(productId, requestDTO, oAuth2User);
-        return ResponseFactory.success("제품의 수량을 성공적으로 수정했습니다");
+        inventoryCommandService.modifyProductAmount(productId, requestDTO, teamMember);
+        return ResponseFactory.noContent();
     }
 
     @Operation(summary = "[관리자] 특정 제품 삭제")
     @DeleteMapping("/products/{productId}")
-    public ResponseEntity<SuccessResponse<String>> deleteProduct(
+    public ResponseEntity<Void> deleteProduct(
             @ExistProduct @PathVariable("productId") Long productId,
-            @AuthenticationPrincipal CustomOAuth2User oAuth2User
+            @TeamMember TeamMemberVO teamMember
     ){
-        inventoryCommandService.deleteProduct(productId, oAuth2User);
-        return ResponseFactory.success("제품을 성공적으로 삭제했습니다.");
+        inventoryCommandService.deleteProduct(productId, teamMember);
+        return ResponseFactory.noContent();
     }
 }

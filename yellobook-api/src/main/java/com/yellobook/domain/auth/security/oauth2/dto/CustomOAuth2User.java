@@ -21,9 +21,10 @@ public class CustomOAuth2User implements OAuth2User {
     @Override
     public Map<String, Object> getAttributes() {
         return Map.of(
-                "email", oauth2UserDTO.getEmail(),
                 "nickname", oauth2UserDTO.getNickname(),
-                "profileImage", oauth2UserDTO.getProfileImage()
+                "email", oauth2UserDTO.getEmail(),
+                "profileImage", oauth2UserDTO.getProfileImage(),
+                "allowance", oauth2UserDTO.getAllowance()
         );
     }
 
@@ -43,6 +44,7 @@ public class CustomOAuth2User implements OAuth2User {
     public Long getMemberId() {
         return oauth2UserDTO.getMemberId();
     }
+
     public MemberRole getRole() {
         return oauth2UserDTO.getRole();
     }
@@ -57,5 +59,9 @@ public class CustomOAuth2User implements OAuth2User {
 
     public String getProfileImage() {
         return oauth2UserDTO.getProfileImage();
+    }
+
+    public Boolean getAllowance() {
+        return oauth2UserDTO.getAllowance();
     }
 }
