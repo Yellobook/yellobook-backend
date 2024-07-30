@@ -21,7 +21,10 @@ public enum AuthErrorCode implements ErrorCode {
     // 권한 애러
     ADMIN_NOT_ALLOWED(HttpStatus.UNAUTHORIZED, "AUTH-008", "관리자는 접근 권한이 없습니다."),
     ORDERER_NOT_ALLOWED(HttpStatus.UNAUTHORIZED, "AUTH-009", "주문자는 접근 권한이 없습니다."),
-    VIEWER_NOT_ALLOWED(HttpStatus.UNAUTHORIZED, "AUTH-010", "뷰어는 접근 권한이 없습니다.");
+    VIEWER_NOT_ALLOWED(HttpStatus.UNAUTHORIZED, "AUTH-010", "뷰어는 접근 권한이 없습니다."),
+    UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "AUTH-011", "권한이 없는 접근입니다."),
+    // 약관 동의여부
+    USER_NOT_EXIST(HttpStatus.UNAUTHORIZED, "AUTH_012", "가입한 사용자가 존재하지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
