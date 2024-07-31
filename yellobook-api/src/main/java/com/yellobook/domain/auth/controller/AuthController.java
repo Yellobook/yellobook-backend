@@ -8,8 +8,6 @@ import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.auth.service.AuthService;
 import com.yellobook.domain.auth.service.CookieService;
 import com.yellobook.domain.auth.service.JwtService;
-import com.yellobook.error.code.AuthErrorCode;
-import com.yellobook.error.exception.CustomException;
 import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,12 +15,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
@@ -38,8 +34,8 @@ public class AuthController {
             HttpServletRequest request
     ) {
         String refreshToken = cookieService.getRefreshToken(request);
-        TokenResponse tokenResponse = authService.reissueToken(refreshToken);
-        return ResponseFactory.success(tokenResponse);
+        var result = authService.reissueToken(refreshToken);
+        return ResponseFactory.success(result);
     }
 
     @Operation(summary = "약관 동의")
@@ -47,9 +43,8 @@ public class AuthController {
     public ResponseEntity<SuccessResponse<AllowanceResponse>> agreeToTerms(
             @Valid @RequestBody AllowanceRequest request
     ) {
-        String allowanceToken = request.getToken();
-        AllowanceResponse allowanceResponse = authService.updateAllowance(allowanceToken);
-        return ResponseFactory.success(allowanceResponse);
+        var result = authService.updateAllowance(request.getToken());
+        return ResponseFactory.success(result);
     }
 
 
@@ -58,16 +53,8 @@ public class AuthController {
     public ResponseEntity<Void> logout(
             @Valid @RequestBody LogoutRequest request,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
-    ){
-        String accessToken = request.getAccessToken();
-        // 본인확인
-        Long tokenMemberId = jwtService.getMemberIdFromAccessToken(accessToken);
-        Long loggedInMemberId = oAuth2User.getMemberId();
-        if (!tokenMemberId.equals(loggedInMemberId)) {
-            throw new CustomException(AuthErrorCode.UNAUTHORIZED_ACCESS);
-        }
-        // 로그아웃
-        authService.logout(accessToken, loggedInMemberId);
+    ) {
+        authService.logout(request.getAccessToken(), oAuth2User.getMemberId());
         return ResponseFactory.noContent();
     }
 
@@ -75,7 +62,7 @@ public class AuthController {
     @PatchMapping("/deactivate")
     public ResponseEntity<SuccessResponse<String>> deactivate(
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
-    ){
+    ) {
 //        authService.deactivate(oAuth2User);
         return null;
     }
