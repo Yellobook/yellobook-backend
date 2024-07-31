@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
-@Tag(name = " \uD83E\uDDD9\uD83C\uDFFB\u200D 주문" , description = "Order API")
+@Tag(name = "\uD83E\uDDFE 주문" , description = "Order API")
 public class OrderController {
     private final OrderCommandService orderCommandService;
 
-    @Operation(summary = "[관리자] 주문 정정 요청")
+    @Operation(summary = "주문 정정 요청")
     @PatchMapping("/{orderId}/correction")
     public ResponseEntity<SuccessResponse<String>> modifyRequestOrder(
             @PathVariable("orderId") Long orderId,
@@ -28,7 +28,7 @@ public class OrderController {
         return null;
     }
 
-    @Operation(summary = "[관리자] 주문 확인")
+    @Operation(summary = "주문 확인")
     @PatchMapping("/{orderId}/confirm")
     public ResponseEntity<SuccessResponse<String>> confirmOrder(
             @PathVariable("orderId") Long orderId,
@@ -38,7 +38,7 @@ public class OrderController {
         return null;
     }
 
-    @Operation(summary = "[주문자] 주문 취소")
+    @Operation(summary = "주문 취소")
     @DeleteMapping("/{orderId}")
     public ResponseEntity<SuccessResponse<String>> cancelOrder(
             @PathVariable("orderId") Long orderId,

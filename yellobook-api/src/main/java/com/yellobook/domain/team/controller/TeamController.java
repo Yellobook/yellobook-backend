@@ -21,7 +21,7 @@ public class TeamController {
     private final TeamCommandService teamCommandService;
 
     @PostMapping("")
-    @Operation(summary = "팀 만들기 API", description ="새로운 팀을 생성하는 API입니다.")
+    @Operation(summary = "팀 생성", description ="새로운 팀을 생성하는 API입니다.")
     public ResponseEntity<SuccessResponse<TeamResponse.CreateTeamResponseDTO>> createTeam(
             @RequestBody TeamRequest.CreateTeamRequestDTO request
     ) {
@@ -30,7 +30,7 @@ public class TeamController {
     }
 
     @PostMapping("/{teamId}/invite")
-    @Operation(summary = "팀 초대하기 API", description = "팀원이 다른 구성원을 초대하기 위해 URL을 생성하는 API입니다.")
+    @Operation(summary = "팀 초대링크 생성", description = "팀원이 다른 구성원을 초대하기 위해 URL을 생성하는 API입니다.")
     public ResponseEntity<SuccessResponse<TeamResponse.InviteTeamResponseDTO>> inviteTeam(
             @PathVariable Long teamId,
             @RequestBody TeamRequest.InviteTeamRequestDTO request,
@@ -41,7 +41,7 @@ public class TeamController {
     }
 
     @DeleteMapping("/{teamId}/leave")
-    @Operation(summary = "팀 나가기 API", description = "팀원이 본인이 속한 팀에서 나가기 위한 API입니다.")
+    @Operation(summary = "팀 나가기", description = "팀원이 본인이 속한 팀에서 나가기 위한 API입니다.")
     public ResponseEntity<SuccessResponse<TeamResponse.LeaveTeamResponseDTO>> leaveTeam(
             @PathVariable Long teamId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
@@ -50,7 +50,7 @@ public class TeamController {
     }
 
     @PostMapping("/{teamId}/join")
-    @Operation(summary = "팀 참가하기 API", description = "멤버가 팀에 참가하는 API입니다.")
+    @Operation(summary = "팀 참가하기", description = "멤버가 팀에 참가하는 API입니다.")
     public ResponseEntity<SuccessResponse<TeamResponse.JoinTeamResponseDTO>> joinTeam(
             @PathVariable Long teamId,
             @RequestBody TeamRequest.JoinTeamRequestDTO request,
@@ -60,7 +60,7 @@ public class TeamController {
     }
 
     @GetMapping("/{teamId}")
-    @Operation(summary = "다른 팀 불러오기 API", description = "멤버가 다른 팀의 정보를 가지고 오는 API입니다.")
+    @Operation(summary = "팀 전환하기", description = "팀을 전환하기 위한 API 입니다.")
     public ResponseEntity<SuccessResponse<TeamResponse.GetTeamResponseDTO>> getTeam(
             @PathVariable Long teamId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
