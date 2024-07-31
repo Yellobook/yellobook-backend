@@ -41,7 +41,7 @@ public class InventoryController {
         return ResponseFactory.success(response);
     }
 
-    @Operation(summary = "특정 일자 재고 현황 상세 조회")
+    @Operation(summary = "일별 재고 현황 상세 조회")
     @GetMapping("/{inventoryId}")
     public ResponseEntity<SuccessResponse<GetProductsResponse>> getProductsByInventory(
             @ExistInventory @PathVariable("inventoryId") Long inventoryId,
@@ -51,7 +51,7 @@ public class InventoryController {
         return ResponseFactory.success(response);
     }
 
-    @Operation(summary = "[관리자] 재고 검색")
+    @Operation(summary = "재고 검색")
     @GetMapping("/{inventoryId}/search")
     public ResponseEntity<SuccessResponse<GetProductsResponse>> getProductByKeywordAndInventory(
             @ExistInventory @PathVariable("inventoryId") Long inventoryId,
@@ -62,7 +62,7 @@ public class InventoryController {
         return ResponseFactory.success(response);
     }
 
-    @Operation(summary = "[관리자] 제품 추가")
+    @Operation(summary = "제품 추가")
     @PostMapping("/{inventoryId}")
     public ResponseEntity<SuccessResponse<AddProductResponse>> addProduct(
             @ExistInventory @PathVariable("inventoryId") Long inventoryId,
@@ -73,7 +73,7 @@ public class InventoryController {
         return ResponseFactory.success(response);
     }
 
-    @Operation(summary = "[관리자] 특정 제품 수량 수정")
+    @Operation(summary = "제품 수량 수정")
     @PutMapping("/products/{productId}")
     public ResponseEntity<Void> modifyProductAmount(
             @ExistProduct @PathVariable("productId") Long productId,
@@ -84,7 +84,7 @@ public class InventoryController {
         return ResponseFactory.noContent();
     }
 
-    @Operation(summary = "[관리자] 특정 제품 삭제")
+    @Operation(summary = "제품 삭제")
     @DeleteMapping("/products/{productId}")
     public ResponseEntity<Void> deleteProduct(
             @ExistProduct @PathVariable("productId") Long productId,

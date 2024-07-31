@@ -50,7 +50,7 @@ public class TeamController {
     }
 
     @PostMapping("/{teamId}/join")
-    @Operation(summary = "팀 참가하기 API", description = "멤버가 팀에 참가하는 API입니다.")
+    @Operation(summary = "팀 참가하기", description = "멤버가 팀에 참가하는 API입니다.")
     public ResponseEntity<SuccessResponse<TeamResponse.JoinTeamResponseDTO>> joinTeam(
             @PathVariable Long teamId,
             @RequestBody TeamRequest.JoinTeamRequestDTO request,
@@ -60,7 +60,7 @@ public class TeamController {
     }
 
     @GetMapping("/{teamId}")
-    @Operation(summary = "다른 팀 불러오기 API", description = "멤버가 다른 팀의 정보를 가지고 오는 API입니다.")
+    @Operation(summary = "팀 전환하기", description = "팀을 전환하기 위한 API 입니다.")
     public ResponseEntity<SuccessResponse<TeamResponse.GetTeamResponseDTO>> getTeam(
             @PathVariable Long teamId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
