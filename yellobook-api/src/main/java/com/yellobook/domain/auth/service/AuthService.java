@@ -63,7 +63,7 @@ public class AuthService {
         //  본인 확인
         if (!tokenMemberId.equals(memberId)) {
             log.warn("사용자 :{} 가 본인이 아닌 사용자에 대한 로그아웃 요청", tokenMemberId);
-            throw new CustomException(AuthErrorCode.UNAUTHORIZED_ACCESS);
+            throw new CustomException(AuthErrorCode.ACCESS_DENIED);
         }
         long expirationTime = jwtService.getAllowanceTokenExpirationTimeInMillis(accessToken);
 
