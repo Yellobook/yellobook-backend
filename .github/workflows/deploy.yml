@@ -1,12 +1,7 @@
-name: Develop Branch CI
+name: EC2 CD
 
 on:
   push:
-    branches:
-      - develop
-    paths-ignore:
-      - '**/*.md'
-  pull_request:
     branches:
       - develop
     paths-ignore:
