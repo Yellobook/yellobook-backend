@@ -127,9 +127,10 @@ subprojects {
 
 tasks.register('jacocoRootReport', JacocoReport) {
     reports {
-        xml.required = false
+        xml.required = true
         csv.required = false
         html.outputLocation = file("${buildDir}/jacocoTestReportHtml")
+        xml.outputLocation = file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
     }
     /**
      * 태스크 간 의존성을 설정해야 실행 순서를 보장할 수 있다.
