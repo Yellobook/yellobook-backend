@@ -1,59 +1,94 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.3.1'
-	id 'io.spring.dependency-management' version '1.1.5'
+    id 'java'
+    id 'org.springframework.boot' version '3.3.1'
+    id 'io.spring.dependency-management' version '1.1.5'
+    id 'jacoco'
 }
 
 allprojects {
-	group = 'com.yellobook'
-	version = '1.0.0'
-	sourceCompatibility = '17'
-	targetCompatibility = '17'
+    group = 'com.yellobook'
+    version = '1.0.0'
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
 
-	repositories {
-		mavenCentral()
-	}
+    repositories {
+        mavenCentral()
+    }
 }
 
 subprojects {
-	apply plugin: 'java-library'
-	apply plugin: 'org.springframework.boot'
-	apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'java-library'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'jacoco'
 
-	configurations {
-		compileOnly {
-			extendsFrom annotationProcessor
-		}
-	}
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
 
-	java {
-		toolchain {
-			languageVersion = JavaLanguageVersion.of(17)
-		}
-	}
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
+    }
 
-	dependencies {
-		// lombok
-		compileOnly 'org.projectlombok:lombok'
-		annotationProcessor 'org.projectlombok:lombok'
+    jacoco {
+        toolVersion = '0.8.9'
+    }
 
-		// mapstruct (lombok 보다 뒤에 있어야 함)
-		implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-		annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+    dependencies {
+        // lombok
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
 
-		// spring boot test
-		testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	}
+        // mapstruct (lombok 보다 뒤에 있어야 함)
+        implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+        annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
-	tasks.named('test') {
-		useJUnitPlatform()
-	}
+        // spring boot test
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    }
+
+    // 모듈별 태스트 실행 가능하도록 설정
+    tasks.named('test') {
+        useJUnitPlatform()
+        finalizedBy 'jacocoTestReport'
+    }
+
+    jacocoTestReport {
+        reports {
+            xml.required = true
+            csv.required = false
+            html.outputLocation = file("${buildDir}/jacocoHtml")
+        }
+    }
 }
 
-if(project == rootProject) {
-	bootJar {
-		enabled = false
-	}
+tasks.register('jacocoRootReport', JacocoReport) {
+    dependsOn subprojects*.jacocoTestReport
+
+    additionalSourceDirs.from = files(subprojects.sourceSets.main.allSource.srcDirs)
+    sourceDirectories.from = files(subprojects.sourceSets.main.allSource.srcDirs)
+    classDirectories.from = files(subprojects.sourceSets.main.output).filter {
+        true
+    }
+    executionData.from = fileTree(dir: '.', include: '**/build/jacoco/test.exec')
+
+    reports {
+        xml.required = true
+        csv.required = false
+        html.outputLocation = file("${buildDir}/jacocoRootHtml")
+    }
 }
 
+if (project == rootProject) {
+    bootJar {
+        enabled = false
+    }
+}
 
+tasks.named('check') {
+    finalizedBy 'jacocoRootReport'
+}
