@@ -12,6 +12,53 @@ jacoco {
     toolVersion = '0.8.9'
 }
 
+ext {
+    defineExcludes = {
+        // 제외할 경로들 선언
+        def excludes = []
+
+        // QueryDSL Q 클래스 제외
+        for (qPattern in 'QA'..'QZ') {
+            excludes.add("**/${qPattern}*")
+        }
+        excludes.addAll([
+                // main
+                "**/*Application*",
+                // 설정
+                "**/*Config*",
+                // 스프링 시큐리티
+                "**/security/**",
+                // DTO, VO
+                "**/*Dto*",
+                "**/*DTO*",
+                "**/*VO*",
+                // 요청, 응답 클래스
+                "**/response/**",
+                "**/request/**",
+                "**/*Request*",
+                "**/*Response*",
+                // 예외 클래스
+                "**/*Exception*",
+                "**/*ErrorCode*",
+                // 리졸버
+                "**/*Resolver*",
+                // AOP
+                "**/*Aspect*",
+                // 인터셉터, 필터
+                "**/*Interceptor*",
+                "**/*Filter*",
+                // enum
+                "**/enums/**",
+                // mapstruct
+                "**/mapper/**",
+                // 커스텀 애노테이션
+                "**/annotation/**"
+        ])
+
+        return excludes
+    }
+}
+
 allprojects {
     group = 'com.yellobook'
     version = '1.0.0'
@@ -54,6 +101,23 @@ subprojects {
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
     }
 
+    jacocoTestReport {
+        reports {
+            xml.required = false
+            csv.required = false
+            html.outputLocation = file("${buildDir}/jacocoTestReportHtml")
+        }
+
+        afterEvaluate  {
+            classDirectories.setFrom(
+                    files(classDirectories.files.collect {
+                        fileTree(dir: it, excludes: rootProject.ext.defineExcludes())
+                    })
+            )
+        }
+
+    }
+
     tasks.named('test') {
         useJUnitPlatform()
         finalizedBy 'jacocoTestReport'
@@ -62,6 +126,11 @@ subprojects {
 
 
 tasks.register('jacocoRootReport', JacocoReport) {
+    reports {
+        xml.required = false
+        csv.required = false
+        html.outputLocation = file("${buildDir}/jacocoTestReportHtml")
+    }
     /**
      * 태스크 간 의존성을 설정해야 실행 순서를 보장할 수 있다.
      *
@@ -70,55 +139,14 @@ tasks.register('jacocoRootReport', JacocoReport) {
      * 2. Declare an explicit dependency on ':yellobook-domain:jacocoTestReport' from ':jacocoRootReport' using Task#dependsOn.
      * 3. Declare an explicit dependency on ':yellobook-domain:jacocoTestReport' from ':jacocoRootReport' using Task#mustRunAfter.
      *
-     *  Gradle 에서 제시한 2번 방법으로 태스크 의존을 설정해 실행 순서를 보장해야 제대로 실행된다.
-     *  각 서브 프로젝트의 jacocoTestReport 태스크가 완료된 후에 실행되도록 한다.
-     *  subprojects 에 jacoco 플러그인을 apply 했으므로 jacocoTestReport 와 jacocoTestCoverageVerification 태스크가 자동으로 생성된다.
+     * Gradle 에서 제시한 2번 방법으로 태스크 의존을 설정해 실행 순서를 보장해야 제대로 실행된다.
+     * 각 서브 프로젝트의 jacocoTestReport 태스크가 완료된 후에 실행되도록 한다.
+     * subprojects 에 jacoco 플러그인을 apply 했으므로 jacocoTestReport 와 jacocoTestCoverageVerification 태스크가 자동으로 생성된다.
      *
-     *  Gradle 공식문서 참고
-     *
+     * Gradle 공식문서 참고
+     * https://docs.gradle.org/current/userguide/jacoco_plugin.html
      */
     dependsOn subprojects*.jacocoTestReport
-
-    // 제외할 경로들 선언
-    def excludes = []
-
-    // QueryDSL Q 클래스 제외
-    for (qPattern in 'QA'..'QZ') {
-        excludes.add("**/${qPattern}*")
-    }
-    excludes.addAll([
-            // main
-            "**/*Application*",
-            // 설정
-            "**/*Config*",
-            // 스프링 시큐리티
-            "**/security/**",
-            // DTO, VO
-            "**/*Dto*",
-            "**/*DTO*",
-            "**/*VO*",
-            // 요청, 응답 클래스
-            "**/response/**",
-            "**/request/**",
-            "**/*Request*",
-            "**/*Response*",
-            // 예외 클래스
-            "**/*Exception*",
-            "**/*ErrorCode*",
-            // 리졸버
-            "**/*Resolver*",
-            // AOP
-            "**/*Aspect*",
-            // 인터셉터, 필터
-            "**/*Interceptor*",
-            "**/*Filter*",
-            // enum
-            "**/enums/**",
-            // mapstruct
-            "**/mapper/**",
-            // 커스텀 애노테이션
-            "**/annotation/**"
-    ])
 
     // 서브 프로젝트의 모든 소스 디렉토리 추가
     additionalSourceDirs.from = files(subprojects.sourceSets.main.allSource.srcDirs)
@@ -128,13 +156,7 @@ tasks.register('jacocoRootReport', JacocoReport) {
 
     // 서브 프로젝트의 클래스 디렉토리를 파일 트리로 생성하고, excludes 에 해당하는 패턴을 제외
     classDirectories.from = files(subprojects.sourceSets.main.output).asFileTree.matching {
-        exclude excludes
-    }
-
-    reports {
-        xml.required = false
-        csv.required = false
-        html.outputLocation = file("${buildDir}/jacocoRootHtml")
+        exclude rootProject.ext.defineExcludes()
     }
 }
 
