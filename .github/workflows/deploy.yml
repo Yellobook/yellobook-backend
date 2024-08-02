@@ -1,4 +1,4 @@
-name: Develop Branch CI
+name: EC2 CD
 
 on:
   push:
