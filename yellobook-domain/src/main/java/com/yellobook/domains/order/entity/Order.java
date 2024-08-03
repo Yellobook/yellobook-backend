@@ -11,6 +11,8 @@ import lombok.Getter;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -73,4 +75,13 @@ public class Order extends BaseEntity {
         this.member = member;
         this.team = team;
     }
+
+    public void requestModifyOrder(){
+        this.orderStatus = OrderStatus.PENDING_MODIFY;
+    }
+
+    public void confirmOrder(){
+        this.orderStatus = OrderStatus.CONFIRMED;
+    }
+
 }

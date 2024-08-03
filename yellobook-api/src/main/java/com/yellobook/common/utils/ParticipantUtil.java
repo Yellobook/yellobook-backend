@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -52,4 +54,10 @@ public class ParticipantUtil {
         }
     }
 
+    /**
+     * 팀에 관리자가 있는지 확인
+     */
+    public Optional<Participant> findAdminByTeamIdAndRole(Long teamId){
+        return participantRepository.findByTeamIdAndRole(teamId, MemberTeamRole.ADMIN);
+    }
 }
