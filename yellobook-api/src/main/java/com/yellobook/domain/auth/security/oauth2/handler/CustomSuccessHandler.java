@@ -3,7 +3,6 @@ package com.yellobook.domain.auth.security.oauth2.handler;
 import com.yellobook.domain.auth.service.JwtService;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.auth.service.CookieService;
-import com.yellobook.common.enums.MemberRole;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 
