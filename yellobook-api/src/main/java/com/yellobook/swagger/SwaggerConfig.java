@@ -1,5 +1,6 @@
 package com.yellobook.swagger;
 
+import com.yellobook.domain.auth.security.oauth2.enums.SocialType;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -50,8 +51,8 @@ public class SwaggerConfig {
                 // 서버 정보 추가
                 .servers(List.of(server))
                 .tags(List.of(new Tag().name(SOCIAL_TAG_NAME).description("Oauth2 Endpoint")))
-                .path("/oauth2/authorization/kakao", oauth2PathItem("카카오 로그인"))
-                .path("/oauth2/authorization/naver", oauth2PathItem("네이버 로그인"));
+                .path("/oauth2/authorization/kakao", oauth2PathItem(SocialType.KAKAO))
+                .path("/oauth2/authorization/naver", oauth2PathItem(SocialType.NAVER));
 
 
         openApiCustomizer.customise(openApi);
@@ -62,13 +63,15 @@ public class SwaggerConfig {
 
 
 
-    private PathItem oauth2PathItem(String socialLoginType) {
+    private PathItem oauth2PathItem(SocialType socialLoginType) {
+        String socialId = socialLoginType.getRegistrationId();
+        String socialTitle = socialLoginType.getTitle();
         return new PathItem().get(new Operation()
                 .tags(List.of(SOCIAL_TAG_NAME))
-                .summary(socialLoginType)
+                .summary(socialTitle)
                 // 인증 비활성화
                 .security(List.of())
-                .description(String.format("[%s](%s/oauth2/authorization/naver)", socialLoginType, backendBaseURL))
+                .description(String.format("[%s](%s/oauth2/authorization/%s)", socialTitle, backendBaseURL,socialId))
                 .responses(new ApiResponses()
                         .addApiResponse("302", new ApiResponse()
                                 .content(new Content().addMediaType("application/json",
