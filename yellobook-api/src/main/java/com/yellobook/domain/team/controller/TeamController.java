@@ -2,7 +2,6 @@ package com.yellobook.domain.team.controller;
 
 import com.yellobook.common.annotation.ExistTeam;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
-import com.yellobook.domain.auth.service.RedisService;
 import com.yellobook.domain.team.dto.TeamRequest;
 import com.yellobook.domain.team.dto.TeamResponse;
 import com.yellobook.domain.team.service.TeamCommandService;

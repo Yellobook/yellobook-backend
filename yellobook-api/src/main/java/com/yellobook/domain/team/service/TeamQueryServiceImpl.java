@@ -1,7 +1,7 @@
 package com.yellobook.domain.team.service;
 
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
-import com.yellobook.domain.auth.service.RedisService;
+import com.yellobook.domain.auth.service.RedisTeamService;
 import com.yellobook.domain.team.dto.TeamRequest;
 import com.yellobook.domain.team.dto.TeamResponse;
 import com.yellobook.domain.team.mapper.TeamMapper;
@@ -26,7 +26,7 @@ public class TeamQueryServiceImpl implements TeamQueryService {
     private final TeamRepository teamRepository;
     private final ParticipantRepository participantRepository;
     private final TeamMapper teamMapper;
-    private final RedisService redisService;
+    private final RedisTeamService redisService;
 
 
     @Override

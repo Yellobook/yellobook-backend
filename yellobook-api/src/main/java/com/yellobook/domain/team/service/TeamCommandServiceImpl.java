@@ -2,7 +2,7 @@ package com.yellobook.domain.team.service;
 
 import com.yellobook.domain.auth.dto.InvitationResponse;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
-import com.yellobook.domain.auth.service.RedisService;
+import com.yellobook.domain.auth.service.RedisTeamService;
 import com.yellobook.domain.team.dto.TeamRequest;
 import com.yellobook.domain.team.dto.TeamResponse;
 import com.yellobook.domain.team.mapper.ParticipantMapper;
@@ -32,7 +32,7 @@ public class TeamCommandServiceImpl implements TeamCommandService {
     private final MemberRepository memberRepository;
     private final TeamMapper teamMapper;
     private final ParticipantMapper participantMapper;
-    private final RedisService redisService;
+    private final RedisTeamService redisService;
 
     @Override
     public TeamResponse.CreateTeamResponseDTO createTeam(TeamRequest.CreateTeamRequestDTO request, CustomOAuth2User customOAuth2User){
