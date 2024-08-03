@@ -5,6 +5,7 @@ import com.yellobook.domains.inform.entity.Inform;
 import com.yellobook.domains.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,4 +29,10 @@ public class OrderMention extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
+
+    @Builder
+    private OrderMention(Member member, Order order){
+        this.member = member;
+        this.order = order;
+    }
 }

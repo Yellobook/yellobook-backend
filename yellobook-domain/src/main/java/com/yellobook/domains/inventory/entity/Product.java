@@ -83,4 +83,8 @@ public class Product extends BaseEntity {
     public void modifyInventory(Inventory inventory){
         this.inventory = inventory;
     }
+
+    public void reduceAmount(Integer orderAmount){
+        this.amount -= orderAmount;
+    }
 }

@@ -34,4 +34,5 @@ public class OrderComment extends BaseEntity {
         this.member = member;
         this.order = order;
     }
+
 }
