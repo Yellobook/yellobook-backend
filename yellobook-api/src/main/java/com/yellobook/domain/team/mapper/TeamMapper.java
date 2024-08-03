@@ -13,13 +13,17 @@ import org.springframework.stereotype.Component;
 public interface TeamMapper {
     TeamMapper INSTANCE = Mappers.getMapper(TeamMapper.class);
 
+    @Mapping(target = "id", ignore = true)
     Team toTeam(TeamRequest.CreateTeamRequestDTO request);
 
     @Mapping(source = "id", target = "teamId")
     TeamResponse.CreateTeamResponseDTO toCreateTeamResponseDTO(Team team);
     TeamResponse.LeaveTeamResponseDTO toLeaveTeamResponseDTO(Long teamId);
     TeamResponse.InvitationCodeResponseDTO toInvitationCodeResponseDTO(String inviteUrl);
+
+    @Mapping(source = "team.id", target = "teamId")
     TeamResponse.JoinTeamResponseDTO toJoinTeamResponseDTO(Team team);
+
     @Mapping(source = "id", target = "teamId")
     TeamResponse.GetTeamResponseDTO toGetTeamResponseDTO(Team team);
 }

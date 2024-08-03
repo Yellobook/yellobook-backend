@@ -2,20 +2,26 @@ package com.yellobook.domain.auth.service;
 
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.vo.TeamMemberVO;
+import com.yellobook.domain.auth.dto.InvitationResponse;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.repository.ParticipantRepository;
 import com.yellobook.error.code.TeamErrorCode;
 import com.yellobook.error.exception.CustomException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
 public class RedisTeamService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ParticipantRepository participantRepository;
+    private final HttpServletRequest request;
 
     /**
      * 사용자가 위치한 팀 id 를 업데이트 또는 저장한다.
@@ -55,7 +61,43 @@ public class RedisTeamService {
         return TeamMemberVO.of(memberId, teamIdValue, memberTeamRole);
     }
 
+
     private String generateTeamKey(Long memberId) {
         return "member:team:" + memberId;
+    }
+
+    public String generateInvitationUrl(Long teamId, MemberTeamRole role) {
+        String code = UUID.randomUUID().toString();
+        String key = generateInvitaionKey(code);
+        String value = teamId + ":" + role;
+
+        // 15분 간 유효한 링크 설정
+        //호스트 별로 다르게!
+        //키를 도메인에 맞춰서
+        redisTemplate.opsForValue().set(key, value, 15, TimeUnit.MINUTES);
+        String invitationUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        return invitationUrl + "/api/v1/invitation?code=" + key;
+    }
+
+    public InvitationResponse getInvitationInfo(String key) {
+        Object value = redisTemplate.opsForValue().get(key);
+        if (value == null) {
+            throw new CustomException(TeamErrorCode.INVITATION_NOT_FOUND);
+        }
+
+        // value 형식이 "teamId:role" 인지 확인하고 분리
+        String stringValue = value.toString();
+        String[] parts = stringValue.split(":");
+        if (parts.length != 2) {
+            throw new CustomException(TeamErrorCode.INVALID_INVITATION);
+        }
+
+        Long teamId = Long.parseLong(parts[0]);
+        MemberTeamRole role = MemberTeamRole.valueOf(parts[1]);
+
+        return new InvitationResponse(teamId, role);
+    }
+    private String generateInvitaionKey(String code){
+        return "team:invite:" + code;
     }
 }
