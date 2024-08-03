@@ -2,8 +2,22 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
-
+    <!-- 로그 포맷 -->
     <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5level [%15.15t] [%X{request_id}] %-40.40logger{39} : %m%n%wEx"/>
+
+
+    <!-- 슬랙 에러 메시지 알림
+         SLACK_WEBHOOK_URI: 슬랙앱으로 추가한 incoming webhook uri
+         SLACK_USERNAME: 슬랙 메시지를 보낼 때 표시될 사용자 이름
+         SLACK_DEFAULT_MESSAGE: 기본으로 표시될 메시지
+         SLACK_USER_MENTIONS: 채널에서 언급할 사용자들
+         SLACK_MESSAGE_PATTERN: 전송될 메시지 포맷
+    -->
+    <springProperty name="SLACK_WEBHOOK_URI" source="logging.slack.webhook-uri"/>
+    <springProperty name="SLACK_USERNAME" source="logging.slack.username"/>
+    <springProperty name="SLACK_DEFAULT_MESSAGE" source="logging.slack.messages"/>
+    <springProperty name="SLACK_USER_MENTIONS" source="logging.slack.mentions"/>
+    <property name="SLACK_MESSAGE_PATTERN" value="${SLACK_DEFAULT_MESSAGE}\n${SLACK_USER_MENTIONS}\n${LOG_PATTERN}"/>
 
     <!-- 콘솔에 로그 출력 -->
     <appender name="THREAD_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -27,7 +41,22 @@
         </rollingPolicy>
     </appender>
 
-    <springProfile name="local, prod">
+    <appender name="SLACK" class="com.github.maricn.logback.SlackAppender">
+        <webhookUri>${SLACK_WEBHOOK_URI}</webhookUri>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>${SLACK_MESSAGE_PATTERN}</pattern>
+        </layout>
+        <username>${SLACK_USERNAME}</username>
+    </appender>
+
+    <appender name="ASYNC_SLACK" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="SLACK"/>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+    <springProfile name="local">
         <root level="INFO">
             <appender-ref ref="FILE"/>
             <appender-ref ref="THREAD_CONSOLE"/>
@@ -35,6 +64,14 @@
     </springProfile>
 
     <springProfile name="dev">
+        <root level="INFO">
+            <appender-ref ref="THREAD_CONSOLE"/>
+            <appender-ref ref="ASYNC_SLACK"/>
+        </root>
+    </springProfile>
+
+
+    <springProfile name="prod">
         <root level="INFO">
             <appender-ref ref="THREAD_CONSOLE"/>
         </root>

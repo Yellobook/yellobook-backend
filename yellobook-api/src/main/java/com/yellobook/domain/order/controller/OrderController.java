@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
-@Tag(name = " \uD83E\uDDD9\uD83C\uDFFB\u200D 주문" , description = "Order API")
 @Validated
+@Tag(name = "\uD83E\uDDFE 주문" , description = "Order API")
 public class OrderController {
     private final OrderQueryService orderQueryService;
     private final OrderCommandService orderCommandService;
@@ -86,7 +86,7 @@ public class OrderController {
         return ResponseFactory.success("주문의 확정을 완료했습니다.");
     }
 
-    @Operation(summary = "[주문자] 주문 취소")
+    @Operation(summary = "주문 취소")
     @DeleteMapping("/{orderId}")
     public ResponseEntity<SuccessResponse<String>> cancelOrder(
             @ExistOrder @PathVariable("orderId") Long orderId,

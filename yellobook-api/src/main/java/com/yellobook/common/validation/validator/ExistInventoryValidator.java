@@ -1,6 +1,6 @@
-package com.yellobook.common.validator;
+package com.yellobook.common.validation.validator;
 
-import com.yellobook.common.annotation.ExistInventory;
+import com.yellobook.common.validation.annotation.ExistInventory;
 import com.yellobook.domain.inventory.service.InventoryQueryService;
 import com.yellobook.error.code.InventoryErrorCode;
 import jakarta.validation.ConstraintValidator;

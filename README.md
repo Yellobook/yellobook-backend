@@ -1,6 +1,39 @@
-## 멀티모듈 프로젝트 구조
+# YelloBook - 옐로북 <a href="https://yellobook.site"><img src="./images/logo.png" align="left" width="100"></a>
 
-### 모듈 구성
+[![codecov](https://codecov.io/gh/Yellobook/yellobook-backend/branch/develop/graph/badge.svg?token=ZDMLLQDDTN)](https://codecov.io/gh/Yellobook/yellobook-backend)
+[![CI Status](https://github.com/Yellobook/yellobook-backend/actions/workflows/coverage.yml/badge.svg)](https://github.com/Yellobook/yellobook-backend/actions)
+[![CD Status](https://github.com/Yellobook/yellobook-backend/actions/workflows/deploy.yml/badge.svg)](https://github.com/Yellobook/yellobook-backend/actions)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/3368d77a-ba68-422f-937f-592fdd87a39e/deploy-status)](https://app.netlify.com/sites/yellobook/deploys)
+
+## 1. 기술 스택
+
+### Backend
+- Java 17
+- Gradle 8.8
+- Spring Boot 3.3.1
+- Postgres 13.x
+- Redis 7.x
+- Spring Data JPA
+- QueryDSL
+- JUnit5
+- Mockito
+
+### Infra
+
+- AWS
+- Docker
+- Github Actions CI/CD
+- Nginx
+
+## 2. 협업툴
+
+<img src="https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=slack&logoColor=white">   
+<img src="https://img.shields.io/badge/Jira-0052CC?style=for-the-badge&logo=jira&logoColor=white">
+<img src="https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=notion&logoColor=white">
+<img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white">
+
+
+## 3. 모듈 구조
 
 - api: 애플리케이션 모듈
 - domain: 도메인 모듈
@@ -9,18 +42,18 @@
 ### 모듈 설명 및 역할
 
 - api
-    - 독립적으로 실행 가능한 애플리케이션 모듈
-    - 설계한 모든 모듈을 의존하여 실행한다.
-    - SpringBoot 애플리케이션을 실행하며, 사용자 요청을 처리하고, 비즈니스 로직을 수행한다.
+  - 독립적으로 실행 가능한 애플리케이션 모듈
+  - 설계한 모든 모듈을 의존하여 실행한다.
+  - SpringBoot 애플리케이션을 실행하며, 사용자 요청을 처리하고, 비즈니스 로직을 수행한다.
 - domain:
-    - 엔티티정보와 관련된 비즈니스 로직을 담고 있는 모듈
-    - JPA Entity 와 Repository가 정의되며, 데이터베이스와의 상호작용을 담당한다.
+  - 엔티티정보와 관련된 비즈니스 로직을 담고 있는 모듈
+  - JPA Entity 와 Repository가 정의되며, 데이터베이스와의 상호작용을 담당한다.
 - common
-    - 애플리케이션에서 공통적으로 사용되는 설정을 모아둔 모듈
-    - 공통 응답 포맷, 공통 에러코드, 공통 예외 처리 핸들러, 공통으로 사용되는 상수, 유틸리티 클래스, 로깅 설정을 포함한다.
+  - 애플리케이션에서 공통적으로 사용되는 설정을 모아둔 모듈
+  - 공통 응답 포맷, 공통 에러코드, 공통 예외 처리 핸들러, 공통으로 사용되는 상수, 유틸리티 클래스, 로깅 설정을 포함한다.
 
 
-## 개발 프로세스
+## 4. 개발 프로세스
 
 Jira 의 Scrum 기반 개발 프로세스를 이용한다.
 
@@ -36,7 +69,7 @@ Jira 의 Scrum 기반 개발 프로세스를 이용한다.
 3. develop merge : 코드 리뷰 / approve 1명 이상 완료시
 
 
-## 버전 관리 규칙
+## 5. 버전 관리 규칙
 
 ### Commit/PR 접두사 규칙
 
@@ -65,6 +98,16 @@ PR 제목은 `[접두사/티켓번호]: 내용`  형식으로 한다. (Jira 의 
 [Feature/YB-1]: 소셜 로그인 기능 구현
 ```
 
+본인 이외 PR 에 기여한 사람이 있다면 공동작업자로 추가한다.
+
+ex) 데이비드가 PR을 올리고, 그리/테리가 함께 작업한 경우 PR 을 올릴 때 아래처럼 추가한다.
+```bash
+[Feature/YB-1]: 소셜 로그인 기능 구현
+
+Co-Authored-By: Ywoosang <opellong13@gmail.com>
+Co-Authored-By: jorippppong <duelee75@gmail.com>
+```
+
 ### Merge 규칙
 
 병합 방법은 merge commit 을 이용한다.
@@ -79,12 +122,4 @@ merge commit 메시지는 PR 이력을 파악하기 쉽도록 PR 제목과 동�
 
 Merge Conflict 가 발생할 경우, PR을 올린 사람이 충돌을 해결한다.
 
-본인 이외 PR 에 기여한 사람이 있다면 병합 커밋에 공동작업자로 추가한다.  
-ex) 데이비드가 PR을 올리고, 그리/테리/주노가 함께 작업한 경우 Merge할 때 아래처럼 추가한다.
-```bash
-[Feature/YB-1]: 소셜 로그인 기능 구현 (#1)
-
-Co-Authored-By: Ywoosang <opellong13@gmail.com>
-Co-Authored-By: jorippppong <duelee75@gmail.com>
-Co-Authored-By: juhhoho <jh102328@khu.ac.kr>
-```
+ 
