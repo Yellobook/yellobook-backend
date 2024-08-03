@@ -3,6 +3,7 @@ package com.yellobook.domain.auth.service;
 import com.yellobook.error.code.AuthErrorCode;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.member.repository.MemberRepository;
+import com.yellobook.error.code.CommonErrorCode;
 import com.yellobook.error.exception.CustomException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -247,16 +248,23 @@ public class JwtService {
                     .getExpiration()
                     .before(new Date());
         } catch (JwtException e) {
+            if (e instanceof ExpiredJwtException) {
+                log.info("[AUTH_INFO] JWT 토큰이 만료: {}", e.getMessage());
+                throw new CustomException(AuthErrorCode.TOKEN_EXPIRED);
+            }
             if (e instanceof MalformedJwtException) {
                 log.warn("[AUTH_WARNING] JWT 토큰 형식이 올바르지 않음: {}", e.getMessage());
+                throw new CustomException(AuthErrorCode.INVALID_TOKEN_FORMAT);
             } else if (e instanceof SignatureException) {
                 log.warn("[AUTH_WARNING] JWT 토큰의 서명이 일치하지 않음: {}", e.getMessage());
+                throw new CustomException(AuthErrorCode.INVALID_TOKEN_SIGNATURE);
             } else if (e instanceof UnsupportedJwtException) {
                 log.warn("[AUTH_WARNING] JWT 토큰의 특정 헤더나 클레임이 지원되지 않음: {}", e.getMessage());
+                throw new CustomException(AuthErrorCode.UNSUPPORTED_TOKEN);
             } else {
-                log.info("[AUTH_INFO] JWT 토큰이 만료: {}", e.getMessage());
+                log.error("[AUTH_ERROR] JWT 토큰 만료 검사중 알 수 없는 오류 발생: {}", e.getMessage());
+                throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
             }
-            throw new CustomException(AuthErrorCode.AUTHENTICATION_FAILED);
         }
     }
 
