@@ -1,6 +1,6 @@
-package com.yellobook.common.annotation;
+package com.yellobook.common.validation.annotation;
 
-import com.yellobook.common.validator.TeamExistValidator;
+import com.yellobook.common.validation.validator.TeamExistValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
