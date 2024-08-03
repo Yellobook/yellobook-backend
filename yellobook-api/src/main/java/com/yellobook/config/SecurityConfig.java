@@ -38,6 +38,9 @@ public class SecurityConfig {
     @Value("${frontend.base-url}")
     private String frontendBaseURL;
 
+    @Value("${backend.base-url}")
+    private String backendBaseURL;
+
     /**
      * 정적 파일은 필터들은 명시적으로 필터를 타지 않도록 한다.
      * debug 로 확인해 보았을 때
@@ -59,7 +62,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         return request -> {
             CorsConfiguration config = new CorsConfiguration();
-            config.setAllowedOrigins(Collections.singletonList(frontendBaseURL));
+            config.setAllowedOrigins(Arrays.asList(frontendBaseURL, backendBaseURL));
             config.setAllowedMethods(Collections.singletonList("*"));
             config.setExposedHeaders(Arrays.asList("Set-Cookie", "Authorization"));
             config.setAllowCredentials(true);
