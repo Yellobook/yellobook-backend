@@ -3,7 +3,7 @@ package com.yellobook.domain.order.service;
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.enums.OrderStatus;
 import com.yellobook.common.utils.ParticipantUtil;
-import com.yellobook.common.utils.TeamUtil;
+import com.yellobook.domain.auth.service.RedisTeamService;
 import com.yellobook.domain.order.dto.AddOrderCommentRequest;
 import com.yellobook.domain.order.dto.AddOrderCommentResponse;
 import com.yellobook.domain.order.dto.MakeOrderRequest;
@@ -45,7 +45,7 @@ public class OrderCommandService{
     private final TeamRepository teamRepository;
     private final ProductRepository productRepository;
     private final ParticipantUtil participantUtil;
-    private final TeamUtil teamUtil;
+    private final RedisTeamService teamUtil;
 
     /**
      * 주문 정정 요청 (관리자)
@@ -127,7 +127,7 @@ public class OrderCommandService{
      */
     public MakeOrderResponse makeOrder(MakeOrderRequest requestDTO, Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
-        Long teamId = teamUtil.getCurrentTeam(memberId);
+        Long teamId = teamUtil.getCurrentTeamMember(memberId).getTeamId();
         Team team = teamRepository.findById(teamId).orElseThrow(() -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
         MemberTeamRole role = participantUtil.getMemberTeamRole(teamId, member.getId());
         // 관리자, 뷰어 주문 불가능

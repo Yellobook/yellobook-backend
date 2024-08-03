@@ -1,6 +1,7 @@
 package com.yellobook.common.annotation;
 
-import com.yellobook.common.validator.ExistOrderValidator;
+
+import com.yellobook.common.validation.validator.ExistOrderValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
