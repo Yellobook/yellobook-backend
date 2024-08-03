@@ -9,7 +9,6 @@ import java.util.Optional;
 
 
 @Repository
-
 public interface ParticipantRepository extends JpaRepository<Participant, Long>, ParticipantCustomRepository {
 
     Optional<Participant> findFirstByMemberIdOrderByCreatedAtAsc(Long memberId);

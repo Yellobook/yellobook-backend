@@ -24,7 +24,7 @@ public class TeamResponse {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class InviteTeamResponseDTO {
+    public static class InvitationCodeResponseDTO {
         @Schema(description = "팀 초대 링크 URL", example = "https://~")
         private String inviteUrl;
     }
@@ -57,8 +57,10 @@ public class TeamResponse {
         @Schema(description = "가져오는 팀의 이름", example ="나이키")
         private String name;
         @Schema(description = "가져오는 팀의 전화번호", example ="012345678")
-        private String phone;
+        private String phoneNumber;
         @Schema(description = "가져오는 팀의 주소", example ="서울특별시 강남구")
         private String address;
     }
+    
+
 }
