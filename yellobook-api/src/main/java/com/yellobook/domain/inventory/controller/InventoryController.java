@@ -37,8 +37,8 @@ public class InventoryController {
             @RequestParam("size") Integer size,
             @TeamMember TeamMemberVO teamMember
             ){
-        GetTotalInventoryResponse response = inventoryQueryService.getTotalInventory(page, size, teamMember);
-        return ResponseFactory.success(response);
+        var result = inventoryQueryService.getTotalInventory(page, size, teamMember);
+        return ResponseFactory.success(result);
     }
 
     @Operation(summary = "일별 재고 현황 상세 조회")

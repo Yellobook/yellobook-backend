@@ -1,6 +1,6 @@
 package com.yellobook.config;
 
-import com.yellobook.common.annotation.TeamMemberArgumentResolver;
+import com.yellobook.common.resolver.TeamMemberArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

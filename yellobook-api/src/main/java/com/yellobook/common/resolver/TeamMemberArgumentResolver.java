@@ -1,5 +1,6 @@
-package com.yellobook.common.annotation;
+package com.yellobook.common.resolver;
 
+import com.yellobook.common.annotation.TeamMember;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.auth.service.RedisTeamService;
