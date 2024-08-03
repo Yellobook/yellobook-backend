@@ -58,7 +58,7 @@ public class Member extends BaseEntity {
         this.deletedAt = LocalDateTime.now();
     }
 
-    public void allowAllowance(){
-        this.allowance = Boolean.TRUE;
+    public void updateAllowance() {
+        this.allowance = true;
     }
 }

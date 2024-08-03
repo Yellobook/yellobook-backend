@@ -8,7 +8,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 
 @SpringBootApplication
 public class ApiServerApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(ApiServerApplication.class, args);
 	}

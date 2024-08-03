@@ -18,6 +18,6 @@ public class MemberCommandService {
 
     public void agreeTerm(Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
-        member.allowAllowance();
+        member.updateAllowance();
     }
 }

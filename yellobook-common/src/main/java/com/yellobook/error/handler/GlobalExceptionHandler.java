@@ -36,7 +36,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = CustomException.class)
     public ResponseEntity<Object> handleCustomException(CustomException exception) {
         ErrorCode errorCode = exception.getErrorCode();
-        log.error("CustomException: code={}, message={}", errorCode.getCode(), errorCode.getMessage());
+        log.warn("CustomException: code={}, message={}", errorCode.getCode(), errorCode.getMessage());
         return ResponseFactory.failure(errorCode);
     }
 
@@ -62,7 +62,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .map(fieldError -> new ValidationError(fieldError.getField(), fieldError.getDefaultMessage()))
                 .collect(Collectors.toList());
 
-        log.error("Validation error: {}", errors);
+        log.warn("Validation error: {}", errors);
         return ResponseFactory.failure(errorCode, errors);
     }
 
@@ -84,7 +84,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .map(violation -> new ValidationError(violation.getPropertyPath().toString(), violation.getMessage()))
                 .collect(Collectors.toList());
 
-        log.error("Constraint violation error: {}", errors);
+        log.warn("Constraint violation error: {}", errors);
         return ResponseFactory.failure(errorCode, errors);
     }
 
@@ -103,7 +103,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
         ErrorCode errorCode = CommonErrorCode.BAD_REQUEST;
         String errorMessage = String.format("Parameter '%s' should be of type '%s'", ex.getName(), ex.getRequiredType().getSimpleName());
-        log.error("Method argument type mismatch: {}", errorMessage);
+        log.warn("Method argument type mismatch: {}", errorMessage);
         return ResponseFactory.failure(errorCode, List.of(new ValidationError(ex.getName(), errorMessage)));
     }
 
@@ -122,7 +122,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         ErrorCode errorCode = CommonErrorCode.BAD_REQUEST;
-        log.error("Missing request parameter: {}", ex.getParameterName());
+        log.warn("Missing request parameter: {}", ex.getParameterName());
         return ResponseFactory.failure(errorCode);
     }
 
@@ -142,7 +142,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         ErrorCode errorCode = CommonErrorCode.NOT_FOUND;
-        log.error("No handler found for URL: {}", ex.getRequestURL());
+        log.warn("No handler found for URL: {}", ex.getRequestURL());
         return ResponseFactory.failure(errorCode);
     }
 
