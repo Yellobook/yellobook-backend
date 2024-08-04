@@ -2,7 +2,7 @@ package com.yellobook.domains.team.entity;
 
 import com.yellobook.domains.common.entity.BaseEntity;
 import com.yellobook.domains.member.entity.Member;
-import com.yellobook.enums.MemberTeamRole;
+import com.yellobook.common.enums.MemberTeamRole;
 import jakarta.persistence.*;
 import lombok.*;
 

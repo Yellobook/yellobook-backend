@@ -1,23 +1,23 @@
 package com.yellobook.domain.inventory.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
 
 import java.util.List;
 
 @Schema(description = "다수의 제품 정보 조회 - 응답 DTO")
 @Getter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GetProductsResponse {
     @Schema(description = "제품")
     private List<ProductInfo> products;
 
-    @Getter
     @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    private GetProductsResponse(List<ProductInfo> products){
+        this.products = products;
+    }
+
+    @Getter
     public static class ProductInfo{
         @Schema(description = "제품 id")
         private Long productId;
@@ -33,5 +33,16 @@ public class GetProductsResponse {
         private Integer salePrice;
         @Schema(description = "재고")
         private Integer amount;
+
+        @Builder
+        private ProductInfo(Long productId, String name, String subProduct, Integer sku, Integer purchasePrice, Integer salePrice, Integer amount){
+            this.productId = productId;
+            this.name = name;
+            this.subProduct = subProduct;
+            this.sku = sku;
+            this.purchasePrice = purchasePrice;
+            this.salePrice = salePrice;
+            this.amount = amount;
+        }
     }
 }

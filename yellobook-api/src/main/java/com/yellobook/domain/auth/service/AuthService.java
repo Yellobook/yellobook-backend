@@ -1,7 +1,10 @@
 package com.yellobook.domain.auth.service;
 
-import com.yellobook.domain.auth.dto.TokenResponse;
+import com.yellobook.domain.auth.dto.response.AllowanceResponse;
+import com.yellobook.domain.auth.dto.response.TokenResponse;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
+import com.yellobook.domains.member.entity.Member;
+import com.yellobook.domains.member.repository.MemberRepository;
 import com.yellobook.error.code.AuthErrorCode;
 import com.yellobook.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class AuthService {
-    private final RedisService redisService;
-    private JwtService jwtService;
+    private final RedisAuthService redisService;
+    private final JwtService jwtService;
+    private final MemberRepository memberRepository;
 
     public TokenResponse reissueToken(String refreshToken) {
         log.info("refreshToken 을 이용해 accessToken 재발급: {}", refreshToken);
@@ -35,8 +39,39 @@ public class AuthService {
         return TokenResponse.builder().accessToken(newAccessToken).build();
     }
 
-    public void logout(CustomOAuth2User oAuth2User) {
-        // 토큰 삭제
+
+    @Transactional
+    public AllowanceResponse updateAllowance(String allowanceToken) {
+        if (jwtService.isAllowanceTokenExpired(allowanceToken)) {
+            log.info("약관 동의 토큰 만료: {}", allowanceToken);
+            throw new CustomException(AuthErrorCode.TOKEN_EXPIRED);
+        }
+        Member member = jwtService.getMemberFromAllowanceToken(allowanceToken);
+        member.updateAllowance();
+        memberRepository.save(member);
+        Long memberId = member.getId();
+        String accessToken = jwtService.createAccessToken(memberId);
+        String refreshToken = jwtService.createRefreshToken(memberId);
+        return AllowanceResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+    public void logout(String accessToken, Long memberId) {
+        Long tokenMemberId = jwtService.getMemberIdFromAccessToken(accessToken);
+        //  본인 확인
+        if (!tokenMemberId.equals(memberId)) {
+            log.warn("사용자 :{} 가 본인이 아닌 사용자에 대한 로그아웃 요청", tokenMemberId);
+            throw new CustomException(AuthErrorCode.ACCESS_DENIED);
+        }
+        long expirationTime = jwtService.getAllowanceTokenExpirationTimeInMillis(accessToken);
+
+        // 토큰을 블랙리스트에 추가
+        redisService.addTokenToBlacklist(accessToken, expirationTime);
+
+        // refreshToken 삭제
+        redisService.deleteRefreshToken(memberId);
     }
 
     public void deactivate(CustomOAuth2User oAuth2User) {

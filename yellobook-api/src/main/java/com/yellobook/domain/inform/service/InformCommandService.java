@@ -5,8 +5,6 @@ import com.yellobook.domain.inform.dto.InformCommentRequest;
 import com.yellobook.domain.inform.dto.InformCommentResponse;
 import com.yellobook.domain.inform.dto.InformRequest;
 import com.yellobook.domain.inform.dto.InformResponse;
-import com.yellobook.domains.inform.entity.Inform;
-import com.yellobook.domains.inform.entity.InformComment;
 
 public interface InformCommandService {
     InformResponse.CreateInformResponseDTO createInform(CustomOAuth2User oAuth2User, InformRequest.CreateInformRequestDTO request);

@@ -1,19 +1,20 @@
 package com.yellobook.domain.auth.security.oauth2.enums;
 
+import lombok.Getter;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 
+
+@Getter
 public enum SocialType {
-    KAKAO("kakao"),
-    NAVER("naver");
+    KAKAO("kakao", "카카오 로그인"),
+    NAVER("naver", "네이버 로그인");
 
     private final String registrationId;
+    private final String title;
 
-    SocialType(String registrationId) {
+    SocialType(String registrationId, String title) {
         this.registrationId = registrationId;
-    }
-
-    private String getRegistrationId() {
-        return registrationId;
+        this.title = title;
     }
 
     public static SocialType from(String registrationId) {

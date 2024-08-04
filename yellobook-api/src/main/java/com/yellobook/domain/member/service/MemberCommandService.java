@@ -1,10 +1,14 @@
 package com.yellobook.domain.member.service;
 
-import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
+import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.member.repository.MemberRepository;
+import com.yellobook.error.code.MemberErrorCode;
+import com.yellobook.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -12,7 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberCommandService {
     private final MemberRepository memberRepository;
 
-    public void agreeTerm(CustomOAuth2User oAuth2User) {
-        // 수정 & dirty checking
+    public void agreeTerm(Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
+        member.updateAllowance();
     }
 }

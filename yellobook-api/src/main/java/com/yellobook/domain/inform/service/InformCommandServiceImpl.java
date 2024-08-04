@@ -1,7 +1,7 @@
 package com.yellobook.domain.inform.service;
 
-import com.yellobook.common.utils.TeamUtil;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
+import com.yellobook.domain.auth.service.RedisTeamService;
 import com.yellobook.domain.inform.dto.*;
 import com.yellobook.domain.inform.mapper.CommentMapper;
 import com.yellobook.domain.inform.mapper.InformMapper;
@@ -37,7 +37,7 @@ public class InformCommandServiceImpl implements InformCommandService {
     private final InformRepository informRepository;
     private final InformMapper informMapper;
     private final ParticipantRepository participantRepository;
-    private final TeamUtil teamUtil;
+    private final RedisTeamService redisService;
     private final TeamQueryService teamQueryService;
     private final MemberRepository memberRepository;
     private final InformMentionRepository informMentionRepository;
@@ -49,7 +49,7 @@ public class InformCommandServiceImpl implements InformCommandService {
             CustomOAuth2User oAuth2User,
             InformRequest.CreateInformRequestDTO request){
         Long memberId = oAuth2User.getMemberId();
-        Long teamId = teamUtil.getCurrentTeam(memberId);
+        Long teamId = redisService.getCurrentTeamMember(memberId).getTeamId();
 
         Participant participant = participantRepository.findByMemberIdAndTeamId(memberId, teamId)
                 .orElseThrow(() ->{
