@@ -1,11 +1,13 @@
 package com.yellobook.domain.team.service;
 
+import com.yellobook.domain.inform.dto.MentionDTO;
+import com.yellobook.domain.team.mapper.ParticipantMapper;
+import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.auth.service.RedisTeamService;
 import com.yellobook.domain.team.dto.TeamRequest;
 import com.yellobook.domain.team.dto.TeamResponse;
 import com.yellobook.domain.team.mapper.TeamMapper;
-import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
 import com.yellobook.domains.team.repository.ParticipantRepository;
 import com.yellobook.domains.team.repository.TeamRepository;
@@ -17,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -27,7 +31,7 @@ public class TeamQueryServiceImpl implements TeamQueryService {
     private final ParticipantRepository participantRepository;
     private final TeamMapper teamMapper;
     private final RedisTeamService redisService;
-
+    private final ParticipantMapper participantMapper;
 
     @Override
     public TeamResponse.InvitationCodeResponseDTO makeInvitationCode(
@@ -71,7 +75,7 @@ public class TeamQueryServiceImpl implements TeamQueryService {
     @Override
     public TeamResponse.GetTeamResponseDTO findByTeamId(Long teamId, CustomOAuth2User customOAuth2User){
         //팀 id를 가지고 팀에 대한 정보 가져오기
-        
+
         Long memberId = customOAuth2User.getMemberId();
 
         Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)
@@ -87,5 +91,22 @@ public class TeamQueryServiceImpl implements TeamQueryService {
 
     public boolean existsByTeamId(Long teamId) {
         return teamRepository.existsById(teamId);
+    }
+
+    @Override
+    public List<MentionDTO> searchParticipants(Long teamId, String name){
+        List<Participant> mentions;
+
+        if(name.equalsIgnoreCase("@everyone")){
+            mentions = participantRepository.findAllByTeamId(teamId);
+        }
+        else if(name.startsWith("@")){
+            String prefix = name.substring(1);
+            mentions = participantRepository.findMentionsByNamePrefix(prefix, teamId);
+        }
+        else {
+            return List.of();
+        }
+        return participantMapper.toMentionDTOlist(mentions);
     }
 }

@@ -25,7 +25,7 @@ public class InformComment extends BaseEntity {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
+    @JoinColumn(name = "inform_id", nullable = false)
     private Inform inform;
 
     @Builder

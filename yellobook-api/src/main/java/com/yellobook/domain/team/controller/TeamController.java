@@ -2,11 +2,14 @@ package com.yellobook.domain.team.controller;
 
 import com.yellobook.common.validation.annotation.ExistTeam;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
+import com.yellobook.domain.inform.dto.InformResponse;
+import com.yellobook.domain.inform.dto.MentionDTO;
 import com.yellobook.domain.team.dto.TeamRequest;
 import com.yellobook.domain.team.dto.TeamResponse;
 import com.yellobook.domain.team.service.TeamCommandService;
 import com.yellobook.domain.team.service.TeamQueryService;
 import com.yellobook.response.ResponseFactory;
+import com.yellobook.domains.team.entity.Team;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/teams")
@@ -24,7 +29,7 @@ public class TeamController {
     private final TeamCommandService teamCommandService;
     private final TeamQueryService teamQueryService;
 
-    @PostMapping("/")
+    @PostMapping("")
     @Operation(summary = "팀 만들기 API", description ="새로운 팀을 생성하는 API입니다.")
     public ResponseEntity<SuccessResponse<TeamResponse.CreateTeamResponseDTO>> createTeam(
             @RequestBody TeamRequest.CreateTeamRequestDTO request,
@@ -33,7 +38,6 @@ public class TeamController {
         TeamResponse.CreateTeamResponseDTO response = teamCommandService.createTeam(request, customOAuth2User);
         return ResponseFactory.created(response);
     }
-
 
     @PostMapping("/{teamId}/invite")
     @Operation(summary = "팀 초대하기 API", description = "팀원이 다른 구성원을 초대하기 위해 URL을 생성하는 API입니다.")
@@ -74,6 +78,16 @@ public class TeamController {
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
         TeamResponse.GetTeamResponseDTO response = teamQueryService.findByTeamId(teamId, customOAuth2User);
+        return ResponseFactory.success(response);
+    }
+
+    @GetMapping("/{teamId}/search")
+    @Operation(summary = "팀 내의 멤버 검색하기 API", description = "팀 내의 멤버들을 검색하는 API입니다.")
+    public ResponseEntity<SuccessResponse<List<MentionDTO>>> searchMembers(
+            @PathVariable Long teamId,
+            @RequestParam String name
+    ){
+        List<MentionDTO> response = teamQueryService.searchParticipants(teamId, name);
         return ResponseFactory.success(response);
     }
 }

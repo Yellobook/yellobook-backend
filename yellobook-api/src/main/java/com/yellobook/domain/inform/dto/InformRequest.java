@@ -2,9 +2,7 @@ package com.yellobook.domain.inform.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.List;
@@ -18,8 +16,12 @@ public class InformRequest {
         @Schema(description = "작성할 글의 내용")
         private String memo;
         @Schema(description = "함께 하는 멤버")
-        private List<Long> mentioned;
+        private List<MentionDTO> mentioned;
         @Schema(description = "날짜")
         private Date date;
+    }
+    public static class MentionRequestDTO {
+        @Schema(description = "멘션하고자 하는 멤버")
+        private Long id;
     }
 }

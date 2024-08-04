@@ -1,10 +1,14 @@
 package com.yellobook.domain.inform.service;
 
 
-import com.yellobook.domains.inform.entity.Inform;
+import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
+import com.yellobook.domain.inform.dto.InformCommentResponse;
+import com.yellobook.domain.inform.dto.InformResponse;
 import com.yellobook.domains.inform.entity.InformComment;
 
+import java.util.List;
+
 public interface InformQueryService {
-    Inform getInformById(Long informId);
-    InformComment getCommentByInformId(Long informId);
+    InformResponse.GetInformResponseDTO getInformById(CustomOAuth2User oAuth2User, Long informId);
+    boolean existInformById(Long informId);
 }
