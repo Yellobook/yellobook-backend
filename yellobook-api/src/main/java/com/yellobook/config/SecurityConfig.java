@@ -21,9 +21,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -60,15 +61,16 @@ public class SecurityConfig {
     // cors 구성
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        return request -> {
-            CorsConfiguration config = new CorsConfiguration();
-            config.setAllowedOrigins(Arrays.asList(frontendBaseURL, backendBaseURL));
-            config.setAllowedMethods(Collections.singletonList("*"));
-            config.setExposedHeaders(Arrays.asList("Set-Cookie", "Authorization"));
-            config.setAllowCredentials(true);
-            config.setMaxAge(3600L);
-            return config;
-        };
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(Arrays.asList(frontendBaseURL, backendBaseURL));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        config.addAllowedHeader("*");
+        config.setExposedHeaders(Arrays.asList("Set-Cookie", "Authorization"));
+        config.setAllowCredentials(true);
+        config.setMaxAge(3600L);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
     // oauth 인증용 필터체인
@@ -122,19 +124,19 @@ public class SecurityConfig {
                         // 이외 요청 모두 jwt 필터를 타도록 설정
                         .anyRequest().authenticated())
                 .exceptionHandling(exceptionHandling ->
-                    exceptionHandling
-                            /**
-                             *  인증되지 않은 요청일 경우
-                             *
-                             *  SecurityContext 에 등록되지 않았을 때 호출된다.
-                             */
-                            .authenticationEntryPoint(customAuthenticationEntryPoint)
-                            /**
-                             * 인증은 되었으나, 해당 요청에 대한 권한이 없는 사용자인 경우
-                             *
-                             * .hasRole 로 권한을 검사할 때 권한이 부족하여 요청이 거부되었을 때 호출된다.
-                             */
-                            .accessDeniedHandler(customAccessDeniedHandler)
+                        exceptionHandling
+                                /**
+                                 *  인증되지 않은 요청일 경우
+                                 *
+                                 *  SecurityContext 에 등록되지 않았을 때 호출된다.
+                                 */
+                                .authenticationEntryPoint(customAuthenticationEntryPoint)
+                                /**
+                                 * 인증은 되었으나, 해당 요청에 대한 권한이 없는 사용자인 경우
+                                 *
+                                 * .hasRole 로 권한을 검사할 때 권한이 부족하여 요청이 거부되었을 때 호출된다.
+                                 */
+                                .accessDeniedHandler(customAccessDeniedHandler)
                 )
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
