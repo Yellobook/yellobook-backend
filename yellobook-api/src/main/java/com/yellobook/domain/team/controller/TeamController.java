@@ -1,10 +1,14 @@
 package com.yellobook.domain.team.controller;
 
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
+import com.yellobook.domain.inform.dto.InformResponse;
+import com.yellobook.domain.inform.dto.MentionDTO;
 import com.yellobook.domain.team.dto.TeamRequest;
 import com.yellobook.domain.team.dto.TeamResponse;
 import com.yellobook.domain.team.service.TeamCommandService;
+import com.yellobook.domain.team.service.TeamQueryService;
 import com.yellobook.domains.team.entity.Team;
+import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,12 +17,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/teams")
 @Tag(name = "\uD83D\uDC65 팀", description = "Team API")
 public class TeamController {
     private final TeamCommandService teamCommandService;
+    private final TeamQueryService teamQueryService;
 
     @PostMapping("")
     @Operation(summary = "팀 만들기 API", description ="새로운 팀을 생성하는 API입니다.")
@@ -66,5 +73,15 @@ public class TeamController {
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
         return null;
+    }
+
+    @GetMapping("/{teamId}/search")
+    @Operation(summary = "팀 내의 멤버 검색하기 API", description = "팀 내의 멤버들을 검색하는 API입니다.")
+    public ResponseEntity<SuccessResponse<List<MentionDTO>>> searchMembers(
+            @PathVariable Long teamId,
+            @RequestParam String name
+    ){
+        List<MentionDTO> response = teamQueryService.searchParticipants(teamId, name);
+        return ResponseFactory.success(response);
     }
 }

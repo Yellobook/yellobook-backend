@@ -38,7 +38,7 @@ public class InformResponse {
         @Schema(description = "가지고 오는 글에 있는 메모")
         private String memo;
         @Schema(description = "함께 하는 멤버")
-        private List<Long> mentioned;
+        private List<MentionDTO> mentioned;
         @Schema(description = "조회수")
         private int view;
         @Schema(description = "댓글")
@@ -46,6 +46,13 @@ public class InformResponse {
         @Schema(description = "날짜")
         private Date date;
     }
-
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MentionResponseDTO {
+        @Schema(description = "멘션된 멤버(들)")
+        private List<MentionDTO> mentioned;
+    }
 
 }

@@ -25,4 +25,9 @@ public class InformMention extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inform_id", nullable = false)
     private Inform inform;
+
+    public InformMention(Inform inform, Member member) {
+        this.inform = inform;
+        this.member = member;
+    }
 }

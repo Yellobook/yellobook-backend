@@ -51,7 +51,8 @@ public class InformController {
             @ExistInform @PathVariable("informId") Long informId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
-        return null;
+        InformResponse.GetInformResponseDTO response = informQueryService.getInformById(customOAuth2User, informId);
+        return ResponseFactory.success(response);
     }
 
     @PostMapping("/{informId}/comment")
@@ -61,15 +62,7 @@ public class InformController {
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
             @RequestBody InformCommentRequest.PostCommentRequestDTO request
     ){
-        return null;
-    }
-
-    @GetMapping("{informId}/comment")
-    @Operation(summary = "댓글 가져오기 API", description = "작성된 댓글을 가져오는 API입니다.")
-    public ResponseEntity<SuccessResponse<InformCommentResponse.CommentResponseDTO>> getComment(
-            @ExistInform @PathVariable("informId") Long informId,
-            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
-    ){
-        return null;
+        InformCommentResponse.PostCommentResponseDTO response = informCommandService.addComment(informId, customOAuth2User, request);
+        return ResponseFactory.created(response);
     }
 }
