@@ -1,19 +1,14 @@
 package com.yellobook.domain.team.service;
 
-import com.yellobook.domain.inform.dto.InformResponse;
 import com.yellobook.domain.inform.dto.MentionDTO;
 import com.yellobook.domain.team.mapper.ParticipantMapper;
-import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.auth.service.RedisTeamService;
 import com.yellobook.domain.team.dto.TeamRequest;
 import com.yellobook.domain.team.dto.TeamResponse;
 import com.yellobook.domain.team.mapper.TeamMapper;
-import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
-import com.yellobook.domains.team.repository.ParticipantRepository;
-import com.yellobook.domains.team.repository.ParticipantRepositoryCustom;
 import com.yellobook.domains.team.repository.ParticipantRepository;
 import com.yellobook.domains.team.repository.TeamRepository;
 import com.yellobook.common.enums.MemberTeamRole;
@@ -25,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)

@@ -5,7 +5,6 @@ import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.team.dto.TeamRequest;
 import com.yellobook.domain.team.dto.TeamResponse;
 import com.yellobook.domain.inform.dto.MentionDTO;
-import com.yellobook.domains.team.entity.Team;
 
 import java.util.List;
 
