@@ -250,7 +250,7 @@ public class JwtService {
         } catch (JwtException e) {
             if (e instanceof ExpiredJwtException) {
                 log.info("[AUTH_INFO] JWT 토큰이 만료: {}", e.getMessage());
-                throw new CustomException(AuthErrorCode.TOKEN_EXPIRED);
+                throw new CustomException(AuthErrorCode.ACCESS_TOKEN_EXPIRED);
             }
             if (e instanceof MalformedJwtException) {
                 log.warn("[AUTH_WARNING] JWT 토큰 형식이 올바르지 않음: {}", e.getMessage());
