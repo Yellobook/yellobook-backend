@@ -18,6 +18,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -25,6 +27,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final RedisAuthService redisAuthService;
+
+
+    // 필터에서 제외시키고 싶은 request 에서 true 를 반환시킨다.
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        Set<String> excludePaths = new HashSet<>(Set.of("/api/v1/auth/terms"));
+        String requestURI = request.getRequestURI();
+        return excludePaths.stream().anyMatch(requestURI::startsWith);
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
