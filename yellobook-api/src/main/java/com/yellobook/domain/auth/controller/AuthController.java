@@ -62,9 +62,12 @@ public class AuthController {
     @Operation(summary = "로그아웃")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
+            HttpServletRequest request,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
+
     ) {
-//        authService.logout(oAuth2User.getMemberId());
+        String accessToken = jwtService.resolveAccessToken(request);
+        authService.logout(oAuth2User.getMemberId(), accessToken);
         return ResponseFactory.noContent();
     }
 

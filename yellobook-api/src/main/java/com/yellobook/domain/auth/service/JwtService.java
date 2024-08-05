@@ -1,5 +1,6 @@
 package com.yellobook.domain.auth.service;
 
+import com.yellobook.domain.auth.enums.TokenType;
 import com.yellobook.error.code.AuthErrorCode;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.member.repository.MemberRepository;
@@ -108,7 +109,7 @@ public class JwtService {
      * @return 토큰이 만료되었는지 여부
      */
     public boolean isAllowanceTokenExpired(String allowanceToken) {
-        return isTokenExpired(allowanceToken, allowanceTokenSecretKey);
+        return isTokenExpired(allowanceToken, allowanceTokenSecretKey, TokenType.TERMS);
     }
 
     /**
@@ -117,7 +118,7 @@ public class JwtService {
      * @return 토큰이 만료되었는지 여부
      */
     public boolean isAccessTokenExpired(String accessToken) {
-        return isTokenExpired(accessToken, accessTokenSecretKey);
+        return isTokenExpired(accessToken, accessTokenSecretKey, TokenType.ACCESS);
     }
 
     /**
@@ -126,7 +127,7 @@ public class JwtService {
      * @return 토큰이 만료되었는지 여부
      */
     public boolean isRefreshTokenExpired(String refreshToken) {
-        return isTokenExpired(refreshToken, refreshTokenSecretKey);
+        return isTokenExpired(refreshToken, refreshTokenSecretKey, TokenType.REFRESH);
     }
 
     /**
@@ -242,7 +243,7 @@ public class JwtService {
      * @param secretKey JWT 비밀키
      * @return 토큰이 만료되었는지 여부
      */
-    private boolean isTokenExpired(String token, SecretKey secretKey) {
+    private boolean isTokenExpired(String token, SecretKey secretKey, TokenType tokenType) {
         try {
             return extractAll(token, secretKey)
                     .getExpiration()
@@ -250,7 +251,11 @@ public class JwtService {
         } catch (JwtException e) {
             if (e instanceof ExpiredJwtException) {
                 log.info("[AUTH_INFO] JWT 토큰이 만료: {}", e.getMessage());
-                throw new CustomException(AuthErrorCode.ACCESS_TOKEN_EXPIRED);
+                switch (tokenType) {
+                    case ACCESS ->  throw new CustomException(AuthErrorCode.ACCESS_TOKEN_EXPIRED);
+                    case REFRESH -> throw new CustomException(AuthErrorCode.REFRESH_TOKEN_EXPIRED);
+                    case TERMS -> throw new CustomException(AuthErrorCode.TERMS_TOKEN_EXPIRED);
+                }
             }
             if (e instanceof MalformedJwtException) {
                 log.warn("[AUTH_WARNING] JWT 토큰 형식이 올바르지 않음: {}", e.getMessage());
