@@ -57,13 +57,8 @@ public class AuthService {
         return authMapper.toAllowanceResponse(accessToken, refreshToken);
     }
 
-    public void logout(String accessToken, Long memberId) {
-        Long tokenMemberId = jwtService.getMemberIdFromAccessToken(accessToken);
-        //  본인 확인
-        if (!tokenMemberId.equals(memberId)) {
-            log.warn("사용자 :{} 가 본인이 아닌 사용자에 대한 로그아웃 요청", tokenMemberId);
-            throw new CustomException(AuthErrorCode.ACCESS_DENIED);
-        }
+    public void logout(Long memberId, String accessToken) {
+        // 토큰의 남은 만료기간
         long expirationTime = jwtService.getAllowanceTokenExpirationTimeInMillis(accessToken);
 
         // 토큰을 블랙리스트에 추가

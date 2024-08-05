@@ -5,29 +5,32 @@ import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domain.auth.dto.InvitationResponse;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.repository.ParticipantRepository;
+import com.yellobook.error.code.CommonErrorCode;
 import com.yellobook.error.code.TeamErrorCode;
 import com.yellobook.error.exception.CustomException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.List;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RedisTeamService {
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
     private final ParticipantRepository participantRepository;
     private final HttpServletRequest request;
-
     /**
      * 사용자가 위치한 팀 id 를 업데이트 또는 저장한다.
      */
     public void setMemberCurrentTeam(Long memberId, Long teamId, String memberTeamRoleName) {
-        ListOperations<String, Object> valueOps = redisTemplate.opsForList();
+        ListOperations<String, String> valueOps = redisTemplate.opsForList();
         String key = generateTeamKey(memberId);
         // 기존 정보가 있다면 삭제
         redisTemplate.delete(key);
@@ -53,12 +56,15 @@ public class RedisTeamService {
             setMemberCurrentTeam(memberId, teamId, memberTeamRole.name());
             return TeamMemberVO.of(memberId, teamId, memberTeamRole);
         }
-        //
-        ListOperations<String, Object> valueOps = redisTemplate.opsForList();
-        Long teamIdValue = (Long) valueOps.index(key, 0);
-        String role =  (String) valueOps.index(key, 1);
-        MemberTeamRole memberTeamRole = MemberTeamRole.valueOf(role);
-        return TeamMemberVO.of(memberId, teamIdValue, memberTeamRole);
+        ListOperations<String, String> valueOps = redisTemplate.opsForList();
+        List<String> values = valueOps.range(key, 0, 1);
+        if (values != null && values.size() == 2) {
+            Long teamId = Long.valueOf(values.get(0));
+            MemberTeamRole memberTeamRole = MemberTeamRole.valueOf(values.get(1));
+            return TeamMemberVO.of(memberId, teamId, memberTeamRole);
+        }
+        log.error("[TEAM_ERROR] 사용자 ID {}가 위치한 팀을 조회할 때 예상치 못한 값이 REDIS 에 들어가 있음: {}",memberId, values);
+        throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
     }
 
 
