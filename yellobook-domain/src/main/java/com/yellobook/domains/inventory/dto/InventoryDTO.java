@@ -15,13 +15,4 @@ public class InventoryDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Integer view;
-
-//    @QueryProjection
-//    public InventoryDTO(Long inventoryId, String title, String createdAt, String updatedAt, Integer view){
-//        this.inventoryId = inventoryId;
-//        this.title = title;
-//        this.createdAt = createdAt;
-//        this.updatedAt = updatedAt;
-//        this.view = view;
-//    }
 }

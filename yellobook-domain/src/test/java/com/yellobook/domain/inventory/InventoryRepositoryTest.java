@@ -8,7 +8,6 @@ import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
 import com.yellobook.domains.team.entity.Team;
-import com.yellobook.domains.team.repository.TeamRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,6 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ContextConfiguration;
@@ -34,14 +34,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class InventoryRepositoryTest {
     private final InventoryRepository inventoryRepository;
     private final ProductRepository productRepository;
-    private final TeamRepository teamRepository;
+    private final TestEntityManager entityManager;
     private Team team;
 
     @Autowired
-    public InventoryRepositoryTest(InventoryRepository inventoryRepository, ProductRepository productRepository, TeamRepository teamRepository){
+    public InventoryRepositoryTest(InventoryRepository inventoryRepository, ProductRepository productRepository,
+                                   TestEntityManager entityManager){
         this.inventoryRepository = inventoryRepository;
         this.productRepository = productRepository;
-        this.teamRepository = teamRepository;
+        this.entityManager = entityManager;
     }
 
     @BeforeEach
@@ -51,7 +52,7 @@ public class InventoryRepositoryTest {
                 .phoneNumber("000-0000-0000")
                 .address("주소1")
                 .build();
-        teamRepository.save(team);
+        entityManager.persist(team);
     }
 
     @Nested
@@ -64,26 +65,23 @@ public class InventoryRepositoryTest {
             //given
             Long teamId = team.getId();
             Pageable pageable = PageRequest.of(0, 5);
-            Inventory inventory1 = Inventory.builder()
-                    .team(team)
-                    .title("2024년 08월 06일 재고현황")
-                    .view(10)
-                    .build();
-            Inventory inventory2 = Inventory.builder()
-                    .team(team)
-                    .title("2024년 08월 07일 재고현황")
-                    .view(5)
-                    .build();
-
-            inventoryRepository.save(inventory1);
-            inventoryRepository.save(inventory2);
+            for(int i =0; i<6; i++){
+                Inventory inventory = Inventory.builder()
+                        .team(team)
+                        .title(String.format("2024년 08월 0%d일 재고현황", i))
+                        .view(i*10)
+                        .build();
+                entityManager.persist(inventory);
+            }
 
             //when
             List<InventoryDTO> result = inventoryRepository.getTotalInventory(teamId, pageable);
 
             //then
-            assertThat(result.size()).isEqualTo(2);
-            assertThat(result.get(0).getCreatedAt()).isAfterOrEqualTo(result.get(1).getCreatedAt());
+            assertThat(result.size()).isEqualTo(5);
+            for(int i=1; i<result.size(); i++){
+                assertThat(result.get(i-1).getCreatedAt()).isAfterOrEqualTo(result.get(i).getCreatedAt());
+            }
         }
 
         @Test
@@ -106,20 +104,15 @@ public class InventoryRepositoryTest {
         void getInventoriesPagingApplied(){
             //given
             Long teamId = team.getId();
-            Pageable pageable = PageRequest.of(1, 1);
-            Inventory inventory1 = Inventory.builder()
-                    .team(team)
-                    .title("2024년 08월 06일 재고현황")
-                    .view(10)
-                    .build();
-            Inventory inventory2 = Inventory.builder()
-                    .team(team)
-                    .title("2024년 08월 07일 재고현황")
-                    .view(5)
-                    .build();
-
-            inventoryRepository.save(inventory1);
-            inventoryRepository.save(inventory2);
+            Pageable pageable = PageRequest.of(1, 5);
+            for(int i =0; i<6; i++){
+                Inventory inventory = Inventory.builder()
+                        .team(team)
+                        .title(String.format("2024년 08월 0%d일 재고현황", i))
+                        .view(i*10)
+                        .build();
+                entityManager.persist(inventory);
+            }
 
             //when
             List<InventoryDTO> result = inventoryRepository.getTotalInventory(teamId, pageable);
@@ -134,7 +127,6 @@ public class InventoryRepositoryTest {
     @DisplayName("제품")
     class productsTests{
         private Inventory inventory;
-        private Product product1;
 
         @BeforeEach
         void setUpInventory(){
@@ -143,28 +135,20 @@ public class InventoryRepositoryTest {
                     .title("2024년 08월 06일 재고현황")
                     .view(10)
                     .build();
-            inventoryRepository.save(inventory);
+            entityManager.persist(inventory);
 
-            product1 = Product.builder()
-                    .name("product1")
-                    .subProduct("sub1")
-                    .sku(1)
-                    .purchasePrice(1000)
-                    .salePrice(2000)
-                    .amount(100)
-                    .build();
-            Product product2 = Product.builder()
-                    .name("제품2")
-                    .subProduct("sub2")
-                    .sku(2)
-                    .purchasePrice(2000)
-                    .salePrice(2000)
-                    .amount(200)
-                    .build();
-            product1.modifyInventory(inventory);
-            product2.modifyInventory(inventory);
-            productRepository.save(product1);
-            productRepository.save(product2);
+            for(int i =0; i<5; i++){
+                Product product = Product.builder()
+                        .name(String.format("product%d", i))
+                        .subProduct(String.format("sub%d", i))
+                        .sku(i)
+                        .purchasePrice(i*1000)
+                        .salePrice(i*2000)
+                        .amount(i+100)
+                        .build();
+                product.modifyInventory(inventory);
+                entityManager.persist(product);
+            }
         }
 
         @Nested
@@ -180,17 +164,18 @@ public class InventoryRepositoryTest {
                 List<ProductDTO> result = productRepository.getProducts(inventoryId);
 
                 //then
-                assertThat(result.size()).isEqualTo(2);
-                assertThat(result.get(0).getName()).isEqualTo("product1");
-                assertThat(result.get(0).getName()).isLessThanOrEqualTo(result.get(1).getName());
+                assertThat(result.size()).isEqualTo(5);
+                for(int i=1; i<result.size(); i++){
+                    assertThat(result.get(i-1).getName()).isLessThanOrEqualTo(result.get(i).getName());
+                }
             }
 
             @DisplayName("키워드를 포함한 제품을 조회하는지 테스트")
             @ParameterizedTest
             @CsvSource(value = {
-                    "product, 1",
+                    "product, 5",
                     "1, 1",
-                    "품, 1"
+                    "품, 0"
             })
             void getProductsByKeyword(String keyword, int total){
                 //given
@@ -208,7 +193,7 @@ public class InventoryRepositoryTest {
         @DisplayName("제품 id로 제품 삭제되었는지 테스트")
         void deleteProduct(){
             //given
-            Long productId = product1.getId();
+            Long productId = 1L;
 
             //when
             productRepository.deleteById(productId);
@@ -222,7 +207,7 @@ public class InventoryRepositoryTest {
         void getByInventoryIdAndSku(){
             //given
             Long inventoryId = inventory.getId();
-            Integer sku = product1.getSku();
+            Integer sku = 1;
 
             //when
             boolean exist1 = productRepository.existsByInventoryIdAndSku(inventoryId, sku);
