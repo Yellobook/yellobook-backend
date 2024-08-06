@@ -26,7 +26,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.in;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -155,7 +154,7 @@ public class InventoryRepositoryTest {
                     .amount(100)
                     .build();
             Product product2 = Product.builder()
-                    .name("product2")
+                    .name("제품2")
                     .subProduct("sub2")
                     .sku(2)
                     .purchasePrice(2000)
@@ -189,8 +188,9 @@ public class InventoryRepositoryTest {
             @DisplayName("키워드를 포함한 제품을 조회하는지 테스트")
             @ParameterizedTest
             @CsvSource(value = {
-                    "product, 2",
-                    "1, 1"
+                    "product, 1",
+                    "1, 1",
+                    "품, 1"
             })
             void getProductsByKeyword(String keyword, int total){
                 //given
