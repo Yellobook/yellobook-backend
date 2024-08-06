@@ -1,0 +1,148 @@
+package com.yellobook.domain.order;
+
+import com.yellobook.config.TestConfig;
+import com.yellobook.domains.order.dto.OrderCommentDTO;
+import com.yellobook.domains.order.dto.OrderDTO;
+import com.yellobook.domains.order.entity.Order;
+import com.yellobook.domains.order.entity.OrderComment;
+import com.yellobook.domains.order.repository.OrderCommentRepository;
+import com.yellobook.domains.order.repository.OrderMentionRepository;
+import com.yellobook.domains.order.repository.OrderRepository;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static com.yellobook.common.enums.MemberTeamRole.ADMIN;
+import static com.yellobook.common.enums.MemberTeamRole.ORDERER;
+import static org.assertj.core.api.Assertions.assertThat;
+
+@ExtendWith(SpringExtension.class)
+@DataJpaTest
+@ContextConfiguration(classes = TestConfig.class)
+@Sql(scripts = "classpath:setup_order.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = "classpath:cleanup_order.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+@DisplayName("Order 도메인 Repository Unit Test")
+public class OrderRepositoryTest {
+    private final OrderRepository orderRepository;
+    private final OrderCommentRepository orderCommentRepository;
+    private final OrderMentionRepository orderMentionRepository;
+    private final Long nonExistOrderId = 9999L;
+
+    @Autowired
+    public OrderRepositoryTest(OrderRepository orderRepository, OrderCommentRepository orderCommentRepository, OrderMentionRepository orderMentionRepository){
+        this.orderRepository = orderRepository;
+        this.orderCommentRepository = orderCommentRepository;
+        this.orderMentionRepository = orderMentionRepository;
+    }
+
+    @Nested
+    @DisplayName("주문 조회 Test")
+    class GetOrderTests{
+
+        @Test
+        @DisplayName("존재하는 주문 조회할 경우 해당 주문을 반환한다.")
+        void getExistOrder(){
+            //given
+            Long orderId = 1L;
+
+            //when
+            OrderDTO orderDTO = orderRepository.getOrder(orderId);
+
+            //then
+            assertThat(orderDTO).isNotNull();
+            assertThat(getOrderById(orderDTO.getOrderId()).getId()).isEqualTo(orderId);
+            assertThat(orderDTO.getMemo()).isEqualTo("메모1");
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 주문을 조회할 경우 null을 반환한다.")
+        void getNotExistOrder(){
+            //given
+            Long orderId = nonExistOrderId;
+
+            //when
+            OrderDTO orderDTO = orderRepository.getOrder(orderId);
+
+            //then
+            assertThat(orderDTO).isNull();
+        }
+
+        private Order getOrderById(Long id){
+            return orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order Not Found"));
+        }
+    }
+
+    @Nested
+    @DisplayName("주문 댓글 조회 Test")
+    class OrderCommentTests{
+        @Test
+        @DisplayName("주문에 댓글이 존재한다면 해당 댓글들을 반환한다.")
+        void getOrderExistComments(){
+            //given
+            Long orderId = 1L;
+
+            //when
+            List<OrderCommentDTO> result = orderRepository.getOrderComments(orderId);
+
+            //then
+            assertThat(result.size()).isEqualTo(3);
+            for (int i = 1; i < result.size(); i++) {
+                LocalDateTime prev = result.get(i-1).getCreatedAt();
+                LocalDateTime after = result.get(i).getCreatedAt();
+                assertThat(prev).isBeforeOrEqualTo(after);
+            }
+            result.forEach(comment -> assertThat(comment.getRole()).isIn(ADMIN, ORDERER));
+            result.forEach(comment -> assertThat(getOrderCommentById(comment.getCommentId()).getOrder().getId()).isEqualTo(orderId));
+        }
+
+        @Test
+        @DisplayName("주문에 댓글이 존재하지 않으면 빈 리스트를 반환한다.")
+        void getOrderNotExistComments(){
+            //given
+            Long orderId = 2L;
+
+            //when
+            List<OrderCommentDTO> result = orderRepository.getOrderComments(orderId);
+
+            //then
+            assertThat(result.size()).isEqualTo(0);
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("주문이 존재하지 않으면, 빈 리스트를 반환한다.")
+        void getNotExistOrderComments(){
+            //given
+            Long orderId = nonExistOrderId;
+
+            //when
+            List<OrderCommentDTO> result = orderRepository.getOrderComments(orderId);
+
+            //then
+            assertThat(result.size()).isEqualTo(0);
+            assertThat(result).isEmpty();
+        }
+
+        private OrderComment getOrderCommentById(Long commentId){
+            return orderCommentRepository.findById(commentId)
+                    .orElseThrow(() -> new RuntimeException("OrderComment Not Found"));
+        }
+
+    }
+
+    @Nested
+    @DisplayName("주문에 접근할 수 있는 사람 Test")
+    class OrderMentionTests{
+
+
+    }
+}

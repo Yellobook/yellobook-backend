@@ -27,7 +27,7 @@ public interface OrderMapper {
     AddOrderCommentResponse toAddOrderCommentResponse(Long commentId);
 
     @Mapping(source = "role", target = "role")
-    CommentInfo toCommentInfo(OrderCommentDTO orderCommentDTOs);  // TODO
+    CommentInfo toCommentInfo(OrderCommentDTO orderCommentDTOs);
 
     default Order toOrder(MakeOrderRequest requestDTO, Member member, Team team, Product product){
         return Order.builder()
