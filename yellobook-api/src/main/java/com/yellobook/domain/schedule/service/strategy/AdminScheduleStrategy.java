@@ -4,14 +4,18 @@ import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domain.schedule.dto.request.DailyParam;
 import com.yellobook.domain.schedule.dto.request.MonthlyParam;
 import com.yellobook.domain.schedule.dto.request.MonthlySearchParam;
-import com.yellobook.domain.schedule.dto.response.CalendarScheduleDTO;
-import com.yellobook.domain.schedule.dto.response.DailyScheduleDTO;
-import com.yellobook.domain.schedule.dto.response.SearchMonthlyScheduleDTO;
-import com.yellobook.domain.schedule.dto.response.UpcomingScheduleDTO;
+import com.yellobook.domain.schedule.dto.response.CalendarResponse;
+import com.yellobook.domain.schedule.dto.response.DailyScheduleResponse;
+import com.yellobook.domain.schedule.dto.response.SearchMonthlyScheduleResponse;
+import com.yellobook.domain.schedule.dto.response.UpcomingScheduleResponse;
 import com.yellobook.domain.schedule.mapper.ScheduleMapper;
-import com.yellobook.domains.schedule.dto.QueryMonthlyScheduleDTO;
-import com.yellobook.domains.schedule.dto.QueryScheduleDTO;
-import com.yellobook.domains.schedule.dto.QueryUpcomingScheduleDTO;
+import com.yellobook.domains.schedule.dto.DailyCond;
+import com.yellobook.domains.schedule.dto.EarliestCond;
+import com.yellobook.domains.schedule.dto.MonthlyCond;
+import com.yellobook.domains.schedule.dto.SearchMonthlyCond;
+import com.yellobook.domains.schedule.dto.query.QueryMonthlySchedule;
+import com.yellobook.domains.schedule.dto.query.QuerySchedule;
+import com.yellobook.domains.schedule.dto.query.QueryUpcomingSchedule;
 import com.yellobook.domains.schedule.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -29,59 +33,54 @@ public class AdminScheduleStrategy implements  ScheduleStrategy{
     private final ScheduleRepository scheduleRepository;
 
     @Override
-    public UpcomingScheduleDTO getUpcomingSchedules(TeamMemberVO teamMember) {
+    public UpcomingScheduleResponse getUpcomingSchedules(TeamMemberVO teamMember) {
         LocalDate today = LocalDate.now();
-        QueryUpcomingScheduleDTO order = scheduleRepository.findEarliestOrder(today, teamMember).orElse(null);
-        QueryUpcomingScheduleDTO inform = scheduleRepository.findEarliestInform(today, teamMember).orElse(null);
-        QueryUpcomingScheduleDTO schedule = this.selectSchedule(order, inform);
+        EarliestCond cond = scheduleMapper.toEarliestCond(today, teamMember);
+        QueryUpcomingSchedule order = scheduleRepository.findEarliestOrder(cond).orElse(null);
+        QueryUpcomingSchedule inform = scheduleRepository.findEarliestInform(cond).orElse(null);
+        QueryUpcomingSchedule schedule = this.selectSchedule(order, inform);
         if(schedule != null) {
-            return scheduleMapper.toUpcomingScheduleDTO(schedule);
+            return scheduleMapper.toUpcomingScheduleResponse(schedule);
         }
-        return new UpcomingScheduleDTO("일정이 없습니다.");
+        return new UpcomingScheduleResponse("일정이 없습니다.");
     }
 
 
     @Override
-    public SearchMonthlyScheduleDTO searchMonthlySchedules(MonthlySearchParam monthlySearchParam, TeamMemberVO teamMember) {
-        String keyword = monthlySearchParam.getKeyword();
-        int year = monthlySearchParam.getYear();
-        int month = monthlySearchParam.getMonth();
-        List<QueryScheduleDTO> orders = scheduleRepository.searchMonthlyOrders(keyword, year, month, teamMember);
-        List<QueryScheduleDTO> informs = scheduleRepository.searchMonthlyInforms(keyword, year, month, teamMember);
-        List<QueryScheduleDTO> schedules = new ArrayList<>();
+    public SearchMonthlyScheduleResponse searchMonthlySchedules(MonthlySearchParam monthlySearchParam, TeamMemberVO teamMember) {
+        SearchMonthlyCond cond = scheduleMapper.toSearchMonthlyCond(monthlySearchParam, teamMember);
+        List<QuerySchedule> orders = scheduleRepository.searchMonthlyOrders(cond);
+        List<QuerySchedule> informs = scheduleRepository.searchMonthlyInforms(cond);
+        List<QuerySchedule> schedules = new ArrayList<>();
         schedules.addAll(orders);
         schedules.addAll(informs);
-        List<QueryScheduleDTO> sortedSchedules = schedules.stream().sorted(this::compareQueryScheduleDTO).toList();
-        return new SearchMonthlyScheduleDTO(sortedSchedules);
+        List<QuerySchedule> sortedSchedules = schedules.stream().sorted(this::compareQuerySchedule).toList();
+        return new SearchMonthlyScheduleResponse(sortedSchedules);
     }
 
 
     @Override
-    public CalendarScheduleDTO getCalendarSchedules(MonthlyParam monthlyParam, TeamMemberVO teamMember) {
-        int year = monthlyParam.getYear();
-        int month = monthlyParam.getMonth();
-        List<QueryMonthlyScheduleDTO> orders = scheduleRepository.findMonthlyOrders(year, month, teamMember);
-        List<QueryMonthlyScheduleDTO> informs = scheduleRepository.findMonthlyInforms(year, month, teamMember);
+    public CalendarResponse getCalendarSchedules(MonthlyParam monthlyParam, TeamMemberVO teamMember) {
+        MonthlyCond cond = scheduleMapper.toMonthlyCond(monthlyParam, teamMember);
+        List<QueryMonthlySchedule> orders = scheduleRepository.findMonthlyOrders(cond);
+        List<QueryMonthlySchedule> informs = scheduleRepository.findMonthlyInforms(cond);
 
         Map<Integer, List<String>> calendarMap = new HashMap<>();
         this.addScheduleToCalendarMap(calendarMap, orders);
         this.addScheduleToCalendarMap(calendarMap, informs);
-        return scheduleMapper.mapToCalendarScheduleDTO(calendarMap);
+        return scheduleMapper.toCalendarResponse(calendarMap);
     }
 
 
     @Override
-    public DailyScheduleDTO getDailySchedules(DailyParam dailyParam, TeamMemberVO teamMember) {
-        int year = dailyParam.getYear();
-        int month = dailyParam.getMonth();
-        int day = dailyParam.getDay();
-        List<QueryScheduleDTO>  orders = scheduleRepository.findDailyOrders(year,month,day,teamMember);
-        List<QueryScheduleDTO> informs = scheduleRepository.findDailyInforms(year,month,day,teamMember);
-        List<QueryScheduleDTO> schedules = new ArrayList<>();
+    public DailyScheduleResponse getDailySchedules(DailyParam dailyParam, TeamMemberVO teamMember) {
+        DailyCond cond = scheduleMapper.toDailyCond(dailyParam, teamMember);
+        List<QuerySchedule>  orders = scheduleRepository.findDailyOrders(cond);
+        List<QuerySchedule> informs = scheduleRepository.findDailyInforms(cond);
+        List<QuerySchedule> schedules = new ArrayList<>();
         schedules.addAll(orders);
         schedules.addAll(informs);
-        List<QueryScheduleDTO> sortedSchedules = schedules.stream().sorted(this::compareQueryScheduleDTO).toList();
-        scheduleRepository.findDailyInforms(year,month,day,teamMember);
-        return new DailyScheduleDTO(sortedSchedules);
+        List<QuerySchedule> sortedSchedules = schedules.stream().sorted(this::compareQuerySchedule).toList();
+        return new DailyScheduleResponse(sortedSchedules);
     }
 }

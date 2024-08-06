@@ -5,13 +5,13 @@ import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domain.schedule.dto.request.DailyParam;
 import com.yellobook.domain.schedule.dto.request.MonthlyParam;
 import com.yellobook.domain.schedule.dto.request.MonthlySearchParam;
-import com.yellobook.domain.schedule.dto.response.CalendarScheduleDTO;
-import com.yellobook.domain.schedule.dto.response.DailyScheduleDTO;
-import com.yellobook.domain.schedule.dto.response.SearchMonthlyScheduleDTO;
-import com.yellobook.domain.schedule.dto.response.UpcomingScheduleDTO;
-import com.yellobook.domains.schedule.dto.QueryMonthlyScheduleDTO;
-import com.yellobook.domains.schedule.dto.QueryScheduleDTO;
-import com.yellobook.domains.schedule.dto.QueryUpcomingScheduleDTO;
+import com.yellobook.domain.schedule.dto.response.CalendarResponse;
+import com.yellobook.domain.schedule.dto.response.DailyScheduleResponse;
+import com.yellobook.domain.schedule.dto.response.SearchMonthlyScheduleResponse;
+import com.yellobook.domain.schedule.dto.response.UpcomingScheduleResponse;
+import com.yellobook.domains.schedule.dto.query.QueryMonthlySchedule;
+import com.yellobook.domains.schedule.dto.query.QuerySchedule;
+import com.yellobook.domains.schedule.dto.query.QueryUpcomingSchedule;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.Map;
 
 public interface ScheduleStrategy {
-    UpcomingScheduleDTO getUpcomingSchedules(TeamMemberVO teamMember);
-    SearchMonthlyScheduleDTO searchMonthlySchedules(MonthlySearchParam monthlySearchParam, TeamMemberVO teamMember);
-    CalendarScheduleDTO getCalendarSchedules(MonthlyParam monthlyParam, TeamMemberVO teamMember);
-    DailyScheduleDTO getDailySchedules(DailyParam dailyParam, TeamMemberVO teamMember);
+    UpcomingScheduleResponse getUpcomingSchedules(TeamMemberVO teamMember);
+    SearchMonthlyScheduleResponse searchMonthlySchedules(MonthlySearchParam monthlySearchParam, TeamMemberVO teamMember);
+    CalendarResponse getCalendarSchedules(MonthlyParam monthlyParam, TeamMemberVO teamMember);
+    DailyScheduleResponse getDailySchedules(DailyParam dailyParam, TeamMemberVO teamMember);
 
 
     /**
@@ -31,7 +31,7 @@ public interface ScheduleStrategy {
      * @param inform 내일부터 가장 이른 공지 및 업무
      * @return 선택된 일정
      */
-    default QueryUpcomingScheduleDTO selectSchedule(QueryUpcomingScheduleDTO order, QueryUpcomingScheduleDTO inform) {
+    default QueryUpcomingSchedule selectSchedule(QueryUpcomingSchedule order, QueryUpcomingSchedule inform) {
         // 둘다 존재할 경우 시간순으로 빠른 것을 표시한다.
         if (order != null && inform != null) {
             // 시간이 같을 경우 주문을 우선으로 표시한다.
@@ -47,7 +47,7 @@ public interface ScheduleStrategy {
      * @param dailyMap 일별 일정을 종합하기 위한 Map
      * @param schedules 일정 (주문, 공지 및 업무)
      */
-    default void addScheduleToCalendarMap(Map<Integer, List<String>> dailyMap, List<QueryMonthlyScheduleDTO> schedules) {
+    default void addScheduleToCalendarMap(Map<Integer, List<String>> dailyMap, List<QueryMonthlySchedule> schedules) {
         schedules.forEach(schedule -> {
             Integer day = schedule.getDate().getDayOfMonth();
             List<String> values = dailyMap.computeIfAbsent(day, k -> new ArrayList<>());
@@ -66,7 +66,7 @@ public interface ScheduleStrategy {
      * @return 정렬을 위한 정수
      * - 양수일경우 o1 이 앞으로, 0 일경우 유지, 음수일경우 o2 가 앞으로
      */
-    default int compareQueryScheduleDTO(QueryScheduleDTO o1, QueryScheduleDTO o2) {
+    default int compareQuerySchedule(QuerySchedule o1, QuerySchedule o2) {
         final LocalDate o1Date = o1.getDate();
         final LocalDate o2Date = o2.getDate();
         final ScheduleType o1Type = o1.getScheduleType();

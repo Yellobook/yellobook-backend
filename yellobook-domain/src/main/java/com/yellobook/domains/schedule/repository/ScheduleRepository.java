@@ -7,9 +7,13 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringTemplate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domains.schedule.dto.QueryMonthlyScheduleDTO;
-import com.yellobook.domains.schedule.dto.QueryScheduleDTO;
-import com.yellobook.domains.schedule.dto.QueryUpcomingScheduleDTO;
+import com.yellobook.domains.schedule.dto.DailyCond;
+import com.yellobook.domains.schedule.dto.EarliestCond;
+import com.yellobook.domains.schedule.dto.MonthlyCond;
+import com.yellobook.domains.schedule.dto.SearchMonthlyCond;
+import com.yellobook.domains.schedule.dto.query.QueryMonthlySchedule;
+import com.yellobook.domains.schedule.dto.query.QuerySchedule;
+import com.yellobook.domains.schedule.dto.query.QueryUpcomingSchedule;
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.enums.ScheduleType;
 import org.springframework.stereotype.Repository;
@@ -41,14 +45,16 @@ public class ScheduleRepository {
      * - 관리자면 모든 주문
      * - 주문자면 자신이 주문한 주문
      */
-    public Optional<QueryUpcomingScheduleDTO> findEarliestOrder(LocalDate today, TeamMemberVO teamMember) {
+    public Optional<QueryUpcomingSchedule> findEarliestOrder(EarliestCond earliestCond) {
+        TeamMemberVO teamMember = earliestCond.teamMember();
+        LocalDate today = earliestCond.today();
         Long teamId = teamMember.getTeamId();
         Long memberId = teamMember.getMemberId();
         MemberTeamRole role = teamMember.getRole();
 
-        QueryUpcomingScheduleDTO schedule = queryFactory
+        QueryUpcomingSchedule schedule = queryFactory
                 .select(
-                        Projections.constructor(QueryUpcomingScheduleDTO.class,
+                        Projections.constructor(QueryUpcomingSchedule.class,
                                 orderTitle.as("title"),
                                 order.date,
                                 Expressions.constant(ScheduleType.ORDER)
@@ -71,13 +77,15 @@ public class ScheduleRepository {
      * 제목, 날짜 일정형식 (주문 공지 및 일정
      * - 관리자, 주문자 구별 없이 본인이 작성했거나, 태그된 일정
      */
-    public Optional<QueryUpcomingScheduleDTO> findEarliestInform(LocalDate today, TeamMemberVO teamMember) {
+    public Optional<QueryUpcomingSchedule> findEarliestInform(EarliestCond cond) {
+        TeamMemberVO teamMember = cond.teamMember();
+        LocalDate today = cond.today();
         Long teamId = teamMember.getTeamId();
         Long memberId = teamMember.getMemberId();
 
-        QueryUpcomingScheduleDTO schedule = queryFactory
+        QueryUpcomingSchedule schedule = queryFactory
                 .select(
-                        Projections.constructor(QueryUpcomingScheduleDTO.class,
+                        Projections.constructor(QueryUpcomingSchedule.class,
                                 inform.title,
                                 inform.date,
                                 Expressions.constant(ScheduleType.INFORM)
@@ -100,14 +108,15 @@ public class ScheduleRepository {
     /**
      * 월별 키워드에 해당하는 주문 검색
      */
-    public List<QueryScheduleDTO> searchMonthlyOrders(String keyword, int year, int month, TeamMemberVO teamMember) {
+    public List<QuerySchedule> searchMonthlyOrders(SearchMonthlyCond cond) {
+        TeamMemberVO teamMember = cond.teamMember();
         Long teamId = teamMember.getTeamId();
         Long memberId = teamMember.getMemberId();
         MemberTeamRole role = teamMember.getRole();
 
-        List<QueryScheduleDTO> schedules = queryFactory
+        List<QuerySchedule> schedules = queryFactory
                 .select(
-                        Projections.constructor(QueryScheduleDTO.class,
+                        Projections.constructor(QuerySchedule.class,
                                 order.id,
                                 orderTitle.as("title"),
                                 order.date,
@@ -116,10 +125,10 @@ public class ScheduleRepository {
                 )
                 .from(order)
                 .where(
-                        eqYearMonth(order.date, year, month),
+                        eqYearMonth(order.date, cond.year(), cond.month()),
                         eqOrderTeam(teamId),
                         eqOrderer(role, memberId),
-                        orderTitle.like("%" + keyword + "%")
+                        orderTitle.like("%" + cond.keyword() + "%")
                 )
                 // 주문날짜 순으로 정렬하고, 주문날짜가 동일하면 주문글 생성시간이 빠른 순으로 한다.
                 .orderBy(order.date.asc(), order.createdAt.asc())
@@ -130,13 +139,14 @@ public class ScheduleRepository {
     /**
      * 월별 키워드에 해당하는 공지/일정 검색
      */
-    public List<QueryScheduleDTO> searchMonthlyInforms(String keyword, int year, int month, TeamMemberVO teamMember) {
+    public List<QuerySchedule> searchMonthlyInforms(SearchMonthlyCond cond) {
+        TeamMemberVO teamMember = cond.teamMember();
         Long teamId = teamMember.getTeamId();
         Long memberId = teamMember.getMemberId();
 
-        List<QueryScheduleDTO> schedules = queryFactory
+        List<QuerySchedule> schedules = queryFactory
                 .select(
-                        Projections.constructor(QueryScheduleDTO.class,
+                        Projections.constructor(QuerySchedule.class,
                                 inform.id,
                                 inform.title,
                                 inform.date,
@@ -147,10 +157,10 @@ public class ScheduleRepository {
                 .leftJoin(informMention)
                 .on(inform.id.eq(informMention.inform.id))
                 .where(
-                        eqYearMonth(inform.date, year, month),
+                        eqYearMonth(inform.date, cond.year(), cond.month()),
                         inform.team.id.eq(teamId),
                         inform.member.id.eq(memberId).or(informMention.member.id.eq(memberId)),
-                        inform.title.like("%" + keyword + "%")
+                        inform.title.like("%" + cond.keyword() + "%")
                 )
                 .orderBy(inform.date.asc(), inform.createdAt.asc())
                 .fetch();
@@ -160,14 +170,15 @@ public class ScheduleRepository {
     /**
      * 월별 종합 주문
      */
-    public List<QueryMonthlyScheduleDTO> findMonthlyOrders(int year, int month, TeamMemberVO teamMember) {
+    public List<QueryMonthlySchedule> findMonthlyOrders(MonthlyCond cond) {
+        TeamMemberVO teamMember = cond.teamMember();
         Long teamId = teamMember.getTeamId();
         Long memberId = teamMember.getMemberId();
         MemberTeamRole role = teamMember.getRole();
 
-        List<QueryMonthlyScheduleDTO> schedules = queryFactory
+        List<QueryMonthlySchedule> schedules = queryFactory
                 .select(
-                        Projections.constructor(QueryMonthlyScheduleDTO.class,
+                        Projections.constructor(QueryMonthlySchedule.class,
                                 order.id,
                                 orderTitle.as("title"),
                                 order.date,
@@ -177,7 +188,7 @@ public class ScheduleRepository {
                 )
                 .from(order)
                 .where(
-                        eqYearMonth(order.date, year, month),
+                        eqYearMonth(order.date, cond.year(), cond.month()),
                         eqOrderTeam(teamId),
                         eqOrderer(role, memberId)
                 )
@@ -189,13 +200,14 @@ public class ScheduleRepository {
     /**
      * 월별 종합 공지/일정
      */
-    public List<QueryMonthlyScheduleDTO> findMonthlyInforms(int year, int month, TeamMemberVO teamMember) {
+    public List<QueryMonthlySchedule> findMonthlyInforms(MonthlyCond cond) {
+        TeamMemberVO teamMember = cond.teamMember();
         Long teamId = teamMember.getTeamId();
         Long memberId = teamMember.getMemberId();
 
-        List<QueryMonthlyScheduleDTO> schedules = queryFactory
+        List<QueryMonthlySchedule> schedules = queryFactory
                 .select(
-                        Projections.constructor(QueryMonthlyScheduleDTO.class,
+                        Projections.constructor(QueryMonthlySchedule.class,
                                 inform.id,
                                 inform.title,
                                 inform.date,
@@ -207,7 +219,7 @@ public class ScheduleRepository {
                 .leftJoin(informMention)
                 .on(inform.id.eq(informMention.inform.id))
                 .where(
-                        eqYearMonth(inform.date, year, month),
+                        eqYearMonth(inform.date, cond.year(), cond.month()),
                         inform.team.id.eq(teamId),
                         inform.member.id.eq(memberId).or(informMention.member.id.eq(memberId))
                 )
@@ -220,14 +232,15 @@ public class ScheduleRepository {
     /**
      * 날짜별 주문 조회
      */
-    public List<QueryScheduleDTO> findDailyOrders(int year, int month, int day, TeamMemberVO teamMember) {
+    public List<QuerySchedule> findDailyOrders(DailyCond cond) {
+        TeamMemberVO teamMember = cond.teamMember();
         Long teamId = teamMember.getTeamId();
         Long memberId = teamMember.getMemberId();
         MemberTeamRole role = teamMember.getRole();
 
-        List<QueryScheduleDTO> schedules = queryFactory
+        List<QuerySchedule> schedules = queryFactory
                 .select(
-                        Projections.constructor(QueryScheduleDTO.class,
+                        Projections.constructor(QuerySchedule.class,
                                 order.id,
                                 orderTitle.as("title"),
                                 order.date,
@@ -237,7 +250,7 @@ public class ScheduleRepository {
                 .from(order)
                 .where(
                         // 해당 월의 주문이여야 하고
-                        eqYearMonthDay(order.date, year, month, day),
+                        eqYearMonthDay(order.date, cond.year(), cond.month(), cond.day()),
                         // 해당 팀의 주문이어야 하고
                         eqOrderTeam(teamId),
                         // 주문자라면 자신이 주문한 주문이어야 하고
@@ -252,13 +265,14 @@ public class ScheduleRepository {
     /**
      * 날짜별 공지/일정 조회
      */
-    public List<QueryScheduleDTO> findDailyInforms(int year, int month, int day, TeamMemberVO teamMember) {
+    public List<QuerySchedule> findDailyInforms(DailyCond cond) {
+        TeamMemberVO teamMember = cond.teamMember();
         Long teamId = teamMember.getTeamId();
         Long memberId = teamMember.getMemberId();
 
-        List<QueryScheduleDTO> schedules = queryFactory
+        List<QuerySchedule> schedules = queryFactory
                 .select(
-                        Projections.constructor(QueryScheduleDTO.class,
+                        Projections.constructor(QuerySchedule.class,
                                 inform.id,
                                 inform.title,
                                 inform.date,
@@ -269,7 +283,7 @@ public class ScheduleRepository {
                 .leftJoin(informMention)
                 .on(inform.id.eq(informMention.inform.id))
                 .where(
-                        eqYearMonthDay(inform.date, year, month, day),
+                        eqYearMonthDay(inform.date, cond.year(), cond.month(), cond.day()),
                         inform.member.id.eq(memberId).or(informMention.member.id.eq(memberId))
                 )
                 .orderBy(inform.date.asc(), inform.createdAt.asc())
