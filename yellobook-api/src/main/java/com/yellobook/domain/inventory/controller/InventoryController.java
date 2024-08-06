@@ -4,7 +4,6 @@ import com.yellobook.common.annotation.TeamMember;
 import com.yellobook.common.validation.annotation.ExistInventory;
 import com.yellobook.common.validation.annotation.ExistProduct;
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.inventory.dto.*;
 import com.yellobook.domain.inventory.service.InventoryCommandService;
 import com.yellobook.domain.inventory.service.InventoryQueryService;
