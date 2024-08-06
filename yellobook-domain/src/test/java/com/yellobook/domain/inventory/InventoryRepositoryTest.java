@@ -131,4 +131,106 @@ public class InventoryRepositoryTest {
 
     }
 
+    @Nested
+    @DisplayName("제품")
+    class productsTests{
+        private Inventory inventory;
+        private Product product1;
+
+        @BeforeEach
+        void setUpInventory(){
+            inventory = Inventory.builder()
+                    .team(team)
+                    .title("2024년 08월 06일 재고현황")
+                    .view(10)
+                    .build();
+            inventoryRepository.save(inventory);
+
+            product1 = Product.builder()
+                    .name("product1")
+                    .subProduct("sub1")
+                    .sku(1)
+                    .purchasePrice(1000)
+                    .salePrice(2000)
+                    .amount(100)
+                    .build();
+            Product product2 = Product.builder()
+                    .name("product2")
+                    .subProduct("sub2")
+                    .sku(2)
+                    .purchasePrice(2000)
+                    .salePrice(2000)
+                    .amount(200)
+                    .build();
+            product1.modifyInventory(inventory);
+            product2.modifyInventory(inventory);
+            productRepository.save(product1);
+            productRepository.save(product2);
+        }
+
+        @Nested
+        @DisplayName("제품 조회 테스트")
+        class getProductsTests{
+            @Test
+            @DisplayName("제품명을 기준으로 오름차순 정렬이 되었는지 테스트")
+            void getProductsByNameAsc(){
+                //given
+                Long inventoryId = inventory.getId();
+
+                //when
+                List<ProductDTO> result = productRepository.getProducts(inventoryId);
+
+                //then
+                assertThat(result.size()).isEqualTo(2);
+                assertThat(result.get(0).getName()).isEqualTo("product1");
+                assertThat(result.get(0).getName()).isLessThanOrEqualTo(result.get(1).getName());
+            }
+
+            @DisplayName("키워드를 포함한 제품을 조회하는지 테스트")
+            @ParameterizedTest
+            @CsvSource(value = {
+                    "product, 2",
+                    "1, 1"
+            })
+            void getProductsByKeyword(String keyword, int total){
+                //given
+                Long inventoryId = inventory.getId();
+
+                //when
+                List<ProductDTO> result = productRepository.getProducts(inventoryId, keyword);
+
+                //then
+                assertThat(result.size()).isEqualTo(total);
+            }
+        }
+
+        @Test
+        @DisplayName("제품 id로 제품 삭제되었는지 테스트")
+        void deleteProduct(){
+            //given
+            Long productId = product1.getId();
+
+            //when
+            productRepository.deleteById(productId);
+
+            //then
+            assertThat(productRepository.existsById(productId)).isFalse();
+        }
+
+        @Test
+        @DisplayName("inventory Id와 sku로 제품이 존재하는지 테스트")
+        void getByInventoryIdAndSku(){
+            //given
+            Long inventoryId = inventory.getId();
+            Integer sku = product1.getSku();
+
+            //when
+            boolean exist1 = productRepository.existsByInventoryIdAndSku(inventoryId, sku);
+
+            //then
+            assertThat(exist1).isTrue();
+        }
+
+    }
+
 }
