@@ -4,6 +4,7 @@ import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domain.schedule.dto.request.DailyParam;
 import com.yellobook.domain.schedule.dto.request.MonthlyParam;
 import com.yellobook.domain.schedule.dto.request.MonthlySearchParam;
+import com.yellobook.domain.schedule.dto.response.CalendarItem;
 import com.yellobook.domain.schedule.dto.response.CalendarResponse;
 import com.yellobook.domain.schedule.dto.response.UpcomingScheduleResponse;
 import com.yellobook.domains.schedule.dto.DailyCond;
@@ -19,8 +20,6 @@ import org.mapstruct.factory.Mappers;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-
-import static com.yellobook.domain.schedule.dto.response.CalendarResponse.*;
 
 @Mapper(componentModel = "spring")
 public interface ScheduleMapper {
@@ -42,7 +41,14 @@ public interface ScheduleMapper {
 
 
     @Named("mapToCalendarItems")
-    default List<CalendarItemDTO> mapToCalendarItems(Map<Integer, List<String>> calendarMap) {
-        return calendarMap.entrySet().stream().map(entry -> CalendarItemDTO.builder().day(entry.getKey()).titles(entry.getValue()).build()).toList();
+    default List<CalendarItem> mapToCalendarItems(Map<Integer, List<String>> calendarMap) {
+        return calendarMap.entrySet()
+                .stream()
+                .map(entry -> CalendarItem.builder()
+                        .day(entry.getKey())
+                        .titles(entry.getValue())
+                        .build()
+                )
+                .toList();
     }
 }
