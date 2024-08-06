@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -35,13 +36,16 @@ public class OrderRepositoryTest {
     private final OrderRepository orderRepository;
     private final OrderCommentRepository orderCommentRepository;
     private final OrderMentionRepository orderMentionRepository;
+    private final TestEntityManager entityManager;
     private final Long nonExistOrderId = 9999L;
 
     @Autowired
-    public OrderRepositoryTest(OrderRepository orderRepository, OrderCommentRepository orderCommentRepository, OrderMentionRepository orderMentionRepository){
+    public OrderRepositoryTest(OrderRepository orderRepository, OrderCommentRepository orderCommentRepository,
+                               TestEntityManager entityManager, OrderMentionRepository orderMentionRepository){
         this.orderRepository = orderRepository;
         this.orderCommentRepository = orderCommentRepository;
         this.orderMentionRepository = orderMentionRepository;
+        this.entityManager = entityManager;
     }
 
     @Nested
@@ -143,6 +147,34 @@ public class OrderRepositoryTest {
     @DisplayName("주문에 접근할 수 있는 사람 Test")
     class OrderMentionTests{
 
+        @Test
+        @DisplayName("주문에 접근할 수 있는 관리자인지 확인")
+        void checkAccessToOrder(){
+            //given
+            Long memberId = 1L;
+            Long orderId = 1L;
+
+            //when
+            boolean exists = orderMentionRepository.existsByMemberIdAndOrderId(memberId, orderId);
+
+            //then
+            assertThat(exists).isTrue();
+        }
+
+        @Test
+        @DisplayName("주문을 삭제하고나면 언급된 사람에서 삭제되는지 확인")
+        void checkOrderMentionDeleted(){
+            //given
+            Long orderId = 1L;
+
+            //when
+            orderMentionRepository.deleteAllByOrderId(orderId);
+            entityManager.flush();
+
+            //then
+            boolean existsAfterDeletion = orderMentionRepository.existsByMemberIdAndOrderId(1L, orderId);
+            assertThat(existsAfterDeletion).isFalse();
+        }
 
     }
 }
