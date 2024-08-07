@@ -4,6 +4,7 @@ import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domain.inventory.dto.AddProductRequest;
 import com.yellobook.domain.inventory.dto.AddProductResponse;
+import com.yellobook.domain.inventory.dto.ModifyProductAmountRequest;
 import com.yellobook.domain.inventory.mapper.ProductMapper;
 import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.entity.Product;
@@ -142,17 +143,66 @@ class InventoryCommandServiceTest {
     @Nested
     @DisplayName("제품 수량 수정")
     class ModifyProductAmountTests{
-//        @Test
-//        @DisplayName("주문자는 제품 수량 수정 불가능")
-//
-//        @Test
-//        @DisplayName("뷰어는 제품 수량 수정 불가능")
-//
-//        @Test
-//        @DisplayName("제품 Id가 존재하지 않으면 제품 수량 수정 불가능")
-//
-//        @Test
-//        @DisplayName("제품 수량 수정이 잘 되었는지 확인")
+        @Test
+        @DisplayName("주문자는 제품 수량 수정 불가능")
+        void orderCantModifyProductAmount(){
+            //given
+            Long productId = 1L;
+            ModifyProductAmountRequest request = createModifyProductAmountRequest();
+
+            //when & then
+            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                    inventoryCommandService.modifyProductAmount(productId, request, orderer));
+            Assertions.assertEquals(AuthErrorCode.ORDERER_NOT_ALLOWED, exception.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("뷰어는 제품 수량 수정 불가능")
+        void viewerCantModifyProductAmount(){
+            //given
+            Long productId = 1L;
+            ModifyProductAmountRequest request = createModifyProductAmountRequest();
+
+            //when & then
+            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                    inventoryCommandService.modifyProductAmount(productId, request, viewer));
+            Assertions.assertEquals(AuthErrorCode.VIEWER_NOT_ALLOWED, exception.getErrorCode());
+
+        }
+
+        @Test
+        @DisplayName("제품 Id가 존재하지 않으면 제품 수량 수정 불가능")
+        void notExistProductCantModifyProductAmount(){
+            //given
+            Long productId = 1L;
+            ModifyProductAmountRequest request = createModifyProductAmountRequest();
+            when(productRepository.findById(productId)).thenReturn(Optional.empty());
+
+            //when & then
+            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                    inventoryCommandService.modifyProductAmount(productId, request, admin));
+            Assertions.assertEquals(InventoryErrorCode.PRODUCT_NOT_FOUND, exception.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("제품 수량 수정이 잘 되었는지 확인")
+        void modifyProductAmount(){
+            //given
+            Long productId = 1L;
+            ModifyProductAmountRequest request = createModifyProductAmountRequest();
+            Product product = createProduct();
+            when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+
+            //when
+            inventoryCommandService.modifyProductAmount(productId, request, admin);
+
+            //then
+            assertThat(product.getAmount()).isEqualTo(request.getAmount());
+        }
+
+        private ModifyProductAmountRequest createModifyProductAmountRequest(){
+            return ModifyProductAmountRequest.builder().amount(1000).build();
+        }
     }
 
     @Nested
@@ -185,7 +235,5 @@ class InventoryCommandServiceTest {
                 .amount(111)
                 .build();
     }
-
-
 
 }
