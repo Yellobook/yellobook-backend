@@ -41,16 +41,20 @@ public class TeamCommandService {
                     log.error("Member {} not found.", customOAuth2User.getMemberId());
                     return new CustomException(TeamErrorCode.MEMBER_NOT_FOUND);
                 });
+        if(teamRepository.findByName(request.getName()).isPresent()){
+            log.error("Team {} already exists.", request.getName());
+            throw new CustomException(TeamErrorCode.EXIST_TEAM_NAME);
+        }
+        else{
+            Team newTeam = teamMapper.toTeam(request);
+            teamRepository.save(newTeam);
+            log.info("New team created: {}", newTeam.getId());
+            Participant founder = participantMapper.toParticipant(request.getRole(),newTeam, member);
+            participantRepository.save(founder);
+            log.info("Participant added: Member ID = {}, Team ID = {}", member.getId(), newTeam.getId());
 
-        Team newTeam = teamMapper.INSTANCE.toTeam(request);
-        teamRepository.save(newTeam);
-        log.info("New team created: {}", newTeam.getId());
-
-        Participant founder = participantMapper.toParticipant(request.getRole(),newTeam, member);
-        participantRepository.save(founder);
-        log.info("Participant added: Member ID = {}, Team ID = {}", member.getId(), newTeam.getId());
-
-        return teamMapper.toCreateTeamResponseDTO(newTeam);
+            return teamMapper.toCreateTeamResponseDTO(newTeam);
+        }
     }
 
     public TeamResponse.LeaveTeamResponseDTO leaveTeam(Long teamId, CustomOAuth2User customOAuth2User) {
