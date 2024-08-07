@@ -3,6 +3,7 @@ package com.yellobook.domains.inventory.dto;
 import lombok.*;
 
 @Getter
+@Builder
 public class ProductDTO {
     private final Long productId;
     private final String name;

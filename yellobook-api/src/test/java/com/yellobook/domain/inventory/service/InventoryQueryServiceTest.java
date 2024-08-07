@@ -2,11 +2,14 @@ package com.yellobook.domain.inventory.service;
 
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.vo.TeamMemberVO;
+import com.yellobook.domain.inventory.dto.GetProductsResponse;
+import com.yellobook.domain.inventory.dto.GetProductsResponse.ProductInfo;
 import com.yellobook.domain.inventory.dto.GetTotalInventoryResponse;
 import com.yellobook.domain.inventory.dto.GetTotalInventoryResponse.InventoryInfo;
 import com.yellobook.domain.inventory.mapper.InventoryMapper;
 import com.yellobook.domain.inventory.mapper.ProductMapper;
 import com.yellobook.domains.inventory.dto.InventoryDTO;
+import com.yellobook.domains.inventory.dto.ProductDTO;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
 import com.yellobook.error.code.AuthErrorCode;
@@ -26,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -130,6 +133,71 @@ class InventoryQueryServiceTest {
     @Nested
     @DisplayName("특정 재고 일자 현황 조회")
     class GetProductsByInventoryTests{
+        @Test
+        @DisplayName("뷰어는 전체 재고 현황 확인 불가능")
+        void viewerCantGetProductsByInventory(){
+            //given
+            Long inventoryId = 1L;
+
+            //when & then
+            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                    inventoryQueryService.getProductsByInventory(inventoryId, viewer));
+            Assertions.assertEquals(AuthErrorCode.VIEWER_NOT_ALLOWED, exception.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("재고를 가져오기 확인")
+        void checkOrderByName(){
+            //given
+            Long inventoryId = 1L;
+            List<ProductDTO> productDTOs = createProductDTOs();
+            List<ProductInfo> productInfos = createProductInfos();
+            when(productRepository.getProducts(inventoryId)).thenReturn(productDTOs);
+            when(productMapper.toProductInfo(productDTOs)).thenReturn(productInfos);
+
+            //when
+            GetProductsResponse response = inventoryQueryService.getProductsByInventory(inventoryId, admin);
+
+            //then
+            verify(productRepository).getProducts(inventoryId);
+            verify(productMapper).toProductInfo(productDTOs);
+            assertThat(response.getProducts()).isSameAs(productInfos);
+        }
+
+        @Test
+        @DisplayName("재고가 없으면 빈 리스트 반환")
+        void getEmptyListProducts(){
+            //given
+            Long inventoryId = 1L;
+            List<ProductDTO> productDTOs = Collections.emptyList();
+            List<ProductInfo> productInfos = Collections.emptyList();
+            when(productRepository.getProducts(inventoryId)).thenReturn(productDTOs);
+            when(productMapper.toProductInfo(productDTOs)).thenReturn(productInfos);
+
+            //when
+            GetProductsResponse response = inventoryQueryService.getProductsByInventory(inventoryId, admin);
+
+            //then
+            verify(productRepository).getProducts(inventoryId);
+            verify(productMapper).toProductInfo(productDTOs);
+            assertThat(response.getProducts()).isSameAs(Collections.emptyList());
+        }
+
+        private List<ProductDTO> createProductDTOs(){
+            List<ProductDTO> result = new ArrayList<>();
+            for(int i =0; i<5; i++){
+                result.add(ProductDTO.builder().build());
+            }
+            return result;
+        }
+
+        private List<ProductInfo> createProductInfos(){
+            List<ProductInfo> result = new ArrayList<>();
+            for(int i =0; i<5; i++){
+                result.add(ProductInfo.builder().build());
+            }
+            return result;
+        }
 
     }
 
