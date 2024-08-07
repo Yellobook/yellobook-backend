@@ -6,6 +6,8 @@ import lombok.*;
 @Schema(description = "제품 추가 - 요청 DTO")
 @Getter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class AddProductRequest {
     @Schema(description = "제품명")
     private String name;

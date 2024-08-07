@@ -1,10 +1,7 @@
 package com.yellobook.domain.inventory.service;
 
-import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.utils.ParticipantUtil;
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domain.auth.service.RedisTeamService;
-import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.inventory.dto.AddProductRequest;
 import com.yellobook.domain.inventory.dto.AddProductResponse;
 import com.yellobook.domain.inventory.dto.ModifyProductAmountRequest;
@@ -27,16 +24,14 @@ import java.util.Optional;
 public class InventoryCommandService{
     private final InventoryRepository inventoryRepository;
     private final ProductRepository productRepository;
-    private final ParticipantUtil participantUtil;
-    private final RedisTeamService teamUtil;
     private final ProductMapper productMapper;
 
     /**
      * 제품 추가 (관리자)
      */
     public AddProductResponse addProduct(Long inventoryId, AddProductRequest requestDTO, TeamMemberVO teamMember) {
-        participantUtil.forbidViewer(teamMember.getRole());
-        participantUtil.forbidOrderer(teamMember.getRole());
+        ParticipantUtil.forbidViewer(teamMember.getRole());
+        ParticipantUtil.forbidOrderer(teamMember.getRole());
 
         // SKU 중복 확인 (inventory & sku)
         if(productRepository.existsByInventoryIdAndSku(inventoryId, requestDTO.getSku())){
@@ -54,8 +49,8 @@ public class InventoryCommandService{
      * 제품 수량 수정 (관리자)
      */
     public void modifyProductAmount(Long productId, ModifyProductAmountRequest requestDTO, TeamMemberVO teamMember) {
-        participantUtil.forbidViewer(teamMember.getRole());
-        participantUtil.forbidOrderer(teamMember.getRole());
+        ParticipantUtil.forbidViewer(teamMember.getRole());
+        ParticipantUtil.forbidOrderer(teamMember.getRole());
 
         Optional<Product> productOptional = productRepository.findById(productId);
         if(productOptional.isEmpty()){
@@ -68,8 +63,8 @@ public class InventoryCommandService{
      * 제품 삭제 (관리자)
      */
     public void deleteProduct(Long productId, TeamMemberVO teamMember) {
-        participantUtil.forbidViewer(teamMember.getRole());
-        participantUtil.forbidOrderer(teamMember.getRole());
+        ParticipantUtil.forbidViewer(teamMember.getRole());
+        ParticipantUtil.forbidOrderer(teamMember.getRole());
 
         productRepository.deleteById(productId);
     }
