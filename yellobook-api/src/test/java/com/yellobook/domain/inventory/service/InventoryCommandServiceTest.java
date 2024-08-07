@@ -13,18 +13,21 @@ import com.yellobook.domains.inventory.repository.ProductRepository;
 import com.yellobook.error.code.AuthErrorCode;
 import com.yellobook.error.code.InventoryErrorCode;
 import com.yellobook.error.exception.CustomException;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -208,14 +211,43 @@ class InventoryCommandServiceTest {
     @Nested
     @DisplayName("제품 삭제")
     class DeleteProductTests{
-//        @Test
-//        @DisplayName("주문자는 제품 삭제 불가능")
-//
-//        @Test
-//        @DisplayName("뷰어는 제품 삭제 불가능")
-//
-//        @Test
-//        @DisplayName("제품이 잘 삭제되었는지 확인")
+        @Test
+        @DisplayName("주문자는 제품 삭제 불가능")
+        void ordererCantDeleteProduct(){
+            //given
+            Long productId = 1L;
+
+            //when & then
+            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                    inventoryCommandService.deleteProduct(productId, orderer));
+            Assertions.assertEquals(AuthErrorCode.ORDERER_NOT_ALLOWED, exception.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("뷰어는 제품 삭제 불가능")
+        void viewerCantDeleteProduct(){
+            //given
+            Long productId = 1L;
+
+            //when & then
+            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                    inventoryCommandService.deleteProduct(productId, viewer));
+            Assertions.assertEquals(AuthErrorCode.VIEWER_NOT_ALLOWED, exception.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("제품이 잘 삭제되었는지 확인")
+        void deleteProduct(){
+            //given
+            Long productId = 1L;
+
+            //when
+            inventoryCommandService.deleteProduct(productId, admin);
+
+            //then
+            verify(productRepository).deleteById(productId);
+        }
+
     }
 
     private Inventory createInventory(){
