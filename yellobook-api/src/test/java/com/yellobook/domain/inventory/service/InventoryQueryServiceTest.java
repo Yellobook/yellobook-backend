@@ -135,7 +135,7 @@ class InventoryQueryServiceTest {
     class GetProductsByInventoryTests{
         @Test
         @DisplayName("뷰어는 전체 재고 현황 확인 불가능")
-        void viewerCantGetProductsByInventory(){
+        void viewerCantGetProducts(){
             //given
             Long inventoryId = 1L;
 
@@ -183,28 +183,94 @@ class InventoryQueryServiceTest {
             assertThat(response.getProducts()).isSameAs(Collections.emptyList());
         }
 
-        private List<ProductDTO> createProductDTOs(){
-            List<ProductDTO> result = new ArrayList<>();
-            for(int i =0; i<5; i++){
-                result.add(ProductDTO.builder().build());
-            }
-            return result;
-        }
-
-        private List<ProductInfo> createProductInfos(){
-            List<ProductInfo> result = new ArrayList<>();
-            for(int i =0; i<5; i++){
-                result.add(ProductInfo.builder().build());
-            }
-            return result;
-        }
-
     }
 
     @Nested
     @DisplayName("재고 검색")
     class GetProductByKeywordAndInventoryTests{
+        @Test
+        @DisplayName("주문자는 재고 검색 불가능")
+        void ordererCantGetProducts(){
+            //given
+            Long inventoryId = 1L;
+            String keyword = "pro";
 
+            //when & then
+            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                    inventoryQueryService.getProductByKeywordAndInventory(inventoryId, keyword, orderer));
+            Assertions.assertEquals(AuthErrorCode.ORDERER_NOT_ALLOWED, exception.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("뷰어는 재고 검색 불가능")
+        void viewerCantGetProducts(){
+            //given
+            Long inventoryId = 1L;
+            String keyword = "pro";
+
+            //when & then
+            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                    inventoryQueryService.getProductByKeywordAndInventory(inventoryId, keyword, viewer));
+            Assertions.assertEquals(AuthErrorCode.VIEWER_NOT_ALLOWED, exception.getErrorCode());
+        }
+
+        @Test
+        @DisplayName("재고 검색 확인")
+        void getProducts(){
+            //given
+            Long inventoryId = 1L;
+            String keyword = "pro";
+            List<ProductDTO> productDTOs = createProductDTOs();
+            List<ProductInfo> productInfos = createProductInfos();
+            when(productRepository.getProducts(inventoryId, keyword)).thenReturn(productDTOs);
+            when(productMapper.toProductInfo(productDTOs)).thenReturn(productInfos);
+
+            //when
+            GetProductsResponse response = inventoryQueryService.getProductByKeywordAndInventory(inventoryId, keyword, admin);
+
+            //then
+            verify(productRepository).getProducts(inventoryId, keyword);
+            verify(productMapper).toProductInfo(productDTOs);
+            assertThat(response.getProducts()).isSameAs(productInfos);
+        }
+
+        @Test
+        @DisplayName("검색 결과가 없으면 빈 리스트 반환")
+        void getEmptyProducts(){
+            //given
+            Long inventoryId = 1L;
+            String keyword = "pro";
+            List<ProductDTO> productDTOs = Collections.emptyList();
+            List<ProductInfo> productInfos = Collections.emptyList();
+            when(productRepository.getProducts(inventoryId, keyword)).thenReturn(Collections.emptyList());
+            when(productMapper.toProductInfo(productDTOs)).thenReturn(productInfos);
+
+            //when
+            GetProductsResponse response = inventoryQueryService.getProductByKeywordAndInventory(inventoryId, keyword, admin);
+
+            //then
+            verify(productRepository).getProducts(inventoryId, keyword);
+            verify(productMapper).toProductInfo(productDTOs);
+            assertThat(response.getProducts()).isSameAs(Collections.emptyList());
+        }
+
+    }
+
+
+    private List<ProductDTO> createProductDTOs(){
+        List<ProductDTO> result = new ArrayList<>();
+        for(int i =0; i<5; i++){
+            result.add(ProductDTO.builder().name("product").build());
+        }
+        return result;
+    }
+
+    private List<ProductInfo> createProductInfos(){
+        List<ProductInfo> result = new ArrayList<>();
+        for(int i =0; i<5; i++){
+            result.add(ProductInfo.builder().name("product").build());
+        }
+        return result;
     }
 
 }

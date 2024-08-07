@@ -4,6 +4,7 @@ import com.yellobook.common.utils.ParticipantUtil;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domain.auth.service.RedisTeamService;
 import com.yellobook.domain.inventory.dto.GetProductsResponse;
+import com.yellobook.domain.inventory.dto.GetProductsResponse.ProductInfo;
 import com.yellobook.domain.inventory.dto.GetTotalInventoryResponse;
 import com.yellobook.domain.inventory.mapper.InventoryMapper;
 import com.yellobook.domain.inventory.mapper.ProductMapper;
@@ -49,7 +50,7 @@ public class InventoryQueryService{
         // 제품 이름 순으로 정렬해서 보여주기 (페이징 X)
         ParticipantUtil.forbidViewer(teamMember.getRole());
 
-        List<GetProductsResponse.ProductInfo> content = productMapper.toProductInfo(productRepository.getProducts(inventoryId));
+        List<ProductInfo> content = productMapper.toProductInfo(productRepository.getProducts(inventoryId));
         return GetProductsResponse.builder().products(content).build();
     }
 
@@ -62,7 +63,7 @@ public class InventoryQueryService{
         ParticipantUtil.forbidViewer(teamMember.getRole());
         ParticipantUtil.forbidOrderer(teamMember.getRole());
 
-        List<GetProductsResponse.ProductInfo> content = productMapper.toProductInfo(productRepository.getProducts(inventoryId, keyword));
+        List<ProductInfo> content = productMapper.toProductInfo(productRepository.getProducts(inventoryId, keyword));
         return GetProductsResponse.builder().products(content).build();
     }
 
