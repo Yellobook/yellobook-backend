@@ -19,4 +19,16 @@ public class WebConfig implements WebMvcConfigurer {
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(teamMemberArgumentResolver);
     }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .exposedHeaders("Set-Cookie")
+                .allowedOrigins(
+                        "http://localhost:3000",
+                        "http://localhost:8080",
+                        "https://yellobook.site",
+                        "https://api.yellobook.site"
+                );
+    }
 }
