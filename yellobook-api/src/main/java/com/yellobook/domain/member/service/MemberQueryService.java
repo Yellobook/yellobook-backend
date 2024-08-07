@@ -1,6 +1,5 @@
 package com.yellobook.domain.member.service;
 
-import com.yellobook.domain.member.dto.MemberResponse;
 import com.yellobook.domain.member.dto.MemberResponse.AllowanceResponseDTO;
 import com.yellobook.domain.member.dto.MemberResponse.ParticipantInfo;
 import com.yellobook.domain.member.dto.MemberResponse.ProfileResponseDTO;
@@ -33,7 +32,8 @@ public class MemberQueryService {
     }
 
     public AllowanceResponseDTO getAllowanceById(Long memberId) {
-        boolean allowed = memberRepository.findById(memberId).map(Member::getAllowance).orElse(false);
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
+        boolean allowed = member.getAllowance() != null ? member.getAllowance() : false;
         return memberMapper.toAllowanceResponseDTO(allowed);
     }
 

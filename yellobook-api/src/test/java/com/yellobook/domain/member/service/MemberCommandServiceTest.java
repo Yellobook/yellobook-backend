@@ -4,7 +4,6 @@ import com.yellobook.common.enums.MemberRole;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.member.repository.MemberRepository;
 import com.yellobook.error.exception.CustomException;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -62,9 +61,7 @@ class MemberCommandServiceTest {
             //when & then
             assertThrows(CustomException.class, () -> memberCommandService.agreeTerm(memberId));
         }
+
     }
-
-
-
 
 }
