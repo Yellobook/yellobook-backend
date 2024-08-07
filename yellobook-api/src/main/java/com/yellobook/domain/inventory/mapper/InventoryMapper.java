@@ -7,8 +7,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static com.yellobook.domain.inventory.dto.GetTotalInventoryResponse.*;
+
 @Component
 @Mapper(componentModel = "spring")
 public interface InventoryMapper {
-    List<GetTotalInventoryResponse.InventoryInfo> toInventoryInfoList(List<InventoryDTO> inventoryDTOList);
+    List<InventoryInfo> toInventoryInfoList(List<InventoryDTO> inventoryDTOList);
 }
