@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.resolver.TeamMemberArgumentResolver;
 import com.yellobook.common.vo.TeamMemberVO;
+import com.yellobook.domain.inventory.dto.request.ModifyProductAmountRequest;
 import com.yellobook.domain.inventory.dto.response.GetProductsResponse;
 import com.yellobook.domain.inventory.dto.response.GetTotalInventoryResponse;
 import com.yellobook.domain.inventory.service.InventoryCommandService;
@@ -28,6 +29,7 @@ import java.util.Collections;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -37,6 +39,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class InventoryControllerTest {
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockBean
     private InventoryQueryService inventoryQueryService;
@@ -110,7 +114,39 @@ class InventoryControllerTest {
                 .andReturn();
     }
 
+    @Test
+    @DisplayName("@ExistInventory - 해당 인벤토리가 없을 때 예외 발생")
+    void validExistInventory() throws Exception{
+        //given
+        Long inventoryId = 1L;
+        GetProductsResponse response = GetProductsResponse.builder().products(Collections.emptyList()).build();
+        when(inventoryQueryService.getProductsByInventory(inventoryId, teamMemberVO)).thenReturn(response);
+        when(inventoryQueryService.existByInventoryId(inventoryId)).thenReturn(false);
 
+        //when & then
+        mockMvc.perform(get("/api/v1/inventories/{inventoryId}", inventoryId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    @DisplayName("@ExistProduct - 해당 제품 없을 때 예외 발생")
+    void validExistProduct() throws Exception{
+        //given
+        Long productId = 1L;
+        ModifyProductAmountRequest request = ModifyProductAmountRequest.builder().build();
+        when(inventoryQueryService.existByProductId(productId)).thenReturn(false);
+
+        //given & when
+        mockMvc.perform(put("/api/v1/inventories/products/{productId}", productId)
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andDo(print())
+                .andReturn();
+    }
 
 
 
