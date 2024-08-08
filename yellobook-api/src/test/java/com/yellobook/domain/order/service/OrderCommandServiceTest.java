@@ -3,14 +3,23 @@ package com.yellobook.domain.order.service;
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.enums.OrderStatus;
 import com.yellobook.common.vo.TeamMemberVO;
+import com.yellobook.domain.order.dto.AddOrderCommentRequest;
+import com.yellobook.domain.order.dto.AddOrderCommentResponse;
+import com.yellobook.domain.order.mapper.OrderMapper;
 import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.member.entity.Member;
+import com.yellobook.domains.member.repository.MemberRepository;
 import com.yellobook.domains.order.entity.Order;
+import com.yellobook.domains.order.entity.OrderComment;
+import com.yellobook.domains.order.repository.OrderCommentRepository;
 import com.yellobook.domains.order.repository.OrderMentionRepository;
 import com.yellobook.domains.order.repository.OrderRepository;
 import com.yellobook.error.code.OrderErrorCode;
 import com.yellobook.error.exception.CustomException;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -20,8 +29,7 @@ import java.lang.reflect.Field;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class OrderCommandServiceTest {
@@ -31,6 +39,12 @@ class OrderCommandServiceTest {
     private OrderRepository orderRepository;
     @Mock
     private OrderMentionRepository orderMentionRepository;
+    @Mock
+    private OrderCommentRepository orderCommentRepository;
+    @Mock
+    private MemberRepository memberRepository;
+    @Mock
+    private OrderMapper orderMapper;
 
     private final TeamMemberVO admin = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
     private final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, MemberTeamRole.ORDERER);
@@ -219,11 +233,88 @@ class OrderCommandServiceTest {
 
     }
 
+    @Nested
+    @DisplayName("주문 댓글 추가")
+    class AddOrderComment{
+        @Test
+        @DisplayName("해당 주문의 주문자가 아니면 댓글 작성 불가능")
+        void nonOrdererCantAddOrderComment(){
+            //given
+            Long orderId = 1L;
+            Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 1L);  // orderMember : 1L
+            Member member = createMember(orderer.getMemberId());  // member : 2L
+            AddOrderCommentRequest request = createAddOrderCommentRequest();
+            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+            when(memberRepository.findById(orderer.getMemberId())).thenReturn(Optional.of(member));
+            when(orderMentionRepository.existsByMemberIdAndOrderId(member.getId(), order.getId())).thenReturn(false);
+
+            //when & then
+            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                    orderCommandService.addOrderComment(orderId, orderer, request));
+            Assertions.assertEquals(OrderErrorCode.ORDER_ACCESS_DENIED, exception.getErrorCode());
+            verify(orderRepository).findById(orderId);
+            verify(memberRepository).findById(orderer.getMemberId());
+        }
+
+        @Test
+        @DisplayName("해당 주문에 언급된 관리자가 아니면 댓글 작성 불가능")
+        void nonAdminCantAddOrderComment(){
+            //given
+            Long orderId = 1L;
+            Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 2L);  // orderMember : 2L
+            Member member = createMember(admin.getMemberId());  // member : 1L
+            AddOrderCommentRequest request = createAddOrderCommentRequest();
+            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+            when(memberRepository.findById(admin.getMemberId())).thenReturn(Optional.of(member));
+            when(orderMentionRepository.existsByMemberIdAndOrderId(member.getId(), order.getId())).thenReturn(false);
+
+            //when & then
+            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                    orderCommandService.addOrderComment(orderId, admin, request));
+            Assertions.assertEquals(OrderErrorCode.ORDER_ACCESS_DENIED, exception.getErrorCode());
+            verify(orderRepository).findById(orderId);
+            verify(memberRepository).findById(admin.getMemberId());
+        }
+
+        @Test
+        @DisplayName("주문자가 맞을 때 주문 댓글 추가가 잘 되는지 확인")
+        void addOrderComment(){
+            //given
+            Long orderId = 1L;
+            Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 1L);  // orderMember : 1L
+            Member member = createMember(admin.getMemberId());  // member : 1L
+            AddOrderCommentRequest request = createAddOrderCommentRequest();
+            OrderComment comment = createOrderCommentWithId(1L);
+            Long commentId = 1L;
+            AddOrderCommentResponse expectResponse = AddOrderCommentResponse.builder().commentId(1L).build();
+            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+            when(memberRepository.findById(admin.getMemberId())).thenReturn(Optional.of(member));
+            when(orderMapper.toOrderComment(request, member, order)).thenReturn(comment);
+            when(orderCommentRepository.save(any(OrderComment.class))).thenReturn(comment);
+            when(orderMapper.toAddOrderCommentResponse(commentId)).thenReturn(expectResponse);
+
+            //when
+            AddOrderCommentResponse response = orderCommandService.addOrderComment(orderId, admin, request);
+
+            //then
+            assertThat(response).isNotNull();
+            assertThat(response.getCommentId()).isEqualTo(expectResponse.getCommentId());
+            verify(orderRepository).findById(orderId);
+            verify(memberRepository).findById(admin.getMemberId());
+            verify(orderCommentRepository).save(any(OrderComment.class));
+            verify(orderMapper).toAddOrderCommentResponse(commentId);
+        }
+
+        private AddOrderCommentRequest createAddOrderCommentRequest(){
+            return AddOrderCommentRequest.builder()
+                    .content("댓글 내용")
+                    .build();
+        }
+    }
+
 
     private Order createOrderAmount(OrderStatus status){
-        return Order.builder()
-                .orderStatus(status)
-                .build();
+        return Order.builder().orderStatus(status).build();
     }
 
     private Order createOrderAmount(Integer productAmount, Integer orderAmount){
@@ -232,6 +323,11 @@ class OrderCommandServiceTest {
     }
 
     private Order createOrderMember(OrderStatus status, Long memberId){
+        Member member = createMember(memberId);
+        return Order.builder().member(member).orderStatus(status).build();
+    }
+
+    private Member createMember(Long memberId){
         Member member = Member.builder().build();
         try {
             Field idField = Member.class.getDeclaredField("id");
@@ -241,11 +337,20 @@ class OrderCommandServiceTest {
             e.printStackTrace();
             throw new RuntimeException("Failed to set member ID", e);
         }
+        return member;
+    }
 
-        return Order.builder()
-                .member(member)
-                .orderStatus(status)
-                .build();
+    private OrderComment createOrderCommentWithId(Long commentId){
+        OrderComment comment = OrderComment.builder().build();
+        try {
+            Field idField = OrderComment.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(comment, commentId);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to set order comment ID", e);
+        }
+        return comment;
     }
 
 }

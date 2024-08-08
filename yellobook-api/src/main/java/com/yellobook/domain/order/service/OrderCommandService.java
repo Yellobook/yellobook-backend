@@ -112,7 +112,7 @@ public class OrderCommandService{
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new CustomException(OrderErrorCode.ORDER_NOT_FOUND));
         Member member = memberRepository.findById(teamMemberVO.getMemberId()).orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
         // 접근 권한 확인 : 해당 글의 주문자 인지 확인, 해당 글의 관리자 인지 확인(언급된 사람)
-        if(member.getId().equals(order.getMember().getId()) || orderMentionRepository.existsByMemberIdAndOrderId(member.getId(), orderId)){
+        if(member.getId().equals(order.getMember().getId()) || orderMentionRepository.existsByMemberIdAndOrderId(member.getId(), order.getId())){
             // 댓글 추가 (단방향)
             OrderComment comment = orderMapper.toOrderComment(requestDTO, member, order);
             Long commentId = orderCommentRepository.save(comment).getId();
