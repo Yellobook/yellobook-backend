@@ -4,20 +4,19 @@ import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.enums.OrderStatus;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.inventory.entity.Product;
+import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.order.entity.Order;
 import com.yellobook.domains.order.repository.OrderMentionRepository;
 import com.yellobook.domains.order.repository.OrderRepository;
 import com.yellobook.error.code.OrderErrorCode;
 import com.yellobook.error.exception.CustomException;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.lang.reflect.Field;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,7 +44,7 @@ class OrderCommandServiceTest {
         void cantModifyRequestOrder(){
             //given
             Long orderId = 1L;
-            Order order = createOrder(OrderStatus.PENDING_CONFIRM);
+            Order order = createOrderAmount(OrderStatus.PENDING_CONFIRM);
             when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
             when(orderMentionRepository.existsByMemberIdAndOrderId(admin.getMemberId(), order.getId())).thenReturn(false);
 
@@ -62,7 +61,7 @@ class OrderCommandServiceTest {
         void CantModifyConfirmedOrder(){
             //given
             Long orderId = 1L;
-            Order order = createOrder(OrderStatus.CONFIRMED);
+            Order order = createOrderAmount(OrderStatus.CONFIRMED);
             when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
             when(orderMentionRepository.existsByMemberIdAndOrderId(admin.getMemberId(), order.getId())).thenReturn(true);
 
@@ -79,7 +78,7 @@ class OrderCommandServiceTest {
         void modifyRequestOrder(){
             //given
             Long orderId = 1L;
-            Order order = createOrder(OrderStatus.PENDING_CONFIRM);
+            Order order = createOrderAmount(OrderStatus.PENDING_CONFIRM);
             when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
             when(orderMentionRepository.existsByMemberIdAndOrderId(admin.getMemberId(), order.getId())).thenReturn(true);
 
@@ -101,7 +100,7 @@ class OrderCommandServiceTest {
         void cantConfirmOrder(){
             //given
             Long orderId = 1L;
-            Order order = createOrder(OrderStatus.PENDING_CONFIRM);
+            Order order = createOrderAmount(OrderStatus.PENDING_CONFIRM);
             when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
             when(orderMentionRepository.existsByMemberIdAndOrderId(admin.getMemberId(), order.getId())).thenReturn(false);
 
@@ -118,7 +117,7 @@ class OrderCommandServiceTest {
         void cantConfirmPendingModifyOrder(){
             //given
             Long orderId = 1L;
-            Order order = createOrder(OrderStatus.PENDING_MODIFY);
+            Order order = createOrderAmount(OrderStatus.PENDING_MODIFY);
             when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
             when(orderMentionRepository.existsByMemberIdAndOrderId(admin.getMemberId(), order.getId())).thenReturn(true);
 
@@ -135,7 +134,7 @@ class OrderCommandServiceTest {
         void cantConfirmExceedAmountOrder(){
             //given
             Long orderId = 1L;
-            Order order = createOrder(10, 100);
+            Order order = createOrderAmount(10, 100);
             when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
             when(orderMentionRepository.existsByMemberIdAndOrderId(admin.getMemberId(), order.getId())).thenReturn(true);
 
@@ -152,7 +151,7 @@ class OrderCommandServiceTest {
         void confirmOrder(){
             //given
             Long orderId = 1L;
-            Order order = createOrder(100, 10);
+            Order order = createOrderAmount(100, 10);
             when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
             when(orderMentionRepository.existsByMemberIdAndOrderId(admin.getMemberId(), order.getId())).thenReturn(true);
 
@@ -168,16 +167,85 @@ class OrderCommandServiceTest {
 
     }
 
+    @Nested
+    @DisplayName("주문 취소")
+    class CancelOrderTests{
+        @Test
+        @DisplayName("내가 작성한 주문이 아니면 취소 불가능")
+        void cantCancelNotMineOrder(){
+            //given
+            Long orderId = 1L;
+            Order order = createOrderMember(OrderStatus.PENDING_MODIFY, 2L);
+            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
 
-    private Order createOrder(OrderStatus status){
+            //when & then
+            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                    orderCommandService.cancelOrder(orderId, admin));
+            Assertions.assertEquals(OrderErrorCode.ORDER_ACCESS_DENIED, exception.getErrorCode());
+            verify(orderRepository).findById(orderId);
+        }
+
+        @Test
+        @DisplayName("주문 정정 상태가 아니면 취소 불가능")
+        void cantCancelPendingModifyOrder(){
+            //given
+            Long orderId = 1L;
+            Order order = createOrderMember(OrderStatus.CONFIRMED, 1L);
+            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+
+            //when & then
+            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                    orderCommandService.cancelOrder(orderId, admin));
+            Assertions.assertEquals(OrderErrorCode.ORDER_CANT_CANCEL, exception.getErrorCode());
+            verify(orderRepository).findById(orderId);
+        }
+
+        @Test
+        @DisplayName("주문이 잘 취소 되었는지 확인")
+        void cancelOrder(){
+            //given
+            Long orderId = 1L;
+            Order order = createOrderMember(OrderStatus.PENDING_MODIFY, 1L);
+            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+
+            //when
+            orderCommandService.cancelOrder(orderId, admin);
+
+            //then
+            verify(orderRepository).findById(orderId);
+            verify(orderMentionRepository).deleteAllByOrderId(order.getId());
+            verify(orderRepository).delete(order);
+        }
+
+    }
+
+
+    private Order createOrderAmount(OrderStatus status){
         return Order.builder()
                 .orderStatus(status)
                 .build();
     }
 
-    private Order createOrder(Integer productAmount, Integer orderAmount){
+    private Order createOrderAmount(Integer productAmount, Integer orderAmount){
         Product product = Product.builder().amount(productAmount).build();
         return Order.builder().orderStatus(OrderStatus.PENDING_CONFIRM).product(product).orderAmount(orderAmount).build();
+    }
+
+    private Order createOrderMember(OrderStatus status, Long memberId){
+        Member member = Member.builder().build();
+        try {
+            Field idField = Member.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(member, memberId);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to set member ID", e);
+        }
+
+        return Order.builder()
+                .member(member)
+                .orderStatus(status)
+                .build();
     }
 
 }

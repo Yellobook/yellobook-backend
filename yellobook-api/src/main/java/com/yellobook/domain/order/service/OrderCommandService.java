@@ -100,7 +100,7 @@ public class OrderCommandService{
             throw new CustomException(OrderErrorCode.ORDER_CANT_CANCEL);
         }
         // 언급한 사용자 삭제
-        orderMentionRepository.deleteAllByOrderId(orderId);
+        orderMentionRepository.deleteAllByOrderId(order.getId());
         // order 삭제
         orderRepository.delete(order);
     }
