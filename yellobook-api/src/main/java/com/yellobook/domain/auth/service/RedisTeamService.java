@@ -82,11 +82,11 @@ public class RedisTeamService {
         //키를 도메인에 맞춰서
         redisTemplate.opsForValue().set(key, value, 15, TimeUnit.MINUTES);
         String invitationUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-        return invitationUrl + "/api/v1/invitation?code=" + key;
+        return invitationUrl + "/api/v1/invitation?code=" + code;
     }
 
     public InvitationResponse getInvitationInfo(String key) {
-        Object value = redisTemplate.opsForValue().get(key);
+        Object value = redisTemplate.opsForValue().get("team:invite:" + key);
         if (value == null) {
             throw new CustomException(TeamErrorCode.INVITATION_NOT_FOUND);
         }

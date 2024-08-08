@@ -1,15 +1,13 @@
 package com.yellobook.domain.inventory.service;
 
-import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.utils.ParticipantUtil;
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domain.auth.service.RedisTeamService;
-import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
-import com.yellobook.domain.inventory.dto.GetProductsResponse;
-import com.yellobook.domain.inventory.dto.GetTotalInventoryResponse;
+import com.yellobook.domain.inventory.dto.response.GetProductsResponse;
+import com.yellobook.domain.inventory.dto.response.GetProductsResponse.ProductInfo;
+import com.yellobook.domain.inventory.dto.response.GetTotalInventoryResponse;
 import com.yellobook.domain.inventory.mapper.InventoryMapper;
 import com.yellobook.domain.inventory.mapper.ProductMapper;
-import com.yellobook.domains.inventory.dto.InventoryDTO;
+import com.yellobook.domains.inventory.dto.query.QueryInventory;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,19 +24,17 @@ import java.util.List;
 public class InventoryQueryService{
     private final InventoryRepository inventoryRepository;
     private final ProductRepository productRepository;
-    private final ParticipantUtil participantUtil;
     private final InventoryMapper inventoryMapper;
     private final ProductMapper productMapper;
-    private final RedisTeamService teamUtil;
 
     /**
      * 전체 재고 현황 확인 API (관리자, 주문자)
      */
     public GetTotalInventoryResponse getTotalInventory(Integer page, Integer size, TeamMemberVO teamMember) {
-        participantUtil.forbidViewer(teamMember.getRole());
+        ParticipantUtil.forbidViewer(teamMember.getRole());
 
         Pageable pageable = PageRequest.of(page-1, size);
-        List<InventoryDTO> content = inventoryRepository.getTotalInventory(teamMember.getTeamId(), pageable);
+        List<QueryInventory> content = inventoryRepository.getTotalInventory(teamMember.getTeamId(), pageable);
         return GetTotalInventoryResponse.builder()
                 .page(page).size(content.size())
                 .inventories(inventoryMapper.toInventoryInfoList(content))
@@ -46,14 +42,14 @@ public class InventoryQueryService{
     }
 
     /**
-     * 특정 제고 일자 현황 조회 (관리자, 주문자)
+     * 특정 재고 일자 현황 조회 (관리자, 주문자)
      */
     public GetProductsResponse getProductsByInventory(Long inventoryId, TeamMemberVO teamMember) {
         // 존재하는 재고 인지 확인, 접근 권환 확인
         // 제품 이름 순으로 정렬해서 보여주기 (페이징 X)
-        participantUtil.forbidViewer(teamMember.getRole());
+        ParticipantUtil.forbidViewer(teamMember.getRole());
 
-        List<GetProductsResponse.ProductInfo> content = productMapper.toProductInfo(productRepository.getProducts(inventoryId));
+        List<ProductInfo> content = productMapper.toProductInfo(productRepository.getProducts(inventoryId));
         return GetProductsResponse.builder().products(content).build();
     }
 
@@ -63,10 +59,10 @@ public class InventoryQueryService{
     public GetProductsResponse getProductByKeywordAndInventory(Long inventoryId, String keyword, TeamMemberVO teamMember) {
         // 존재하는 재고인지 확인, 접근 권한 확인
         // 제품 이름 순으로 정렬해서 보여주기 (페이징 X)
-        participantUtil.forbidViewer(teamMember.getRole());
-        participantUtil.forbidOrderer(teamMember.getRole());
+        ParticipantUtil.forbidViewer(teamMember.getRole());
+        ParticipantUtil.forbidOrderer(teamMember.getRole());
 
-        List<GetProductsResponse.ProductInfo> content = productMapper.toProductInfo(productRepository.getProducts(inventoryId, keyword));
+        List<ProductInfo> content = productMapper.toProductInfo(productRepository.getProducts(inventoryId, keyword));
         return GetProductsResponse.builder().products(content).build();
     }
 

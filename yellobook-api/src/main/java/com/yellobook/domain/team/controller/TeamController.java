@@ -2,14 +2,12 @@ package com.yellobook.domain.team.controller;
 
 import com.yellobook.common.validation.annotation.ExistTeam;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
-import com.yellobook.domain.inform.dto.InformResponse;
 import com.yellobook.domain.inform.dto.MentionDTO;
 import com.yellobook.domain.team.dto.TeamRequest;
 import com.yellobook.domain.team.dto.TeamResponse;
 import com.yellobook.domain.team.service.TeamCommandService;
 import com.yellobook.domain.team.service.TeamQueryService;
 import com.yellobook.response.ResponseFactory;
-import com.yellobook.domains.team.entity.Team;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
