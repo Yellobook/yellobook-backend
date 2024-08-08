@@ -73,7 +73,7 @@ public class OrderCommandService{
         if(!orderMentionRepository.existsByMemberIdAndOrderId(teamMemberVO.getMemberId(), order.getId())){
             throw new CustomException(OrderErrorCode.ORDER_ACCESS_DENIED);
         }
-        // 주문 주문 정정 요청이 되어 있으면 주문 확정 불가능
+        // 주문 정정 요청이 되어 있으면 주문 확정 불가능
         if(order.getOrderStatus().equals(OrderStatus.PENDING_MODIFY)){
             throw new CustomException(OrderErrorCode.ORDER_PENDING_MODIFY_CANT_CONFIRM);
         }
