@@ -104,6 +104,77 @@ public class ScheduleRepositoryTest {
         }
     }
 
+    @Nested
+    @DisplayName("findEarliestOrder 는")
+    class findEarliestOrderTests {
+
+        @Test
+        @DisplayName("주문자라면 팀에서 자신이 주문한 주문 중 내일부터 가장 이른 주문을 가져와야 한다.")
+        void testFindEarliestOrderForOrderer() {
+            // given
+            var cond = EarliestCond.builder()
+                    .teamMember(orderer1)
+                    .today(today)
+                    .build();
+
+            // when
+            Optional<QueryUpcomingSchedule> result = scheduleRepository.findEarliestOrder(cond);
+
+            // then
+            assertThat(result).isPresent();
+            QueryUpcomingSchedule schedule = result.get();
+            assertThat(schedule.title()).isEqualTo("제품1 서브제품1 1개");
+            assertThat(schedule.day()).isEqualTo("2024-08-05");
+            assertThat(schedule.scheduleType()).isEqualTo(ScheduleType.ORDER);
+        }
+
+        @Test
+        @DisplayName("관리자라면 팀에서 모든 주문 중 내일부터 가장 이른 주문을 가져와야 한다.")
+        void testFindEarliestOrderForAdmin() {
+            // given
+            var cond = EarliestCond.builder()
+                    .teamMember(admin1)
+                    .today(today)
+                    .build();
+
+            // when
+            Optional<QueryUpcomingSchedule> result = scheduleRepository.findEarliestOrder(cond);
+
+            // then
+            assertThat(result).isPresent();
+            QueryUpcomingSchedule schedule = result.get();
+            assertThat(schedule.title()).isEqualTo("제품1 서브제품1 1개");
+            assertThat(schedule.day()).isEqualTo("2024-08-04");
+            assertThat(schedule.scheduleType()).isEqualTo(ScheduleType.ORDER);
+        }
+    }
+
+    @Nested
+    @DisplayName("findEarliestInform 는")
+    class findEarliestInformTests {
+
+        @Test
+        @DisplayName("사용자와 관련된 공지 및 일정 중 내일부터 가장 이른 공지 및 일정 을 가져와야 한다.")
+        void testFindEarliestInformForMember() {
+            // given
+            var cond = EarliestCond.builder()
+                    .today(today)
+                    .teamMember(viewer1)
+                    .build();
+
+            // when
+            Optional<QueryUpcomingSchedule> result = scheduleRepository.findEarliestInform(cond);
+
+            // then
+            assertThat(result).isPresent();
+            QueryUpcomingSchedule schedule = result.get();
+
+            assertThat(schedule.title()).isEqualTo("공지 및 일정");
+            assertThat(schedule.day()).isEqualTo("2024-08-04");;
+            assertThat(schedule.scheduleType()).isEqualTo(ScheduleType.INFORM);
+        }
+    }
+    
 
     private void initData() throws Exception{
         // 팀 생성
