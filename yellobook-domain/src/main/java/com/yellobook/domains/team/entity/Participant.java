@@ -13,9 +13,7 @@ import lombok.*;
             @UniqueConstraint(name = "uc_participant", columnNames = {"team_id", "member_id"})
         }
 )
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class Participant extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,4 +29,18 @@ public class Participant extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private MemberTeamRole role;
+
+    @Builder
+    public Participant(Team team, Member member, MemberTeamRole role) {
+        isValid(team, member, role);
+        this.team = team;
+        this.member = member;
+        this.role = role;
+    }
+
+    private void isValid(Team team, Member member, MemberTeamRole role) {
+        if(team == null|| member == null||role == null) {
+            throw new IllegalArgumentException("null값이 존재합니다.");
+        }
+    }
 }
