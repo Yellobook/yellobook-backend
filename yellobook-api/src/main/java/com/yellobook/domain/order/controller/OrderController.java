@@ -72,32 +72,32 @@ public class OrderController {
 
     @Operation(summary = "[관리자] 주문 정정 요청")
     @PatchMapping("/{orderId}/correction")
-    public ResponseEntity<SuccessResponse<String>> modifyRequestOrder(
+    public ResponseEntity<Void> modifyRequestOrder(
             @ExistOrder @PathVariable("orderId") Long orderId,
             @TeamMember TeamMemberVO teamMember
             ) {
         orderCommandService.modifyRequestOrder(orderId, teamMember);
-        return ResponseFactory.success("주문의 정정 요청을 완료했습니다.");
+        return ResponseFactory.noContent();
     }
 
     @Operation(summary = "[관리자] 주문 확정")
     @PatchMapping("/{orderId}/confirm")
-    public ResponseEntity<SuccessResponse<String>> confirmOrder(
+    public ResponseEntity<Void> confirmOrder(
             @ExistOrder @PathVariable("orderId") Long orderId,
             @TeamMember TeamMemberVO teamMember
     ) {
         orderCommandService.confirmOrder(orderId, teamMember);
-        return ResponseFactory.success("주문의 확정을 완료했습니다.");
+        return ResponseFactory.noContent();
     }
 
     @Operation(summary = "주문 취소")
     @DeleteMapping("/{orderId}")
-    public ResponseEntity<SuccessResponse<String>> cancelOrder(
+    public ResponseEntity<Void> cancelOrder(
             @ExistOrder @PathVariable("orderId") Long orderId,
             @TeamMember TeamMemberVO teamMember
     ) {
         orderCommandService.cancelOrder(orderId, teamMember);
-        return ResponseFactory.success("주문 최소를 완료했습니다.");
+        return ResponseFactory.noContent();
     }
 
 }
