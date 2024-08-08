@@ -4,12 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.resolver.TeamMemberArgumentResolver;
 import com.yellobook.common.vo.TeamMemberVO;
+import com.yellobook.domain.inventory.dto.request.AddProductRequest;
 import com.yellobook.domain.inventory.dto.request.ModifyProductAmountRequest;
+import com.yellobook.domain.inventory.dto.response.AddProductResponse;
 import com.yellobook.domain.inventory.dto.response.GetProductsResponse;
 import com.yellobook.domain.inventory.dto.response.GetTotalInventoryResponse;
 import com.yellobook.domain.inventory.service.InventoryCommandService;
 import com.yellobook.domain.inventory.service.InventoryQueryService;
-import com.yellobook.response.ResponseFactory;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.convert.DataSizeUnit;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -27,11 +27,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(InventoryController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -148,12 +149,55 @@ class InventoryControllerTest {
                 .andReturn();
     }
 
+    @Test
+    @DisplayName("제품 추가 - 재고가 존재하는 경우")
+    void addProduct() throws Exception{
+        //given
+        Long inventoryId = 1L;
+        AddProductRequest request = AddProductRequest.builder().build();
+        AddProductResponse response = AddProductResponse.builder().productId(1L).build();
+        when(inventoryQueryService.existByInventoryId(inventoryId)).thenReturn(true);
+        when(inventoryCommandService.addProduct(inventoryId, request, teamMemberVO)).thenReturn(response);
 
+        //when & then
+        mockMvc.perform(post("/api/v1/inventories/{inventoryId}", inventoryId)
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.productId", CoreMatchers.is(response.productId().intValue())))
+                .andReturn();
+    }
 
+    @Test
+    @DisplayName("제품 수량 수정 - 제품이 존재 할 때")
+    void modifyProductAmount() throws Exception{
+        //given
+        Long productId = 1L;
+        ModifyProductAmountRequest request = ModifyProductAmountRequest.builder().build();
+        when(inventoryQueryService.existByProductId(productId)).thenReturn(true);
+        doNothing().when(inventoryCommandService).modifyProductAmount(productId, request, teamMemberVO);
 
+        //when & then
+        mockMvc.perform(put("/api/v1/inventories/products/{productId}", productId)
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andReturn();
+    }
 
+    @Test
+    @DisplayName("제품 삭제 - 제품이 존재 할 때")
+    void deleteProduct() throws Exception{
+        //given
+        Long productId = 1L;
+        when(inventoryQueryService.existByProductId(productId)).thenReturn(true);
+        doNothing().when(inventoryCommandService).deleteProduct(productId, teamMemberVO);
 
-
-
+        //when & then
+        mockMvc.perform(delete("/api/v1/inventories/products/{productId}", productId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andReturn();
+    }
 
 }
