@@ -28,8 +28,15 @@ public class Team extends BaseEntity {
 
     @Builder
     public Team(String name, String phoneNumber, String address) {
+        isValid(name,phoneNumber,address);
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.address = address;
+    }
+
+    private void isValid(String name, String phoneNumber, String address){
+        if(name == null || name.isEmpty() || phoneNumber == null || phoneNumber.isEmpty() || address == null || address.isEmpty()){
+            throw new IllegalArgumentException("빈칸이 존재합니다.");
+        }
     }
 }
