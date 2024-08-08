@@ -5,8 +5,10 @@ import com.yellobook.common.enums.OrderStatus;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domain.order.dto.AddOrderCommentRequest;
 import com.yellobook.domain.order.dto.AddOrderCommentResponse;
+import com.yellobook.domain.order.dto.MakeOrderRequest;
 import com.yellobook.domain.order.mapper.OrderMapper;
 import com.yellobook.domains.inventory.entity.Product;
+import com.yellobook.domains.inventory.repository.ProductRepository;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.member.repository.MemberRepository;
 import com.yellobook.domains.order.entity.Order;
@@ -14,6 +16,12 @@ import com.yellobook.domains.order.entity.OrderComment;
 import com.yellobook.domains.order.repository.OrderCommentRepository;
 import com.yellobook.domains.order.repository.OrderMentionRepository;
 import com.yellobook.domains.order.repository.OrderRepository;
+import com.yellobook.domains.team.entity.Participant;
+import com.yellobook.domains.team.entity.Team;
+import com.yellobook.domains.team.repository.ParticipantRepository;
+import com.yellobook.domains.team.repository.TeamRepository;
+import com.yellobook.error.code.AuthErrorCode;
+import com.yellobook.error.code.InventoryErrorCode;
 import com.yellobook.error.code.OrderErrorCode;
 import com.yellobook.error.exception.CustomException;
 import org.junit.jupiter.api.Assertions;
@@ -43,6 +51,12 @@ class OrderCommandServiceTest {
     private OrderCommentRepository orderCommentRepository;
     @Mock
     private MemberRepository memberRepository;
+    @Mock
+    private TeamRepository teamRepository;
+    @Mock
+    private ParticipantRepository participantRepository;
+    @Mock
+    private ProductRepository productRepository;
     @Mock
     private OrderMapper orderMapper;
 
@@ -312,6 +326,117 @@ class OrderCommandServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("주문 생성")
+    class MakeOrderTests{
+        @Test
+        @DisplayName("관리자는 주문 생성 불가능")
+        void adminCantMakeOrder(){
+            //given
+            MakeOrderRequest request = createMakeOrderRequest(10);
+            Member member = createMember(admin.getMemberId());
+            Team team = createTeam(admin.getTeamId());
+            when(memberRepository.findById(admin.getMemberId())).thenReturn(Optional.of(member));
+            when(teamRepository.findById(admin.getTeamId())).thenReturn(Optional.of(team));
+
+            //when & then
+            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                    orderCommandService.makeOrder(request, admin));
+            Assertions.assertEquals(AuthErrorCode.ADMIN_NOT_ALLOWED, exception.getErrorCode());
+            verify(memberRepository).findById(admin.getMemberId());
+            verify(teamRepository).findById(admin.getTeamId());
+        }
+
+        @Test
+        @DisplayName("뷰어는 주문 생성 불가능")
+        void viewerCantMakeOrder(){
+            //given
+            MakeOrderRequest request = createMakeOrderRequest(10);
+            Member member = createMember(viewer.getMemberId());
+            Team team = createTeam(viewer.getTeamId());
+            when(memberRepository.findById(viewer.getMemberId())).thenReturn(Optional.of(member));
+            when(teamRepository.findById(viewer.getTeamId())).thenReturn(Optional.of(team));
+
+            //when & then
+            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                    orderCommandService.makeOrder(request, viewer));
+            Assertions.assertEquals(AuthErrorCode.VIEWER_NOT_ALLOWED, exception.getErrorCode());
+            verify(memberRepository).findById(viewer.getMemberId());
+            verify(teamRepository).findById(viewer.getTeamId());
+        }
+
+        @Test
+        @DisplayName("관리자가 없는 팀 스페이스에서 주문 생성 불가능")
+        void notExistAdminCantMakeOrder(){
+            //given
+            MakeOrderRequest request = createMakeOrderRequest(10);
+            Member member = createMember(orderer.getMemberId());
+            Team team = createTeam(orderer.getTeamId());
+            when(memberRepository.findById(orderer.getMemberId())).thenReturn(Optional.of(member));
+            when(teamRepository.findById(orderer.getTeamId())).thenReturn(Optional.of(team));
+            when(participantRepository.findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN)).thenReturn(Optional.empty());
+
+            //when & then
+            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                    orderCommandService.makeOrder(request, orderer));
+            Assertions.assertEquals(OrderErrorCode.ORDER_CREATION_NOT_ALLOWED, exception.getErrorCode());
+            verify(memberRepository).findById(orderer.getMemberId());
+            verify(teamRepository).findById(orderer.getTeamId());
+            verify(participantRepository).findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 제품에 주문 불가능")
+        void notExistProductCantMakeOrder(){
+            //given
+            MakeOrderRequest request = createMakeOrderRequest(10);
+            Member member = createMember(orderer.getMemberId());
+            Team team = createTeam(orderer.getTeamId());
+            Participant participant = createParticipant();
+            when(memberRepository.findById(orderer.getMemberId())).thenReturn(Optional.of(member));
+            when(teamRepository.findById(orderer.getTeamId())).thenReturn(Optional.of(team));
+            when(participantRepository.findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN)).thenReturn(Optional.of(participant));
+            when(productRepository.findById(request.getProductId())).thenReturn(Optional.empty());
+
+            //when & then
+            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                    orderCommandService.makeOrder(request, orderer));
+            Assertions.assertEquals(InventoryErrorCode.PRODUCT_NOT_FOUND, exception.getErrorCode());
+            verify(memberRepository).findById(orderer.getMemberId());
+            verify(teamRepository).findById(orderer.getTeamId());
+            verify(participantRepository).findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN);
+            verify(productRepository).findById(request.getProductId());
+        }
+
+        @Test
+        @DisplayName("제품 수량보다 많은 수량 주문 불가능")
+        void exceedProductAmountCantMakeOrder(){
+            //given
+            MakeOrderRequest request = createMakeOrderRequest(1111);
+            Member member = createMember(orderer.getMemberId());
+            Team team = createTeam(orderer.getTeamId());
+            Participant participant = createParticipant();
+            Product product = Product.builder().amount(10).build();
+            when(memberRepository.findById(orderer.getMemberId())).thenReturn(Optional.of(member));
+            when(teamRepository.findById(orderer.getTeamId())).thenReturn(Optional.of(team));
+            when(participantRepository.findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN)).thenReturn(Optional.of(participant));
+            when(productRepository.findById(request.getProductId())).thenReturn(Optional.of(product));
+
+            //when & then
+            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                    orderCommandService.makeOrder(request, orderer));
+            Assertions.assertEquals(OrderErrorCode.ORDER_AMOUNT_EXCEED, exception.getErrorCode());
+            verify(memberRepository).findById(orderer.getMemberId());
+            verify(teamRepository).findById(orderer.getTeamId());
+            verify(participantRepository).findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN);
+            verify(productRepository).findById(request.getProductId());
+        }
+
+        private MakeOrderRequest createMakeOrderRequest(Integer orderAmount){
+            return MakeOrderRequest.builder().productId(1L).orderAmount(orderAmount).build();
+        }
+
+    }
 
     private Order createOrderAmount(OrderStatus status){
         return Order.builder().orderStatus(status).build();
@@ -338,6 +463,24 @@ class OrderCommandServiceTest {
             throw new RuntimeException("Failed to set member ID", e);
         }
         return member;
+    }
+
+    private Team createTeam(Long teamId){
+        Team team = Team.builder().build();
+        try {
+            Field idField = Team.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(team, teamId);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to set member ID", e);
+        }
+        return team;
+    }
+
+    private Participant createParticipant(){
+        Member member = Member.builder().build();
+        return Participant.builder().member(member).build();
     }
 
     private OrderComment createOrderCommentWithId(Long commentId){
