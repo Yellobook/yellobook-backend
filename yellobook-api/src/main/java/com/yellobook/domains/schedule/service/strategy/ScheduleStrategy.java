@@ -1,14 +1,14 @@
-package com.yellobook.domain.schedule.service.strategy;
+package com.yellobook.domains.schedule.service.strategy;
 
 import com.yellobook.common.enums.ScheduleType;
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domain.schedule.dto.request.DailyParam;
-import com.yellobook.domain.schedule.dto.request.MonthlyParam;
-import com.yellobook.domain.schedule.dto.request.MonthlySearchParam;
-import com.yellobook.domain.schedule.dto.response.CalendarResponse;
-import com.yellobook.domain.schedule.dto.response.DailyScheduleResponse;
-import com.yellobook.domain.schedule.dto.response.SearchMonthlyScheduleResponse;
-import com.yellobook.domain.schedule.dto.response.UpcomingScheduleResponse;
+import com.yellobook.domains.schedule.dto.request.DailyParam;
+import com.yellobook.domains.schedule.dto.request.MonthlyParam;
+import com.yellobook.domains.schedule.dto.request.MonthlySearchParam;
+import com.yellobook.domains.schedule.dto.response.CalendarResponse;
+import com.yellobook.domains.schedule.dto.response.DailyScheduleResponse;
+import com.yellobook.domains.schedule.dto.response.SearchMonthlyScheduleResponse;
+import com.yellobook.domains.schedule.dto.response.UpcomingScheduleResponse;
 import com.yellobook.domains.schedule.dto.query.QueryMonthlySchedule;
 import com.yellobook.domains.schedule.dto.query.QuerySchedule;
 import com.yellobook.domains.schedule.dto.query.QueryUpcomingSchedule;
@@ -35,7 +35,7 @@ public interface ScheduleStrategy {
         // 둘다 존재할 경우 시간순으로 빠른 것을 표시한다.
         if (order != null && inform != null) {
             // 시간이 같을 경우 주문을 우선으로 표시한다.
-            return inform.getDay().isBefore(order.getDay()) ? inform : order;
+            return inform.day().isBefore(order.day()) ? inform : order;
         }
         // 하나만 존재할 경우 존재하는 것을 다가오는 일정으로 표시한다.
         return order != null ? order : inform;
@@ -49,11 +49,11 @@ public interface ScheduleStrategy {
      */
     default void addScheduleToCalendarMap(Map<Integer, List<String>> dailyMap, List<QueryMonthlySchedule> schedules) {
         schedules.forEach(schedule -> {
-            Integer day = schedule.getDate().getDayOfMonth();
+            Integer day = schedule.date().getDayOfMonth();
             List<String> values = dailyMap.computeIfAbsent(day, k -> new ArrayList<>());
             // day 는 3개까지 가능
             if(values.size() < 3) {
-                values.add(schedule.getTitle());
+                values.add(schedule.title());
             }
         });
     }
@@ -67,10 +67,10 @@ public interface ScheduleStrategy {
      * - 양수일경우 o1 이 앞으로, 0 일경우 유지, 음수일경우 o2 가 앞으로
      */
     default int compareQuerySchedule(QuerySchedule o1, QuerySchedule o2) {
-        final LocalDate o1Date = o1.getDate();
-        final LocalDate o2Date = o2.getDate();
-        final ScheduleType o1Type = o1.getScheduleType();
-        final ScheduleType o2Type = o2.getScheduleType();
+        final LocalDate o1Date = o1.date();
+        final LocalDate o2Date = o2.date();
+        final ScheduleType o1Type = o1.scheduleType();
+        final ScheduleType o2Type = o2.scheduleType();
 
         // 시간이 같다면 ORDER 우선
         if (o1Date.isEqual(o2Date)) {

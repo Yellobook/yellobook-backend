@@ -1,4 +1,4 @@
-package com.yellobook.domain.schedule.dto.response;
+package com.yellobook.domains.schedule.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;

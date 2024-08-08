@@ -1,12 +1,12 @@
-package com.yellobook.domain.schedule.mapper;
+package com.yellobook.domains.schedule.mapper;
 
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domain.schedule.dto.request.DailyParam;
-import com.yellobook.domain.schedule.dto.request.MonthlyParam;
-import com.yellobook.domain.schedule.dto.request.MonthlySearchParam;
-import com.yellobook.domain.schedule.dto.response.CalendarItem;
-import com.yellobook.domain.schedule.dto.response.CalendarResponse;
-import com.yellobook.domain.schedule.dto.response.UpcomingScheduleResponse;
+import com.yellobook.domains.schedule.dto.request.DailyParam;
+import com.yellobook.domains.schedule.dto.request.MonthlyParam;
+import com.yellobook.domains.schedule.dto.request.MonthlySearchParam;
+import com.yellobook.domains.schedule.dto.response.CalendarItem;
+import com.yellobook.domains.schedule.dto.response.CalendarResponse;
+import com.yellobook.domains.schedule.dto.response.UpcomingScheduleResponse;
 import com.yellobook.domains.schedule.dto.DailyCond;
 import com.yellobook.domains.schedule.dto.EarliestCond;
 import com.yellobook.domains.schedule.dto.MonthlyCond;

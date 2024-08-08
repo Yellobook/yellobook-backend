@@ -1,16 +1,16 @@
-package com.yellobook.domain.schedule.service;
+package com.yellobook.domains.schedule.service;
 
 
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domain.schedule.dto.request.DailyParam;
-import com.yellobook.domain.schedule.dto.request.MonthlyParam;
-import com.yellobook.domain.schedule.dto.request.MonthlySearchParam;
-import com.yellobook.domain.schedule.dto.response.CalendarResponse;
-import com.yellobook.domain.schedule.dto.response.DailyScheduleResponse;
-import com.yellobook.domain.schedule.dto.response.SearchMonthlyScheduleResponse;
-import com.yellobook.domain.schedule.dto.response.UpcomingScheduleResponse;
-import com.yellobook.domain.schedule.service.strategy.ScheduleStrategy;
-import com.yellobook.domain.schedule.service.strategy.ScheduleStrategyFactory;
+import com.yellobook.domains.schedule.dto.request.DailyParam;
+import com.yellobook.domains.schedule.dto.request.MonthlyParam;
+import com.yellobook.domains.schedule.dto.request.MonthlySearchParam;
+import com.yellobook.domains.schedule.dto.response.CalendarResponse;
+import com.yellobook.domains.schedule.dto.response.DailyScheduleResponse;
+import com.yellobook.domains.schedule.dto.response.SearchMonthlyScheduleResponse;
+import com.yellobook.domains.schedule.dto.response.UpcomingScheduleResponse;
+import com.yellobook.domains.schedule.service.strategy.ScheduleStrategy;
+import com.yellobook.domains.schedule.service.strategy.ScheduleStrategyFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

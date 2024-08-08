@@ -1,4 +1,4 @@
-package com.yellobook.domain.schedule.service.strategy;
+package com.yellobook.domains.schedule.service.strategy;
 
 import com.yellobook.common.enums.MemberTeamRole;
 import lombok.RequiredArgsConstructor;
