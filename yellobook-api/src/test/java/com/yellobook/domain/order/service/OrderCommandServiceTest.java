@@ -392,7 +392,7 @@ class OrderCommandServiceTest {
             MakeOrderRequest request = createMakeOrderRequest(10);
             Member member = createMember(orderer.getMemberId());
             Team team = createTeam(orderer.getTeamId());
-            Participant participant = createParticipant();
+            Participant participant = createParticipant(team);
             when(memberRepository.findById(orderer.getMemberId())).thenReturn(Optional.of(member));
             when(teamRepository.findById(orderer.getTeamId())).thenReturn(Optional.of(team));
             when(participantRepository.findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN)).thenReturn(Optional.of(participant));
@@ -415,7 +415,7 @@ class OrderCommandServiceTest {
             MakeOrderRequest request = createMakeOrderRequest(1111);
             Member member = createMember(orderer.getMemberId());
             Team team = createTeam(orderer.getTeamId());
-            Participant participant = createParticipant();
+            Participant participant = createParticipant(team);
             Product product = Product.builder().amount(10).build();
             when(memberRepository.findById(orderer.getMemberId())).thenReturn(Optional.of(member));
             when(teamRepository.findById(orderer.getTeamId())).thenReturn(Optional.of(team));
@@ -466,7 +466,7 @@ class OrderCommandServiceTest {
     }
 
     private Team createTeam(Long teamId){
-        Team team = Team.builder().build();
+        Team team = Team.builder().name("team").address("address").phoneNumber("aaa").build();
         try {
             Field idField = Team.class.getDeclaredField("id");
             idField.setAccessible(true);
@@ -478,9 +478,9 @@ class OrderCommandServiceTest {
         return team;
     }
 
-    private Participant createParticipant(){
+    private Participant createParticipant(Team team){
         Member member = Member.builder().build();
-        return Participant.builder().member(member).build();
+        return Participant.builder().member(member).team(team).role(MemberTeamRole.ADMIN).build();
     }
 
     private OrderComment createOrderCommentWithId(Long commentId){
