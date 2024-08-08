@@ -35,8 +35,6 @@ class MemberControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @MockBean
     private MemberQueryService memberQueryService;
@@ -60,7 +58,6 @@ class MemberControllerTest {
 
         //when & then
         mockMvc.perform(get("/api/v1/members/profile")
-                .content(objectMapper.writeValueAsString(ResponseFactory.success(response)))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.nickname", CoreMatchers.is(response.nickname())))
