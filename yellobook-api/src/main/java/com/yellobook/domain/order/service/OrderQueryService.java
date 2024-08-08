@@ -1,5 +1,6 @@
 package com.yellobook.domain.order.service;
 
+import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domain.order.dto.GetOrderCommentsResponse;
 import com.yellobook.domain.order.dto.GetOrderCommentsResponse.CommentInfo;
 import com.yellobook.domain.order.dto.GetOrderResponse;
@@ -27,10 +28,10 @@ public class OrderQueryService {
     /**
      * 주문 댓글 조회
      */
-    public GetOrderCommentsResponse getOrderComments(Long orderId, Long memberId) {
+    public GetOrderCommentsResponse getOrderComments(Long orderId, TeamMemberVO teamMemberVO) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new CustomException(OrderErrorCode.ORDER_NOT_FOUND));
         // 접근 권한 있는지 확인
-        if(memberId.equals(order.getMember().getId()) || orderMentionRepository.existsByMemberIdAndOrderId(memberId, orderId)){
+        if(teamMemberVO.getMemberId().equals(order.getMember().getId()) || orderMentionRepository.existsByMemberIdAndOrderId(teamMemberVO.getMemberId(), orderId)){
             // 댓글 조회
             List<CommentInfo> commentInfos = orderRepository.getOrderComments(orderId).stream().map(orderMapper::toCommentInfo).toList();
             //return orderMapper.toGetOrderCommentsResponse(commentInfos);  //적용 안됨ㅜㅜ
@@ -43,10 +44,10 @@ public class OrderQueryService {
     /**
      * 주문 조회
      */
-    public GetOrderResponse getOrder(Long orderId, Long memberId) {
+    public GetOrderResponse getOrder(Long orderId, TeamMemberVO teamMemberVO) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new CustomException(OrderErrorCode.ORDER_NOT_FOUND));
         // 접근 권한 있는지 확인
-        if(memberId.equals(order.getMember().getId()) || orderMentionRepository.existsByMemberIdAndOrderId(memberId, orderId)){
+        if(teamMemberVO.getMemberId().equals(order.getMember().getId()) || orderMentionRepository.existsByMemberIdAndOrderId(teamMemberVO.getMemberId(), orderId)){
             // 주문 조회
             OrderDTO orderDTO = orderRepository.getOrder(orderId);
             return orderMapper.toGetOrderResponse(orderDTO);
