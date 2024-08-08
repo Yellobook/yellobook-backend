@@ -1,12 +1,10 @@
 package com.yellobook.domain.member.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.resolver.TeamMemberArgumentResolver;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domain.member.dto.response.ProfileResponse;
 import com.yellobook.domain.member.service.MemberQueryService;
-import com.yellobook.response.ResponseFactory;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

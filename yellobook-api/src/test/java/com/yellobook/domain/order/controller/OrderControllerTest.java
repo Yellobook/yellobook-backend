@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.convert.DataSizeUnit;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -29,9 +28,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -130,7 +129,7 @@ class OrderControllerTest {
     }
 
     @Test
-    @DisplayName("주문 댓글 조회")
+    @DisplayName("주문 댓글 조회 - 주문이 존재 할 때")
     void getOrderComments() throws Exception{
         //given
         Long orderId = 1L;
@@ -146,12 +145,49 @@ class OrderControllerTest {
                 .andReturn();
     }
 
+    @Test
+    @DisplayName("주문 정정 요청 - 주문이 존재 할 때")
+    void modifyRequestOrder() throws Exception{
+        //given
+        Long orderId = 1L;
+        when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
+        doNothing().when(orderCommandService).modifyRequestOrder(orderId, teamMemberVO);
 
+        //when & then
+        mockMvc.perform(patch("/api/v1/orders/{orderId}/correction", orderId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andReturn();
+    }
 
+    @Test
+    @DisplayName("주문 확정 - 주문이 존재 할 때")
+    void confirmOrder() throws Exception{
+        //given
+        Long orderId = 1L;
+        when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
+        doNothing().when(orderCommandService).confirmOrder(orderId, teamMemberVO);
 
+        //when & then
+        mockMvc.perform(patch("/api/v1/orders/{orderId}/confirm", orderId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andReturn();
+    }
 
+    @Test
+    @DisplayName("주문 취소 - 주문이 존재할 때")
+    void cancelOrder() throws Exception{
+        //given
+        Long orderId = 1L;
+        when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
+        doNothing().when(orderCommandService).cancelOrder(orderId, teamMemberVO);
 
-
-
+        //when & then
+        mockMvc.perform(delete("/api/v1/orders/{orderId}", orderId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andReturn();
+    }
 
 }
