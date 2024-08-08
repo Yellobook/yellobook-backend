@@ -3,9 +3,9 @@ package com.yellobook.domain.order.service;
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.enums.OrderStatus;
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domain.order.dto.AddOrderCommentRequest;
-import com.yellobook.domain.order.dto.AddOrderCommentResponse;
-import com.yellobook.domain.order.dto.MakeOrderRequest;
+import com.yellobook.domain.order.dto.request.AddOrderCommentRequest;
+import com.yellobook.domain.order.dto.response.AddOrderCommentResponse;
+import com.yellobook.domain.order.dto.request.MakeOrderRequest;
 import com.yellobook.domain.order.mapper.OrderMapper;
 import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.inventory.repository.ProductRepository;
@@ -312,7 +312,7 @@ class OrderCommandServiceTest {
 
             //then
             assertThat(response).isNotNull();
-            assertThat(response.getCommentId()).isEqualTo(expectResponse.getCommentId());
+            assertThat(response.commentId()).isEqualTo(expectResponse.commentId());
             verify(orderRepository).findById(orderId);
             verify(memberRepository).findById(admin.getMemberId());
             verify(orderCommentRepository).save(any(OrderComment.class));
@@ -396,7 +396,7 @@ class OrderCommandServiceTest {
             when(memberRepository.findById(orderer.getMemberId())).thenReturn(Optional.of(member));
             when(teamRepository.findById(orderer.getTeamId())).thenReturn(Optional.of(team));
             when(participantRepository.findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN)).thenReturn(Optional.of(participant));
-            when(productRepository.findById(request.getProductId())).thenReturn(Optional.empty());
+            when(productRepository.findById(request.productId())).thenReturn(Optional.empty());
 
             //when & then
             CustomException exception = Assertions.assertThrows(CustomException.class, () ->
@@ -405,7 +405,7 @@ class OrderCommandServiceTest {
             verify(memberRepository).findById(orderer.getMemberId());
             verify(teamRepository).findById(orderer.getTeamId());
             verify(participantRepository).findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN);
-            verify(productRepository).findById(request.getProductId());
+            verify(productRepository).findById(request.productId());
         }
 
         @Test
@@ -420,7 +420,7 @@ class OrderCommandServiceTest {
             when(memberRepository.findById(orderer.getMemberId())).thenReturn(Optional.of(member));
             when(teamRepository.findById(orderer.getTeamId())).thenReturn(Optional.of(team));
             when(participantRepository.findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN)).thenReturn(Optional.of(participant));
-            when(productRepository.findById(request.getProductId())).thenReturn(Optional.of(product));
+            when(productRepository.findById(request.productId())).thenReturn(Optional.of(product));
 
             //when & then
             CustomException exception = Assertions.assertThrows(CustomException.class, () ->
@@ -429,7 +429,7 @@ class OrderCommandServiceTest {
             verify(memberRepository).findById(orderer.getMemberId());
             verify(teamRepository).findById(orderer.getTeamId());
             verify(participantRepository).findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN);
-            verify(productRepository).findById(request.getProductId());
+            verify(productRepository).findById(request.productId());
         }
 
         private MakeOrderRequest createMakeOrderRequest(Integer orderAmount){

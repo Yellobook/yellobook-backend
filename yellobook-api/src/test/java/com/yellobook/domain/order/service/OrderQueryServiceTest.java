@@ -3,13 +3,13 @@ package com.yellobook.domain.order.service;
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.enums.OrderStatus;
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domain.order.dto.GetOrderCommentsResponse;
-import com.yellobook.domain.order.dto.GetOrderCommentsResponse.CommentInfo;
-import com.yellobook.domain.order.dto.GetOrderResponse;
+import com.yellobook.domain.order.dto.response.GetOrderCommentsResponse;
+import com.yellobook.domain.order.dto.response.GetOrderCommentsResponse.CommentInfo;
+import com.yellobook.domain.order.dto.response.GetOrderResponse;
 import com.yellobook.domain.order.mapper.OrderMapper;
 import com.yellobook.domains.member.entity.Member;
-import com.yellobook.domains.order.dto.OrderCommentDTO;
-import com.yellobook.domains.order.dto.OrderDTO;
+import com.yellobook.domains.order.dto.query.QueryOrder;
+import com.yellobook.domains.order.dto.query.QueryOrderComment;
 import com.yellobook.domains.order.entity.Order;
 import com.yellobook.domains.order.repository.OrderMentionRepository;
 import com.yellobook.domains.order.repository.OrderRepository;
@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -88,15 +88,15 @@ class OrderQueryServiceTest {
             CommentInfo commentInfo = CommentInfo.builder().content("content").role(MemberTeamRole.ORDERER).build();
 
             when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-            when(orderRepository.getOrderComments(orderId)).thenReturn(List.of(OrderCommentDTO.builder().build()));
-            when(orderMapper.toCommentInfo(any(OrderCommentDTO.class))).thenReturn(commentInfo);
+            when(orderRepository.getOrderComments(orderId)).thenReturn(List.of(QueryOrderComment.builder().build()));
+            when(orderMapper.toCommentInfo(any(QueryOrderComment.class))).thenReturn(commentInfo);
 
             //when
             GetOrderCommentsResponse response = orderQueryService.getOrderComments(orderId, orderer);
 
             //then
             assertThat(response).isNotNull();
-            assertThat(response.getComments().size()).isEqualTo(1);
+            assertThat(response.comments().size()).isEqualTo(1);
         }
 
         @Test
@@ -114,8 +114,8 @@ class OrderQueryServiceTest {
 
             //then
             assertThat(response).isNotNull();
-            assertThat(response.getComments().size()).isEqualTo(0);
-            assertThat(response.getComments()).isEmpty();
+            assertThat(response.comments().size()).isEqualTo(0);
+            assertThat(response.comments()).isEmpty();
         }
 
 
@@ -158,12 +158,12 @@ class OrderQueryServiceTest {
             //given
             Long orderId = 1L;
             Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 2L);  // orderMember : 2L, member : 2L
-            OrderDTO orderDTO = OrderDTO.builder().build();
+            QueryOrder queryOrder = QueryOrder.builder().build();
             GetOrderResponse expectResponse = GetOrderResponse.builder().build();
 
             when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-            when(orderRepository.getOrder(orderId)).thenReturn(orderDTO);
-            when(orderMapper.toGetOrderResponse(orderDTO)).thenReturn(expectResponse);
+            when(orderRepository.getOrder(orderId)).thenReturn(queryOrder);
+            when(orderMapper.toGetOrderResponse(queryOrder)).thenReturn(expectResponse);
 
             //when
             GetOrderResponse response = orderQueryService.getOrder(orderId, orderer);

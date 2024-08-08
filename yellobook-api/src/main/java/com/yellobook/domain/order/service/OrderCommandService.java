@@ -4,10 +4,10 @@ import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.enums.OrderStatus;
 import com.yellobook.common.utils.ParticipantUtil;
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domain.order.dto.AddOrderCommentRequest;
-import com.yellobook.domain.order.dto.AddOrderCommentResponse;
-import com.yellobook.domain.order.dto.MakeOrderRequest;
-import com.yellobook.domain.order.dto.MakeOrderResponse;
+import com.yellobook.domain.order.dto.request.AddOrderCommentRequest;
+import com.yellobook.domain.order.dto.response.AddOrderCommentResponse;
+import com.yellobook.domain.order.dto.request.MakeOrderRequest;
+import com.yellobook.domain.order.dto.response.MakeOrderResponse;
 import com.yellobook.domain.order.mapper.OrderMapper;
 import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.inventory.repository.ProductRepository;
@@ -139,9 +139,9 @@ public class OrderCommandService{
         }
         Member admin = optionalParticipant.get().getMember();
         // 존재하는 제품인지 확인
-        Product product = productRepository.findById(requestDTO.getProductId()).orElseThrow(() -> new CustomException(InventoryErrorCode.PRODUCT_NOT_FOUND));
+        Product product = productRepository.findById(requestDTO.productId()).orElseThrow(() -> new CustomException(InventoryErrorCode.PRODUCT_NOT_FOUND));
         // 수량 비교
-        if(product.getAmount() < requestDTO.getOrderAmount()){
+        if(product.getAmount() < requestDTO.orderAmount()){
             throw new CustomException(OrderErrorCode.ORDER_AMOUNT_EXCEED);
         }
         // mapstruct로 주문 생성 - 작성자, 팀, 제품 FK

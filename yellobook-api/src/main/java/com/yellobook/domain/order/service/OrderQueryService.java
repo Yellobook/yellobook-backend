@@ -1,11 +1,11 @@
 package com.yellobook.domain.order.service;
 
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domain.order.dto.GetOrderCommentsResponse;
-import com.yellobook.domain.order.dto.GetOrderCommentsResponse.CommentInfo;
-import com.yellobook.domain.order.dto.GetOrderResponse;
+import com.yellobook.domain.order.dto.response.GetOrderCommentsResponse;
+import com.yellobook.domain.order.dto.response.GetOrderCommentsResponse.CommentInfo;
+import com.yellobook.domain.order.dto.response.GetOrderResponse;
 import com.yellobook.domain.order.mapper.OrderMapper;
-import com.yellobook.domains.order.dto.OrderDTO;
+import com.yellobook.domains.order.dto.query.QueryOrder;
 import com.yellobook.domains.order.entity.Order;
 import com.yellobook.domains.order.repository.OrderMentionRepository;
 import com.yellobook.domains.order.repository.OrderRepository;
@@ -49,8 +49,8 @@ public class OrderQueryService {
         // 접근 권한 있는지 확인
         if(teamMemberVO.getMemberId().equals(order.getMember().getId()) || orderMentionRepository.existsByMemberIdAndOrderId(teamMemberVO.getMemberId(), orderId)){
             // 주문 조회
-            OrderDTO orderDTO = orderRepository.getOrder(orderId);
-            return orderMapper.toGetOrderResponse(orderDTO);
+            QueryOrder queryOrder = orderRepository.getOrder(orderId);
+            return orderMapper.toGetOrderResponse(queryOrder);
         }else{
             throw new CustomException(OrderErrorCode.ORDER_ACCESS_DENIED);
         }
