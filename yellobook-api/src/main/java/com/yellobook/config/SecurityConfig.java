@@ -36,12 +36,6 @@ public class SecurityConfig {
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
-    @Value("${frontend.base-url}")
-    private String frontendBaseURL;
-
-    @Value("${backend.base-url}")
-    private String backendBaseURL;
-
     /**
      * 정적 파일은 필터들은 명시적으로 필터를 타지 않도록 한다.
      * debug 로 확인해 보았을 때
@@ -62,7 +56,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList(frontendBaseURL, backendBaseURL));
+        config.setAllowedOrigins(
+                Arrays.asList(
+                        "http://localhost:3000",
+                        "http://localhost:8080",
+                        "https://yellobook.site",
+                        "https://api.yellobook.site"
+                )
+        );
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.addAllowedHeader("*");
         config.setExposedHeaders(Arrays.asList("Set-Cookie", "Authorization"));
