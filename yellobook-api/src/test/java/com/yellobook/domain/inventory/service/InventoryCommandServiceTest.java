@@ -2,9 +2,9 @@ package com.yellobook.domain.inventory.service;
 
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domain.inventory.dto.AddProductRequest;
-import com.yellobook.domain.inventory.dto.AddProductResponse;
-import com.yellobook.domain.inventory.dto.ModifyProductAmountRequest;
+import com.yellobook.domain.inventory.dto.request.AddProductRequest;
+import com.yellobook.domain.inventory.dto.response.AddProductResponse;
+import com.yellobook.domain.inventory.dto.request.ModifyProductAmountRequest;
 import com.yellobook.domain.inventory.mapper.ProductMapper;
 import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.entity.Product;
@@ -26,6 +26,7 @@ import java.lang.reflect.Field;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.in;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -82,7 +83,7 @@ class InventoryCommandServiceTest {
             //given
             Long inventoryId = 1L;
             AddProductRequest request = createAddProductRequest();
-            when(productRepository.existsByInventoryIdAndSku(1L, request.getSku())).thenReturn(true);
+            when(productRepository.existsByInventoryIdAndSku(1L, request.sku())).thenReturn(true);
 
             //when & then
             CustomException exception = Assertions.assertThrows(CustomException.class, () ->
@@ -113,7 +114,7 @@ class InventoryCommandServiceTest {
             Inventory inventory = createInventory();
             Product product = createProduct();
             when(inventoryRepository.findById(1L)).thenReturn(Optional.of(inventory));
-            when(productMapper.toProduct(request)).thenReturn(product);
+            when(productMapper.toProduct(request, inventory)).thenReturn(product);
             when(productRepository.save(any(Product.class))).thenAnswer(invocation -> {
                 Product savedProduct = invocation.getArgument(0);
                 Field idField = Product.class.getDeclaredField("id");
@@ -127,7 +128,7 @@ class InventoryCommandServiceTest {
 
             //then
             assertThat(response).isNotNull();
-            assertThat(response.getProductId()).isEqualTo(1L);
+            assertThat(response.productId()).isEqualTo(1L);
         }
 
         private AddProductRequest createAddProductRequest(){
@@ -200,7 +201,7 @@ class InventoryCommandServiceTest {
             inventoryCommandService.modifyProductAmount(productId, request, admin);
 
             //then
-            assertThat(product.getAmount()).isEqualTo(request.getAmount());
+            assertThat(product.getAmount()).isEqualTo(request.amount());
         }
 
         private ModifyProductAmountRequest createModifyProductAmountRequest(){
@@ -251,9 +252,8 @@ class InventoryCommandServiceTest {
     }
 
     private Inventory createInventory(){
-        return Inventory.builder().team(null).id(1L)
+        return Inventory.builder().team(null)
                 .title("title")
-                .view(100)
                 .build();
     }
 

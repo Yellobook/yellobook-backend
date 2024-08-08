@@ -2,14 +2,14 @@ package com.yellobook.domain.inventory.service;
 
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domain.inventory.dto.GetProductsResponse;
-import com.yellobook.domain.inventory.dto.GetProductsResponse.ProductInfo;
-import com.yellobook.domain.inventory.dto.GetTotalInventoryResponse;
-import com.yellobook.domain.inventory.dto.GetTotalInventoryResponse.InventoryInfo;
+import com.yellobook.domain.inventory.dto.response.GetProductsResponse;
+import com.yellobook.domain.inventory.dto.response.GetProductsResponse.ProductInfo;
+import com.yellobook.domain.inventory.dto.response.GetTotalInventoryResponse;
+import com.yellobook.domain.inventory.dto.response.GetTotalInventoryResponse.InventoryInfo;
 import com.yellobook.domain.inventory.mapper.InventoryMapper;
 import com.yellobook.domain.inventory.mapper.ProductMapper;
-import com.yellobook.domains.inventory.dto.InventoryDTO;
-import com.yellobook.domains.inventory.dto.ProductDTO;
+import com.yellobook.domains.inventory.dto.query.QueryInventory;
+import com.yellobook.domains.inventory.dto.query.QueryProduct;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
 import com.yellobook.error.code.AuthErrorCode;
@@ -29,9 +29,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class InventoryQueryServiceTest {
@@ -73,20 +73,20 @@ class InventoryQueryServiceTest {
             Integer page = 1;
             Integer size = 5;
             Pageable pageable = PageRequest.of(page-1, size);
-            List<InventoryDTO> inventoryDTOs = createInventoryDTOs();
+            List<QueryInventory> queryInventories = createInventoryDTOs();
             List<InventoryInfo> inventoryInfos = createInventoryInfo();
-            when(inventoryRepository.getTotalInventory(admin.getTeamId(), pageable)).thenReturn(inventoryDTOs);
-            when(inventoryMapper.toInventoryInfoList(inventoryDTOs)).thenReturn(inventoryInfos);
+            when(inventoryRepository.getTotalInventory(admin.getTeamId(), pageable)).thenReturn(queryInventories);
+            when(inventoryMapper.toInventoryInfoList(queryInventories)).thenReturn(inventoryInfos);
 
             //when
             GetTotalInventoryResponse response = inventoryQueryService.getTotalInventory(page, size, admin);
 
             //then
             verify(inventoryRepository).getTotalInventory(admin.getTeamId(), pageable);
-            verify(inventoryMapper).toInventoryInfoList(inventoryDTOs);
-            assertThat(response.getPage()).isEqualTo(page);
-            assertThat(response.getSize()).isEqualTo(4);
-            assertThat(response.getInventories()).isSameAs(inventoryInfos);
+            verify(inventoryMapper).toInventoryInfoList(queryInventories);
+            assertThat(response.page()).isEqualTo(page);
+            assertThat(response.size()).isEqualTo(4);
+            assertThat(response.inventories()).isSameAs(inventoryInfos);
         }
 
         @Test
@@ -96,26 +96,26 @@ class InventoryQueryServiceTest {
             Integer page = 1;
             Integer size = 5;
             Pageable pageable = PageRequest.of(page-1, size);
-            List<InventoryDTO> inventoryDTOs = Collections.emptyList();
+            List<QueryInventory> queryInventories = Collections.emptyList();
             List<InventoryInfo> inventoryInfos = Collections.emptyList();
-            when(inventoryRepository.getTotalInventory(admin.getTeamId(), pageable)).thenReturn(inventoryDTOs);
-            when(inventoryMapper.toInventoryInfoList(inventoryDTOs)).thenReturn(inventoryInfos);
+            when(inventoryRepository.getTotalInventory(admin.getTeamId(), pageable)).thenReturn(queryInventories);
+            when(inventoryMapper.toInventoryInfoList(queryInventories)).thenReturn(inventoryInfos);
 
             //when
             GetTotalInventoryResponse response = inventoryQueryService.getTotalInventory(page, size, admin);
 
             //then
             verify(inventoryRepository).getTotalInventory(admin.getTeamId(), pageable);
-            verify(inventoryMapper).toInventoryInfoList(inventoryDTOs);
-            assertThat(response.getPage()).isEqualTo(page);
-            assertThat(response.getSize()).isEqualTo(0);
-            assertThat(response.getInventories()).isSameAs(Collections.emptyList());
+            verify(inventoryMapper).toInventoryInfoList(queryInventories);
+            assertThat(response.page()).isEqualTo(page);
+            assertThat(response.size()).isEqualTo(0);
+            assertThat(response.inventories()).isSameAs(Collections.emptyList());
         }
 
-        private List<InventoryDTO> createInventoryDTOs(){
-            List<InventoryDTO> result = new ArrayList<>();
+        private List<QueryInventory> createInventoryDTOs(){
+            List<QueryInventory> result = new ArrayList<>();
             for(int i =0; i<4; i++){
-                result.add(InventoryDTO.builder().build());
+                result.add(QueryInventory.builder().build());
             }
             return result;
         }
@@ -150,18 +150,18 @@ class InventoryQueryServiceTest {
         void checkOrderByName(){
             //given
             Long inventoryId = 1L;
-            List<ProductDTO> productDTOs = createProductDTOs();
+            List<QueryProduct> queryProducts = createProductDTOs();
             List<ProductInfo> productInfos = createProductInfos();
-            when(productRepository.getProducts(inventoryId)).thenReturn(productDTOs);
-            when(productMapper.toProductInfo(productDTOs)).thenReturn(productInfos);
+            when(productRepository.getProducts(inventoryId)).thenReturn(queryProducts);
+            when(productMapper.toProductInfo(queryProducts)).thenReturn(productInfos);
 
             //when
             GetProductsResponse response = inventoryQueryService.getProductsByInventory(inventoryId, admin);
 
             //then
             verify(productRepository).getProducts(inventoryId);
-            verify(productMapper).toProductInfo(productDTOs);
-            assertThat(response.getProducts()).isSameAs(productInfos);
+            verify(productMapper).toProductInfo(queryProducts);
+            assertThat(response.products()).isSameAs(productInfos);
         }
 
         @Test
@@ -169,18 +169,18 @@ class InventoryQueryServiceTest {
         void getEmptyListProducts(){
             //given
             Long inventoryId = 1L;
-            List<ProductDTO> productDTOs = Collections.emptyList();
+            List<QueryProduct> queryProducts = Collections.emptyList();
             List<ProductInfo> productInfos = Collections.emptyList();
-            when(productRepository.getProducts(inventoryId)).thenReturn(productDTOs);
-            when(productMapper.toProductInfo(productDTOs)).thenReturn(productInfos);
+            when(productRepository.getProducts(inventoryId)).thenReturn(queryProducts);
+            when(productMapper.toProductInfo(queryProducts)).thenReturn(productInfos);
 
             //when
             GetProductsResponse response = inventoryQueryService.getProductsByInventory(inventoryId, admin);
 
             //then
             verify(productRepository).getProducts(inventoryId);
-            verify(productMapper).toProductInfo(productDTOs);
-            assertThat(response.getProducts()).isSameAs(Collections.emptyList());
+            verify(productMapper).toProductInfo(queryProducts);
+            assertThat(response.products()).isSameAs(Collections.emptyList());
         }
 
     }
@@ -220,18 +220,18 @@ class InventoryQueryServiceTest {
             //given
             Long inventoryId = 1L;
             String keyword = "pro";
-            List<ProductDTO> productDTOs = createProductDTOs();
+            List<QueryProduct> queryProducts = createProductDTOs();
             List<ProductInfo> productInfos = createProductInfos();
-            when(productRepository.getProducts(inventoryId, keyword)).thenReturn(productDTOs);
-            when(productMapper.toProductInfo(productDTOs)).thenReturn(productInfos);
+            when(productRepository.getProducts(inventoryId, keyword)).thenReturn(queryProducts);
+            when(productMapper.toProductInfo(queryProducts)).thenReturn(productInfos);
 
             //when
             GetProductsResponse response = inventoryQueryService.getProductByKeywordAndInventory(inventoryId, keyword, admin);
 
             //then
             verify(productRepository).getProducts(inventoryId, keyword);
-            verify(productMapper).toProductInfo(productDTOs);
-            assertThat(response.getProducts()).isSameAs(productInfos);
+            verify(productMapper).toProductInfo(queryProducts);
+            assertThat(response.products()).isSameAs(productInfos);
         }
 
         @Test
@@ -240,27 +240,27 @@ class InventoryQueryServiceTest {
             //given
             Long inventoryId = 1L;
             String keyword = "pro";
-            List<ProductDTO> productDTOs = Collections.emptyList();
+            List<QueryProduct> queryProducts = Collections.emptyList();
             List<ProductInfo> productInfos = Collections.emptyList();
             when(productRepository.getProducts(inventoryId, keyword)).thenReturn(Collections.emptyList());
-            when(productMapper.toProductInfo(productDTOs)).thenReturn(productInfos);
+            when(productMapper.toProductInfo(queryProducts)).thenReturn(productInfos);
 
             //when
             GetProductsResponse response = inventoryQueryService.getProductByKeywordAndInventory(inventoryId, keyword, admin);
 
             //then
             verify(productRepository).getProducts(inventoryId, keyword);
-            verify(productMapper).toProductInfo(productDTOs);
-            assertThat(response.getProducts()).isSameAs(Collections.emptyList());
+            verify(productMapper).toProductInfo(queryProducts);
+            assertThat(response.products()).isSameAs(Collections.emptyList());
         }
 
     }
 
 
-    private List<ProductDTO> createProductDTOs(){
-        List<ProductDTO> result = new ArrayList<>();
+    private List<QueryProduct> createProductDTOs(){
+        List<QueryProduct> result = new ArrayList<>();
         for(int i =0; i<5; i++){
-            result.add(ProductDTO.builder().name("product").build());
+            result.add(QueryProduct.builder().name("product").build());
         }
         return result;
     }

@@ -2,13 +2,12 @@ package com.yellobook.domain.inventory.service;
 
 import com.yellobook.common.utils.ParticipantUtil;
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domain.auth.service.RedisTeamService;
-import com.yellobook.domain.inventory.dto.GetProductsResponse;
-import com.yellobook.domain.inventory.dto.GetProductsResponse.ProductInfo;
-import com.yellobook.domain.inventory.dto.GetTotalInventoryResponse;
+import com.yellobook.domain.inventory.dto.response.GetProductsResponse;
+import com.yellobook.domain.inventory.dto.response.GetProductsResponse.ProductInfo;
+import com.yellobook.domain.inventory.dto.response.GetTotalInventoryResponse;
 import com.yellobook.domain.inventory.mapper.InventoryMapper;
 import com.yellobook.domain.inventory.mapper.ProductMapper;
-import com.yellobook.domains.inventory.dto.InventoryDTO;
+import com.yellobook.domains.inventory.dto.query.QueryInventory;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +34,7 @@ public class InventoryQueryService{
         ParticipantUtil.forbidViewer(teamMember.getRole());
 
         Pageable pageable = PageRequest.of(page-1, size);
-        List<InventoryDTO> content = inventoryRepository.getTotalInventory(teamMember.getTeamId(), pageable);
+        List<QueryInventory> content = inventoryRepository.getTotalInventory(teamMember.getTeamId(), pageable);
         return GetTotalInventoryResponse.builder()
                 .page(page).size(content.size())
                 .inventories(inventoryMapper.toInventoryInfoList(content))

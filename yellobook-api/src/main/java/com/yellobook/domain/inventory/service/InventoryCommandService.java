@@ -2,9 +2,9 @@ package com.yellobook.domain.inventory.service;
 
 import com.yellobook.common.utils.ParticipantUtil;
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domain.inventory.dto.AddProductRequest;
-import com.yellobook.domain.inventory.dto.AddProductResponse;
-import com.yellobook.domain.inventory.dto.ModifyProductAmountRequest;
+import com.yellobook.domain.inventory.dto.request.AddProductRequest;
+import com.yellobook.domain.inventory.dto.response.AddProductResponse;
+import com.yellobook.domain.inventory.dto.request.ModifyProductAmountRequest;
 import com.yellobook.domain.inventory.mapper.ProductMapper;
 import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.entity.Product;
@@ -34,13 +34,12 @@ public class InventoryCommandService{
         ParticipantUtil.forbidOrderer(teamMember.getRole());
 
         // SKU 중복 확인 (inventory & sku)
-        if(productRepository.existsByInventoryIdAndSku(inventoryId, requestDTO.getSku())){
+        if(productRepository.existsByInventoryIdAndSku(inventoryId, requestDTO.sku())){
             throw new CustomException(InventoryErrorCode.SKU_ALREADY_EXISTS);
         }
 
         Inventory inventory = inventoryRepository.findById(inventoryId).orElseThrow(() -> new CustomException(InventoryErrorCode.INVENTORY_NOT_FOUND) );
-        Product newProduct = productMapper.toProduct(requestDTO);
-        newProduct.modifyInventory(inventory);
+        Product newProduct = productMapper.toProduct(requestDTO, inventory);
         Long productId = productRepository.save(newProduct).getId();
         return AddProductResponse.builder().productId(productId).build();
     }
@@ -56,7 +55,7 @@ public class InventoryCommandService{
         if(productOptional.isEmpty()){
             throw new CustomException(InventoryErrorCode.PRODUCT_NOT_FOUND);  // 여기 이미 validation 했는데, 또 해야 하나...?
         }
-        productOptional.get().modifyAmount(requestDTO.getAmount());
+        productOptional.get().modifyAmount(requestDTO.amount());
     }
 
     /**
