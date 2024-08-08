@@ -1,11 +1,12 @@
-package com.yellobook.domain.member.controller;
+package com.yellobook.domain.inventory.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.resolver.TeamMemberArgumentResolver;
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domain.member.dto.response.ProfileResponse;
-import com.yellobook.domain.member.service.MemberQueryService;
+import com.yellobook.domain.inventory.dto.response.GetTotalInventoryResponse;
+import com.yellobook.domain.inventory.service.InventoryCommandService;
+import com.yellobook.domain.inventory.service.InventoryQueryService;
 import com.yellobook.response.ResponseFactory;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,25 +20,25 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(MemberController.class)
+@WebMvcTest(InventoryController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(MockitoExtension.class)
-class MemberControllerTest {
-
+class InventoryControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private MemberQueryService memberQueryService;
+    private InventoryQueryService inventoryQueryService;
+    @MockBean
+    private InventoryCommandService inventoryCommandService;
     @MockBean
     private TeamMemberArgumentResolver teamMemberArgumentResolver;
 
@@ -50,17 +51,29 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("사용자 프로필 조회")
-    void getMemberProfile() throws Exception{
+    @DisplayName("전체 재고 현황 글 조회")
+    void getTotalInventory() throws Exception{
         //given
-        ProfileResponse response = new ProfileResponse(1L, "yellow", "image", "email", Collections.emptyList());
-        when(memberQueryService.getMemberProfile(teamMemberVO.getMemberId())).thenReturn(response);
+        Integer page = 1;
+        Integer size = 5;
+        GetTotalInventoryResponse response = GetTotalInventoryResponse.builder().page(page).size(0)
+                .inventories(Collections.emptyList()).build();
+        when(inventoryQueryService.getTotalInventory(page, size, teamMemberVO)).thenReturn(response);
 
         //when & then
-        mockMvc.perform(get("/api/v1/members/profile")
+        mockMvc.perform(get("/api/v1/inventories")
+                .param("page", String.valueOf(page))
+                .param("size", String.valueOf(size))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.nickname", CoreMatchers.is(response.nickname())))
+                .andExpect(jsonPath("$.data.page", CoreMatchers.is(response.page())))
+                .andExpect(jsonPath("$.data.size", CoreMatchers.is(response.size())))
                 .andReturn();
     }
+
+
+
+
+
+
 }
