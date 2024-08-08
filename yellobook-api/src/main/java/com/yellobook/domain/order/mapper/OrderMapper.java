@@ -2,18 +2,23 @@ package com.yellobook.domain.order.mapper;
 
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.enums.OrderStatus;
-import com.yellobook.domain.order.dto.*;
-import com.yellobook.domain.order.dto.GetOrderCommentsResponse.CommentInfo;
+import com.yellobook.domain.order.dto.request.AddOrderCommentRequest;
+import com.yellobook.domain.order.dto.request.MakeOrderRequest;
+import com.yellobook.domain.order.dto.response.GetOrderCommentsResponse.CommentInfo;
+import com.yellobook.domain.order.dto.response.AddOrderCommentResponse;
+import com.yellobook.domain.order.dto.response.GetOrderResponse;
+import com.yellobook.domain.order.dto.response.MakeOrderResponse;
 import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.member.entity.Member;
-import com.yellobook.domains.order.dto.OrderCommentDTO;
-import com.yellobook.domains.order.dto.OrderDTO;
+import com.yellobook.domains.order.dto.query.QueryOrder;
+import com.yellobook.domains.order.dto.query.QueryOrderComment;
 import com.yellobook.domains.order.entity.Order;
 import com.yellobook.domains.order.entity.OrderComment;
 import com.yellobook.domains.order.entity.OrderMention;
 import com.yellobook.domains.team.entity.Team;
-
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,15 +32,15 @@ public interface OrderMapper {
     AddOrderCommentResponse toAddOrderCommentResponse(Long commentId);
 
     @Mapping(source = "role", target = "role")
-    CommentInfo toCommentInfo(OrderCommentDTO orderCommentDTOs);  // TODO
+    CommentInfo toCommentInfo(QueryOrderComment orderCommentDTOs);  // TODO
 
     default Order toOrder(MakeOrderRequest requestDTO, Member member, Team team, Product product){
         return Order.builder()
                 .view(0)
-                .memo(requestDTO.getMemo())
-                .date(requestDTO.getDate())
+                .memo(requestDTO.memo())
+                .date(requestDTO.date())
                 .orderStatus(OrderStatus.PENDING_CONFIRM)
-                .orderAmount(requestDTO.getOrderAmount())
+                .orderAmount(requestDTO.orderAmount())
                 .product(product)
                 .member(member)
                 .team(team)
@@ -48,7 +53,7 @@ public interface OrderMapper {
 
     MakeOrderResponse toMakeOrderResponse(Long orderId);
 
-    GetOrderResponse toGetOrderResponse(OrderDTO orderDTO);
+    GetOrderResponse toGetOrderResponse(QueryOrder queryOrder);
 
 
 //    @Mapping(source = "comments", target = "comments")

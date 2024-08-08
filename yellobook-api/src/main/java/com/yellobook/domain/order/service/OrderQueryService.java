@@ -1,10 +1,11 @@
 package com.yellobook.domain.order.service;
 
-import com.yellobook.domain.order.dto.GetOrderCommentsResponse;
-import com.yellobook.domain.order.dto.GetOrderCommentsResponse.CommentInfo;
-import com.yellobook.domain.order.dto.GetOrderResponse;
+import com.yellobook.common.vo.TeamMemberVO;
+import com.yellobook.domain.order.dto.response.GetOrderCommentsResponse;
+import com.yellobook.domain.order.dto.response.GetOrderCommentsResponse.CommentInfo;
+import com.yellobook.domain.order.dto.response.GetOrderResponse;
 import com.yellobook.domain.order.mapper.OrderMapper;
-import com.yellobook.domains.order.dto.OrderDTO;
+import com.yellobook.domains.order.dto.query.QueryOrder;
 import com.yellobook.domains.order.entity.Order;
 import com.yellobook.domains.order.repository.OrderMentionRepository;
 import com.yellobook.domains.order.repository.OrderRepository;
@@ -27,11 +28,11 @@ public class OrderQueryService {
     /**
      * 주문 댓글 조회
      */
-    public GetOrderCommentsResponse getOrderComments(Long orderId, Long memberId) {
+    public GetOrderCommentsResponse getOrderComments(Long orderId, TeamMemberVO teamMemberVO) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new CustomException(OrderErrorCode.ORDER_NOT_FOUND));
         // 접근 권한 있는지 확인
-        if(memberId.equals(order.getMember().getId()) || orderMentionRepository.existsByMemberIdAndOrderId(memberId, orderId)){
-            // 댓글 조회
+        if(teamMemberVO.getMemberId().equals(order.getMember().getId()) || orderMentionRepository.existsByMemberIdAndOrderId(teamMemberVO.getMemberId(), orderId)){
+            // 댓글 조회접
             List<CommentInfo> commentInfos = orderRepository.getOrderComments(orderId).stream().map(orderMapper::toCommentInfo).toList();
             //return orderMapper.toGetOrderCommentsResponse(commentInfos);  //적용 안됨ㅜㅜ
             return GetOrderCommentsResponse.builder().comments(commentInfos).build();
@@ -43,13 +44,13 @@ public class OrderQueryService {
     /**
      * 주문 조회
      */
-    public GetOrderResponse getOrder(Long orderId, Long memberId) {
+    public GetOrderResponse getOrder(Long orderId, TeamMemberVO teamMemberVO) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new CustomException(OrderErrorCode.ORDER_NOT_FOUND));
         // 접근 권한 있는지 확인
-        if(memberId.equals(order.getMember().getId()) || orderMentionRepository.existsByMemberIdAndOrderId(memberId, orderId)){
+        if(teamMemberVO.getMemberId().equals(order.getMember().getId()) || orderMentionRepository.existsByMemberIdAndOrderId(teamMemberVO.getMemberId(), orderId)){
             // 주문 조회
-            OrderDTO orderDTO = orderRepository.getOrder(orderId);
-            return orderMapper.toGetOrderResponse(orderDTO);
+            QueryOrder queryOrder = orderRepository.getOrder(orderId);
+            return orderMapper.toGetOrderResponse(queryOrder);
         }else{
             throw new CustomException(OrderErrorCode.ORDER_ACCESS_DENIED);
         }

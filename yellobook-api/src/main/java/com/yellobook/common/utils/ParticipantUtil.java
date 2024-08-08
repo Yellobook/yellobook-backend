@@ -57,7 +57,7 @@ public class ParticipantUtil {
     /**
      * 팀에 관리자가 있는지 확인
      */
-    public Optional<Participant> findAdminByTeamIdAndRole(Long teamId){
-        return participantRepository.findByTeamIdAndRole(teamId, MemberTeamRole.ADMIN);
-    }
+//    public Optional<Participant> findAdminByTeamIdAndRole(Long teamId){
+//        return participantRepository.findByTeamIdAndRole(teamId, MemberTeamRole.ADMIN);
+//    }
 }

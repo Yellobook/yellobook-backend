@@ -1,18 +1,22 @@
 package com.yellobook.domain.order.controller;
 
 import com.yellobook.common.annotation.ExistOrder;
-import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
-import com.yellobook.domain.order.dto.*;
+import com.yellobook.common.annotation.TeamMember;
+import com.yellobook.common.vo.TeamMemberVO;
+import com.yellobook.domain.order.dto.request.AddOrderCommentRequest;
+import com.yellobook.domain.order.dto.request.MakeOrderRequest;
+import com.yellobook.domain.order.dto.response.AddOrderCommentResponse;
+import com.yellobook.domain.order.dto.response.GetOrderResponse;
+import com.yellobook.domain.order.dto.response.MakeOrderResponse;
 import com.yellobook.domain.order.service.OrderCommandService;
 import com.yellobook.domain.order.service.OrderQueryService;
-import com.yellobook.domain.order.dto.GetOrderCommentsResponse;
+import com.yellobook.domain.order.dto.response.GetOrderCommentsResponse;
 import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,9 +33,9 @@ public class OrderController {
     @PostMapping("")
     public ResponseEntity<SuccessResponse<MakeOrderResponse>> makeOrder(
             @RequestBody MakeOrderRequest requestDTO,
-            @AuthenticationPrincipal CustomOAuth2User oAuth2User
+            @TeamMember TeamMemberVO teamMember
     ){
-        MakeOrderResponse response = orderCommandService.makeOrder(requestDTO, oAuth2User.getMemberId());
+        MakeOrderResponse response = orderCommandService.makeOrder(requestDTO, teamMember);
         return ResponseFactory.success(response);
     }
 
@@ -39,9 +43,9 @@ public class OrderController {
     @GetMapping("/{orderId}")
     public ResponseEntity<SuccessResponse<GetOrderResponse>> getOrder(
             @ExistOrder @PathVariable("orderId") Long orderId,
-            @AuthenticationPrincipal CustomOAuth2User oAuth2User
+            @TeamMember TeamMemberVO teamMember
     ){
-        GetOrderResponse response = orderQueryService.getOrder(orderId, oAuth2User.getMemberId());
+        GetOrderResponse response = orderQueryService.getOrder(orderId, teamMember);
         return ResponseFactory.success(response);
     }
 
@@ -50,9 +54,9 @@ public class OrderController {
     public ResponseEntity<SuccessResponse<AddOrderCommentResponse>> addOrderComment(
             @ExistOrder @PathVariable("orderId") Long orderId,
             @RequestBody AddOrderCommentRequest requestDTO,
-            @AuthenticationPrincipal CustomOAuth2User oAuth2User
+            @TeamMember TeamMemberVO teamMember
     ){
-        AddOrderCommentResponse response = orderCommandService.addOrderComment(orderId, oAuth2User.getMemberId(), requestDTO);
+        AddOrderCommentResponse response = orderCommandService.addOrderComment(orderId, teamMember, requestDTO);
         return ResponseFactory.success(response);
     }
 
@@ -60,9 +64,9 @@ public class OrderController {
     @GetMapping("/{orderId}/comment")
     public ResponseEntity<SuccessResponse<GetOrderCommentsResponse>> getOrderComments(
             @ExistOrder @PathVariable("orderId") Long orderId,
-            @AuthenticationPrincipal CustomOAuth2User oAuth2User
+            @TeamMember TeamMemberVO teamMember
     ){
-        GetOrderCommentsResponse response = orderQueryService.getOrderComments(orderId, oAuth2User.getMemberId());
+        GetOrderCommentsResponse response = orderQueryService.getOrderComments(orderId,teamMember);
         return ResponseFactory.success(response);
     }
 
@@ -70,9 +74,9 @@ public class OrderController {
     @PatchMapping("/{orderId}/correction")
     public ResponseEntity<SuccessResponse<String>> modifyRequestOrder(
             @ExistOrder @PathVariable("orderId") Long orderId,
-            @AuthenticationPrincipal CustomOAuth2User oAuth2User
+            @TeamMember TeamMemberVO teamMember
             ) {
-        orderCommandService.modifyRequestOrder(orderId, oAuth2User.getMemberId());
+        orderCommandService.modifyRequestOrder(orderId, teamMember);
         return ResponseFactory.success("주문의 정정 요청을 완료했습니다.");
     }
 
@@ -80,9 +84,9 @@ public class OrderController {
     @PatchMapping("/{orderId}/confirm")
     public ResponseEntity<SuccessResponse<String>> confirmOrder(
             @ExistOrder @PathVariable("orderId") Long orderId,
-            @AuthenticationPrincipal CustomOAuth2User oAuth2User
+            @TeamMember TeamMemberVO teamMember
     ) {
-        orderCommandService.confirmOrder(orderId, oAuth2User.getMemberId());
+        orderCommandService.confirmOrder(orderId, teamMember);
         return ResponseFactory.success("주문의 확정을 완료했습니다.");
     }
 
@@ -90,9 +94,9 @@ public class OrderController {
     @DeleteMapping("/{orderId}")
     public ResponseEntity<SuccessResponse<String>> cancelOrder(
             @ExistOrder @PathVariable("orderId") Long orderId,
-            @AuthenticationPrincipal CustomOAuth2User oAuth2User
+            @TeamMember TeamMemberVO teamMember
     ) {
-        orderCommandService.cancelOrder(orderId, oAuth2User.getMemberId());
+        orderCommandService.cancelOrder(orderId, teamMember);
         return ResponseFactory.success("주문 최소를 완료했습니다.");
     }
 
