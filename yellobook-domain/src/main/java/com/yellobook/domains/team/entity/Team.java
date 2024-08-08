@@ -11,8 +11,6 @@ import lombok.*;
         @UniqueConstraint(name = "uc_team_name", columnNames = "name")
     }
 )
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Team extends BaseEntity {
 
@@ -27,4 +25,11 @@ public class Team extends BaseEntity {
 
     @Column(nullable = false)
     private String address;
+
+    @Builder
+    public Team(String name, String phoneNumber, String address) {
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+    }
 }
