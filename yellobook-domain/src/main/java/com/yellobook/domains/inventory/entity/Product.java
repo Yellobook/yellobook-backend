@@ -1,8 +1,10 @@
 package com.yellobook.domains.inventory.entity;
 
 import com.yellobook.domains.common.entity.BaseEntity;
+import com.yellobook.domains.inventory.entity.Inventory;
 
 import jakarta.persistence.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -65,22 +67,18 @@ public class Product extends BaseEntity {
     private Integer amount;
 
     @Builder
-    private Product(Inventory inventory, String name, String subProduct, Integer sku, Integer purchasePrice, Integer salePrice, Integer amount){
-        this.inventory = inventory;
+    public Product(String name, String subProduct, Integer sku, Integer purchasePrice, Integer salePrice, Integer amount, Inventory inventory){
         this.name = name;
         this.subProduct = subProduct;
         this.sku = sku;
         this.purchasePrice = purchasePrice;
         this.salePrice = salePrice;
         this.amount = amount;
+        this.inventory = inventory;
     }
 
     public void modifyAmount(Integer amount){
         this.amount = amount;
-    }
-
-    public void modifyInventory(Inventory inventory){
-        this.inventory = inventory;
     }
 
     public void reduceAmount(Integer orderAmount){

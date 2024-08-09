@@ -1,14 +1,15 @@
 package com.yellobook.domain.inventory.mapper;
 
-import com.yellobook.domain.inventory.dto.GetTotalInventoryResponse;
-import com.yellobook.domains.inventory.dto.InventoryDTO;
+import com.yellobook.domains.inventory.dto.query.QueryInventory;
 import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static com.yellobook.domain.inventory.dto.response.GetTotalInventoryResponse.*;
+
 @Component
 @Mapper(componentModel = "spring")
 public interface InventoryMapper {
-    List<GetTotalInventoryResponse.InventoryInfo> toInventoryInfoList(List<InventoryDTO> inventoryDTOList);
+    List<InventoryInfo> toInventoryInfoList(List<QueryInventory> queryInventoryList);
 }

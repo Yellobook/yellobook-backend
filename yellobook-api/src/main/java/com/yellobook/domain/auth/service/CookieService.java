@@ -58,7 +58,7 @@ public class CookieService {
         cookie.setPath("/");
         cookie.setDomain(domain);
         cookie.setHttpOnly(false);
-        cookie.setSecure(false);
+        cookie.setSecure(true);
         return cookie;
     }
 
@@ -67,8 +67,8 @@ public class CookieService {
         cookie.setMaxAge(0);
         cookie.setPath("/");
         cookie.setDomain(domain);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
+        cookie.setHttpOnly(false);
+        cookie.setSecure(true);
         response.addCookie(cookie);
     }
 
