@@ -56,9 +56,9 @@ public class CookieService {
         Cookie cookie = new Cookie(cookieName, token);
         cookie.setMaxAge(maxAge);
         cookie.setPath("/");
-//        cookie.setDomain(domain);
+        cookie.setDomain(domain);
         cookie.setHttpOnly(false);
-        cookie.setSecure(false);
+        cookie.setSecure(true);
         return cookie;
     }
 
@@ -66,9 +66,9 @@ public class CookieService {
         Cookie cookie = new Cookie(cookieName, null);
         cookie.setMaxAge(0);
         cookie.setPath("/");
-//        cookie.setDomain(domain);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
+        cookie.setDomain(domain);
+        cookie.setHttpOnly(false);
+        cookie.setSecure(true);
         response.addCookie(cookie);
     }
 
