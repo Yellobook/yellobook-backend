@@ -553,7 +553,6 @@ public class ScheduleRepositoryTest {
         return Inventory.builder()
                 .team(team)
                 .title("2024년 08월 06일 재고현황")
-                .view(1000)
                 .build();
     }
 
