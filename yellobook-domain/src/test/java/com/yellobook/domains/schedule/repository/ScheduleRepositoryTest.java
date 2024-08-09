@@ -12,6 +12,7 @@ import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.order.entity.Order;
 import com.yellobook.domains.order.entity.OrderMention;
+import com.yellobook.domains.schedule.dto.DailyCond;
 import com.yellobook.domains.schedule.dto.EarliestCond;
 import com.yellobook.domains.schedule.dto.MonthlyCond;
 import com.yellobook.domains.schedule.dto.SearchMonthlyCond;
@@ -319,7 +320,7 @@ public class ScheduleRepositoryTest {
 
     @Nested
     @DisplayName("findMonthlyOrders 는")
-    class FindMonthlyOrdersTests {
+    class findMonthlyOrdersTests {
 
         @Test
         @DisplayName("관리자일 경우 팀의 해당 월의 주문들을 모두 가져와야 한다.")
@@ -363,7 +364,7 @@ public class ScheduleRepositoryTest {
 
     @Nested
     @DisplayName("findMonthlyInforms 는")
-    class FindMonthlyInformsTests {
+    class findMonthlyInformsTests {
 
         @Test
         @DisplayName("사용자와 연관된 월의 공지 및 일정을 모두 가져와야 한다.")
@@ -384,6 +385,60 @@ public class ScheduleRepositoryTest {
            assertThat(result.size()).isEqualTo(10);
         }
     }
+
+    @Nested
+    @DisplayName("findDailyInforms 는")
+    class findDailyInformsTests {
+
+        @Test
+        @DisplayName("특정 날짜의 공지 및 일정목록을 반환해야 한다.")
+        void testFindDailyInforms() {
+            // given
+            int year = today.getYear();
+            int month = today.getMonthValue();
+            int day = today.getDayOfMonth();
+            var cond = DailyCond.builder()
+                    .year(year)
+                    .month(month)
+                    .day(day)
+                    .teamMember(viewer1)
+                    .build();
+
+
+            // when
+            List<QuerySchedule> result = scheduleRepository.findDailyInforms(cond);
+
+            // then
+            assertThat(result.size()).isEqualTo(1);
+        }
+    }
+
+    @Nested
+    @DisplayName("findDailyOrders 는")
+    class findDailyOrdersTests {
+
+        @Test
+        @DisplayName("특정 날짜의 주문목록을 반환해야 한다.")
+        void testFindDailyOrders() {
+            // given
+            int year = today.getYear();
+            int month = today.getMonthValue();
+            int day = today.getDayOfMonth();
+            var cond = DailyCond.builder()
+                    .year(year)
+                    .month(month)
+                    .day(day)
+                    .teamMember(orderer1)
+                    .build();
+
+            // when
+            List<QuerySchedule> result = scheduleRepository.findDailyOrders(cond);
+
+            // then
+            assertThat(result.size()).isEqualTo(1);
+        }
+    }
+
 
     private void initData() throws Exception{
         // 팀 생성
