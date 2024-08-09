@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ContextConfiguration;
 
 @DataJpaTest
@@ -67,5 +68,29 @@ public class TeamRepositoryTest {
         //then
         Assertions.assertThat(t1.getId()).isEqualTo(1);
         Assertions.assertThat(teamRepository.findAll().size()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("중복된 팀 이름으로 저장할 때 예외 발생")
+    public void findSameNameTeam(){
+        //given
+        Team team = Team.builder()
+                .name("team")
+                .address("서울 강남구")
+                .phoneNumber("0101").build();
+
+        Team team2 = Team.builder()
+                .name("team")
+                .address("서울 강남구")
+                .phoneNumber("0101").build();
+        //when
+        teamRepository.save(team);
+
+        //then
+        Assertions.assertThatThrownBy(() -> teamRepository.save(team2))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("could not execute statement");
+        entityManager.clear();
+        Assertions.assertThat(teamRepository.findAll()).hasSize(1);
     }
 }
