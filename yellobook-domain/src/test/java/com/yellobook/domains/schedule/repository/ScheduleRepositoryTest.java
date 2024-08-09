@@ -174,7 +174,146 @@ public class ScheduleRepositoryTest {
             assertThat(schedule.scheduleType()).isEqualTo(ScheduleType.INFORM);
         }
     }
-    
+    @Nested
+    @DisplayName("searchMonthlyOrders 는")
+    class searchMonthlyOrdersTests {
+
+        @Test
+        @DisplayName("관리자라면 키워드가 포함된 이번달 모든 주문들을 가져와야 한다.")
+        void testSearchMonthlyOrdersForAdmin() {
+            // given
+            int year = today.getYear();
+            int month = today.getMonthValue();
+            var cond = SearchMonthlyCond.builder()
+                    .keyword("제품")
+                    .teamMember(admin1)
+                    .year(year)
+                    .month(month)
+                    .build();
+
+            // when
+            List<QuerySchedule> result = scheduleRepository.searchMonthlyOrders(cond);
+
+            // then
+            assertThat(result.size()).isEqualTo(20);
+            result.forEach(schedule -> {
+                assertThat(schedule.scheduleType()).isEqualTo(ScheduleType.ORDER);
+                assertThat(schedule.date().getYear()).isEqualTo(year);
+                assertThat(schedule.date().getMonthValue()).isEqualTo(month);
+            });
+
+        }
+
+        @Test
+        @DisplayName("주문자라면 키워드가 포함된 이번달 본인이 주문한 주문들을 가져와야 한다.")
+        void testSearchMonthlyOrdersForOrderer() {
+            // given
+            int year = today.getYear();
+            int month = today.getMonthValue();
+            var cond = SearchMonthlyCond.builder()
+                    .keyword("제품")
+                    .teamMember(orderer1)
+                    .year(year)
+                    .month(month)
+                    .build();
+
+            // when
+            List<QuerySchedule> result = scheduleRepository.searchMonthlyOrders(cond);
+
+            // then
+            assertThat(result.size()).isEqualTo(10);
+            result.forEach(schedule -> {
+                assertThat(schedule.scheduleType()).isEqualTo(ScheduleType.ORDER);
+                assertThat(schedule.date().getYear()).isEqualTo(year);
+                assertThat(schedule.date().getMonthValue()).isEqualTo(month);
+            });
+
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 키워드로 검색 시 빈 리스트를 반환해야 한다.")
+        void testSearchMonthlyOrdersWithNonExistentKeyword() {
+            // given
+            var cond = SearchMonthlyCond.builder()
+                    .keyword("없는키워드")
+                    .teamMember(orderer1)
+                    .year(baseTime.getYear())
+                    .month(baseTime.getMonthValue())
+                    .build();
+
+            // when
+            List<QuerySchedule> result = scheduleRepository.searchMonthlyOrders(cond);
+
+            // then
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("주문 목록을 시간순으로 정렬해서 반환해야 한다.")
+        void testSearchMonthlyOrdersSortedOrder() {
+            // given
+            int year = today.getYear();
+            int month = today.getMonthValue();
+            var cond = SearchMonthlyCond.builder()
+                    .keyword("제품")
+                    .teamMember(orderer1)
+                    .year(year)
+                    .month(month)
+                    .build();
+
+            // when
+            List<QuerySchedule> result = scheduleRepository.searchMonthlyOrders(cond);
+
+            // then
+            assertThat(result).isNotEmpty();
+            assertThat(result).isSortedAccordingTo(Comparator.comparing(QuerySchedule::date));
+        }
+    }
+
+    @Nested
+    @DisplayName("searchMonthlyInforms는")
+    class searchMonthlyInformsTests {
+
+        @Test
+        @DisplayName("키워드가 포함된 이번달 자신이 작성한 일정목록을 반환해야 한다.")
+        void testSearchMonthlyInformsWritten() {
+            // given
+            int year = today.getYear();
+            int month = today.getMonthValue();
+            var cond = SearchMonthlyCond.builder()
+                    .keyword("일정")
+                    .teamMember(viewer1)
+                    .year(year)
+                    .month(month)
+                    .build();
+
+            // when
+            List<QuerySchedule> result = scheduleRepository.searchMonthlyInforms(cond);
+
+            // then
+            assertThat(result.size()).isEqualTo(10);
+
+        }
+
+        @Test
+        @DisplayName("키워드가 포함된 이번달 자신이 멘션된 일정목록을 반환해야 한다.")
+        void testSearchMonthlyInformsMentioned() {
+            // given
+            int year = today.getYear();
+            int month = today.getMonthValue();
+            var cond = SearchMonthlyCond.builder()
+                    .keyword("일정")
+                    .teamMember(admin1)
+                    .year(year)
+                    .month(month)
+                    .build();
+            // when
+            List<QuerySchedule> result = scheduleRepository.searchMonthlyInforms(cond);
+
+            // then
+            assertThat(result.size()).isEqualTo(10);
+        }
+    }
 
     private void initData() throws Exception{
         // 팀 생성
