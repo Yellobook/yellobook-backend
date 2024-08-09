@@ -9,7 +9,7 @@ import com.yellobook.domains.schedule.dto.response.CalendarResponse;
 import com.yellobook.domains.schedule.dto.response.DailyScheduleResponse;
 import com.yellobook.domains.schedule.dto.response.SearchMonthlyScheduleResponse;
 import com.yellobook.domains.schedule.dto.response.UpcomingScheduleResponse;
-import com.yellobook.domains.schedule.service.ScheduleService;
+import com.yellobook.domains.schedule.ScheduleService;
 import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
