@@ -1,24 +1,23 @@
 package com.yellobook.domain.team.mapper;
 
-import com.yellobook.domain.team.dto.TeamRequest;
-import com.yellobook.domain.team.dto.TeamResponse;
+import com.yellobook.domain.team.dto.request.TeamCreateRequest;
+import com.yellobook.domain.team.dto.response.*;
 import com.yellobook.domains.team.entity.Team;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Component;
 
 @Component
 @Mapper(componentModel = "spring")
 public interface TeamMapper {
-    Team toTeam(TeamRequest.CreateTeamRequestDTO request);
+    Team toTeam(TeamCreateRequest request);
 
     @Mapping(source = "id", target = "teamId")
-    TeamResponse.CreateTeamResponseDTO toCreateTeamResponseDTO(Team team);
-    TeamResponse.LeaveTeamResponseDTO toLeaveTeamResponseDTO(Long teamId);
-    TeamResponse.InvitationCodeResponseDTO toInvitationCodeResponseDTO(String inviteUrl);
+    TeamCreateResponse toTeamCreateResponse(Team team);
+    TeamLeaveResponse toTeamLeaveResponse(Long teamId);
+    InvitationCodeResponse toInvitationCodeResponse(String inviteUrl);
     @Mapping(source = "id", target = "teamId")
-    TeamResponse.JoinTeamResponseDTO toJoinTeamResponseDTO(Team team);
+    TeamJoinResponse toTeamJoinResponse(Team team);
     @Mapping(source = "id", target = "teamId")
-    TeamResponse.GetTeamResponseDTO toGetTeamResponseDTO(Team team);
+    TeamGetResponse toTeamGetResponse(Team team);
 }

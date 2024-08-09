@@ -3,8 +3,10 @@ package com.yellobook.domain.team.service;
 import com.yellobook.domain.auth.dto.InvitationResponse;
 import com.yellobook.domain.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domain.auth.service.RedisTeamService;
-import com.yellobook.domain.team.dto.TeamRequest;
-import com.yellobook.domain.team.dto.TeamResponse;
+import com.yellobook.domain.team.dto.request.TeamCreateRequest;
+import com.yellobook.domain.team.dto.response.TeamCreateResponse;
+import com.yellobook.domain.team.dto.response.TeamJoinResponse;
+import com.yellobook.domain.team.dto.response.TeamLeaveResponse;
 import com.yellobook.domain.team.mapper.ParticipantMapper;
 import com.yellobook.domain.team.mapper.TeamMapper;
 import com.yellobook.domains.member.entity.Member;
@@ -34,30 +36,30 @@ public class TeamCommandService {
     private final ParticipantMapper participantMapper;
     private final RedisTeamService redisService;
 
-    public TeamResponse.CreateTeamResponseDTO createTeam(TeamRequest.CreateTeamRequestDTO request, CustomOAuth2User customOAuth2User){
+    public TeamCreateResponse createTeam(TeamCreateRequest request, CustomOAuth2User customOAuth2User){
 
         Member member = memberRepository.findById(customOAuth2User.getMemberId())
                 .orElseThrow(() -> {
                     log.error("Member {} not found.", customOAuth2User.getMemberId());
                     return new CustomException(TeamErrorCode.MEMBER_NOT_FOUND);
                 });
-        if(teamRepository.findByName(request.getName()).isPresent()){
-            log.error("Team {} already exists.", request.getName());
+        if(teamRepository.findByName(request.name()).isPresent()){
+            log.error("Team {} already exists.", request.name());
             throw new CustomException(TeamErrorCode.EXIST_TEAM_NAME);
         }
         else{
             Team newTeam = teamMapper.toTeam(request);
             teamRepository.save(newTeam);
             log.info("New team created: {}", newTeam.getId());
-            Participant founder = participantMapper.toParticipant(request.getRole(),newTeam, member);
+            Participant founder = participantMapper.toParticipant(request.role(),newTeam, member);
             participantRepository.save(founder);
             log.info("Participant added: Member ID = {}, Team ID = {}", member.getId(), newTeam.getId());
 
-            return teamMapper.toCreateTeamResponseDTO(newTeam);
+            return teamMapper.toTeamCreateResponse(newTeam);
         }
     }
 
-    public TeamResponse.LeaveTeamResponseDTO leaveTeam(Long teamId, CustomOAuth2User customOAuth2User) {
+    public TeamLeaveResponse leaveTeam(Long teamId, CustomOAuth2User customOAuth2User) {
         Long memberId = customOAuth2User.getMemberId();
 
         Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)
@@ -69,10 +71,10 @@ public class TeamCommandService {
         participantRepository.delete(participant);
         log.info("Participant (Member ID = {}, Team ID = {}) is deleted", memberId, teamId);
 
-        return teamMapper.toLeaveTeamResponseDTO(teamId);
+        return teamMapper.toTeamLeaveResponse(teamId);
     }
 
-    public TeamResponse.JoinTeamResponseDTO joinTeam(CustomOAuth2User customOAuth2User, String code) {
+    public TeamJoinResponse joinTeam(CustomOAuth2User customOAuth2User, String code) {
 
         InvitationResponse invitationData = redisService.getInvitationInfo(code);
         Long teamId = invitationData.getTeamId();
@@ -104,7 +106,7 @@ public class TeamCommandService {
         participantRepository.save(participantMapper.toParticipant(role, team, member));
         log.info("Participant added: Team ID = {}, Role = {}, Member ID = {}", teamId, role, memberId);
 
-        return teamMapper.toJoinTeamResponseDTO(team);
+        return teamMapper.toTeamJoinResponse(team);
     }
 
 }
