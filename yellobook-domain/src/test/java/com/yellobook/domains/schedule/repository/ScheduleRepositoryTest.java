@@ -13,7 +13,9 @@ import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.order.entity.Order;
 import com.yellobook.domains.order.entity.OrderMention;
 import com.yellobook.domains.schedule.dto.EarliestCond;
+import com.yellobook.domains.schedule.dto.MonthlyCond;
 import com.yellobook.domains.schedule.dto.SearchMonthlyCond;
+import com.yellobook.domains.schedule.dto.query.QueryMonthlySchedule;
 import com.yellobook.domains.schedule.dto.query.QuerySchedule;
 import com.yellobook.domains.schedule.dto.query.QueryUpcomingSchedule;
 import com.yellobook.common.enums.MemberTeamRole;
@@ -312,6 +314,74 @@ public class ScheduleRepositoryTest {
 
             // then
             assertThat(result.size()).isEqualTo(10);
+        }
+    }
+
+    @Nested
+    @DisplayName("findMonthlyOrders 는")
+    class FindMonthlyOrdersTests {
+
+        @Test
+        @DisplayName("관리자일 경우 팀의 해당 월의 주문들을 모두 가져와야 한다.")
+        void testFindMonthlyOrdersAdmin() {
+            // given
+            int year = today.getYear();
+            int month = today.getMonthValue();
+            var cond = MonthlyCond.builder()
+                    .teamMember(admin1)
+                    .year(year)
+                    .month(month)
+                    .build();
+
+
+            // when
+            List<QueryMonthlySchedule> result = scheduleRepository.findMonthlyOrders(cond);
+
+            // then
+            assertThat(result.size()).isEqualTo(20);
+        }
+
+        @Test
+        @DisplayName("주문자일 경우 팀의 해당 월의 자신이 주문한 주문들을 모두 가져와야 한다.")
+        void testFindMonthlyOrdersOrderer() {
+            // given
+            int year = today.getYear();
+            int month = today.getMonthValue();
+            var cond = MonthlyCond.builder()
+                    .teamMember(orderer1)
+                    .year(year)
+                    .month(month)
+                    .build();
+
+            // when
+            List<QueryMonthlySchedule> result = scheduleRepository.findMonthlyOrders(cond);
+
+            // then
+            assertThat(result.size()).isEqualTo(10);
+        }
+    }
+
+    @Nested
+    @DisplayName("findMonthlyInforms 는")
+    class FindMonthlyInformsTests {
+
+        @Test
+        @DisplayName("사용자와 연관된 월의 공지 및 일정을 모두 가져와야 한다.")
+        void testFindMonthlyOrdersAdmin() {
+            // given
+            int year = today.getYear();
+            int month = today.getMonthValue();
+            var cond = MonthlyCond.builder()
+                    .teamMember(viewer1)
+                    .year(year)
+                    .month(month)
+                    .build();
+
+            // when
+            List<QueryMonthlySchedule> result = scheduleRepository.findMonthlyInforms(cond);
+
+            // then
+           assertThat(result.size()).isEqualTo(10);
         }
     }
 
