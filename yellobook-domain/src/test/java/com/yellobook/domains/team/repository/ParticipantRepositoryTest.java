@@ -35,8 +35,7 @@ public class ParticipantRepositoryTest {
     @PersistenceContext
     private EntityManager em;
 
-
-    @InjectMocks
+    @Autowired
     private ParticipantCustomRepositoryImpl participantCustomRepository;
 
     @BeforeEach
