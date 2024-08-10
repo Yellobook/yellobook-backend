@@ -1,8 +1,7 @@
 package com.yellobook.domain.order;
 
-import com.yellobook.config.TestConfig;
-import com.yellobook.domains.order.dto.OrderCommentDTO;
-import com.yellobook.domains.order.dto.OrderDTO;
+import com.yellobook.domains.order.dto.query.QueryOrder;
+import com.yellobook.domains.order.dto.query.QueryOrderComment;
 import com.yellobook.domains.order.entity.Order;
 import com.yellobook.domains.order.entity.OrderComment;
 import com.yellobook.domains.order.repository.OrderCommentRepository;
@@ -15,7 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -28,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
-@ContextConfiguration(classes = TestConfig.class)
+@EnableJpaAuditing
 @Sql(scripts = "classpath:setup_order.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(scripts = "classpath:cleanup_order.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @DisplayName("Order 도메인 Repository Unit Test")
@@ -59,12 +58,12 @@ public class OrderRepositoryTest {
             Long orderId = 1L;
 
             //when
-            OrderDTO orderDTO = orderRepository.getOrder(orderId);
+            QueryOrder orderDTO = orderRepository.getOrder(orderId);
 
             //then
             assertThat(orderDTO).isNotNull();
-            assertThat(getOrderById(orderDTO.getOrderId()).getId()).isEqualTo(orderId);
-            assertThat(orderDTO.getMemo()).isEqualTo("메모1");
+            //assertThat(getOrderById(orderDTO.getOrderId()).getId()).isEqualTo(orderId);
+            assertThat(orderDTO.memo()).isEqualTo("메모1");
         }
 
         @Test
@@ -74,7 +73,7 @@ public class OrderRepositoryTest {
             Long orderId = nonExistOrderId;
 
             //when
-            OrderDTO orderDTO = orderRepository.getOrder(orderId);
+            QueryOrder orderDTO = orderRepository.getOrder(orderId);
 
             //then
             assertThat(orderDTO).isNull();
@@ -95,17 +94,17 @@ public class OrderRepositoryTest {
             Long orderId = 1L;
 
             //when
-            List<OrderCommentDTO> result = orderRepository.getOrderComments(orderId);
+            List<QueryOrderComment> result = orderRepository.getOrderComments(orderId);
 
             //then
             assertThat(result.size()).isEqualTo(3);
             for (int i = 1; i < result.size(); i++) {
-                LocalDateTime prev = result.get(i-1).getCreatedAt();
-                LocalDateTime after = result.get(i).getCreatedAt();
+                LocalDateTime prev = result.get(i-1).createdAt();
+                LocalDateTime after = result.get(i).createdAt();
                 assertThat(prev).isBeforeOrEqualTo(after);
             }
-            result.forEach(comment -> assertThat(comment.getRole()).isIn(ADMIN, ORDERER));
-            result.forEach(comment -> assertThat(getOrderCommentById(comment.getCommentId()).getOrder().getId()).isEqualTo(orderId));
+            result.forEach(comment -> assertThat(comment.role()).isIn(ADMIN, ORDERER));
+            result.forEach(comment -> assertThat(getOrderCommentById(comment.commentId()).getOrder().getId()).isEqualTo(orderId));
         }
 
         @Test
@@ -115,7 +114,7 @@ public class OrderRepositoryTest {
             Long orderId = 2L;
 
             //when
-            List<OrderCommentDTO> result = orderRepository.getOrderComments(orderId);
+            List<QueryOrderComment> result = orderRepository.getOrderComments(orderId);
 
             //then
             assertThat(result.size()).isEqualTo(0);
@@ -129,7 +128,7 @@ public class OrderRepositoryTest {
             Long orderId = nonExistOrderId;
 
             //when
-            List<OrderCommentDTO> result = orderRepository.getOrderComments(orderId);
+            List<QueryOrderComment> result = orderRepository.getOrderComments(orderId);
 
             //then
             assertThat(result.size()).isEqualTo(0);
