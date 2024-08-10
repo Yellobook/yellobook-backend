@@ -136,7 +136,7 @@ tasks.register('jacocoRootReport', JacocoReport) {
      * 태스크 간 의존성을 설정해야 실행 순서를 보장할 수 있다.
      *
      * Possible solutions:
-     * 1. Declare task ':yellobook-domain:jacocoTestReport' as an input of ':jacocoRootReport'.
+     * 1. Declare task ':yellobook-domains:jacocoTestReport' as an input of ':jacocoRootReport'.
      * 2. Declare an explicit dependency on ':yellobook-domain:jacocoTestReport' from ':jacocoRootReport' using Task#dependsOn.
      * 3. Declare an explicit dependency on ':yellobook-domain:jacocoTestReport' from ':jacocoRootReport' using Task#mustRunAfter.
      *

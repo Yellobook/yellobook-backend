@@ -3,7 +3,6 @@
 [![codecov](https://codecov.io/gh/Yellobook/yellobook-backend/branch/develop/graph/badge.svg?token=ZDMLLQDDTN)](https://codecov.io/gh/Yellobook/yellobook-backend)
 [![CI Status](https://github.com/Yellobook/yellobook-backend/actions/workflows/coverage.yml/badge.svg)](https://github.com/Yellobook/yellobook-backend/actions)
 [![CD Status](https://github.com/Yellobook/yellobook-backend/actions/workflows/deploy.yml/badge.svg)](https://github.com/Yellobook/yellobook-backend/actions)
-[![Netlify Status](https://api.netlify.com/api/v1/badges/3368d77a-ba68-422f-937f-592fdd87a39e/deploy-status)](https://app.netlify.com/sites/yellobook/deploys)
 
 ## 1. 기술 스택
 
