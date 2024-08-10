@@ -8,9 +8,7 @@ import lombok.*;
 @Entity
 @Getter
 @Table(name = "inventories")
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class Inventory extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,4 +32,11 @@ public class Inventory extends BaseEntity {
      */
     @Column(nullable = false)
     private Integer view;
+
+    @Builder
+    private Inventory(Team team, String title){
+        this.team = team;
+        this.title = title;
+        this.view = 0;
+    }
 }

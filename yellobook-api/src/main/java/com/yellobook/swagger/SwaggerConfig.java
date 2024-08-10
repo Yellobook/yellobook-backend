@@ -1,6 +1,6 @@
 package com.yellobook.swagger;
 
-import com.yellobook.domain.auth.security.oauth2.enums.SocialType;
+import com.yellobook.domains.auth.security.oauth2.enums.SocialType;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;

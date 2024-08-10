@@ -1,7 +1,7 @@
 package com.yellobook.common.validation.validator;
 
 import com.yellobook.common.validation.annotation.ExistTeam;
-import com.yellobook.domain.team.service.TeamQueryService;
+import com.yellobook.domains.team.service.TeamQueryService;
 import com.yellobook.error.code.TeamErrorCode;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

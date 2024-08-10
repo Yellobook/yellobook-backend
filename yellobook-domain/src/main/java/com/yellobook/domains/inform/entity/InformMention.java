@@ -26,6 +26,7 @@ public class InformMention extends BaseEntity {
     @JoinColumn(name = "inform_id", nullable = false)
     private Inform inform;
 
+    @Builder
     public InformMention(Inform inform, Member member) {
         this.inform = inform;
         this.member = member;
