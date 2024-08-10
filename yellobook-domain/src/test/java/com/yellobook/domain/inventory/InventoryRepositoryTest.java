@@ -1,7 +1,7 @@
 package com.yellobook.domain.inventory;
 
-import com.yellobook.config.TestConfig;
-import com.yellobook.domains.inventory.dto.ProductDTO;
+import com.yellobook.domains.inventory.dto.query.QueryInventory;
+import com.yellobook.domains.inventory.dto.query.QueryProduct;
 import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
@@ -15,20 +15,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith(SpringExtension.class)
 @DataJpaTest
-@ContextConfiguration(classes = TestConfig.class)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ExtendWith(SpringExtension.class)
+@EnableJpaAuditing
 @DisplayName("Inventory 도메인 Repository Unit Test")
 public class InventoryRepositoryTest {
     private final InventoryRepository inventoryRepository;
@@ -68,18 +70,17 @@ public class InventoryRepositoryTest {
                 Inventory inventory = Inventory.builder()
                         .team(team)
                         .title(String.format("2024년 08월 0%d일 재고현황", i))
-                        .view(i*10)
                         .build();
                 entityManager.persist(inventory);
             }
 
             //when
-            List<InventoryDTO> result = inventoryRepository.getTotalInventory(teamId, pageable);
+            List<QueryInventory> result = inventoryRepository.getTotalInventory(teamId, pageable);
 
             //then
             assertThat(result.size()).isEqualTo(5);
             for(int i=1; i<result.size(); i++){
-                assertThat(result.get(i-1).getCreatedAt()).isAfterOrEqualTo(result.get(i).getCreatedAt());
+                assertThat(result.get(i-1).createdAt()).isAfterOrEqualTo(result.get(i).createdAt());
             }
         }
 
@@ -91,7 +92,7 @@ public class InventoryRepositoryTest {
             Pageable pageable = PageRequest.of(0, 5);
 
             //when
-            List<InventoryDTO> result = inventoryRepository.getTotalInventory(teamId, pageable);
+            List<QueryInventory> result = inventoryRepository.getTotalInventory(teamId, pageable);
 
             //then
             assertThat(result.size()).isEqualTo(0);
@@ -108,13 +109,12 @@ public class InventoryRepositoryTest {
                 Inventory inventory = Inventory.builder()
                         .team(team)
                         .title(String.format("2024년 08월 0%d일 재고현황", i))
-                        .view(i*10)
                         .build();
                 entityManager.persist(inventory);
             }
 
             //when
-            List<InventoryDTO> result = inventoryRepository.getTotalInventory(teamId, pageable);
+            List<QueryInventory> result = inventoryRepository.getTotalInventory(teamId, pageable);
 
             //then
             assertThat(result.size()).isEqualTo(1);
@@ -132,7 +132,6 @@ public class InventoryRepositoryTest {
             inventory = Inventory.builder()
                     .team(team)
                     .title("2024년 08월 06일 재고현황")
-                    .view(10)
                     .build();
             entityManager.persist(inventory);
 
@@ -144,8 +143,8 @@ public class InventoryRepositoryTest {
                         .purchasePrice(i*1000)
                         .salePrice(i*2000)
                         .amount(i+100)
+                        .inventory(inventory)
                         .build();
-                product.modifyInventory(inventory);
                 entityManager.persist(product);
             }
         }
@@ -160,12 +159,12 @@ public class InventoryRepositoryTest {
                 Long inventoryId = inventory.getId();
 
                 //when
-                List<ProductDTO> result = productRepository.getProducts(inventoryId);
+                List<QueryProduct> result = productRepository.getProducts(inventoryId);
 
                 //then
                 assertThat(result.size()).isEqualTo(5);
                 for(int i=1; i<result.size(); i++){
-                    assertThat(result.get(i-1).getName()).isLessThanOrEqualTo(result.get(i).getName());
+                    assertThat(result.get(i-1).name()).isLessThanOrEqualTo(result.get(i).name());
                 }
             }
 
@@ -181,7 +180,7 @@ public class InventoryRepositoryTest {
                 Long inventoryId = inventory.getId();
 
                 //when
-                List<ProductDTO> result = productRepository.getProducts(inventoryId, keyword);
+                List<QueryProduct> result = productRepository.getProducts(inventoryId, keyword);
 
                 //then
                 assertThat(result.size()).isEqualTo(total);
