@@ -1,12 +1,9 @@
-package com.yellobook.domain.order;
+package com.yellobook.domains.order.repository;
 
 import com.yellobook.domains.order.dto.query.QueryOrder;
 import com.yellobook.domains.order.dto.query.QueryOrderComment;
 import com.yellobook.domains.order.entity.Order;
 import com.yellobook.domains.order.entity.OrderComment;
-import com.yellobook.domains.order.repository.OrderCommentRepository;
-import com.yellobook.domains.order.repository.OrderMentionRepository;
-import com.yellobook.domains.order.repository.OrderRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

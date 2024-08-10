@@ -1,4 +1,4 @@
-package com.yellobook.domain.inventory;
+package com.yellobook.domains.inventory.repository;
 
 import com.yellobook.domains.inventory.dto.query.QueryInventory;
 import com.yellobook.domains.inventory.dto.query.QueryProduct;
