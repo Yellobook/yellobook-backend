@@ -28,11 +28,12 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
         return queryFactory.select(Projections.constructor(QueryOrderComment.class,
                     orderComment.id.as("commentId"),
                     participant.role,
-                    orderComment.content
+                    orderComment.content,
+                    orderComment.createdAt
                 ))
                 .from(orderComment)
                 .join(participant).on(orderComment.member.id.eq(participant.member.id))
-                .where(orderComment.id.eq(orderId))
+                .where(orderComment.order.id.eq(orderId))
                 .orderBy(orderComment.createdAt.asc())
                 .fetch();
     }
