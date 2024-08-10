@@ -1,13 +1,13 @@
 package com.yellobook.domains.order.repository;
 
-import com.yellobook.domains.order.dto.OrderCommentDTO;
-import com.yellobook.domains.order.dto.OrderDTO;
+import com.yellobook.domains.order.dto.query.QueryOrder;
+import com.yellobook.domains.order.dto.query.QueryOrderComment;
 
 import java.util.List;
 
 public interface OrderRepositoryCustom {
 
-    List<OrderCommentDTO> getOrderComments(Long orderId);
+    List<QueryOrderComment> getOrderComments(Long orderId);
 
-    OrderDTO getOrder(Long orderId);
+    QueryOrder getOrder(Long orderId);
 }

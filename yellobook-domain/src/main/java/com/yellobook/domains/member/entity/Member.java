@@ -18,8 +18,8 @@ import java.time.LocalDateTime;
                 @UniqueConstraint(name = "uc_members_email", columnNames = "email")
         }
 )
-@Builder
-@AllArgsConstructor
+//@Builder
+//@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
     @Id
@@ -45,12 +45,13 @@ public class Member extends BaseEntity {
     private LocalDateTime deletedAt;
 
     @Builder
-    public Member(Long memberId, String nickname, String email, String profileImage, MemberRole role) {
+    public Member(Long memberId, String nickname, String email, String profileImage, MemberRole role, Boolean allowance) {
         this.id = memberId;
         this.nickname = nickname;
         this.email = email;
         this.profileImage = profileImage;
         this.role = role;
+        this.allowance = allowance;
     }
 
     @PreRemove

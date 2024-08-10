@@ -1,14 +1,13 @@
 package com.yellobook.config;
 
-import com.yellobook.domain.auth.security.filter.JwtAuthFilter;
-import com.yellobook.domain.auth.security.handler.CustomAccessDeniedHandler;
-import com.yellobook.domain.auth.security.handler.CustomAuthenticationEntryPoint;
-import com.yellobook.domain.auth.security.oauth2.handler.CustomSuccessHandler;
-import com.yellobook.domain.auth.security.oauth2.service.CustomOAuth2UserService;
-import com.yellobook.domain.auth.service.JwtService;
-import com.yellobook.domain.auth.service.RedisAuthService;
+import com.yellobook.domains.auth.security.filter.JwtAuthFilter;
+import com.yellobook.domains.auth.security.handler.CustomAccessDeniedHandler;
+import com.yellobook.domains.auth.security.handler.CustomAuthenticationEntryPoint;
+import com.yellobook.domains.auth.security.oauth2.handler.CustomSuccessHandler;
+import com.yellobook.domains.auth.security.oauth2.service.CustomOAuth2UserService;
+import com.yellobook.domains.auth.service.JwtService;
+import com.yellobook.domains.auth.service.RedisAuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

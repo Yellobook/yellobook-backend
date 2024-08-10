@@ -67,21 +67,18 @@ public class Product extends BaseEntity {
     private Integer amount;
 
     @Builder
-    public Product(String name, String subProduct, Integer sku, Integer purchasePrice, Integer salePrice, Integer amount){
+    public Product(String name, String subProduct, Integer sku, Integer purchasePrice, Integer salePrice, Integer amount, Inventory inventory){
         this.name = name;
         this.subProduct = subProduct;
         this.sku = sku;
         this.purchasePrice = purchasePrice;
         this.salePrice = salePrice;
         this.amount = amount;
+        this.inventory = inventory;
     }
 
     public void modifyAmount(Integer amount){
         this.amount = amount;
-    }
-
-    public void modifyInventory(Inventory inventory){
-        this.inventory = inventory;
     }
 
     public void reduceAmount(Integer orderAmount){
