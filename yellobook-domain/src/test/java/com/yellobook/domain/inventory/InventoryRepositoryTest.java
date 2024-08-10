@@ -1,7 +1,6 @@
 package com.yellobook.domain.inventory;
 
 import com.yellobook.config.TestConfig;
-import com.yellobook.domains.inventory.dto.InventoryDTO;
 import com.yellobook.domains.inventory.dto.ProductDTO;
 import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.entity.Product;

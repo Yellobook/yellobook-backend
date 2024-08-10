@@ -2,7 +2,7 @@ package com.yellobook.domains.inventory.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.yellobook.domains.inventory.dto.InventoryDTO;
+import com.yellobook.domains.inventory.dto.query.QueryInventory;
 import com.yellobook.domains.inventory.entity.QInventory;
 import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Pageable;
@@ -20,10 +20,10 @@ public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom{
 
 
     @Override
-    public List<InventoryDTO> getTotalInventory(Long teamId, Pageable page) {
+    public List<QueryInventory> getTotalInventory(Long teamId, Pageable page) {
         QInventory inventory = QInventory.inventory;
 
-        return queryFactory.select(Projections.constructor(InventoryDTO.class,
+        return queryFactory.select(Projections.constructor(QueryInventory.class,
                         inventory.id.as("inventoryId"),
                         inventory.title,
                         inventory.createdAt,

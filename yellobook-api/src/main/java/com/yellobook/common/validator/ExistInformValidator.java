@@ -1,7 +1,7 @@
 package com.yellobook.common.validator;
 
 import com.yellobook.common.annotation.ExistInform;
-import com.yellobook.domain.inform.service.InformQueryService;
+import com.yellobook.domains.inform.service.InformQueryService;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;

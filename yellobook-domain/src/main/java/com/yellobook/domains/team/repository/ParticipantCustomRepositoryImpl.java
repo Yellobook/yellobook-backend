@@ -3,7 +3,7 @@ package com.yellobook.domains.team.repository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yellobook.domains.member.entity.QMember;
-import com.yellobook.domains.team.dto.MemberJoinTeamDTO;
+import com.yellobook.domains.team.dto.query.QueryMemberJoinTeam;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.QParticipant;
 import jakarta.persistence.EntityManager;
@@ -21,9 +21,9 @@ public class ParticipantCustomRepositoryImpl implements ParticipantCustomReposit
 
 
     @Override
-    public List<MemberJoinTeamDTO> getMemberJoinTeam(Long memberId) {
+    public List<QueryMemberJoinTeam> getMemberJoinTeam(Long memberId) {
         QParticipant participant = QParticipant.participant;
-        return queryFactory.select(Projections.constructor(MemberJoinTeamDTO.class,
+        return queryFactory.select(Projections.constructor(QueryMemberJoinTeam.class,
                 participant.role,
                 participant.team.name.as("teamName")
                         ))
