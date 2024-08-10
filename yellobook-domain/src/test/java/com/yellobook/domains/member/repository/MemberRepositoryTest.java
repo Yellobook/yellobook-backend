@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -22,11 +23,13 @@ import java.util.Optional;
 @DisplayName("Member 도메인 Repository Unit Test")
 public class MemberRepositoryTest {
     private final MemberRepository memberRepository;
+    private final TestEntityManager entityManager;
     private Member member;
 
     @Autowired
-    public MemberRepositoryTest(MemberRepository memberRepository){
+    public MemberRepositoryTest(MemberRepository memberRepository, TestEntityManager entityManager){
         this.memberRepository = memberRepository;
+        this.entityManager = entityManager;
     }
 
     @BeforeEach
@@ -45,7 +48,7 @@ public class MemberRepositoryTest {
     void getExistMember(){
         //given
         String email = member.getEmail();
-        memberRepository.save(member);
+        entityManager.persist(member);
 
         //when
         Optional<Member> optionalMember = memberRepository.findByEmail(email);
