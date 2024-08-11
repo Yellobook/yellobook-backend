@@ -84,6 +84,8 @@ public class TeamQueryService{
 
         Team team = teamRepository.getReferenceById(teamId);
 
+        redisService.setMemberCurrentTeam(memberId,teamId,participant.getRole().name());
+
         return teamMapper.toGetTeamResponse(team);
     }
 
