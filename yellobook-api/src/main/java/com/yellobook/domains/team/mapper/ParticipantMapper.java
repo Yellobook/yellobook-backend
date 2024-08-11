@@ -16,7 +16,6 @@ public interface ParticipantMapper {
     Participant toParticipant(MemberTeamRole role, Team team, Member member);
 
     @Mapping(source ="participant.id", target = "id")
-    @Mapping(source ="participant.member.nickname", target = "nickname")
     MentionDTO toMentionDTO(Participant participant);
 
     List<MentionDTO> toMentionDTOlist(List<Participant> participants);
