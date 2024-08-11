@@ -71,7 +71,7 @@ public class TeamQueryService{
         }
     }
 
-    public TeamGetResponse findByTeamId(Long teamId, CustomOAuth2User customOAuth2User){
+    public GetTeamResponse findByTeamId(Long teamId, CustomOAuth2User customOAuth2User){
         //팀 id를 가지고 팀에 대한 정보 가져오기
 
         Long memberId = customOAuth2User.getMemberId();
@@ -84,7 +84,7 @@ public class TeamQueryService{
 
         Team team = teamRepository.getReferenceById(teamId);
 
-        return teamMapper.toTeamGetResponse(team);
+        return teamMapper.toGetTeamResponse(team);
     }
 
     public boolean existsByTeamId(Long teamId) {

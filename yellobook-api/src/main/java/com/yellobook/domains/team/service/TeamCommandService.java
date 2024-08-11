@@ -34,7 +34,7 @@ public class TeamCommandService {
     private final ParticipantMapper participantMapper;
     private final RedisTeamService redisService;
 
-    public TeamCreateResponse createTeam(TeamCreateRequest request, CustomOAuth2User customOAuth2User){
+    public CreateTeamResponse createTeam(CreateTeamRequest request, CustomOAuth2User customOAuth2User){
 
         Member member = memberRepository.findById(customOAuth2User.getMemberId())
                 .orElseThrow(() -> {
@@ -53,11 +53,11 @@ public class TeamCommandService {
             participantRepository.save(founder);
             log.info("Participant added: Member ID = {}, Team ID = {}", member.getId(), newTeam.getId());
 
-            return teamMapper.toTeamCreateResponse(newTeam);
+            return teamMapper.toCreateTeamResponse(newTeam);
         }
     }
 
-    public TeamLeaveResponse leaveTeam(Long teamId, CustomOAuth2User customOAuth2User) {
+    public LeaveTeamResponse leaveTeam(Long teamId, CustomOAuth2User customOAuth2User) {
         Long memberId = customOAuth2User.getMemberId();
 
         Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)
@@ -69,10 +69,10 @@ public class TeamCommandService {
         participantRepository.delete(participant);
         log.info("Participant (Member ID = {}, Team ID = {}) is deleted", memberId, teamId);
 
-        return teamMapper.toTeamLeaveResponse(teamId);
+        return teamMapper.toLeaveTeamResponse(teamId);
     }
 
-    public TeamJoinResponse joinTeam(CustomOAuth2User customOAuth2User, String code) {
+    public JoinTeamResponse joinTeam(CustomOAuth2User customOAuth2User, String code) {
 
         InvitationResponse invitationData = redisService.getInvitationInfo(code);
         Long teamId = invitationData.getTeamId();
@@ -104,7 +104,7 @@ public class TeamCommandService {
         participantRepository.save(participantMapper.toParticipant(role, team, member));
         log.info("Participant added: Team ID = {}, Role = {}, Member ID = {}", teamId, role, memberId);
 
-        return teamMapper.toTeamJoinResponse(team);
+        return teamMapper.toJoinTeamResponse(team);
     }
 
 }

@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 @Builder
-public record TeamGetResponse(
+public record GetTeamResponse(
         @Schema(description = "가져오는 팀의 고유 id",example = "123")
         Long teamId,
         @Schema(description = "가져오는 팀의 이름", example ="나이키")

@@ -29,11 +29,11 @@ public class TeamController {
 
     @PostMapping("")
     @Operation(summary = "팀 만들기 API", description ="새로운 팀을 생성하는 API입니다.")
-    public ResponseEntity<SuccessResponse<TeamCreateResponse>> createTeam(
-            @RequestBody TeamCreateRequest request,
+    public ResponseEntity<SuccessResponse<CreateTeamResponse>> createTeam(
+            @RequestBody CreateTeamRequest request,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
-        TeamCreateResponse response = teamCommandService.createTeam(request, customOAuth2User);
+        CreateTeamResponse response = teamCommandService.createTeam(request, customOAuth2User);
         return ResponseFactory.created(response);
     }
 
@@ -50,32 +50,32 @@ public class TeamController {
 
     @DeleteMapping("/{teamId}/leave")
     @Operation(summary = "팀 나가기 API", description = "팀원이 본인이 속한 팀에서 나가기 위한 API입니다.")
-    public ResponseEntity<SuccessResponse<TeamLeaveResponse>> leaveTeam(
+    public ResponseEntity<SuccessResponse<LeaveTeamResponse>> leaveTeam(
             @ExistTeam @PathVariable("teamId") Long teamId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
-        TeamLeaveResponse response = teamCommandService.leaveTeam(teamId, customOAuth2User);
+        LeaveTeamResponse response = teamCommandService.leaveTeam(teamId, customOAuth2User);
         return ResponseFactory.success(response);
     }
 
     @GetMapping("/invitation")
     @Operation(summary = "팀 참가하기 API", description = "멤버가 팀에 참가하는 API입니다.")
-    public ResponseEntity<SuccessResponse<TeamJoinResponse>> joinTeam(
+    public ResponseEntity<SuccessResponse<JoinTeamResponse>> joinTeam(
             @RequestParam("code") String code,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
             HttpServletResponse res
     ){
-        TeamJoinResponse response = teamCommandService.joinTeam(customOAuth2User, code);
+        JoinTeamResponse response = teamCommandService.joinTeam(customOAuth2User, code);
         return ResponseFactory.success(response);
     }
 
     @GetMapping("/{teamId}")
     @Operation(summary = "다른 팀 불러오기 API", description = "멤버가 다른 팀의 정보를 가지고 오는 API입니다.")
-    public ResponseEntity<SuccessResponse<TeamGetResponse>> getTeam(
+    public ResponseEntity<SuccessResponse<GetTeamResponse>> getTeam(
             @ExistTeam @PathVariable("teamId") Long teamId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
-        TeamGetResponse response = teamQueryService.findByTeamId(teamId, customOAuth2User);
+        GetTeamResponse response = teamQueryService.findByTeamId(teamId, customOAuth2User);
         return ResponseFactory.success(response);
     }
 
