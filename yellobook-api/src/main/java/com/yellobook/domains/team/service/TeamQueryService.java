@@ -43,7 +43,7 @@ public class TeamQueryService{
 
         Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)
                 .orElseThrow(() -> {
-                    log.error("Cannot make invitation: Member ID = {}, Team ID = {}", memberId, teamId);
+                    log.warn("Cannot make invitation: Member ID = {}, Team ID = {}", memberId, teamId);
                     return new CustomException(TeamErrorCode.USER_NOT_IN_THAT_TEAM);
                 });
 
@@ -57,14 +57,14 @@ public class TeamQueryService{
         MemberTeamRole currentRole = participant.getRole();
 
         if (currentRole == MemberTeamRole.VIEWER) {
-            log.error("VIEWER cannot invite: Participant ID = {}, Team ID = {}", participant.getId(), teamId);
+            log.warn("VIEWER cannot invite: Participant ID = {}, Team ID = {}", participant.getId(), teamId);
             throw new CustomException(TeamErrorCode.VIEWER_CANNOT_INVITE);
         }
 
         if (requestedRole == MemberTeamRole.ADMIN) {
             if (currentRole != MemberTeamRole.ADMIN) {
                 participantRepository.findByTeamIdAndRole(teamId, MemberTeamRole.ADMIN).ifPresent(admin -> {
-                    log.error("ADMIN already exists: Team ID = {}", teamId);
+                    log.warn("ADMIN already exists: Team ID = {}", teamId);
                     throw new CustomException(TeamErrorCode.ADMIN_EXISTS);
                 });
             }
@@ -78,7 +78,7 @@ public class TeamQueryService{
 
         Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)
                 .orElseThrow(() ->{
-                    log.error("Cannot get team: Member ID = {}, Team ID = {}", memberId, teamId);
+                    log.warn("Cannot get team: Member ID = {}, Team ID = {}", memberId, teamId);
                     return new CustomException(TeamErrorCode.USER_NOT_IN_THAT_TEAM);
                 });
 
