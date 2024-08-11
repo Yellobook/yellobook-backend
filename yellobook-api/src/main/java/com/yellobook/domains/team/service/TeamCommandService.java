@@ -117,6 +117,8 @@ public class TeamCommandService {
         participantRepository.save(participantMapper.toParticipant(role, team, member));
         log.info("Participant added: Team ID = {}, Role = {}, Member ID = {}", teamId, role, memberId);
 
+        redisService.setMemberCurrentTeam(memberId, teamId, role.name());
+
         return teamMapper.toJoinTeamResponse(team);
     }
 
