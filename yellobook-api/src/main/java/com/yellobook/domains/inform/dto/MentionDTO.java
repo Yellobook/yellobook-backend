@@ -7,5 +7,4 @@ import lombok.Getter;
 @AllArgsConstructor
 public class MentionDTO {
     private Long id;
-    private String nickname;
 }
