@@ -42,7 +42,7 @@ public class TeamCommandService {
                     return new CustomException(TeamErrorCode.MEMBER_NOT_FOUND);
                 });
         if(teamRepository.findByName(request.getName()).isPresent()){
-            log.error("Team {} already exists.", request.getName());
+            log.warn("Team {} already exists.", request.getName());
             throw new CustomException(TeamErrorCode.EXIST_TEAM_NAME);
         }
         else{
@@ -62,7 +62,7 @@ public class TeamCommandService {
 
         Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)
                 .orElseThrow(() -> {
-                    log.error("Participant not found for Member ID = {} and Team ID = {}", memberId, teamId);
+                    log.warn("Participant not found for Member ID = {} and Team ID = {}", memberId, teamId);
                     return new CustomException(TeamErrorCode.USER_NOT_IN_THAT_TEAM);
                 });
 
@@ -81,7 +81,7 @@ public class TeamCommandService {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> {
-                    log.error("Member not found: {}", memberId);
+                    log.warn("Member not found: {}", memberId);
                     return new CustomException(TeamErrorCode.MEMBER_NOT_FOUND);
                 });
 
@@ -90,14 +90,14 @@ public class TeamCommandService {
                 .orElseThrow(() -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
 
         if (participantRepository.findByTeamIdAndMemberId(teamId, memberId).isPresent()){
-            log.error("Member {} already on the team {}", memberId, teamId);
+            log.warn("Member {} already on the team {}", memberId, teamId);
             throw new CustomException(TeamErrorCode.MEMBER_ALREADY_EXIST);
         }
         // ADMIN이 있는가?
         if (role == MemberTeamRole.ADMIN) {
             participantRepository.findByTeamIdAndRole(teamId, MemberTeamRole.ADMIN).ifPresent(
                     admin -> {
-                        log.error("Admin already exists in team {}", teamId);
+                        log.warn("Admin already exists in team {}", teamId);
                         throw new CustomException(TeamErrorCode.ADMIN_EXISTS);
                     });
         }
