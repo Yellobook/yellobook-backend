@@ -53,6 +53,8 @@ public class TeamCommandService {
             participantRepository.save(founder);
             log.info("Participant added: Member ID = {}, Team ID = {}", member.getId(), newTeam.getId());
 
+            redisService.setMemberCurrentTeam(member.getId(), newTeam.getId(), request.role().name());
+
             return teamMapper.toCreateTeamResponse(newTeam);
         }
     }
