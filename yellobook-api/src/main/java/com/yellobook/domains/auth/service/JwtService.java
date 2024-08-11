@@ -146,6 +146,16 @@ public class JwtService {
     }
 
     /**
+     * 약관 동의 토큰의 만료 시간을 밀리초 단위로 반환한다.
+     * @param token JWT 엑세스 토큰
+     * @return 토큰의 남은 유효 기간 (밀리초 단위)
+     */
+    public long getAccessTokenExpirationTimeInMillis(String token) {
+        return extractAll(token, accessTokenSecretKey)
+                .getExpiration().getTime() - System.currentTimeMillis();
+    }
+
+    /**
      * 유효한 약관 동의 토큰에서 사용자 정보를 추출한다.
      * 토큰 만료 여부 검사 필요.
      * @param token JWT 약관 동의 토큰
@@ -158,16 +168,6 @@ public class JwtService {
                     log.error("[AUTH_ERROR] 유효한 약관 동의 토큰에서 추출된 사용자 ID: {}에 해당하는 사용자가 존재하지 않음", memberId);
                     return new CustomException(AuthErrorCode.USER_NOT_EXIST);
                 });
-    }
-
-    /**
-     * 약관 동의 토큰의 만료 시간을 밀리초 단위로 반환한다.
-     * @param token JWT 약관 동의 토큰
-     * @return 토큰의 남은 유효 기간 (밀리초 단위)
-     */
-    public long getAllowanceTokenExpirationTimeInMillis(String token) {
-        return extractAll(token, allowanceTokenSecretKey)
-                .getExpiration().getTime() - System.currentTimeMillis();
     }
 
     /**
