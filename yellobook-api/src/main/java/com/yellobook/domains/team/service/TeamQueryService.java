@@ -1,5 +1,6 @@
 package com.yellobook.domains.team.service;
 
+import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.inform.dto.MentionDTO;
 import com.yellobook.domains.team.mapper.ParticipantMapper;
 import com.yellobook.domains.team.entity.Participant;
@@ -93,8 +94,9 @@ public class TeamQueryService{
         return teamRepository.existsById(teamId);
     }
 
-    public List<MentionDTO> searchParticipants(Long teamId, String name){
+    public List<MentionDTO> searchParticipants(TeamMemberVO teamMember, String name){
         List<Participant> mentions;
+        Long teamId = teamMember.getTeamId();
 
         if(name.equalsIgnoreCase("@everyone")){
             mentions = participantRepository.findAllByTeamId(teamId);

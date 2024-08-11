@@ -1,6 +1,8 @@
 package com.yellobook.domains.team.controller;
 
+import com.yellobook.common.annotation.TeamMember;
 import com.yellobook.common.validation.annotation.ExistTeam;
+import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.inform.dto.MentionDTO;
 import com.yellobook.domains.team.dto.response.*;
@@ -79,13 +81,13 @@ public class TeamController {
         return ResponseFactory.success(response);
     }
 
-    @GetMapping("/{teamId}/search")
+    @GetMapping("/members/search")
     @Operation(summary = "팀 내의 멤버 검색하기 API", description = "팀 내의 멤버들을 검색하는 API입니다.")
     public ResponseEntity<SuccessResponse<List<MentionDTO>>> searchMembers(
-            @PathVariable Long teamId,
-            @RequestParam String name
+            @RequestParam("name") String name,
+            @TeamMember TeamMemberVO teamMember
     ){
-        List<MentionDTO> response = teamQueryService.searchParticipants(teamId, name);
+        List<MentionDTO> response = teamQueryService.searchParticipants(teamMember, name);
         return ResponseFactory.success(response);
     }
 }
