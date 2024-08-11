@@ -51,7 +51,7 @@ public class InformCommandServiceImpl implements InformCommandService {
         Long memberId = oAuth2User.getMemberId();
         Long teamId = redisService.getCurrentTeamMember(memberId).getTeamId();
 
-        Participant participant = participantRepository.findByMemberIdAndTeamId(memberId, teamId)
+        Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)
                 .orElseThrow(() ->{
                     log.error("Member {} does not exist in team {}", memberId, teamId);
                     return new CustomException(TeamErrorCode.TEAM_NOT_FOUND);

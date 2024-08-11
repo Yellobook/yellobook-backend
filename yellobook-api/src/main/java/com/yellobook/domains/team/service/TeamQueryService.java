@@ -5,8 +5,8 @@ import com.yellobook.domains.team.mapper.ParticipantMapper;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.auth.service.RedisTeamService;
-import com.yellobook.domains.team.dto.TeamRequest;
-import com.yellobook.domains.team.dto.TeamResponse;
+import com.yellobook.domains.team.dto.request.InvitationCodeRequest;
+import com.yellobook.domains.team.dto.response.*;
 import com.yellobook.domains.team.mapper.TeamMapper;
 import com.yellobook.domains.team.entity.Team;
 import com.yellobook.domains.team.repository.ParticipantRepository;
@@ -33,13 +33,13 @@ public class TeamQueryService{
     private final RedisTeamService redisService;
     private final ParticipantMapper participantMapper;
 
-    public TeamResponse.InvitationCodeResponseDTO makeInvitationCode(
+    public InvitationCodeResponse makeInvitationCode(
             Long teamId,
-            TeamRequest.InvitationCodeRequestDTO request,
+            InvitationCodeRequest request,
             CustomOAuth2User customOAuth2User
     ) {
         Long memberId = customOAuth2User.getMemberId();
-        MemberTeamRole role = request.getRole();
+        MemberTeamRole role = request.role();
 
         Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)
                 .orElseThrow(() -> {
@@ -50,7 +50,7 @@ public class TeamQueryService{
         validateInvitationPermission(participant, role, teamId);
         String invitationUrl = redisService.generateInvitationUrl(teamId, role);
 
-        return teamMapper.toInvitationCodeResponseDTO(invitationUrl);
+        return teamMapper.toInvitationCodeResponse(invitationUrl);
     }
 
     private void validateInvitationPermission(Participant participant, MemberTeamRole requestedRole, Long teamId) {
@@ -71,7 +71,7 @@ public class TeamQueryService{
         }
     }
 
-    public TeamResponse.GetTeamResponseDTO findByTeamId(Long teamId, CustomOAuth2User customOAuth2User){
+    public GetTeamResponse findByTeamId(Long teamId, CustomOAuth2User customOAuth2User){
         //팀 id를 가지고 팀에 대한 정보 가져오기
 
         Long memberId = customOAuth2User.getMemberId();
@@ -84,7 +84,7 @@ public class TeamQueryService{
 
         Team team = teamRepository.getReferenceById(teamId);
 
-        return teamMapper.toGetTeamResponseDTO(team);
+        return teamMapper.toGetTeamResponse(team);
     }
 
     public boolean existsByTeamId(Long teamId) {

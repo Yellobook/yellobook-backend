@@ -12,11 +12,7 @@ import java.util.Optional;
 @Repository
 public interface ParticipantRepository extends JpaRepository<Participant, Long>, ParticipantCustomRepository {
     Optional<Participant> findFirstByMemberIdOrderByCreatedAtAsc(Long memberId);
-    Optional<Participant> findByMemberIdAndTeamId(Long memberId, Long teamId);
-    Optional<Participant> findByTeamId(Long teamId);
     List<Participant> findAllByTeamId(Long teamId);
-
     Optional<Participant> findByTeamIdAndMemberId(Long teamId, Long memberId);
-
     Optional<Participant> findByTeamIdAndRole(Long teamId, MemberTeamRole role);
 }
