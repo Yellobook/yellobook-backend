@@ -1,6 +1,7 @@
 package com.yellobook.domains.auth.controller;
 
 import com.yellobook.domains.auth.dto.request.AllowanceRequest;
+import com.yellobook.domains.auth.dto.response.AllowanceResponse;
 import com.yellobook.domains.auth.dto.response.RefreshResponse;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.auth.service.AuthService;
@@ -48,15 +49,12 @@ public class AuthController {
 
     @Operation(summary = "약관 동의")
     @PostMapping("/terms")
-    public void agreeToTerms(
+    public ResponseEntity<SuccessResponse<AllowanceResponse>> agreeToTerms(
             @Valid @RequestBody AllowanceRequest request,
             HttpServletResponse response
     ) throws IOException {
         var result = authService.updateAllowance(request.getToken());
-        log.info(result.toString());
-        response.addCookie(cookieService.createAccessTokenCookie(result.accessToken()));
-        response.addCookie(cookieService.createRefreshTokenCookie(result.refreshToken()));
-        response.sendRedirect(authRedirectUrl);
+        return ResponseFactory.success(result);
     }
 
     @Operation(summary = "로그아웃")
