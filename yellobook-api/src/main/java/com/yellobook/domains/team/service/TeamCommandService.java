@@ -21,6 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -70,6 +72,15 @@ public class TeamCommandService {
 
         participantRepository.delete(participant);
         log.info("Participant (Member ID = {}, Team ID = {}) is deleted", memberId, teamId);
+
+        participantRepository.findFirstByMemberIdOrderByCreatedAtAsc(memberId)
+                .ifPresent(tempParticipant -> {
+                    redisService.setMemberCurrentTeam(
+                            memberId,
+                            tempParticipant.getTeam().getId(),
+                            tempParticipant.getRole().name()
+                    );
+                });
 
         return teamMapper.toLeaveTeamResponse(teamId);
     }
