@@ -98,7 +98,7 @@ public class InventoryController {
         return ResponseFactory.noContent();
     }
 
-    @Operation(summary = "주문 시 제품 이름으로 제품 조회")
+    @Operation(summary = "제품 이름으로 제품 조회")
     @GetMapping("/products/search")
     public ResponseEntity<SuccessResponse<GetProductsNameResponse>> getProductNames(
             @RequestParam("name") String name,
@@ -108,7 +108,7 @@ public class InventoryController {
         return ResponseFactory.success(response);
     }
 
-    @Operation(summary = "제품 이름 조회 시 하위 제품 조회")
+    @Operation(summary = "제품 이름으로 하위 제품 조회")
     @GetMapping("/subProducts/search")
     public ResponseEntity<SuccessResponse<GetSubProductNameResponse>> getSubProductName(
             @RequestParam("name") String name,
