@@ -1,5 +1,6 @@
 package com.yellobook.domains.inventory.mapper;
 
+import com.yellobook.domains.inventory.dto.query.QueryProductName;
 import com.yellobook.domains.inventory.dto.query.QuerySubProduct;
 import com.yellobook.domains.inventory.dto.request.AddProductRequest;
 import com.yellobook.domains.inventory.dto.response.GetProductsResponse;
@@ -10,7 +11,6 @@ import com.yellobook.domains.order.dto.response.GetProductsNameResponse;
 import com.yellobook.domains.order.dto.response.GetSubProductNameResponse;
 import com.yellobook.domains.order.dto.response.GetSubProductNameResponse.SubProductInfo;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -30,9 +30,9 @@ public interface ProductMapper {
                 .build();
     }
 
-    default GetProductsNameResponse toGetProductsNameResponse(List<QueryProduct> queryProducts){
+    default GetProductsNameResponse toGetProductsNameResponse(List<QueryProductName> queryProducts){
         return GetProductsNameResponse.builder()
-                .names(queryProducts.stream().map(QueryProduct::name).toList())
+                .names(queryProducts.stream().map(QueryProductName::name).toList())
                 .build();
     }
 

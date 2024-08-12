@@ -2,10 +2,10 @@ package com.yellobook.domains.inventory.repository;
 
 import com.yellobook.domains.inventory.dto.query.QueryInventory;
 import com.yellobook.domains.inventory.dto.query.QueryProduct;
+import com.yellobook.domains.inventory.dto.query.QueryProductName;
+import com.yellobook.domains.inventory.dto.query.QuerySubProduct;
 import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.entity.Product;
-import com.yellobook.domains.inventory.repository.InventoryRepository;
-import com.yellobook.domains.inventory.repository.ProductRepository;
 import com.yellobook.domains.team.entity.Team;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,14 +21,17 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Sql(scripts = "classpath:cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @ExtendWith(SpringExtension.class)
 @EnableJpaAuditing
 @DisplayName("Inventory 도메인 Repository Unit Test")
@@ -81,6 +84,44 @@ public class InventoryRepositoryTest {
             assertThat(result.size()).isEqualTo(5);
             for(int i=1; i<result.size(); i++){
                 assertThat(result.get(i-1).createdAt()).isAfterOrEqualTo(result.get(i).createdAt());
+            }
+        }
+
+        @Nested
+        @DisplayName("가장 최근 재고 조회")
+        class GetRecentInventoryTests{
+            @Test
+            @DisplayName("가장 최근 재고 1개를 가지고 오는지 확인한다.")
+            void getOneRecentInventory(){
+                //given
+                Long teamId = team.getId();
+                for(int i =0; i<6; i++){
+                    Inventory inventory = Inventory.builder()
+                            .team(team)
+                            .title(String.format("2024년 08월 0%d일 재고현황", i))
+                            .build();
+                    entityManager.persist(inventory);
+                }
+
+                //when
+                Optional<Inventory> result = inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(teamId);
+
+                //then
+                assertThat(result).isNotEmpty();
+                assertThat(result.get().getId()).isEqualTo(6L);
+            }
+
+            @Test
+            @DisplayName("재고가 없으면 Optional.empty()를 반환한다.")
+            void getEmptyInventory(){
+                //given
+                Long teamId = team.getId();
+
+                //when
+                Optional<Inventory> result = inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(teamId);
+
+                //then
+                assertThat(result).isEmpty();
             }
         }
 
@@ -137,7 +178,7 @@ public class InventoryRepositoryTest {
 
             for(int i =0; i<5; i++){
                 Product product = Product.builder()
-                        .name(String.format("product%d", i))
+                        .name("product 제품")
                         .subProduct(String.format("sub%d", i))
                         .sku(i)
                         .purchasePrice(i*1000)
@@ -172,8 +213,9 @@ public class InventoryRepositoryTest {
             @ParameterizedTest
             @CsvSource(value = {
                     "product, 5",
-                    "1, 1",
-                    "품, 0"
+                    "p, 5",
+                    "제품, 5",
+                    "1, 0"
             })
             void getProductsByKeyword(String keyword, int total){
                 //given
@@ -185,6 +227,49 @@ public class InventoryRepositoryTest {
                 //then
                 assertThat(result.size()).isEqualTo(total);
             }
+
+            @DisplayName("키워드를 포함하는 제품이 중복없이 조회되는지 확인")
+            @ParameterizedTest
+            @CsvSource(value = {
+                    "product, 1",
+                    "p, 1",
+                    "제품, 1",
+                    "1, 0"
+            })
+            void getProductNameDistinct(String keyword, int total){
+                //given
+                Long inventoryId = inventory.getId();
+
+                //when
+                List<QueryProductName> result = productRepository.getProductsName(inventoryId, keyword);
+
+                //then
+                assertThat(result.size()).isEqualTo(total);
+            }
+
+
+            @DisplayName("제품명과 일치하는 제품들을 하위 제품의 이름을 기준으로 내림차순 정렬하는지 테스트")
+            @ParameterizedTest
+            @CsvSource(value = {
+                    "product 제품, 5",
+                    "product, 0",
+                    "1, 0",
+                    "제품, 0"
+            })
+            void getSubProducts(String productName, int total){
+                //given
+                Long inventoryId = 1L;
+
+                //when
+                List<QuerySubProduct> result = productRepository.getSubProducts(inventoryId, productName);
+
+                //then
+                assertThat(result.size()).isEqualTo(total);
+                for(int i=1; i<result.size(); i++){
+                    assertThat(result.get(i-1).subProductName()).isLessThanOrEqualTo(result.get(i).subProductName());
+                }
+            }
+
         }
 
         @Test

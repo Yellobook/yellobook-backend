@@ -3,6 +3,7 @@ package com.yellobook.domains.inventory.repository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yellobook.domains.inventory.dto.query.QueryProduct;
+import com.yellobook.domains.inventory.dto.query.QueryProductName;
 import com.yellobook.domains.inventory.dto.query.QuerySubProduct;
 import com.yellobook.domains.inventory.entity.QProduct;
 import jakarta.persistence.EntityManager;
@@ -51,7 +52,20 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom{
                         product.amount
                 ))
                 .from(product)
-                .where(product.inventory.id.eq(inventoryId), product.name.contains(keyword))
+                .where(product.inventory.id.eq(inventoryId), product.name.contains(keyword.trim()))
+                .orderBy(product.name.asc())
+                .fetch();
+    }
+
+    @Override
+    public List<QueryProductName> getProductsName(Long inventoryId, String productName) {
+        QProduct product = QProduct.product;
+
+        return queryFactory.select(Projections.constructor(QueryProductName.class,
+                        product.name
+                )).distinct()
+                .from(product)
+                .where(product.inventory.id.eq(inventoryId), product.name.contains(productName.trim()))
                 .orderBy(product.name.asc())
                 .fetch();
     }
@@ -64,7 +78,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom{
                         product.id.as("productId"),
                         product.subProduct.as("subProductName")))
                 .from(product)
-                .where(product.inventory.id.eq(inventoryId), product.name.eq(productName))
+                .where(product.inventory.id.eq(inventoryId), product.name.eq(productName.trim()))
                 .orderBy(product.subProduct.asc())
                 .fetch();
     }

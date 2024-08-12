@@ -3,6 +3,7 @@ package com.yellobook.domains.inventory.service;
 import com.yellobook.common.utils.ParticipantUtil;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.inventory.dto.query.QueryProduct;
+import com.yellobook.domains.inventory.dto.query.QueryProductName;
 import com.yellobook.domains.inventory.dto.query.QuerySubProduct;
 import com.yellobook.domains.inventory.dto.response.GetProductsResponse;
 import com.yellobook.domains.inventory.dto.response.GetProductsResponse.ProductInfo;
@@ -83,7 +84,7 @@ public class InventoryQueryService{
             return productMapper.toEmptyGetProductNameResponse();
         } else {
             // 제고가 존재하면 해당 제고에 있는 제품 중 검색 조건에 맞는 것들 반환
-            List<QueryProduct> productsName = productRepository.getProducts(optionalInventory.get().getId(), name);
+            List<QueryProductName> productsName = productRepository.getProductsName(optionalInventory.get().getId(), name);
             return productMapper.toGetProductsNameResponse(productsName);
         }
     }
