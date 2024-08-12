@@ -2,16 +2,23 @@ package com.yellobook.domains.inventory.service;
 
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.vo.TeamMemberVO;
+import com.yellobook.domains.inventory.dto.query.QueryProductName;
+import com.yellobook.domains.inventory.dto.query.QuerySubProduct;
 import com.yellobook.domains.inventory.dto.response.GetProductsResponse;
 import com.yellobook.domains.inventory.dto.response.GetProductsResponse.ProductInfo;
 import com.yellobook.domains.inventory.dto.response.GetTotalInventoryResponse;
 import com.yellobook.domains.inventory.dto.response.GetTotalInventoryResponse.InventoryInfo;
+import com.yellobook.domains.inventory.entity.Inventory;
+import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.inventory.mapper.InventoryMapper;
 import com.yellobook.domains.inventory.mapper.ProductMapper;
 import com.yellobook.domains.inventory.dto.query.QueryInventory;
 import com.yellobook.domains.inventory.dto.query.QueryProduct;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
+import com.yellobook.domains.order.dto.response.GetProductsNameResponse;
+import com.yellobook.domains.order.dto.response.GetSubProductNameResponse;
+import com.yellobook.domains.order.entity.OrderComment;
 import com.yellobook.error.code.AuthErrorCode;
 import com.yellobook.error.exception.CustomException;
 import org.junit.jupiter.api.Assertions;
@@ -22,13 +29,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.convert.DataSizeUnit;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.as;
+import static org.mockito.ArgumentMatchers.assertArg;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -256,6 +268,118 @@ class InventoryQueryServiceTest {
 
     }
 
+    @Nested
+    @DisplayName("제품 이름 검색")
+    class GetProductsNameTest{
+        @Test
+        @DisplayName("team에 제고가 존재하지 않으면 빈 리스트 반환")
+        void getEmptyProductName(){
+            //given
+            String name = "product";
+            GetProductsNameResponse expectResult = GetProductsNameResponse.builder().names(Collections.emptyList()).build();
+            when(inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId())).thenReturn(Optional.empty());
+            when(productMapper.toEmptyGetProductNameResponse()).thenReturn(expectResult);
+
+            //when
+            GetProductsNameResponse response = inventoryQueryService.getProductsName(name, admin);
+
+            //then
+            assertThat(response.names()).isEqualTo(Collections.emptyList());
+            verify(inventoryRepository).findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId());
+            verify(productMapper).toEmptyGetProductNameResponse();
+        }
+
+        @Test
+        @DisplayName("재고가 존재하면 해당 재고에 있는 제품 중 검색 키워드를 포함하고 있는 제품 이름 반환")
+        void getProductName(){
+            //given
+            String name = "product";
+            Inventory inventory = createInventory();
+            List<QueryProductName> productsName = Collections.emptyList();
+            GetProductsNameResponse expectResponse = GetProductsNameResponse.builder().names(Collections.emptyList()).build();
+            when(inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId())).thenReturn(Optional.of(inventory));
+            when(productRepository.getProductsName(inventory.getId(), name)).thenReturn(productsName);
+            when(productMapper.toGetProductsNameResponse(productsName)).thenReturn(expectResponse);
+
+            //when
+            GetProductsNameResponse response = inventoryQueryService.getProductsName(name, admin);
+
+            //then
+            assertThat(response).isNotNull();
+            assertThat(response.names()).isEqualTo(expectResponse.names());
+            verify(inventoryRepository).findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId());
+            verify(productRepository).getProductsName(inventory.getId(), name);
+            verify(productMapper).toGetProductsNameResponse(productsName);
+        }
+
+    }
+
+    @Nested
+    @DisplayName("제품 이름으로 하위 제품 조회")
+    class GetSubProductNameTest{
+        @Test
+        @DisplayName("team에 제고가 존재하지 않으면 빈 리스트 반환")
+        void getEmptySubProductName(){
+            //given
+            String name = "product";
+            GetSubProductNameResponse expectResult = GetSubProductNameResponse.builder().subProducts(Collections.emptyList()).build();
+            when(inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId())).thenReturn(Optional.empty());
+            when(productMapper.toEmptyGetSubProductNameResponse()).thenReturn(expectResult);
+
+            //when
+            GetSubProductNameResponse response = inventoryQueryService.getSubProductName(name, admin);
+
+            //then
+            assertThat(response.subProducts()).isEqualTo(Collections.emptyList());
+            verify(inventoryRepository).findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId());
+            verify(productMapper).toEmptyGetSubProductNameResponse();
+        }
+
+        @Test
+        @DisplayName("재고가 존재하면 해당 재고에 있는 제품 중 제품 이름과 일치하는 제품의 하위 제품 이름과 Id 반환")
+        void getSubProductName(){
+            //given
+            String name = "product";
+            Inventory inventory = createInventory();
+            List<QuerySubProduct> subProducts = createQuerySubProducts();
+            GetSubProductNameResponse expectResponse = createGetSubProductNameResponse();
+            when(inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId())).thenReturn(Optional.of(inventory));
+            when(productRepository.getSubProducts(inventory.getId(), name)).thenReturn(subProducts);
+            when(productMapper.toGetSubProductNameResponse(subProducts)).thenReturn(expectResponse);
+
+            //when
+            GetSubProductNameResponse response = inventoryQueryService.getSubProductName(name, admin);
+
+            //then
+            assertThat(response).isNotNull();
+            assertThat(response.subProducts()).isEqualTo(expectResponse.subProducts());
+            verify(inventoryRepository).findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId());
+            verify(productRepository).getSubProducts(inventory.getId(), name);
+            verify(productMapper).toGetSubProductNameResponse(subProducts);
+        }
+
+        private List<QuerySubProduct> createQuerySubProducts(){
+            return List.of(
+                    QuerySubProduct.builder().productId(1L).subProductName("SubProduct A").build(),
+                    QuerySubProduct.builder().productId(2L).subProductName("SubProduct B").build(),
+                    QuerySubProduct.builder().productId(3L).subProductName("SubProduct C").build()
+            );
+        }
+
+        private GetSubProductNameResponse createGetSubProductNameResponse(){
+            List<GetSubProductNameResponse.SubProductInfo> subProductInfos = List.of(
+                    GetSubProductNameResponse.SubProductInfo.builder().productId(1L).subProductName("SubProduct A").build(),
+                    GetSubProductNameResponse.SubProductInfo.builder().productId(2L).subProductName("SubProduct B").build(),
+                    GetSubProductNameResponse.SubProductInfo.builder().productId(3L).subProductName("SubProduct C").build()
+            );
+
+            return GetSubProductNameResponse.builder()
+                    .subProducts(subProductInfos)
+                    .build();
+        }
+
+    }
+
 
     private List<QueryProduct> createProductDTOs(){
         List<QueryProduct> result = new ArrayList<>();
@@ -271,6 +395,19 @@ class InventoryQueryServiceTest {
             result.add(ProductInfo.builder().name("product").build());
         }
         return result;
+    }
+
+    private Inventory createInventory(){
+        Inventory inventory = Inventory.builder().build();
+        try {
+            Field idField = Inventory.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(inventory, 1L);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to set order comment ID", e);
+        }
+        return inventory;
     }
 
 }

@@ -83,7 +83,7 @@ public class InventoryQueryService{
             // team에서 제고가 존재하지 않으면 빈 리스트 반환
             return productMapper.toEmptyGetProductNameResponse();
         } else {
-            // 제고가 존재하면 해당 제고에 있는 제품 중 검색 조건에 맞는 것들 반환
+            // 제고가 존재하면 해당 재고에 있는 제품 중 검색 조건에 맞는 것들 반환
             List<QueryProductName> productsName = productRepository.getProductsName(optionalInventory.get().getId(), name);
             return productMapper.toGetProductsNameResponse(productsName);
         }
@@ -99,7 +99,7 @@ public class InventoryQueryService{
             // team에서 제고가 존재하지 않으면 빈 리스트 반환
             return productMapper.toEmptyGetSubProductNameResponse();
         } else {
-            // 제고가 존재하면 해당 제고에 있는 제품 중 검색 조건에 맞는 것들 반환
+            // 제고가 존재하면 해당 재고에 있는 제품 중 검색 조건에 맞는 것들 반환
             List<QuerySubProduct> subProducts = productRepository.getSubProducts(optionalInventory.get().getId(), name);
             return productMapper.toGetSubProductNameResponse(subProducts);
         }
