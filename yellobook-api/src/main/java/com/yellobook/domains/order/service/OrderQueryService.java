@@ -59,4 +59,5 @@ public class OrderQueryService {
     public boolean existsByOrderId(Long orderId){
         return orderRepository.existsById(orderId);
     }
+
 }

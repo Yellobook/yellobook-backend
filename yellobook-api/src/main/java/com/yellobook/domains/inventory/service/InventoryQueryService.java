@@ -2,14 +2,19 @@ package com.yellobook.domains.inventory.service;
 
 import com.yellobook.common.utils.ParticipantUtil;
 import com.yellobook.common.vo.TeamMemberVO;
+import com.yellobook.domains.inventory.dto.query.QueryProduct;
+import com.yellobook.domains.inventory.dto.query.QuerySubProduct;
 import com.yellobook.domains.inventory.dto.response.GetProductsResponse;
 import com.yellobook.domains.inventory.dto.response.GetProductsResponse.ProductInfo;
 import com.yellobook.domains.inventory.dto.response.GetTotalInventoryResponse;
+import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.mapper.InventoryMapper;
 import com.yellobook.domains.inventory.mapper.ProductMapper;
 import com.yellobook.domains.inventory.dto.query.QueryInventory;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
+import com.yellobook.domains.order.dto.response.GetProductsNameResponse;
+import com.yellobook.domains.order.dto.response.GetSubProductNameResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -64,6 +70,38 @@ public class InventoryQueryService{
 
         List<ProductInfo> content = productMapper.toProductInfo(productRepository.getProducts(inventoryId, keyword));
         return GetProductsResponse.builder().products(content).build();
+    }
+
+    /**
+     * 제품 이름 검색
+     */
+    public GetProductsNameResponse getProductsName(String name, TeamMemberVO teamMember) {
+        // team의 가장 최근 인벤토리 가져옴
+        Optional<Inventory> optionalInventory = inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(teamMember.getTeamId());
+        if(optionalInventory.isEmpty()){
+            // team에서 제고가 존재하지 않으면 빈 리스트 반환
+            return productMapper.toEmptyGetProductNameResponse();
+        } else {
+            // 제고가 존재하면 해당 제고에 있는 제품 중 검색 조건에 맞는 것들 반환
+            List<QueryProduct> productsName = productRepository.getProducts(optionalInventory.get().getId(), name);
+            return productMapper.toGetProductsNameResponse(productsName);
+        }
+    }
+
+    /**
+     * 하위 제품 이름 검색 및 제품 id 반환
+     */
+    public GetSubProductNameResponse getSubProductName(String name, TeamMemberVO teamMember) {
+        // team의 가장 최근 인벤토리 가져옴
+        Optional<Inventory> optionalInventory = inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(teamMember.getTeamId());
+        if(optionalInventory.isEmpty()){
+            // team에서 제고가 존재하지 않으면 빈 리스트 반환
+            return productMapper.toEmptyGetSubProductNameResponse();
+        } else {
+            // 제고가 존재하면 해당 제고에 있는 제품 중 검색 조건에 맞는 것들 반환
+            List<QuerySubProduct> subProducts = productRepository.getSubProducts(optionalInventory.get().getId(), name);
+            return productMapper.toGetSubProductNameResponse(subProducts);
+        }
     }
 
     public boolean existByInventoryId(Long inventoryId){

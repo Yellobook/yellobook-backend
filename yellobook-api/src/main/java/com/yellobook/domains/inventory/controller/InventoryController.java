@@ -11,6 +11,8 @@ import com.yellobook.domains.inventory.dto.response.GetProductsResponse;
 import com.yellobook.domains.inventory.dto.response.GetTotalInventoryResponse;
 import com.yellobook.domains.inventory.service.InventoryCommandService;
 import com.yellobook.domains.inventory.service.InventoryQueryService;
+import com.yellobook.domains.order.dto.response.GetProductsNameResponse;
+import com.yellobook.domains.order.dto.response.GetSubProductNameResponse;
 import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -94,5 +96,25 @@ public class InventoryController {
     ){
         inventoryCommandService.deleteProduct(productId, teamMember);
         return ResponseFactory.noContent();
+    }
+
+    @Operation(summary = "주문 시 제품 이름으로 제품 조회")
+    @GetMapping("/products/search")
+    public ResponseEntity<SuccessResponse<GetProductsNameResponse>> getProductNames(
+            @RequestParam("name") String name,
+            @TeamMember TeamMemberVO teamMember
+    ){
+        GetProductsNameResponse response = inventoryQueryService.getProductsName(name, teamMember);
+        return ResponseFactory.success(response);
+    }
+
+    @Operation(summary = "제품 이름 조회 시 하위 제품 조회")
+    @GetMapping("/subProducts/search")
+    public ResponseEntity<SuccessResponse<GetSubProductNameResponse>> getSubProductName(
+            @RequestParam("name") String name,
+            @TeamMember TeamMemberVO teamMember
+    ){
+        GetSubProductNameResponse response = inventoryQueryService.getSubProductName(name, teamMember);
+        return ResponseFactory.success(response);
     }
 }
