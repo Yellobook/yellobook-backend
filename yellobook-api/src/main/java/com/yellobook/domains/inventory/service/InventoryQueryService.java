@@ -2,7 +2,6 @@ package com.yellobook.domains.inventory.service;
 
 import com.yellobook.common.utils.ParticipantUtil;
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domains.inventory.dto.query.QueryProduct;
 import com.yellobook.domains.inventory.dto.query.QueryProductName;
 import com.yellobook.domains.inventory.dto.query.QuerySubProduct;
 import com.yellobook.domains.inventory.dto.response.GetProductsResponse;
@@ -14,8 +13,8 @@ import com.yellobook.domains.inventory.mapper.ProductMapper;
 import com.yellobook.domains.inventory.dto.query.QueryInventory;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
-import com.yellobook.domains.order.dto.response.GetProductsNameResponse;
-import com.yellobook.domains.order.dto.response.GetSubProductNameResponse;
+import com.yellobook.domains.inventory.dto.response.GetProductsNameResponse;
+import com.yellobook.domains.inventory.dto.response.GetSubProductNameResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

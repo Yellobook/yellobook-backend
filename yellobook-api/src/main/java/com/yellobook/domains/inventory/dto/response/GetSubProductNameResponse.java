@@ -1,4 +1,4 @@
-package com.yellobook.domains.order.dto.response;
+package com.yellobook.domains.inventory.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;

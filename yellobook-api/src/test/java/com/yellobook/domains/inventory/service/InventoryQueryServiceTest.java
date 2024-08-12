@@ -9,16 +9,14 @@ import com.yellobook.domains.inventory.dto.response.GetProductsResponse.ProductI
 import com.yellobook.domains.inventory.dto.response.GetTotalInventoryResponse;
 import com.yellobook.domains.inventory.dto.response.GetTotalInventoryResponse.InventoryInfo;
 import com.yellobook.domains.inventory.entity.Inventory;
-import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.inventory.mapper.InventoryMapper;
 import com.yellobook.domains.inventory.mapper.ProductMapper;
 import com.yellobook.domains.inventory.dto.query.QueryInventory;
 import com.yellobook.domains.inventory.dto.query.QueryProduct;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
-import com.yellobook.domains.order.dto.response.GetProductsNameResponse;
-import com.yellobook.domains.order.dto.response.GetSubProductNameResponse;
-import com.yellobook.domains.order.entity.OrderComment;
+import com.yellobook.domains.inventory.dto.response.GetProductsNameResponse;
+import com.yellobook.domains.inventory.dto.response.GetSubProductNameResponse;
 import com.yellobook.error.code.AuthErrorCode;
 import com.yellobook.error.exception.CustomException;
 import org.junit.jupiter.api.Assertions;
@@ -29,7 +27,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.convert.DataSizeUnit;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -39,7 +36,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.mockito.ArgumentMatchers.assertArg;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

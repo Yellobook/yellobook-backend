@@ -7,9 +7,9 @@ import com.yellobook.domains.inventory.dto.response.GetProductsResponse;
 import com.yellobook.domains.inventory.dto.query.QueryProduct;
 import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.entity.Product;
-import com.yellobook.domains.order.dto.response.GetProductsNameResponse;
-import com.yellobook.domains.order.dto.response.GetSubProductNameResponse;
-import com.yellobook.domains.order.dto.response.GetSubProductNameResponse.SubProductInfo;
+import com.yellobook.domains.inventory.dto.response.GetProductsNameResponse;
+import com.yellobook.domains.inventory.dto.response.GetSubProductNameResponse;
+import com.yellobook.domains.inventory.dto.response.GetSubProductNameResponse.SubProductInfo;
 import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
 
