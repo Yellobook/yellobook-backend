@@ -62,12 +62,11 @@ public class InformCommandServiceImpl implements InformCommandService {
         Inform newInform = informMapper.toInform(request, member, team);
         informRepository.save(newInform);
 
-        List<InformMention> mentions = request.getMentioned().stream().map(mentionDTO -> {
-            Member mentioned = memberRepository.findById(mentionDTO.getId())
-                    .orElseThrow(() -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
-                    return informMapper.toInformMention(newInform, mentioned);
-                })
-                .collect(Collectors.toList());
+        List<InformMention> mentions = request.getMentioned().getIds().stream().map(mentionDTO -> {
+            Member mentioned = memberRepository.findById(mentionDTO)
+                    .orElseThrow(() -> new CustomException(TeamErrorCode.MEMBER_NOT_FOUND));
+            return informMapper.toInformMention(newInform, mentioned);
+        }).toList();
 
         informMentionRepository.saveAll(mentions);
 

@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -94,7 +95,7 @@ public class TeamQueryService{
         return teamRepository.existsById(teamId);
     }
 
-    public List<MentionDTO> searchParticipants(TeamMemberVO teamMember, String name){
+    public MentionDTO searchParticipants(TeamMemberVO teamMember, String name){
         List<Participant> mentions;
         Long teamId = teamMember.getTeamId();
 
@@ -106,8 +107,13 @@ public class TeamQueryService{
             mentions = participantRepository.findMentionsByNamePrefix(prefix, teamId);
         }
         else {
-            return List.of();
+            return new MentionDTO(List.of());
         }
-        return participantMapper.toMentionDTOlist(mentions);
+        List<Long> participantIds = mentions.stream()
+                .map(Participant::getId)
+                .collect(Collectors.toList());
+
+        // 변환된 ID 리스트를 사용하여 MentionDTO 생성
+        return participantMapper.toMentionDTO(participantIds);
     }
 }

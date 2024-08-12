@@ -16,7 +16,7 @@ public class InformRequest {
         @Schema(description = "작성할 글의 내용")
         private String memo;
         @Schema(description = "함께 하는 멤버")
-        private List<MentionDTO> mentioned;
+        private MentionDTO mentioned;
         @Schema(description = "날짜")
         private Date date;
     }

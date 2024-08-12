@@ -83,11 +83,11 @@ public class TeamController {
 
     @GetMapping("/members/search")
     @Operation(summary = "팀 내의 멤버 검색하기 API", description = "팀 내의 멤버들을 검색하는 API입니다.")
-    public ResponseEntity<SuccessResponse<List<MentionDTO>>> searchMembers(
+    public ResponseEntity<SuccessResponse<MentionDTO>> searchMembers(
             @RequestParam("name") String name,
             @TeamMember TeamMemberVO teamMember
     ){
-        List<MentionDTO> response = teamQueryService.searchParticipants(teamMember, name);
+        MentionDTO response = teamQueryService.searchParticipants(teamMember, name);
         return ResponseFactory.success(response);
     }
 }

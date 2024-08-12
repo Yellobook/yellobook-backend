@@ -7,16 +7,17 @@ import com.yellobook.domains.team.entity.Team;
 import com.yellobook.common.enums.MemberTeamRole;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface ParticipantMapper {
     @Mapping(source = "role", target = "role")
     Participant toParticipant(MemberTeamRole role, Team team, Member member);
 
-    @Mapping(source ="participant.id", target = "id")
-    MentionDTO toMentionDTO(Participant participant);
-
-    List<MentionDTO> toMentionDTOlist(List<Participant> participants);
+    default MentionDTO toMentionDTO(List<Long> participantIds) {
+        return new MentionDTO(participantIds);
+    }
 }
