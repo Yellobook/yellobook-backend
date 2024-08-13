@@ -14,6 +14,8 @@ import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -84,7 +86,7 @@ public class TeamController {
     @GetMapping("/members/search")
     @Operation(summary = "팀 내의 멤버 검색하기 API", description = "팀 내의 멤버들을 검색하는 API입니다.")
     public ResponseEntity<SuccessResponse<MentionDTO>> searchMembers(
-            @RequestParam("name") String name,
+            @RequestParam("name") @NotBlank(message = "이름은 필수 입력 값입니다.") String name,
             @TeamMember TeamMemberVO teamMember
     ){
         MentionDTO response = teamQueryService.searchParticipants(teamMember, name);
