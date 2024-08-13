@@ -99,7 +99,7 @@ public class TeamQueryService{
         List<Participant> mentions;
         Long teamId = teamMember.getTeamId();
 
-        if(name.equalsIgnoreCase("@everyone")){
+        if(name.trim().equalsIgnoreCase("everyone")){
             mentions = participantRepository.findAllByTeamId(teamId);
         }
         else if(name.startsWith("@")){
