@@ -1,7 +1,7 @@
 package com.yellobook.domains.team.service;
 
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domains.inform.dto.MentionDTO;
+import com.yellobook.domains.team.dto.MentionDTO;
 import com.yellobook.domains.team.mapper.ParticipantMapper;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;

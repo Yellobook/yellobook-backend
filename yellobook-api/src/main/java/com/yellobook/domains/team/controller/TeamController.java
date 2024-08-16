@@ -4,7 +4,7 @@ import com.yellobook.common.annotation.TeamMember;
 import com.yellobook.common.validation.annotation.ExistTeam;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
-import com.yellobook.domains.inform.dto.MentionDTO;
+import com.yellobook.domains.team.dto.MentionDTO;
 import com.yellobook.domains.team.dto.response.*;
 import com.yellobook.domains.team.dto.request.*;
 import com.yellobook.domains.team.service.TeamCommandService;
@@ -15,13 +15,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
