@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -35,7 +37,7 @@ public class Inform extends BaseEntity {
      * 조회수
      */
     @Column(nullable = false)
-    private Integer view;
+    private Integer view = 0;
 
     /**
      * 캘린더에 표시되어야 하는 날짜
@@ -51,15 +53,25 @@ public class Inform extends BaseEntity {
     @JoinColumn(name = "team_id", nullable = false)
     private Team team;
 
+    @OneToMany(mappedBy = "inform", cascade = CascadeType.REMOVE)
+    private List<InformComment> comments = new ArrayList<>();
+
     @Builder
-    private Inform(String title, Integer view, String content, LocalDate date, Member member, Team team) {
-        // 필수 필드 검증 추가할 것
-        // 양방향 연관관계 필요하면 private 으로 빼서만들고 생성자에 추가할것
+    private Inform(String title, String content, LocalDate date, Member member, Team team) {
         this.title = title;
-        this.view = view;
         this.content = content;
         this.date = date;
         this.member = member;
         this.team = team;
+        this.view = 0;
+    }
+
+    public void updateView() {
+        this.view += 1;
+    }
+
+    public void addComment(InformComment comment) {
+        comments.add(comment);
+        comment.setInform(this);
     }
 }
