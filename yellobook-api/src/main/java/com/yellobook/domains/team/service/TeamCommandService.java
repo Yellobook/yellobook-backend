@@ -21,6 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -53,6 +55,8 @@ public class TeamCommandService {
             participantRepository.save(founder);
             log.info("Participant added: Member ID = {}, Team ID = {}", member.getId(), newTeam.getId());
 
+            redisService.setMemberCurrentTeam(member.getId(), newTeam.getId(), request.role().name());
+
             return teamMapper.toCreateTeamResponse(newTeam);
         }
     }
@@ -68,6 +72,15 @@ public class TeamCommandService {
 
         participantRepository.delete(participant);
         log.info("Participant (Member ID = {}, Team ID = {}) is deleted", memberId, teamId);
+
+        participantRepository.findFirstByMemberIdOrderByCreatedAtAsc(memberId)
+                .ifPresent(tempParticipant -> {
+                    redisService.setMemberCurrentTeam(
+                            memberId,
+                            tempParticipant.getTeam().getId(),
+                            tempParticipant.getRole().name()
+                    );
+                });
 
         return teamMapper.toLeaveTeamResponse(teamId);
     }
@@ -103,6 +116,8 @@ public class TeamCommandService {
         }
         participantRepository.save(participantMapper.toParticipant(role, team, member));
         log.info("Participant added: Team ID = {}, Role = {}, Member ID = {}", teamId, role, memberId);
+
+        redisService.setMemberCurrentTeam(memberId, teamId, role.name());
 
         return teamMapper.toJoinTeamResponse(team);
     }

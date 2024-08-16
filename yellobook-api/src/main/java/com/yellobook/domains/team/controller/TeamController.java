@@ -1,8 +1,10 @@
 package com.yellobook.domains.team.controller;
 
+import com.yellobook.common.annotation.TeamMember;
 import com.yellobook.common.validation.annotation.ExistTeam;
+import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
-import com.yellobook.domains.inform.dto.MentionDTO;
+import com.yellobook.domains.team.dto.MentionDTO;
 import com.yellobook.domains.team.dto.response.*;
 import com.yellobook.domains.team.dto.request.*;
 import com.yellobook.domains.team.service.TeamCommandService;
@@ -12,12 +14,12 @@ import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -79,13 +81,13 @@ public class TeamController {
         return ResponseFactory.success(response);
     }
 
-    @GetMapping("/{teamId}/search")
+    @GetMapping("/members/search")
     @Operation(summary = "팀 내의 멤버 검색하기 API", description = "팀 내의 멤버들을 검색하는 API입니다.")
-    public ResponseEntity<SuccessResponse<List<MentionDTO>>> searchMembers(
-            @PathVariable Long teamId,
-            @RequestParam String name
+    public ResponseEntity<SuccessResponse<MentionDTO>> searchMembers(
+            @RequestParam("name") @NotBlank(message = "이름은 필수 입력 값입니다.") String name,
+            @TeamMember TeamMemberVO teamMember
     ){
-        List<MentionDTO> response = teamQueryService.searchParticipants(teamId, name);
+        MentionDTO response = teamQueryService.searchParticipants(teamMember, name);
         return ResponseFactory.success(response);
     }
 }

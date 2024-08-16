@@ -527,7 +527,6 @@ public class ScheduleRepositoryTest {
         Inform inform = Inform.builder()
                 .title("공지 및 일정")
                 .content("내용")
-                .view(0)
                 .date(date)
                 .team(team)
                 .member(member)

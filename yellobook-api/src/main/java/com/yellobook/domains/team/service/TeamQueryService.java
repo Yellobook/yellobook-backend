@@ -1,6 +1,7 @@
 package com.yellobook.domains.team.service;
 
-import com.yellobook.domains.inform.dto.MentionDTO;
+import com.yellobook.common.vo.TeamMemberVO;
+import com.yellobook.domains.team.dto.MentionDTO;
 import com.yellobook.domains.team.mapper.ParticipantMapper;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -84,6 +86,8 @@ public class TeamQueryService{
 
         Team team = teamRepository.getReferenceById(teamId);
 
+        redisService.setMemberCurrentTeam(memberId,teamId,participant.getRole().name());
+
         return teamMapper.toGetTeamResponse(team);
     }
 
@@ -91,10 +95,11 @@ public class TeamQueryService{
         return teamRepository.existsById(teamId);
     }
 
-    public List<MentionDTO> searchParticipants(Long teamId, String name){
+    public MentionDTO searchParticipants(TeamMemberVO teamMember, String name){
         List<Participant> mentions;
+        Long teamId = teamMember.getTeamId();
 
-        if(name.equalsIgnoreCase("@everyone")){
+        if(name.trim().equalsIgnoreCase("everyone")){
             mentions = participantRepository.findAllByTeamId(teamId);
         }
         else if(name.startsWith("@")){
@@ -102,8 +107,13 @@ public class TeamQueryService{
             mentions = participantRepository.findMentionsByNamePrefix(prefix, teamId);
         }
         else {
-            return List.of();
+            return new MentionDTO(List.of());
         }
-        return participantMapper.toMentionDTOlist(mentions);
+        List<Long> participantIds = mentions.stream()
+                .map(Participant::getId)
+                .collect(Collectors.toList());
+
+        // 변환된 ID 리스트를 사용하여 MentionDTO 생성
+        return participantMapper.toMentionDTO(participantIds);
     }
 }
