@@ -33,7 +33,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
                 ))
                 .from(orderComment)
                 .join(participant).on(orderComment.member.id.eq(participant.member.id))
-                .where(orderComment.order.id.eq(orderId))
+                .where(orderComment.order.id.eq(orderId), orderComment.order.team.id.eq(participant.team.id))
                 .orderBy(orderComment.createdAt.asc())
                 .fetch();
     }
