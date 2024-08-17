@@ -9,6 +9,7 @@ import com.yellobook.domains.inventory.dto.request.ModifyProductAmountRequest;
 import com.yellobook.domains.inventory.dto.response.AddProductResponse;
 import com.yellobook.domains.inventory.dto.response.GetProductsResponse;
 import com.yellobook.domains.inventory.dto.response.GetTotalInventoryResponse;
+import com.yellobook.domains.inventory.service.ExcelReadService;
 import com.yellobook.domains.inventory.service.InventoryCommandService;
 import com.yellobook.domains.inventory.service.InventoryQueryService;
 import com.yellobook.response.ResponseFactory;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("api/v1/inventories")
@@ -31,6 +33,7 @@ public class InventoryController {
 
     private final InventoryCommandService inventoryCommandService;
     private final InventoryQueryService inventoryQueryService;
+    private final ExcelReadService excelReadService;
 
     @Operation(summary = "전체 재고 현황 글 조회")
     @GetMapping
@@ -95,4 +98,15 @@ public class InventoryController {
         inventoryCommandService.deleteProduct(productId, teamMember);
         return ResponseFactory.noContent();
     }
+
+    // TODO : 엑셀 읽어서 제고 추가 (생성된 ID 반환)
+    @Operation(summary = "엑셀 파일 읽어서 제고 생성")
+    @PostMapping()
+    public ResponseEntity<SuccessResponse<?>> createInventory(
+            @RequestPart("file") MultipartFile file
+    ){
+        excelReadService.read(file);
+        return null;
+    }
+
 }
