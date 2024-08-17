@@ -51,7 +51,7 @@ public class DevController {
     }
 
     public record TokenRequest(
-            @Schema(description = "관리자, 주문자, ", example = "ADMIN")
+            @Schema(description = "팀에서 사용자의 권한", example = "ADMIN")
             String role
     ) {
     }
