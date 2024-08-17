@@ -15,6 +15,7 @@ import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -35,8 +36,8 @@ public class InventoryController {
     @Operation(summary = "전체 재고 현황 글 조회")
     @GetMapping
     public ResponseEntity<SuccessResponse<GetTotalInventoryResponse>> getTotalInventory(
-            @RequestParam("page") Integer page,
-            @RequestParam("size") Integer size,
+            @Min(value = 1, message = "page는 1 이상이여야 합니다.") @RequestParam("page") Integer page,
+            @Min(value = 1, message = "size는 1 이상이여야 합니다.")@RequestParam("size") Integer size,
             @TeamMember TeamMemberVO teamMember
             ){
         var result = inventoryQueryService.getTotalInventory(page, size, teamMember);
