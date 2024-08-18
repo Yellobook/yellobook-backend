@@ -114,11 +114,26 @@ public class TeamControllerTest {
         when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
         when(teamQueryService.findByTeamId(any(), any())).thenReturn(response);
 
+        //when & then
         mockMvc.perform(get("/api/v1/teams/{teamId}", teamId)
                         .content(objectMapper.writeValueAsString(response))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.teamId", CoreMatchers.is(response.teamId().intValue())))
                 .andDo(print());
+    }
+
+    @Test
+    @DisplayName("@ExistTeam - 해당 팀이 존재하지 않을 때 예외 발생")
+    public void validTeamTest() throws Exception {
+        //given
+        Long teamId = 1L;
+        when(teamQueryService.existsByTeamId(teamId)).thenReturn(false);
+
+        //when & then
+        mockMvc.perform(get("/api/v1/teams/{teamId}", teamId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
     }
 }
