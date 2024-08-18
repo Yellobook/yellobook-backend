@@ -64,7 +64,7 @@ public class InformCommandService {
         List<Long> mentionIds = request.mentionIds();
 
         // 언급한 사용자들이 존재할 경우
-        if (mentionIds != null && mentionIds.isEmpty()) {
+        if (mentionIds != null && !mentionIds.isEmpty()) {
             List<InformMention> mentions = request.mentionIds().stream().map(mentionDTO -> {
                 Member mentioned = memberRepository.findById(mentionDTO)
                         .orElseThrow(() -> new CustomException(TeamErrorCode.MENTIONED_MEMBER_NOT_FOUND));
