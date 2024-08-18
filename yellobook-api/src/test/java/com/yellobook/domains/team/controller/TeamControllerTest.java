@@ -184,4 +184,26 @@ public class TeamControllerTest {
                     .andDo(print());
         }
     }
+
+    @Test
+    @DisplayName("팀 초대하기")
+    public void inviteTeamTest() throws Exception {
+        // given
+        Long teamId = 1L;
+        String expectedInviteUrl = "https://example.com/invite";
+        InvitationCodeResponse response = InvitationCodeResponse.builder()
+                .inviteUrl(expectedInviteUrl)
+                .build();
+
+        InvitationCodeRequest request = new InvitationCodeRequest(MemberTeamRole.ADMIN);
+        when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
+        when(teamQueryService.makeInvitationCode(any(), any(), any())).thenReturn(response);
+
+        //when & then
+        mockMvc.perform(post("/api/v1/teams/{teamId}/invite", teamId)
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.inviteUrl", equalTo(response.inviteUrl())));
+    }
 }
