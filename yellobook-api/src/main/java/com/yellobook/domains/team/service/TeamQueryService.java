@@ -2,6 +2,7 @@ package com.yellobook.domains.team.service;
 
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.team.dto.MentionDTO;
+import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.mapper.ParticipantMapper;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
@@ -23,10 +24,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-@Slf4j
 public class TeamQueryService{
 
     private final TeamRepository teamRepository;
@@ -75,7 +76,6 @@ public class TeamQueryService{
 
     public GetTeamResponse findByTeamId(Long teamId, CustomOAuth2User customOAuth2User){
         //팀 id를 가지고 팀에 대한 정보 가져오기
-
         Long memberId = customOAuth2User.getMemberId();
 
         Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)
@@ -90,6 +90,12 @@ public class TeamQueryService{
 
         return teamMapper.toGetTeamResponse(team);
     }
+
+    public TeamMemberListResponse findTeamMembers(Long teamId){
+        List<QueryTeamMember> members = teamRepository.findTeamMembers(teamId);
+        return teamMapper.toTeamMemberListResponse(members);
+    }
+
 
     public boolean existsByTeamId(Long teamId) {
         return teamRepository.existsById(teamId);

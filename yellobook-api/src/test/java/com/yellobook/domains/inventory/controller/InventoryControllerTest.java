@@ -11,6 +11,8 @@ import com.yellobook.domains.inventory.dto.response.GetProductsResponse;
 import com.yellobook.domains.inventory.dto.response.GetTotalInventoryResponse;
 import com.yellobook.domains.inventory.service.InventoryCommandService;
 import com.yellobook.domains.inventory.service.InventoryQueryService;
+import com.yellobook.domains.inventory.dto.response.GetProductsNameResponse;
+import com.yellobook.domains.inventory.dto.response.GetSubProductNameResponse;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -133,6 +135,40 @@ class InventoryControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.products", CoreMatchers.is(response.products())))
+                .andReturn();
+    }
+
+    @Test
+    @DisplayName("제품 이름으로 제품 조회")
+    void getProductNames() throws Exception{
+        //given
+        String name = "product";
+        GetProductsNameResponse response = GetProductsNameResponse.builder().build();
+        when(inventoryQueryService.getProductsName(name, teamMemberVO)).thenReturn(response);
+
+        //when & then
+        mockMvc.perform(get("/api/v1/inventories/products/search")
+                        .param("name", name)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.names", CoreMatchers.is(response.names())))
+                .andReturn();
+    }
+
+    @Test
+    @DisplayName("제품 이름으로 하위 제품 조회")
+    void getSubProductName() throws Exception{
+        //given
+        String name = "product";
+        GetSubProductNameResponse response = GetSubProductNameResponse.builder().build();
+        when(inventoryQueryService.getSubProductName(name, teamMemberVO)).thenReturn(response);
+
+        //when & then
+        mockMvc.perform(get("/api/v1/inventories/subProducts/search")
+                        .param("name", name)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.subProducts", CoreMatchers.is(response.subProducts())))
                 .andReturn();
     }
 

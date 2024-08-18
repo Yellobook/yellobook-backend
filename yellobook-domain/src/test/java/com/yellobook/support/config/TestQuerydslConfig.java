@@ -1,20 +1,18 @@
-package com.yellobook.config;
+package com.yellobook.support.config;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.boot.test.context.TestConfiguration;
-
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 
 @TestConfiguration
-public class TeamRepositoryTestConfig {
-
+public class TestQuerydslConfig {
     @PersistenceContext
-    private EntityManager entityManager;
+    private EntityManager em;
 
     @Bean
-    public EntityManager entityManager() {
-        return entityManager;
+    public JPAQueryFactory jpaQueryFactory() {
+        return new JPAQueryFactory(em);
     }
 }

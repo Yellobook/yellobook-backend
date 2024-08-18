@@ -3,7 +3,6 @@ package com.yellobook.domains.schedule.repository;
 import com.yellobook.common.enums.MemberRole;
 import com.yellobook.common.enums.OrderStatus;
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.config.ScheduleRepositoryTestConfig;
 import com.yellobook.domains.common.entity.BaseEntity;
 import com.yellobook.domains.inform.entity.Inform;
 import com.yellobook.domains.inform.entity.InformMention;
@@ -23,14 +22,11 @@ import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.enums.ScheduleType;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
+import com.yellobook.support.annotation.RepositoryTest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
@@ -43,10 +39,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@DataJpaTest
-@Sql(scripts = "classpath:cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import(ScheduleRepositoryTestConfig.class)
+@RepositoryTest
 @DisplayName("ScheduleRepository 테스트")
 public class ScheduleRepositoryTest {
 

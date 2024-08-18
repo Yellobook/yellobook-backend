@@ -23,13 +23,13 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/informs")
-@Tag(name = "\uD83D\uDCBC 업무 및 공지", description = "Inform API")
+@Tag(name = "\uD83D\uDCBC 공지", description = "Inform API")
 public class InformController {
     private final InformQueryService informQueryService;
     private final InformCommandService informCommandService;
 
     @PostMapping
-    @Operation(summary = "업무 및 공지 작성 API", description = "업무 및 공지를 생성하는 API 입니다.")
+    @Operation(summary = "공지 작성", description = "새로운 공지를 생성하는 API 입니다.")
     public ResponseEntity<SuccessResponse<CreateInformResponse>> createInform(
             @RequestBody CreateInformRequest request,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
@@ -39,7 +39,7 @@ public class InformController {
     }
 
     @DeleteMapping("/{informId}")
-    @Operation(summary = "업무(공지) 삭제")
+    @Operation(summary = "공지 삭제", description = "등록된 공지를 삭제하는 API 입니다.")
     public ResponseEntity<Void> deleteInform(
             @ExistInform @PathVariable("informId") Long informId,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
@@ -49,7 +49,7 @@ public class InformController {
     }
 
     @GetMapping("/{informId}")
-    @Operation(summary = "업무(공지) 조회 API", description = "등록된 업무(공지)를 조회하는 API 입니다.")
+    @Operation(summary = "공지목록 조회", description = "등록된 공지를 조회하는 API 입니다.")
     public ResponseEntity<SuccessResponse<GetInformResponse>> getInform(
             @ExistInform @PathVariable("informId") Long informId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
@@ -60,7 +60,7 @@ public class InformController {
 
 
     @PostMapping("/{informId}/comment")
-    @Operation(summary = "댓글 작성 API", description = "댓글을 작성하는 API입니다.")
+    @Operation(summary = "공지 댓글 작성", description = "공지에 댓글을 작성하는 API 입니다.")
     public ResponseEntity<SuccessResponse<CreateInformCommentResponse>> addComment(
             @ExistInform @PathVariable("informId") Long informId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User,

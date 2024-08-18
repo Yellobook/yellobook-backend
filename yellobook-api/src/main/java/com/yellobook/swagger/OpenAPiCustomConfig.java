@@ -16,7 +16,7 @@ import java.util.stream.IntStream;
 @Configuration
 public class OpenAPiCustomConfig {
 
-    private final List<String> TAG_ORDER =  List.of("로그인", "인증", "사용자", "팀", "일정", "업무 및 공지","주문", "재고", "헬스체크");
+    private final List<String> TAG_ORDER =  List.of("개발", "로그인", "인증", "사용자", "팀", "일정", "공지","주문", "재고", "헬스체크");
 
     @Bean
     public OpenApiCustomizer customOpenAPI() {

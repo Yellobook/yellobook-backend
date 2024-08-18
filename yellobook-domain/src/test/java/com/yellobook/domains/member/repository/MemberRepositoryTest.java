@@ -2,24 +2,16 @@ package com.yellobook.domains.member.repository;
 
 import com.yellobook.common.enums.MemberRole;
 import com.yellobook.domains.member.entity.Member;
+import com.yellobook.support.annotation.RepositoryTest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-
 import java.util.Optional;
 
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ExtendWith(SpringExtension.class)
-@EnableJpaAuditing
+@RepositoryTest
 @DisplayName("Member 도메인 Repository Unit Test")
 public class MemberRepositoryTest {
     private final MemberRepository memberRepository;

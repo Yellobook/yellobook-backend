@@ -1,16 +1,13 @@
 package com.yellobook.domains.member.controller;
 
 import com.yellobook.common.enums.MemberRole;
-import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.resolver.TeamMemberArgumentResolver;
-import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.auth.security.oauth2.dto.OAuth2UserDTO;
-import com.yellobook.domains.auth.service.RedisTeamService;
 import com.yellobook.domains.member.dto.response.ProfileResponse;
 import com.yellobook.domains.member.entity.Member;
+import com.yellobook.domains.member.service.MemberCommandService;
 import com.yellobook.domains.member.service.MemberQueryService;
-import org.apache.catalina.User;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,10 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
-import java.security.Principal;
 import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -48,6 +42,10 @@ class MemberControllerTest {
 
     @MockBean
     private MemberQueryService memberQueryService;
+
+    @MockBean
+    private MemberCommandService memberCommandService;
+
     @MockBean
     private TeamMemberArgumentResolver teamMemberArgumentResolver;
 
