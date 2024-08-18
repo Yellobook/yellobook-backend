@@ -136,4 +136,52 @@ public class TeamControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
     }
+
+    @Nested
+    @DisplayName("팀 내의 멤버 검색")
+    class TeamMemberSearch{
+        @Test
+        @DisplayName("모든 멤버")
+        void searchMembers_everyone() throws Exception {
+            // given
+            String name = "everyone";
+            MentionDTO mentionDTO = new MentionDTO(List.of(1L, 2L, 3L));
+
+            when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
+            when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                    .thenReturn(teamMemberVO);
+
+            when(teamQueryService.searchParticipants(teamMemberVO, name)).thenReturn(mentionDTO);
+
+            // when & then
+            mockMvc.perform(get("/api/v1/teams/members/search")
+                            .param("name", name)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.ids[0]", CoreMatchers.is(1)))
+                    .andDo(print());
+        }
+
+        @Test
+        @DisplayName("특정 접두사")
+        void searchMembers_withPrefix() throws Exception {
+            // given
+            String name = "@john";
+            MentionDTO mentionDTO = new MentionDTO(List.of(2L));
+
+            when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
+            when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                    .thenReturn(teamMemberVO);
+
+            when(teamQueryService.searchParticipants(teamMemberVO, name)).thenReturn(mentionDTO);
+
+            // when & then
+            mockMvc.perform(get("/api/v1/teams/members/search")
+                            .param("name", name)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.ids[0]", CoreMatchers.is(2)))
+                    .andDo(print());
+        }
+    }
 }
