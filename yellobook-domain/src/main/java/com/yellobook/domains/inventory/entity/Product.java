@@ -39,7 +39,7 @@ public class Product extends BaseEntity {
     /**
      * 하위 품목
      */
-    @Column(length = 30)
+    @Column(length = 30, nullable = false)
     private String subProduct;
 
     /**

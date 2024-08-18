@@ -2,30 +2,24 @@ package com.yellobook.domains.team.repository;
 
 import com.yellobook.common.enums.MemberRole;
 import com.yellobook.common.enums.MemberTeamRole;
-import com.yellobook.config.ParticipantRepositoryTestConfig;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
+import com.yellobook.support.annotation.RepositoryTest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import(ParticipantRepositoryTestConfig.class)
+@RepositoryTest
 @DisplayName("Participant Repository 테스트")
 public class ParticipantRepositoryTest {
 
@@ -35,8 +29,6 @@ public class ParticipantRepositoryTest {
     @PersistenceContext
     private EntityManager em;
 
-    @Autowired
-    private ParticipantCustomRepositoryImpl participantCustomRepository;
 
     @BeforeEach
     void setUp() {
@@ -44,9 +36,6 @@ public class ParticipantRepositoryTest {
         em.createNativeQuery("ALTER TABLE participants ALTER COLUMN id RESTART WITH 1").executeUpdate();
         em.createNativeQuery("ALTER TABLE teams ALTER COLUMN id RESTART WITH 1").executeUpdate();
         em.createNativeQuery("ALTER TABLE members ALTER COLUMN id RESTART WITH 1").executeUpdate();
-
-
-        participantCustomRepository = new ParticipantCustomRepositoryImpl(em);
     }
 
     @Test
@@ -148,7 +137,7 @@ public class ParticipantRepositoryTest {
             );
 
             // When
-            List<Participant> result = participantCustomRepository.findMentionsByNamePrefix(prefix, teamId);
+            List<Participant> result = participantRepository.findMentionsByNamePrefix(prefix, teamId);
 
             // Then
             assertThat(result).hasSize(2);
