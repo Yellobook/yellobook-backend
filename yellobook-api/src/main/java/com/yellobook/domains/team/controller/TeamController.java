@@ -60,7 +60,7 @@ public class TeamController {
         return ResponseFactory.success(response);
     }
 
-    @GetMapping("/invitation")
+    @PostMapping("/invitation")
     @Operation(summary = "팀 참가하기 API", description = "멤버가 팀에 참가하는 API입니다.")
     public ResponseEntity<SuccessResponse<JoinTeamResponse>> joinTeam(
             @RequestParam("code") String code,
