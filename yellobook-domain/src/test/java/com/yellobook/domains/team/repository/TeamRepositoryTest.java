@@ -1,7 +1,7 @@
 package com.yellobook.domains.team.repository;
 
-import com.yellobook.config.TeamRepositoryTestConfig;
 import com.yellobook.domains.team.entity.Team;
+import com.yellobook.support.annotation.RepositoryTest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.assertj.core.api.Assertions;
@@ -9,14 +9,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import(TeamRepositoryTestConfig.class)
+@RepositoryTest
 @DisplayName("teamRepository 테스트")
 public class TeamRepositoryTest {
     @Autowired
