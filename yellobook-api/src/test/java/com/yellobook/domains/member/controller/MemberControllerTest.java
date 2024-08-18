@@ -4,6 +4,7 @@ import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.resolver.TeamMemberArgumentResolver;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.member.dto.response.ProfileResponse;
+import com.yellobook.domains.member.service.MemberCommandService;
 import com.yellobook.domains.member.service.MemberQueryService;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +37,10 @@ class MemberControllerTest {
 
     @MockBean
     private MemberQueryService memberQueryService;
+
+    @MockBean
+    private MemberCommandService memberCommandService;
+
     @MockBean
     private TeamMemberArgumentResolver teamMemberArgumentResolver;
 
