@@ -206,4 +206,37 @@ public class TeamControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.inviteUrl", equalTo(response.inviteUrl())));
     }
+
+    @Test
+    @DisplayName("팀 참가하기")
+    public void joinTeamTest() throws Exception {
+        //given
+        Long teamId = 1L;
+        String code = "team:code";
+        JoinTeamResponse response = new JoinTeamResponse(1L);
+        when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
+        when(teamCommandService.joinTeam(any(), any())).thenReturn(response);
+
+        //when & then
+        mockMvc.perform(post("/api/v1/teams/invitation")
+                        .param("code", code)
+                        .requestAttr("customOAuth2User", customOAuth2User)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.teamId", CoreMatchers.is(1)));
+    }
+
+    @Test
+    @DisplayName("팀 나가기")
+    public void leaveTeamTest() throws Exception {
+        //given
+        Long teamId = 1L;
+        when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
+        doNothing().when(teamCommandService).leaveTeam(teamId, customOAuth2User);
+
+        // when & then
+        mockMvc.perform(delete("/api/v1/teams/{teamId}/leave", teamId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
 }
