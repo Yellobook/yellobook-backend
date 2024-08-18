@@ -14,7 +14,6 @@ public interface TeamMapper {
 
     @Mapping(source = "id", target = "teamId")
     CreateTeamResponse toCreateTeamResponse(Team team);
-    LeaveTeamResponse toLeaveTeamResponse(Long teamId);
     InvitationCodeResponse toInvitationCodeResponse(String inviteUrl);
     @Mapping(source = "id", target = "teamId")
     JoinTeamResponse toJoinTeamResponse(Team team);
