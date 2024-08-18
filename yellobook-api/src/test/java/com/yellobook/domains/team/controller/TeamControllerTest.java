@@ -11,12 +11,10 @@ import com.yellobook.domains.auth.security.oauth2.dto.OAuth2UserDTO;
 import com.yellobook.domains.auth.service.RedisTeamService;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.team.dto.MentionDTO;
+import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.dto.request.InvitationCodeRequest;
 import com.yellobook.domains.team.dto.request.CreateTeamRequest;
-import com.yellobook.domains.team.dto.response.GetTeamResponse;
-import com.yellobook.domains.team.dto.response.InvitationCodeResponse;
-import com.yellobook.domains.team.dto.response.CreateTeamResponse;
-import com.yellobook.domains.team.dto.response.JoinTeamResponse;
+import com.yellobook.domains.team.dto.response.*;
 import com.yellobook.domains.team.service.TeamCommandService;
 import com.yellobook.domains.team.service.TeamQueryService;
 import org.hamcrest.CoreMatchers;
@@ -144,21 +142,21 @@ public class TeamControllerTest {
         @DisplayName("모든 멤버")
         void searchMembers_everyone() throws Exception {
             // given
-            String name = "everyone";
-            MentionDTO mentionDTO = new MentionDTO(List.of(1L, 2L, 3L));
+            TeamMemberListResponse response = new TeamMemberListResponse(
+                    List.of(new QueryTeamMember(1L,"test1"),
+                            new QueryTeamMember(2L, "test2")));
 
             when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
             when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
                     .thenReturn(teamMemberVO);
 
-            when(teamQueryService.searchParticipants(teamMemberVO, name)).thenReturn(mentionDTO);
+            when(teamQueryService.findTeamMembers(1L)).thenReturn(response);
 
             // when & then
-            mockMvc.perform(get("/api/v1/teams/members/search")
-                            .param("name", name)
+            mockMvc.perform(get("/api/v1/teams/members")
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data.ids[0]", CoreMatchers.is(1)))
+                    .andExpect(jsonPath("$.data.members.size()").value(2))
                     .andDo(print());
         }
 
