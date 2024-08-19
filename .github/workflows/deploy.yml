@@ -39,7 +39,7 @@ jobs:
 
       - name: 도커 이미지 빌드 후 Docker Hub 에 업로드
         run: |
-          docker build -t ywoosang/yellobook-server:latest -f Dockerfile.dev .
+          docker build -t ywoosang/yellobook-server:latest -f yellobook-api/Dockerfile .
           docker push ywoosang/yellobook-server:latest
   push:
     runs-on: ubuntu-latest
@@ -49,12 +49,12 @@ jobs:
       - name: 리포지토리 checkout
         uses: actions/checkout@v3
 
-      - name: docker-compose.dev.yml 파일을 EC2 로 복사
+      - name: docker-compose.yml 파일을 EC2 로 복사
         # 공식문서 https://github.com/appleboy/scp-action
         uses: appleboy/scp-action@v0.1.7
         with:
-          source: "docker-compose.dev.yml"
-          target: "~/yellobook"
+          source: "infrastructure/app/docker-compose.yml"
+          target: "~/yellobook/api"
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_PEM_KEY }}
@@ -69,8 +69,8 @@ jobs:
           key: ${{ secrets.EC2_PEM_KEY }}
           port: 22
           script: |
-            cd ~/yellobook
+            cd ~/yellobook/api
             docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PASSWORD }}
-            docker-compose -f docker-compose.dev.yml down
-            docker-compose -f docker-compose.dev.yml pull
-            docker-compose -f docker-compose.dev.yml up -d
+            docker-compose -f docker-compose.yml down
+            docker-compose -f docker-compose.yml pull
+            docker-compose -f docker-compose.yml up -d
