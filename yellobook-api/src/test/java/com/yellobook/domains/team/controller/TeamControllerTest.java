@@ -97,7 +97,6 @@ public class TeamControllerTest {
         mockMvc.perform(post("/api/v1/teams")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .principal(() -> customOAuth2User.getName())
                 )
                 .andExpect(status().isCreated());
     }
