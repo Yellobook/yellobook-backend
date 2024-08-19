@@ -1,6 +1,5 @@
 package com.yellobook.domains.order.dto.response;
 
-import com.yellobook.common.enums.MemberTeamRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
@@ -13,6 +12,7 @@ public record GetOrderCommentsResponse(
         List<CommentInfo> comments
 ) {
 
+    @Builder
     public record CommentInfo(
             @Schema(description = "댓글 Id", example = "1")
             Long commentId,
@@ -22,12 +22,6 @@ public record GetOrderCommentsResponse(
             String content,
             @Schema(description = "댓글 생성 날짜", example = "2007-12-03T10:15:30")
             LocalDateTime createdAt
-    ){
-
-        @Builder
-        public static CommentInfo of(Long commentId, MemberTeamRole role, String content, LocalDateTime createdAt){
-            return new CommentInfo(commentId, role.getDescription(), content, createdAt);
-        }
-    }
+    ){ }
 
 }

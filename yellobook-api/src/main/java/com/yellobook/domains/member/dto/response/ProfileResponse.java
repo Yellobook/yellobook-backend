@@ -1,6 +1,5 @@
 package com.yellobook.domains.member.dto.response;
 
-import com.yellobook.domains.team.dto.query.QueryMemberJoinTeam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
@@ -24,20 +23,12 @@ public record ProfileResponse(
         List<ParticipantInfo> teams
 ){
 
+    @Builder
     public record ParticipantInfo(
             @Schema(description = "팀 이름", example ="team1")
             String teamName,
             @Schema(description = "팀에서 역할", example ="관리자")
             String role
-    ){
-
-        @Builder
-        public static ParticipantInfo of(QueryMemberJoinTeam queryMemberJoinTeam){
-            return new ParticipantInfo(
-                    queryMemberJoinTeam.teamName(),
-                    queryMemberJoinTeam.role().getDescription()
-            );
-        }
-    }
+    ){ }
 
 }
