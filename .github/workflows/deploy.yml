@@ -38,6 +38,7 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
       - name: 도커 이미지 빌드 후 Docker Hub 에 업로드
+        # EC2 Ubuntu (amd64), Github Actions (amd64) 따라서 --platform linux/amd64 명시적으로 지정해줄 필요 없음
         run: |
           docker build -t ywoosang/yellobook-server:latest -f yellobook-api/Dockerfile .
           docker push ywoosang/yellobook-server:latest
