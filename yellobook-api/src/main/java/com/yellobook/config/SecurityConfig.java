@@ -120,7 +120,13 @@ public class SecurityConfig {
                         // 헬스 체크 경로는 jwt 인증 비활성화
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         // 헬스 체크 경로는 jwt 인증 비활성화
-                        .requestMatchers("/api/v1/", "/api/v1/health", "/api/v1/auth/terms", "/api/v1/inventories").permitAll()
+                        .requestMatchers(
+                                "/api/v1",
+                                "/api/v1/health",
+                                "/api/v1/auth/terms",
+                                "/api/v1/dev/**",
+                                "/api/v1/inventories"
+                        ).permitAll()
                         // 이외 요청 모두 jwt 필터를 타도록 설정
                         .anyRequest().authenticated())
                 .exceptionHandling(exceptionHandling ->

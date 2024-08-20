@@ -12,10 +12,13 @@ import com.yellobook.domains.inventory.dto.response.GetTotalInventoryResponse;
 import com.yellobook.domains.inventory.service.ExcelReadService;
 import com.yellobook.domains.inventory.service.InventoryCommandService;
 import com.yellobook.domains.inventory.service.InventoryQueryService;
+import com.yellobook.domains.inventory.dto.response.GetProductsNameResponse;
+import com.yellobook.domains.inventory.dto.response.GetSubProductNameResponse;
 import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -38,8 +41,8 @@ public class InventoryController {
     @Operation(summary = "전체 재고 현황 글 조회")
     @GetMapping
     public ResponseEntity<SuccessResponse<GetTotalInventoryResponse>> getTotalInventory(
-            @RequestParam("page") Integer page,
-            @RequestParam("size") Integer size,
+            @Min(value = 1, message = "page는 1 이상이여야 합니다.") @RequestParam("page") Integer page,
+            @Min(value = 1, message = "size는 1 이상이여야 합니다.")@RequestParam("size") Integer size,
             @TeamMember TeamMemberVO teamMember
             ){
         var result = inventoryQueryService.getTotalInventory(page, size, teamMember);
@@ -99,7 +102,7 @@ public class InventoryController {
         return ResponseFactory.noContent();
     }
 
-    // TODO : 엑셀 읽어서 제고 추가 (생성된 ID 반환)
+    // TODO : 엑셀 읽어서 제고 추가 (생성된 ID 반환), security Config에서 url 제거
     @Operation(summary = "엑셀 파일 읽어서 제고 생성")
     @PostMapping()
     public ResponseEntity<SuccessResponse<?>> createInventory(
@@ -107,6 +110,26 @@ public class InventoryController {
     ){
         excelReadService.read(file);
         return null;
+    }
+
+    @Operation(summary = "제품 이름으로 제품 조회")
+    @GetMapping("/products/search")
+    public ResponseEntity<SuccessResponse<GetProductsNameResponse>> getProductNames(
+            @RequestParam("name") String name,
+            @TeamMember TeamMemberVO teamMember
+    ){
+        GetProductsNameResponse response = inventoryQueryService.getProductsName(name, teamMember);
+        return ResponseFactory.success(response);
+    }
+
+    @Operation(summary = "제품 이름으로 하위 제품 조회")
+    @GetMapping("/subProducts/search")
+    public ResponseEntity<SuccessResponse<GetSubProductNameResponse>> getSubProductName(
+            @RequestParam("name") String name,
+            @TeamMember TeamMemberVO teamMember
+    ){
+        GetSubProductNameResponse response = inventoryQueryService.getSubProductName(name, teamMember);
+        return ResponseFactory.success(response);
     }
 
 }

@@ -32,7 +32,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     // 필터에서 제외시키고 싶은 request 에서 true 를 반환시킨다.
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        Set<String> excludePaths = new HashSet<>(Set.of("/api/v1/auth/terms"));
+        Set<String> excludePaths = new HashSet<>(Set.of(
+                "/api/v1/auth/terms",
+                "/api/v1/dev"
+        ));
         String requestURI = request.getRequestURI();
         return excludePaths.stream().anyMatch(requestURI::startsWith);
     }
@@ -45,6 +48,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     && !redisAuthService.isTokenInBlacklist(accessToken)
             ) {
                 Member member = jwtService.getMemberFromAccessToken(accessToken);
+                log.info("[AUTH_INFO] 사용자 인가: ID{} 닉네임{}", member.getId(), member.getNickname());
                 OAuth2UserDTO oauth2UserDTO = OAuth2UserDTO.from(member);
                 CustomOAuth2User customOAuth2User = new CustomOAuth2User(oauth2UserDTO);
                 Authentication authentication = new UsernamePasswordAuthenticationToken(

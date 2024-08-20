@@ -7,18 +7,15 @@ import com.yellobook.domains.order.dto.query.QueryOrderComment;
 import com.yellobook.domains.order.entity.QOrder;
 import com.yellobook.domains.order.entity.QOrderComment;
 import com.yellobook.domains.team.entity.QParticipant;
-import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
-
     private final JPAQueryFactory queryFactory;
-    public OrderRepositoryCustomImpl(EntityManager em){
-        this.queryFactory = new JPAQueryFactory(em);
-    }
 
     @Override
     public List<QueryOrderComment> getOrderComments(Long orderId) {
@@ -33,7 +30,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
                 ))
                 .from(orderComment)
                 .join(participant).on(orderComment.member.id.eq(participant.member.id))
-                .where(orderComment.order.id.eq(orderId))
+                .where(orderComment.order.id.eq(orderId), orderComment.order.team.id.eq(participant.team.id))
                 .orderBy(orderComment.createdAt.asc())
                 .fetch();
     }

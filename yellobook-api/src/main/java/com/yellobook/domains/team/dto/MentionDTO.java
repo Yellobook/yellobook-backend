@@ -1,10 +1,12 @@
-package com.yellobook.domains.inform.dto;
+package com.yellobook.domains.team.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 @AllArgsConstructor
 public class MentionDTO {
-    private Long id;
+    private List<Long> ids;
 }

@@ -34,4 +34,8 @@ public class InformComment extends BaseEntity {
         this.member = member;
         this.inform = inform;
     }
+
+    public void setInform(Inform inform) {
+        this.inform = inform;
+    }
 }

@@ -18,7 +18,8 @@ public enum TeamErrorCode implements ErrorCode {
     INVITATION_NOT_FOUND(HttpStatus.NOT_FOUND, "TEAM-008", "초대장을 찾을 수 없습니다."),
     INVALID_INVITATION(HttpStatus.NOT_FOUND, "TEAM-009", "유효하지 않은 초대장 입니다."),
     MEMBER_ALREADY_EXIST(HttpStatus.CONFLICT, "TEAM-010", "이미 존재하는 멤버입니다."),
-    EXIST_TEAM_NAME(HttpStatus.CONFLICT, "TEAM-011", "이미 존재하는 팀 이름입니다.");
+    EXIST_TEAM_NAME(HttpStatus.CONFLICT, "TEAM-011", "이미 존재하는 팀 이름입니다."),
+    MENTIONED_MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "TEAM-012", "존재하지 않는 사용자에 대한 언급입니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

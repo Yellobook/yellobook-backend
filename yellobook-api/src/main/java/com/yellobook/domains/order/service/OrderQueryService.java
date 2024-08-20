@@ -32,9 +32,8 @@ public class OrderQueryService {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new CustomException(OrderErrorCode.ORDER_NOT_FOUND));
         // 접근 권한 있는지 확인
         if(teamMemberVO.getMemberId().equals(order.getMember().getId()) || orderMentionRepository.existsByMemberIdAndOrderId(teamMemberVO.getMemberId(), orderId)){
-            // 댓글 조회접
+            // 댓글 조회
             List<CommentInfo> commentInfos = orderRepository.getOrderComments(orderId).stream().map(orderMapper::toCommentInfo).toList();
-            //return orderMapper.toGetOrderCommentsResponse(commentInfos);  //적용 안됨ㅜㅜ
             return GetOrderCommentsResponse.builder().comments(commentInfos).build();
         }else{
             throw new CustomException(OrderErrorCode.ORDER_ACCESS_DENIED);
@@ -59,4 +58,5 @@ public class OrderQueryService {
     public boolean existsByOrderId(Long orderId){
         return orderRepository.existsById(orderId);
     }
+
 }

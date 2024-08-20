@@ -1,12 +1,20 @@
--- 공지 및 일정 멘션 데이터 삭제
+-- 공지 및 업무 멘션 데이터 삭제
 DELETE FROM inform_mentions;
 ALTER TABLE inform_mentions ALTER COLUMN id RESTART WITH 1;
+
+-- 주문 댓글 데이터 삭제
+DELETE FROM order_comments;
+ALTER TABLE order_comments ALTER COLUMN  id RESTART WITH 1;
+
+-- 공지 및 업무 댓글 데이터 삭제
+DELETE FROM inform_comments;
+ALTER TABLE inform_comments ALTER COLUMN  id RESTART WITH 1;
 
 -- 주문 멘션 데이터 삭제
 DELETE FROM order_mentions;
 ALTER TABLE order_mentions ALTER COLUMN id RESTART WITH 1;
 
--- 공지 및 일정 데이터 삭제
+-- 공지 및 업무 데이터 삭제
 DELETE FROM informs;
 ALTER TABLE informs ALTER COLUMN id RESTART WITH 1;
 

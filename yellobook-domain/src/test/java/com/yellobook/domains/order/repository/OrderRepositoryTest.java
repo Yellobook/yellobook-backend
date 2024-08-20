@@ -4,16 +4,13 @@ import com.yellobook.domains.order.dto.query.QueryOrder;
 import com.yellobook.domains.order.dto.query.QueryOrderComment;
 import com.yellobook.domains.order.entity.Order;
 import com.yellobook.domains.order.entity.OrderComment;
+import com.yellobook.support.annotation.RepositoryTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,11 +19,8 @@ import static com.yellobook.common.enums.MemberTeamRole.ADMIN;
 import static com.yellobook.common.enums.MemberTeamRole.ORDERER;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith(SpringExtension.class)
-@DataJpaTest
-@EnableJpaAuditing
+@RepositoryTest
 @Sql(scripts = "classpath:setup_order.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-@Sql(scripts = "classpath:cleanup_order.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @DisplayName("Order 도메인 Repository Unit Test")
 public class OrderRepositoryTest {
     private final OrderRepository orderRepository;

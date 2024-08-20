@@ -1,6 +1,8 @@
 package com.yellobook.domains.team.service;
 
-import com.yellobook.domains.inform.dto.MentionDTO;
+import com.yellobook.common.vo.TeamMemberVO;
+import com.yellobook.domains.team.dto.MentionDTO;
+import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.mapper.ParticipantMapper;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
@@ -20,11 +22,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-@Slf4j
 public class TeamQueryService{
 
     private final TeamRepository teamRepository;
@@ -73,7 +76,6 @@ public class TeamQueryService{
 
     public GetTeamResponse findByTeamId(Long teamId, CustomOAuth2User customOAuth2User){
         //팀 id를 가지고 팀에 대한 정보 가져오기
-
         Long memberId = customOAuth2User.getMemberId();
 
         Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)
@@ -84,17 +86,26 @@ public class TeamQueryService{
 
         Team team = teamRepository.getReferenceById(teamId);
 
+        redisService.setMemberCurrentTeam(memberId,teamId,participant.getRole().name());
+
         return teamMapper.toGetTeamResponse(team);
     }
+
+    public TeamMemberListResponse findTeamMembers(Long teamId){
+        List<QueryTeamMember> members = teamRepository.findTeamMembers(teamId);
+        return teamMapper.toTeamMemberListResponse(members);
+    }
+
 
     public boolean existsByTeamId(Long teamId) {
         return teamRepository.existsById(teamId);
     }
 
-    public List<MentionDTO> searchParticipants(Long teamId, String name){
+    public MentionDTO searchParticipants(TeamMemberVO teamMember, String name){
         List<Participant> mentions;
+        Long teamId = teamMember.getTeamId();
 
-        if(name.equalsIgnoreCase("@everyone")){
+        if(name.trim().equalsIgnoreCase("everyone")){
             mentions = participantRepository.findAllByTeamId(teamId);
         }
         else if(name.startsWith("@")){
@@ -102,8 +113,13 @@ public class TeamQueryService{
             mentions = participantRepository.findMentionsByNamePrefix(prefix, teamId);
         }
         else {
-            return List.of();
+            return new MentionDTO(List.of());
         }
-        return participantMapper.toMentionDTOlist(mentions);
+        List<Long> participantIds = mentions.stream()
+                .map(Participant::getId)
+                .collect(Collectors.toList());
+
+        // 변환된 ID 리스트를 사용하여 MentionDTO 생성
+        return participantMapper.toMentionDTO(participantIds);
     }
 }
