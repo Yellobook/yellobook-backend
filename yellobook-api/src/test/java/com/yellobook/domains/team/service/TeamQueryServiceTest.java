@@ -221,6 +221,47 @@ public class TeamQueryServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("existsByTeamId 메소드는")
+    class Describe_existsByTeamId {
+
+        @Nested
+        @DisplayName("Team이 존재하는 경우")
+        class Context_Exist_Team{
+
+            @Test
+            @DisplayName("true를 반환한다.")
+            void it_returns_true(){
+                //given
+                when(teamRepository.existsById(team.getId())).thenReturn(true);
+
+                //when
+                boolean result = teamQueryService.existsByTeamId(team.getId());
+
+                //then
+                assertTrue(result);
+            }
+        }
+
+        @Nested
+        @DisplayName("Team이 존재하지 않는 경우")
+        class Context_Not_Exist_Team{
+
+            @Test
+            @DisplayName("false를 반환한다.")
+            void it_returns_false(){
+                //given
+                when(teamRepository.existsById(team.getId())).thenReturn(false);
+
+                //when
+                boolean result = teamQueryService.existsByTeamId(team.getId());
+
+                //then
+                assertFalse(result);
+            }
+        }
+    }
+
 
     private Member createMember(Long memberId){
         return Member.builder().memberId(memberId).build();
