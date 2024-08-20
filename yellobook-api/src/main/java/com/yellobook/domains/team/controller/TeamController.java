@@ -4,7 +4,6 @@ import com.yellobook.common.annotation.TeamMember;
 import com.yellobook.common.validation.annotation.ExistTeam;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
-import com.yellobook.domains.team.dto.MentionDTO;
 import com.yellobook.domains.team.dto.response.*;
 import com.yellobook.domains.team.dto.request.*;
 import com.yellobook.domains.team.service.TeamCommandService;
@@ -94,11 +93,11 @@ public class TeamController {
 
     @GetMapping("/members/search")
     @Operation(summary = "팀 내의 멤버 검색", description = "팀 내의 멤버들을 검색하는 API입니다.")
-    public ResponseEntity<SuccessResponse<MentionDTO>> searchMembers(
+    public ResponseEntity<SuccessResponse<TeamMemberListResponse>> searchMembers(
             @RequestParam("name") @NotBlank(message = "이름은 필수 입력 값입니다.") String name,
             @TeamMember TeamMemberVO teamMember
     ){
-        MentionDTO response = teamQueryService.searchParticipants(teamMember, name);
+        TeamMemberListResponse response = teamQueryService.searchParticipants(teamMember, name);
         return ResponseFactory.success(response);
     }
 }

@@ -1,7 +1,6 @@
 package com.yellobook.domains.team.service;
 
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domains.team.dto.MentionDTO;
 import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.mapper.ParticipantMapper;
 import com.yellobook.domains.team.entity.Participant;
@@ -101,25 +100,10 @@ public class TeamQueryService{
         return teamRepository.existsById(teamId);
     }
 
-    public MentionDTO searchParticipants(TeamMemberVO teamMember, String name){
-        List<Participant> mentions;
+    public TeamMemberListResponse searchParticipants(TeamMemberVO teamMember, String name){
         Long teamId = teamMember.getTeamId();
+        List<QueryTeamMember> mentions = participantRepository.findMentionsByNamePrefix(name, teamId);
 
-        if(name.trim().equalsIgnoreCase("everyone")){
-            mentions = participantRepository.findAllByTeamId(teamId);
-        }
-        else if(name.startsWith("@")){
-            String prefix = name.substring(1);
-            mentions = participantRepository.findMentionsByNamePrefix(prefix, teamId);
-        }
-        else {
-            return new MentionDTO(List.of());
-        }
-        List<Long> participantIds = mentions.stream()
-                .map(Participant::getId)
-                .collect(Collectors.toList());
-
-        // 변환된 ID 리스트를 사용하여 MentionDTO 생성
-        return participantMapper.toMentionDTO(participantIds);
+        return teamMapper.toTeamMemberListResponse(mentions);
     }
 }

@@ -32,11 +32,16 @@ public class ParticipantCustomRepositoryImpl implements ParticipantCustomReposit
     }
 
     @Override
-    public List<Participant> findMentionsByNamePrefix(String prefix, Long teamId) {
+    public List<QueryTeamMember> findMentionsByNamePrefix(String prefix, Long teamId) {
         QMember member = QMember.member;
         QParticipant participant = QParticipant.participant;
 
-        return queryFactory.selectFrom(participant)
+        return queryFactory
+                .select(Projections.constructor(QueryTeamMember.class,
+                        member.id,
+                        member.nickname
+                ))
+                .from(participant)
                 .join(participant.member, member)
                 .where(member.nickname.like(prefix + "%")
                         .and(participant.team.id.eq(teamId)))

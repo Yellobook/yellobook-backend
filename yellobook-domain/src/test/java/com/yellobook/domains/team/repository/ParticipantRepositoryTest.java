@@ -3,6 +3,7 @@ package com.yellobook.domains.team.repository;
 import com.yellobook.common.enums.MemberRole;
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.domains.member.entity.Member;
+import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
 import com.yellobook.support.annotation.RepositoryTest;
@@ -137,12 +138,12 @@ public class ParticipantRepositoryTest {
             );
 
             // When
-            List<Participant> result = participantRepository.findMentionsByNamePrefix(prefix, teamId);
+            List<QueryTeamMember> result = participantRepository.findMentionsByNamePrefix(prefix, teamId);
 
             // Then
             assertThat(result).hasSize(2);
-            assertThat(result.get(0).getMember().getNickname()).isEqualTo("홍길동");
-            assertThat(result.get(1).getMember().getNickname()).isEqualTo("홍명보");
+            assertThat(result.get(0).nickname()).isEqualTo("홍길동");
+            assertThat(result.get(1).nickname()).isEqualTo("홍명보");
         }
         //팀 id를 통해 모든 참가자를 받는 조회
         @Test
