@@ -14,7 +14,7 @@ dependencies {
     implementation "p6spy:p6spy:3.9.1"
 
     // h2
-    runtimeOnly 'com.h2database:h2'
+    testRuntimeOnly 'com.h2database:h2'
 }
 
 processResources.dependsOn('copyConfig')

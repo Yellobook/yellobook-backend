@@ -1,7 +1,8 @@
 -- 팀 데이터 삽입
 INSERT INTO teams (id, name, phone_number, address, created_at, updated_at)
 VALUES
-    (1, '팀 A', '010-1234-5678', '서울특별시', '2024-07-25 10:00:00', '2024-07-25 10:00:00');
+    (1, '팀 A', '010-1234-5678', '서울특별시', '2024-07-25 10:00:00', '2024-07-25 10:00:00'),
+    (2, '팀 B', '010-1234-5679', '서울특별시', '2024-07-25 10:00:00', '2024-07-25 10:00:00');
 
 -- 회원 데이터 삽입
 INSERT INTO members (id, nickname, email, profile_image, role, allowance, created_at, updated_at)
@@ -15,7 +16,8 @@ INSERT INTO participants (id, team_id, member_id, role, created_at, updated_at)
 VALUES
     (1, 1, 1, 'ADMIN', '2024-07-25 10:00:00', '2024-07-25 10:00:00'),
     (2, 1, 2, 'ORDERER', '2024-07-25 10:00:00', '2024-07-25 10:00:00'),
-    (3, 1, 3, 'VIEWER', '2024-07-25 10:00:00', '2024-07-25 10:00:00');
+    (3, 1, 3, 'VIEWER', '2024-07-25 10:00:00', '2024-07-25 10:00:00'),
+    (4, 2, 1, 'ORDERER', '2024-07-25 10:00:00', '2024-07-25 10:00:00');
 
 INSERT INTO inventories (id, team_id, title, view, created_at, updated_at)
 VALUES

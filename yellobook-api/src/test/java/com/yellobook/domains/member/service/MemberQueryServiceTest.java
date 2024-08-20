@@ -47,7 +47,8 @@ class MemberQueryServiceTest {
             Long memberId = 1L;
             Member member = createMember();
             List<QueryMemberJoinTeam> queryMemberJoinTeams = createQueryMemberJoinTeam();
-            List<ParticipantInfo> participantInfos = queryMemberJoinTeams.stream().map((QueryMemberJoinTeam teamName) -> ParticipantInfo.builder().queryMemberJoinTeam(teamName).build()).toList();
+            List<ParticipantInfo> participantInfos = queryMemberJoinTeams.stream().map((QueryMemberJoinTeam teamName) -> ParticipantInfo.builder()
+                    .teamName(teamName.teamName()).role(teamName.role().getDescription()).build()).toList();
             ProfileResponse expectResponse = createProfileResponse(participantInfos);
 
             when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));

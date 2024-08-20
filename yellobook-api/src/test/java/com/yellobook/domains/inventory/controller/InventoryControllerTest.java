@@ -82,6 +82,46 @@ class InventoryControllerTest {
     }
 
     @Test
+    @DisplayName("전체 재고 현황 글 조회 - page가 1보다 작을 경우 예외 발생")
+    void getTotalInventoryPageLessOne() throws Exception{
+        //given
+        Integer page = 0;
+        Integer size = 5;
+        GetTotalInventoryResponse response = GetTotalInventoryResponse.builder().page(page).size(0)
+                .inventories(Collections.emptyList()).build();
+        when(inventoryQueryService.getTotalInventory(page, size, teamMemberVO)).thenReturn(response);
+
+        //when & then
+        mockMvc.perform(get("/api/v1/inventories")
+                        .param("page", String.valueOf(page))
+                        .param("size", String.valueOf(size))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    @DisplayName("전체 재고 현황 글 조회 - page가 1보다 작을 경우 예외 발생")
+    void getTotalInventorySizeLessOne() throws Exception{
+        //given
+        Integer page = 1;
+        Integer size = 0;
+        GetTotalInventoryResponse response = GetTotalInventoryResponse.builder().page(page).size(0)
+                .inventories(Collections.emptyList()).build();
+        when(inventoryQueryService.getTotalInventory(page, size, teamMemberVO)).thenReturn(response);
+
+        //when & then
+        mockMvc.perform(get("/api/v1/inventories")
+                        .param("page", String.valueOf(page))
+                        .param("size", String.valueOf(size))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
     @DisplayName("일별 재고 현황 상세 조회 - 재고가 존재하는 경우")
     void getProductsByInventory() throws Exception{
         //given
