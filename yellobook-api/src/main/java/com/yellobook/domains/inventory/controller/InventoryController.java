@@ -6,14 +6,9 @@ import com.yellobook.common.validation.annotation.ExistProduct;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.inventory.dto.request.AddProductRequest;
 import com.yellobook.domains.inventory.dto.request.ModifyProductAmountRequest;
-import com.yellobook.domains.inventory.dto.response.AddProductResponse;
-import com.yellobook.domains.inventory.dto.response.GetProductsResponse;
-import com.yellobook.domains.inventory.dto.response.GetTotalInventoryResponse;
-import com.yellobook.domains.inventory.service.ExcelReadService;
+import com.yellobook.domains.inventory.dto.response.*;
 import com.yellobook.domains.inventory.service.InventoryCommandService;
 import com.yellobook.domains.inventory.service.InventoryQueryService;
-import com.yellobook.domains.inventory.dto.response.GetProductsNameResponse;
-import com.yellobook.domains.inventory.dto.response.GetSubProductNameResponse;
 import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,7 +31,6 @@ public class InventoryController {
 
     private final InventoryCommandService inventoryCommandService;
     private final InventoryQueryService inventoryQueryService;
-    private final ExcelReadService excelReadService;
 
     @Operation(summary = "전체 재고 현황 글 조회")
     @GetMapping
@@ -78,7 +72,7 @@ public class InventoryController {
             @TeamMember TeamMemberVO teamMember
     ){
         AddProductResponse response = inventoryCommandService.addProduct(inventoryId, requestDTO, teamMember);
-        return ResponseFactory.success(response);
+        return ResponseFactory.created(response);
     }
 
     @Operation(summary = "제품 수량 수정")
@@ -102,14 +96,15 @@ public class InventoryController {
         return ResponseFactory.noContent();
     }
 
-    // TODO : 엑셀 읽어서 제고 추가 (생성된 ID 반환), security Config에서 url 제거
+    // TODO : security Config에서 url 제거
     @Operation(summary = "엑셀 파일 읽어서 제고 생성")
     @PostMapping()
-    public ResponseEntity<SuccessResponse<?>> createInventory(
+    public ResponseEntity<SuccessResponse<AddInventoryResponse>> addInventory(
             @RequestPart("file") MultipartFile file
+            //@TeamMember TeamMemberVO teamMember
     ){
-        excelReadService.read(file);
-        return null;
+        AddInventoryResponse response = inventoryCommandService.addInventory(file);
+        return ResponseFactory.created(response);
     }
 
     @Operation(summary = "제품 이름으로 제품 조회")

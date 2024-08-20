@@ -239,7 +239,7 @@ class InventoryControllerTest {
         mockMvc.perform(post("/api/v1/inventories/{inventoryId}", inventoryId)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.productId", CoreMatchers.is(response.productId().intValue())))
                 .andReturn();
     }
