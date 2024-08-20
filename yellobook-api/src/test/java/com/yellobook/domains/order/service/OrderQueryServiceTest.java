@@ -85,7 +85,7 @@ class OrderQueryServiceTest {
             //given
             Long orderId = 1L;
             Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 2L);  // orderMember : 2L, member : 2L
-            CommentInfo commentInfo = CommentInfo.builder().content("content").role(MemberTeamRole.ORDERER).build();
+            CommentInfo commentInfo = CommentInfo.builder().content("content").role("주문자").build();
 
             when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
             when(orderRepository.getOrderComments(orderId)).thenReturn(List.of(QueryOrderComment.builder().build()));
