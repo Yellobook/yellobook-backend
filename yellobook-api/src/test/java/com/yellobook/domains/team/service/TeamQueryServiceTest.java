@@ -150,6 +150,33 @@ public class TeamQueryServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("findTeamMembers 메소드는")
+    class Describe_findTeamMembers {
+        @Nested
+        @DisplayName("TeamMember인 경우")
+        class Context_TeamMember{
+            @Test
+            @DisplayName("모든 팀원을 반환한다.")
+            void it_returns_all_team_members(){
+                //given
+                TeamMemberListResponse response = new TeamMemberListResponse(List.of(
+                        new QueryTeamMember(1L, "test1"),
+                        new QueryTeamMember(2L, "test2")));
+
+                when(teamRepository.findTeamMembers(team.getId())).thenReturn(response.members());
+                when(teamMapper.toTeamMemberListResponse(response.members())).thenReturn(response);
+                //when
+                TeamMemberListResponse res = teamQueryService.findTeamMembers(team.getId());
+
+                //then
+                assertNotNull(res);
+                assertEquals(response, res);
+            }
+        }
+    }
+
+
     private Member createMember(Long memberId){
         return Member.builder().memberId(memberId).build();
     }
