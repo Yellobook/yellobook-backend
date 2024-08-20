@@ -272,6 +272,51 @@ public class TeamCommandServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("leaveTeam 메소드는")
+    class Describe_leaveTeam{
+
+        @Nested
+        @DisplayName("팀 멤버가 아닌 경우")
+        class Context_Not_Team_Member{
+
+            @Test
+            @DisplayName("USER_NOT_IN_THAT_TEAM 에러를 반환한다.")
+            void it_returns_UserNotInThatTeam(){
+                //given
+                when(participantRepository.findByTeamIdAndMemberId(team.getId(), member.getId())).thenReturn(Optional.empty());
+
+                //when
+                CustomException exception = assertThrows(
+                        CustomException.class, () -> teamCommandService.leaveTeam(team.getId(), customOAuth2User));
+
+                //then
+                assertEquals(TeamErrorCode.USER_NOT_IN_THAT_TEAM, exception.getErrorCode());
+                verify(participantRepository, never()).delete(any(Participant.class));
+            }
+        }
+
+        @Nested
+        @DisplayName("팀 멤버인 경우")
+        class Context_Team_Member{
+
+            @Test
+            @DisplayName("정상적으로 팀에서 나간다.")
+            void it_returns_member_to_leave_team(){
+                //given
+                when(participantRepository.findByTeamIdAndMemberId(team.getId(), member.getId())).thenReturn(Optional.of(participant));
+                when(participantRepository.findFirstByMemberIdOrderByCreatedAtAsc(member.getId())).thenReturn(Optional.of(participant));
+
+                //when
+                teamCommandService.leaveTeam(team.getId(), customOAuth2User);
+
+                //then
+                verify(participantRepository).delete(participant); // 참가자 삭제 확인
+                verify(redisService, times(1)).setMemberCurrentTeam(anyLong(), anyLong(), anyString());
+            }
+        }
+    }
+
     private Member createMember(Long memberId){
         return Member.builder().memberId(memberId).build();
     }
