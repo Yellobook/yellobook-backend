@@ -176,6 +176,51 @@ public class TeamQueryServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("searchParticipants 메소드는")
+    class Describe_searchParticipants {
+        @Nested
+        @DisplayName("TeamMember인 경우")
+        class Context_TeamMember{
+            @Test
+            @DisplayName("검색어로 시작하는 팀원들을 반환한다.")
+            void it_returns_team_members_starts_with_prefix(){
+                //given
+                String prefix = "test";
+                TeamMemberListResponse response = new TeamMemberListResponse(List.of(
+                        new QueryTeamMember(1L, "test1"),
+                        new QueryTeamMember(2L, "test2")));
+                TeamMemberVO teamMember = TeamMemberVO.of(member.getId(),team.getId(), MemberTeamRole.ORDERER);
+
+                when(participantRepository.findMentionsByNamePrefix(prefix, team.getId())).thenReturn(response.members());
+                when(teamMapper.toTeamMemberListResponse(response.members())).thenReturn(response);
+
+
+                TeamMemberListResponse res = teamQueryService.searchParticipants(teamMember, prefix);
+
+                assertNotNull(res);
+                assertEquals(response, res);
+            }
+        }
+
+        @Nested
+        @DisplayName("팀에 속하지 않은 경우")
+        class Context_Not_TeamMember{
+
+            @Test
+            @DisplayName("USER_NOT_IN_THAT_TEAM 에러를 반환한다.")
+            void it_returns_user_not_in_that_team(){
+                //given
+                when(participantRepository.findByTeamIdAndMemberId(team.getId(), customOAuth2User.getMemberId())).thenReturn(Optional.empty());
+
+                CustomException exception = assertThrows(
+                        CustomException.class, () -> teamQueryService.findByTeamId(team.getId(), customOAuth2User));
+
+                assertEquals(TeamErrorCode.USER_NOT_IN_THAT_TEAM, exception.getErrorCode());
+            }
+        }
+    }
+
 
     private Member createMember(Long memberId){
         return Member.builder().memberId(memberId).build();
