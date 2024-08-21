@@ -3,7 +3,20 @@ plugins {
     id 'org.springframework.boot' version '3.3.1'
     id 'io.spring.dependency-management' version '1.1.5'
     id 'jacoco'
+    id 'org.sonarqube' version '4.4.1.3373'
 }
+
+sonar {
+    properties {
+        property 'sonar.projectKey', 'Yellobook_yellobook-backend'
+        property 'sonar.organization', 'yellobook-server-sonar-cloud-key'
+        property 'sonar.host.url', 'https://sonarcloud.io'
+        property 'sonar.coverage.jacoco.xmlReportPaths', 'build/reports/jacoco/test/jacocoTestReport.xml'
+    }
+}
+
+group = 'com.yellobook'
+version = '1.0.0'
 
 /**
  * 루트 build.gradle 에 플러그인 설정을 추가하면 모든 서브프로젝트에 동일한 설정이 적용된다.
@@ -19,40 +32,33 @@ ext {
 
         // QueryDSL Q 클래스 제외
         for (qPattern in 'QA'..'QZ') {
-            excludes.add("**/${qPattern}*")
+            excludes.add('**/${qPattern}*')
         }
         excludes.addAll([
                 // main
-                "**/*Application*",
+                '**/*Application*',
                 // 설정
-                "**/*Config*",
+                '**/*Config*',
                 // 스프링 시큐리티
-                "**/security/**",
-                // DTO, VO
-                "**/*Dto*",
-                "**/*DTO*",
-                "**/*VO*",
-                // 요청, 응답 클래스
-                "**/response/**",
-                "**/request/**",
-                "**/*Request*",
-                "**/*Response*",
+                '**/security/**',
+                // DTO
+                '**/dto/**',
                 // 예외 클래스
-                "**/*Exception*",
-                "**/*ErrorCode*",
+                '**/*Exception*',
+                '**/*ErrorCode*',
                 // 리졸버
-                "**/*Resolver*",
+                '**/*Resolver*',
                 // AOP
-                "**/*Aspect*",
+                '**/*Aspect*',
                 // 인터셉터, 필터
-                "**/*Interceptor*",
-                "**/*Filter*",
+                '**/*Interceptor*',
+                '**/*Filter*',
                 // enum
-                "**/enums/**",
+                '**/enums/**',
                 // mapstruct
-                "**/mapper/**",
+                '**/mapper/**',
                 // 커스텀 애노테이션
-                "**/annotation/**"
+                '**/annotation/**'
         ])
 
         return excludes
@@ -60,8 +66,6 @@ ext {
 }
 
 allprojects {
-    group = 'com.yellobook'
-    version = '1.0.0'
     sourceCompatibility = '17'
     targetCompatibility = '17'
 
@@ -105,7 +109,7 @@ subprojects {
         reports {
             xml.required = false
             csv.required = false
-            html.outputLocation = file("${buildDir}/jacocoTestReportHtml")
+            html.outputLocation = file('build/jacocoTestReportHtml')
         }
 
         afterEvaluate  {
@@ -125,12 +129,14 @@ subprojects {
 }
 
 
+
+
 tasks.register('jacocoRootReport', JacocoReport) {
     reports {
         xml.required = true
         csv.required = false
-        html.outputLocation = file("${buildDir}/jacocoTestReportHtml")
-        xml.outputLocation = file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
+        html.outputLocation = file('build/jacocoTestReportHtml')
+        xml.outputLocation = file('build/reports/jacoco/test/jacocoTestReport.xml')
     }
     /**
      * 태스크 간 의존성을 설정해야 실행 순서를 보장할 수 있다.
@@ -160,6 +166,7 @@ tasks.register('jacocoRootReport', JacocoReport) {
         exclude rootProject.ext.defineExcludes()
     }
 }
+
 
 if (project == rootProject) {
     bootJar {
