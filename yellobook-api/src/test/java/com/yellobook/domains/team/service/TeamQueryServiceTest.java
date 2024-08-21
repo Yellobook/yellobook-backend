@@ -78,18 +78,23 @@ public class TeamQueryServiceTest {
         @DisplayName("멤버가 팀에 속하지 않은 경우")
         class Context_Member_Not_Belong_Team{
 
-            @Test
-            @DisplayName("USER_NOT_IN_THAT_TEAM 에러를 반환한다.")
-            void it_returns_cannot_invite(){
-                //given
-                InvitationCodeRequest request = new InvitationCodeRequest(MemberTeamRole.ORDERER);
+            InvitationCodeRequest request;
+            CustomException exception;
+
+            @BeforeEach
+            void setUp() {
+                request = new InvitationCodeRequest(MemberTeamRole.ORDERER);
 
                 when(participantRepository.findByTeamIdAndMemberId(team.getId(), member.getId())).thenReturn(Optional.empty());
 
-                //when & then
-                CustomException exception = assertThrows(
+                exception = assertThrows(
                         CustomException.class, () -> teamQueryService.makeInvitationCode(team.getId(), request, customOAuth2User));
 
+            }
+
+            @Test
+            @DisplayName("USER_NOT_IN_THAT_TEAM 에러를 반환한다.")
+            void it_returns_cannot_invite(){
                 assertEquals(TeamErrorCode.USER_NOT_IN_THAT_TEAM, exception.getErrorCode());
             }
         }
@@ -97,26 +102,36 @@ public class TeamQueryServiceTest {
         @Nested
         @DisplayName("ADMIN이 이미 있을 때, ADMIN을 초대하는 경우")
         class Context_Admin_Already_Exists{
+            Long teamId;
+            Long memberId;
+            Long memberId2;
 
-            @Test
-            @DisplayName("ADMIN_EXISTS 에러를 반환한다.")
-            void it_returns_admin_exists(){
-                //given
-                Long teamId = 1L;
-                Long memberId = 1L;
-                Long memberId2 = 2L;
-                Member member2 = createMember(memberId2);
-                Participant adminPar = createParticipant(2L, team, member2, MemberTeamRole.ADMIN);
-                InvitationCodeRequest request = new InvitationCodeRequest(MemberTeamRole.ADMIN);
+            Member member2;
+            Participant adminPar;
+            InvitationCodeRequest request;
+            CustomException exception;
+
+            @BeforeEach
+            void setUp() {
+                teamId = team.getId();
+                memberId = member.getId();
+                memberId2 = 2L;
+                member2 = createMember(memberId2);
+                adminPar = createParticipant(2L, team, member2, MemberTeamRole.ADMIN);
+                request = new InvitationCodeRequest(MemberTeamRole.ADMIN);
 
                 when(participantRepository.findByTeamIdAndMemberId(teamId, memberId))
                         .thenReturn(Optional.of(participant));
                 when(participantRepository.findByTeamIdAndRole(teamId, MemberTeamRole.ADMIN))
                         .thenReturn(Optional.of(adminPar));
 
-                CustomException exception = assertThrows(
+                exception = assertThrows(
                         CustomException.class, () -> teamQueryService.makeInvitationCode(teamId, request, customOAuth2User));
+            }
 
+            @Test
+            @DisplayName("ADMIN_EXISTS 에러를 반환한다.")
+            void it_returns_admin_exists(){
                 assertEquals(TeamErrorCode.ADMIN_EXISTS, exception.getErrorCode());
                 verify(participantRepository).findByTeamIdAndRole(teamId, MemberTeamRole.ADMIN);
             }
@@ -126,11 +141,12 @@ public class TeamQueryServiceTest {
         @DisplayName("문제가 없는 경우")
         class Context_No_Problem{
 
-            @Test
-            @DisplayName("초대 코드를 발급한다.")
-            void it_returns_invitation_code(){
-                //given
-                InvitationCodeRequest request = new InvitationCodeRequest(MemberTeamRole.ORDERER);
+            InvitationCodeRequest request;
+            InvitationCodeResponse response;
+
+            @BeforeEach
+            void setUp() {
+                request = new InvitationCodeRequest(MemberTeamRole.ORDERER);
 
                 when(participantRepository.findByTeamIdAndMemberId(team.getId(), customOAuth2User.getMemberId()))
                         .thenReturn(Optional.of(participant)); // 참가자 정보
@@ -139,10 +155,12 @@ public class TeamQueryServiceTest {
                 when(teamMapper.toInvitationCodeResponse(anyString()))
                         .thenReturn(new InvitationCodeResponse("http://invitation-url")); // 응답 매핑
 
-                // When
-                InvitationCodeResponse response = teamQueryService.makeInvitationCode(team.getId(), request, customOAuth2User);
+                response = teamQueryService.makeInvitationCode(team.getId(), request, customOAuth2User);
+            }
 
-                // Then
+            @Test
+            @DisplayName("초대 코드를 발급한다.")
+            void it_returns_invitation_code(){
                 assertNotNull(response);
                 assertEquals("http://invitation-url", response.inviteUrl());
                 verify(redisService).generateInvitationUrl(team.getId(), request.role());
@@ -156,40 +174,52 @@ public class TeamQueryServiceTest {
         @Nested
         @DisplayName("팀원이 존재하는 경우")
         class Context_TeamMember{
+
+            TeamMemberListResponse res;
+
+            @BeforeEach
+            void setUp() {
+                List<QueryTeamMember> members = List.of(
+                        new QueryTeamMember(1L, "test1"),
+                        new QueryTeamMember(2L, "test2")
+                );
+                when(teamRepository.findTeamMembers(team.getId())).thenReturn(members);
+                when(teamMapper.toTeamMemberListResponse(members)).thenReturn(new TeamMemberListResponse(members));
+
+                //when
+                res = teamQueryService.findTeamMembers(team.getId());
+            }
+
             @Test
             @DisplayName("모든 팀원을 반환한다.")
-            void it_returns_all_team_members(){
-                //given
-                TeamMemberListResponse response = new TeamMemberListResponse(List.of(
-                        new QueryTeamMember(1L, "test1"),
-                        new QueryTeamMember(2L, "test2")));
-
-                when(teamRepository.findTeamMembers(team.getId())).thenReturn(response.members());
-                when(teamMapper.toTeamMemberListResponse(response.members())).thenReturn(response);
-                //when
-                TeamMemberListResponse res = teamQueryService.findTeamMembers(team.getId());
-
-                //then
+            void it_returns_all_team_members() {
                 assertNotNull(res);
-                assertEquals(response, res);
+                assertEquals(2, res.members().size());
+                assertEquals("test1", res.members().get(0).nickname());
+                assertEquals("test2", res.members().get(1).nickname());
             }
         }
         @Nested
         @DisplayName("팀원이 존재하지 않는 경우")
         class Context_No_TeamMember_Exist{
 
+            TeamMemberListResponse res;
+
+            @BeforeEach
+            void setUp() {
+                List<QueryTeamMember> members = List.of();
+
+                when(teamRepository.findTeamMembers(team.getId())).thenReturn(members);
+                when(teamMapper.toTeamMemberListResponse(Collections.emptyList())).thenReturn(new TeamMemberListResponse(members));
+
+                res = teamQueryService.findTeamMembers(team.getId());
+            }
+
             @Test
             @DisplayName("빈 리스트를 반환한다")
             void it_returns_empty_list(){
-                TeamMemberListResponse response = new TeamMemberListResponse(Collections.emptyList());
-                when(teamRepository.findTeamMembers(team.getId())).thenReturn(response.members());
-                when(teamMapper.toTeamMemberListResponse(Collections.emptyList())).thenReturn(response);
-
-
-                TeamMemberListResponse res = teamQueryService.findTeamMembers(team.getId());
-
-                assertEquals(response, res);
                 assertNotNull(res);
+                assertEquals(0, res.members().size());
             }
         }
     }
@@ -197,48 +227,63 @@ public class TeamQueryServiceTest {
     @Nested
     @DisplayName("searchParticipants 메소드는")
     class Describe_searchParticipants {
+
         @Nested
         @DisplayName("TeamMember이면서 검색어로 시작하는 팀원이 존재하는 경우")
         class Context_TeamMember_And_Exist_Team_Members_Start_With_Prefix {
+
+            String prefix;
+            TeamMemberListResponse res;
+            TeamMemberVO teamMember;
+
+            @BeforeEach
+            void setUp() {
+                prefix = "test";
+                List<QueryTeamMember> members = List.of(
+                        new QueryTeamMember(1L, "test1"),
+                        new QueryTeamMember(2L, "test2")
+                );
+                teamMember = TeamMemberVO.of(member.getId(),team.getId(), MemberTeamRole.ORDERER);
+
+                when(participantRepository.findMentionsByNamePrefix(prefix, team.getId())).thenReturn(members);
+                when(teamMapper.toTeamMemberListResponse(members)).thenReturn(new TeamMemberListResponse(members));
+
+                res = teamQueryService.searchParticipants(teamMember, prefix);
+            }
+
             @Test
             @DisplayName("조건에 맞는 팀원들을 반환한다.")
             void it_returns_team_members_match_the_condition(){
-                //given
-                String prefix = "test";
-                TeamMemberListResponse response = new TeamMemberListResponse(List.of(
-                        new QueryTeamMember(1L, "test1"),
-                        new QueryTeamMember(2L, "test2")));
-                TeamMemberVO teamMember = TeamMemberVO.of(member.getId(),team.getId(), MemberTeamRole.ORDERER);
-
-                when(participantRepository.findMentionsByNamePrefix(prefix, team.getId())).thenReturn(response.members());
-                when(teamMapper.toTeamMemberListResponse(response.members())).thenReturn(response);
-
-                //when
-                TeamMemberListResponse res = teamQueryService.searchParticipants(teamMember, prefix);
-
-                //then
                 assertNotNull(res);
-                assertEquals(response, res);
+                assertEquals(2, res.members().size());
+                assertEquals("test1", res.members().get(0).nickname());
+                assertEquals("test2", res.members().get(1).nickname());
             }
         }
         @Nested
         @DisplayName("TeamMember이지만 검색어로 시작하는 팀원이 없는 경우")
         class Context_TeamMember_But_Not_Exist_Team_Members_Start_With_Prefix {
 
+            String prefix;
+            TeamMemberListResponse res;
+            TeamMemberVO teamMember;
+
+            @BeforeEach
+            void setUp() {
+                prefix = "test";
+                List<QueryTeamMember> members = List.of();
+                teamMember = TeamMemberVO.of(member.getId(),team.getId(), MemberTeamRole.ORDERER);
+                when(participantRepository.findMentionsByNamePrefix(prefix, team.getId())).thenReturn(members);
+                when(teamMapper.toTeamMemberListResponse(members)).thenReturn(new TeamMemberListResponse(members));
+
+                res = teamQueryService.searchParticipants(teamMember, prefix);
+            }
+
             @Test
             @DisplayName("빈 리스트를 반환한다")
             void it_returns_empty_list(){
-                String prefix = "test";
-
-                TeamMemberListResponse response = new TeamMemberListResponse(Collections.emptyList());
-                when(participantRepository.findMentionsByNamePrefix(prefix, team.getId())).thenReturn(response.members());
-                when(teamMapper.toTeamMemberListResponse(Collections.emptyList())).thenReturn(response);
-
-                TeamMemberVO teamMember = TeamMemberVO.of(member.getId(),team.getId(), MemberTeamRole.ORDERER);
-
-                TeamMemberListResponse res = teamQueryService.searchParticipants(teamMember, prefix);
                 assertNotNull(res);
-                assertEquals(response, res);
+                assertEquals(0, res.members().size());
             }
         }
 
@@ -246,15 +291,21 @@ public class TeamQueryServiceTest {
         @DisplayName("팀에 속하지 않은 경우")
         class Context_Not_TeamMember{
 
+            CustomException exception;
+            @BeforeEach
+            void setUp() {
+                when(participantRepository.findByTeamIdAndMemberId(
+                        team.getId(),
+                        customOAuth2User.getMemberId()))
+                        .thenReturn(Optional.empty());
+
+                exception = assertThrows(
+                        CustomException.class, () -> teamQueryService.findByTeamId(team.getId(), customOAuth2User));
+            }
+
             @Test
             @DisplayName("USER_NOT_IN_THAT_TEAM 에러를 반환한다.")
             void it_returns_user_not_in_that_team(){
-                //given
-                when(participantRepository.findByTeamIdAndMemberId(team.getId(), customOAuth2User.getMemberId())).thenReturn(Optional.empty());
-
-                CustomException exception = assertThrows(
-                        CustomException.class, () -> teamQueryService.findByTeamId(team.getId(), customOAuth2User));
-
                 assertEquals(TeamErrorCode.USER_NOT_IN_THAT_TEAM, exception.getErrorCode());
             }
         }
@@ -268,16 +319,18 @@ public class TeamQueryServiceTest {
         @DisplayName("Team이 존재하는 경우")
         class Context_Exist_Team{
 
+            boolean result;
+
+            @BeforeEach
+            void setUp() {
+                when(teamRepository.existsById(team.getId())).thenReturn(true);
+
+                result = teamQueryService.existsByTeamId(team.getId());
+            }
+
             @Test
             @DisplayName("true를 반환한다.")
             void it_returns_true(){
-                //given
-                when(teamRepository.existsById(team.getId())).thenReturn(true);
-
-                //when
-                boolean result = teamQueryService.existsByTeamId(team.getId());
-
-                //then
                 assertTrue(result);
             }
         }
@@ -285,17 +338,18 @@ public class TeamQueryServiceTest {
         @Nested
         @DisplayName("Team이 존재하지 않는 경우")
         class Context_Not_Exist_Team{
+            boolean result;
+
+            @BeforeEach
+            void setUp() {
+                when(teamRepository.existsById(team.getId())).thenReturn(false);
+
+                result = teamQueryService.existsByTeamId(team.getId());
+            }
 
             @Test
             @DisplayName("false를 반환한다.")
             void it_returns_false(){
-                //given
-                when(teamRepository.existsById(team.getId())).thenReturn(false);
-
-                //when
-                boolean result = teamQueryService.existsByTeamId(team.getId());
-
-                //then
                 assertFalse(result);
             }
         }

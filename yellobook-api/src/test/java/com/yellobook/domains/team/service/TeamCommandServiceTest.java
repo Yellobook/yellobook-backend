@@ -1,6 +1,5 @@
 package com.yellobook.domains.team.service;
 
-import com.yellobook.common.enums.MemberRole;
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.domains.auth.dto.InvitationResponse;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
@@ -77,58 +76,67 @@ public class TeamCommandServiceTest {
     @DisplayName("createTeam 메소드는")
     class Describe_createTeam {
         @Nested
-        @DisplayName("중복된 이름을 생성할 경우")
+        @DisplayName("중복된 이름의 팀을 생성하는 요청을 받은 경우")
         class Context_InvalidName{
+
+            CreateTeamRequest duplicateNameRequest;
+            CustomException exception;
+
+            @BeforeEach
+            void setUp() {
+                duplicateNameRequest = new CreateTeamRequest(
+                        "duplicate team name",
+                        "01000000000",
+                        "seoul",
+                        MemberTeamRole.ADMIN);
+
+                when(teamRepository.findByName(duplicateNameRequest.name())).thenReturn(Optional.of(team));
+                when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
+
+                exception = assertThrows(CustomException.class, () -> {
+                    teamCommandService.createTeam(duplicateNameRequest, customOAuth2User);
+                });
+            }
+
             @Test
             @DisplayName("EXIST_TEAM_NAME 에러를 반환한다.")
             void it_cannot_create(){
-                //given
-                CreateTeamRequest request = new CreateTeamRequest(
-                        "nike",
-                        "01000000000",
-                        "seoul",
-                        MemberTeamRole.ADMIN);
-
-                when(teamRepository.findByName(request.name())).thenReturn(Optional.of(team));
-                when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
-
-                //when
-                CustomException exception = assertThrows(CustomException.class, () -> {
-                    teamCommandService.createTeam(request, customOAuth2User);
-                });
-                //then
                 assertEquals(TeamErrorCode.EXIST_TEAM_NAME, exception.getErrorCode());
-                verify(teamRepository).findByName(request.name());
-
+                verify(teamRepository).findByName(duplicateNameRequest.name());
             }
         }
+
         @Nested
-        @DisplayName("중복되지 않은 이름일 경우")
+        @DisplayName("중복되지 않은 이름의 팀을 생성하는 요청일 경우")
         class Context_ValidName{
-            @Test
-            @DisplayName("정상적으로 생성된다.")
-            void it_can_create(){
-                //given
-                CreateTeamRequest request = new CreateTeamRequest(
+
+            CreateTeamRequest validRequest;
+            CreateTeamResponse response;
+
+            @BeforeEach
+            void setUp() {
+                validRequest = new CreateTeamRequest(
                         "nike",
                         "01000000000",
                         "seoul",
                         MemberTeamRole.ADMIN);
 
-                when(teamRepository.findByName(request.name())).thenReturn(Optional.empty());
+                when(teamRepository.findByName(validRequest.name())).thenReturn(Optional.empty());
                 when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
-                when(participantMapper.toParticipant(request.role(), team, member)).thenReturn(participant);
-                when(teamMapper.toTeam(request)).thenReturn(team);
+                when(participantMapper.toParticipant(validRequest.role(), team, member)).thenReturn(participant);
+                when(teamMapper.toTeam(validRequest)).thenReturn(team);
                 when(teamMapper.toCreateTeamResponse(any(Team.class))).thenReturn(new CreateTeamResponse(1L, LocalDateTime.now()));
 
-                //when
-                CreateTeamResponse response = teamCommandService.createTeam(request, customOAuth2User);
+                response = teamCommandService.createTeam(validRequest, customOAuth2User);
+            }
 
-                //then
-                verify(teamRepository).findByName(request.name());
+            @Test
+            @DisplayName("정상적으로 생성하고 현재 팀 위치를 생성한 팀으로 변경한다.")
+            void it_can_create(){
+                verify(teamRepository).findByName(validRequest.name());
                 verify(teamRepository).save(team);
                 verify(participantRepository).save(participant);
-                verify(redisService).setMemberCurrentTeam(member.getId(), team.getId(), request.role().name());
+                verify(redisService).setMemberCurrentTeam(member.getId(), team.getId(), validRequest.role().name());
 
                 assertNotNull(response);
                 assertEquals(1L, response.teamId());
@@ -141,117 +149,139 @@ public class TeamCommandServiceTest {
     class Describe_joinTeam {
 
         @Nested
-        @DisplayName("멤버가 존재하지 않을 경우")
+        @DisplayName("가입되지 않은 멤버가 접근을 한 경우")
         class Context_Not_Exist_Member{
+
+            String code;
+            InvitationResponse invitationResponse;
+            CustomException exception;
+
+            @BeforeEach
+            void setUp() {
+                code = "invitationCode";
+                invitationResponse = new InvitationResponse(team.getId(), MemberTeamRole.ORDERER);
+                when(redisService.getInvitationInfo(code)).thenReturn(invitationResponse);
+                when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+                exception = assertThrows(CustomException.class, () -> {
+                    teamCommandService.joinTeam(customOAuth2User, code);
+                });
+            }
 
             @Test
             @DisplayName("MEMBER_NOT_FOUND 에러를 반환한다.")
             void it_returns_MemberNotFound(){
-                //given
-                String code = "invitationCode";
-                InvitationResponse invitationResponse = new InvitationResponse(1L, MemberTeamRole.ORDERER);
-                when(redisService.getInvitationInfo(code)).thenReturn(invitationResponse);
-                when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-                //when
-                CustomException exception = assertThrows(CustomException.class, () -> {
-                    teamCommandService.joinTeam(customOAuth2User, code);
-                });
-
-                //then
                 assertEquals(TeamErrorCode.MEMBER_NOT_FOUND, exception.getErrorCode());
+                verify(participantRepository, never()).save(any(Participant.class));
             }
         }
 
         @Nested
-        @DisplayName("Admin이 존재하는 경우 Admin으로 참가하고자 하면")
+        @DisplayName("Admin이 존재하는 팀에 Admin 초대 코드인 경우")
         class Context_Admin_Exist_And_Join_As_Admin{
 
-            @Test
-            @DisplayName("ADMIN_ALREADY_EXIST 에러를 반환한다.")
-            void it_returns_AdminAlreadyExist(){
-                //given
-                String code = "invitationCode";
-                InvitationResponse invitationResponse = new InvitationResponse(1L, MemberTeamRole.ADMIN);
+            String adminInvitationCode;
+            InvitationResponse invitationResponse;
 
-                when(redisService.getInvitationInfo(code)).thenReturn(invitationResponse);
+            CustomException exception;
+            @BeforeEach
+            void setUp() {
+                adminInvitationCode = "adminInvitationCode";
+                invitationResponse = new InvitationResponse(team.getId(), MemberTeamRole.ADMIN);
+
+                when(redisService.getInvitationInfo(adminInvitationCode)).thenReturn(invitationResponse);
                 when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
                 when(teamRepository.findById(anyLong())).thenReturn(Optional.of(team));
                 when(participantRepository.findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN)).thenReturn(Optional.of(participant));
 
-                //when
-                CustomException exception = assertThrows(CustomException.class, () -> {
-                    teamCommandService.joinTeam(customOAuth2User, code);
+                exception = assertThrows(CustomException.class, () -> {
+                    teamCommandService.joinTeam(customOAuth2User, adminInvitationCode);
                 });
+            }
 
-                //then
+            @Test
+            @DisplayName("ADMIN_ALREADY_EXIST 에러를 반환한다.")
+            void it_returns_AdminAlreadyExist(){
                 assertEquals(TeamErrorCode.ADMIN_EXISTS, exception.getErrorCode());
+                verify(participantRepository, never()).save(any(Participant.class));
             }
         }
 
         @Nested
-        @DisplayName("Team이 존재하지 않는 경우")
+        @DisplayName("존재하지 않는 팀에 대한 초대코드일 경우")
         class Context_Team_Not_Exist{
+
+            String notExistTeamCode;
+            InvitationResponse invitationResponse;
+            CustomException exception;
+
+            @BeforeEach
+            void setUp() {
+                notExistTeamCode = "invitationCode";
+                invitationResponse = new InvitationResponse(team.getId(), MemberTeamRole.ORDERER);
+
+                when(redisService.getInvitationInfo(notExistTeamCode)).thenReturn(invitationResponse);
+                when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
+                when(teamRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+                exception = assertThrows(CustomException.class, () -> {
+                    teamCommandService.joinTeam(customOAuth2User, notExistTeamCode);
+                });
+            }
 
             @Test
             @DisplayName("TEAM_NOT_FOUND 에러를 반환한다.")
             void it_returns_TeamNotFound(){
-                //given
-                String code = "invitationCode";
-                InvitationResponse invitationResponse = new InvitationResponse(1L, MemberTeamRole.ORDERER);
-
-                when(redisService.getInvitationInfo(code)).thenReturn(invitationResponse);
-                when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
-                when(teamRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-                //when
-                CustomException exception = assertThrows(CustomException.class, () -> {
-                    teamCommandService.joinTeam(customOAuth2User, code);
-                });
-
-                //then
                 assertEquals(TeamErrorCode.TEAM_NOT_FOUND, exception.getErrorCode());
+                verify(participantRepository, never()).save(any(Participant.class));
             }
         }
 
         @Nested
-        @DisplayName("이미 가입된 멤버인 경우")
+        @DisplayName("해당 팀에 이미 가입된 멤버인 경우")
         class Context_Member_Already_In_Team{
+
+            Long belongTeamId;
+            String belongTeamCode;
+            InvitationResponse invitationResponse;
+            CustomException exception;
+
+            @BeforeEach
+            void setUp(){
+                belongTeamId = team.getId();
+                belongTeamCode = "invitationCode";
+                invitationResponse = new InvitationResponse(belongTeamId, MemberTeamRole.ADMIN);
+
+                when(redisService.getInvitationInfo(belongTeamCode)).thenReturn(invitationResponse);
+                when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
+                when(teamRepository.findById(anyLong())).thenReturn(Optional.of(team));
+                when(participantRepository.findByTeamIdAndMemberId(belongTeamId, 1L)).thenReturn(Optional.of(participant));
+
+                exception = assertThrows(CustomException.class, () -> {
+                    teamCommandService.joinTeam(customOAuth2User, belongTeamCode);
+                });
+            }
 
             @Test
             @DisplayName("MEMBER_ALREADY_EXIST 에러를 반환한다.")
             void it_returns_MemberAlreadyExist(){
-                //given
-                Long teamId = 1L;
-                String code = "invitationCode";
-                InvitationResponse invitationResponse = new InvitationResponse(1L, MemberTeamRole.ADMIN);
-
-                when(redisService.getInvitationInfo(code)).thenReturn(invitationResponse);
-                when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
-                when(teamRepository.findById(anyLong())).thenReturn(Optional.of(team));
-                when(participantRepository.findByTeamIdAndMemberId(teamId, 1L)).thenReturn(Optional.of(participant));
-
-                //when
-                CustomException exception = assertThrows(CustomException.class, () -> {
-                    teamCommandService.joinTeam(customOAuth2User, code);
-                });
-
-                //then
                 assertEquals(TeamErrorCode.MEMBER_ALREADY_EXIST, exception.getErrorCode());
+                verify(participantRepository, never()).save(any(Participant.class));
             }
         }
 
         @Nested
-        @DisplayName("정상적인 요청일 경우")
+        @DisplayName("존재하는 멤버이지만, 팀에 가입되지 않은 경우")
         class Context_Valid{
 
-            @Test
-            @DisplayName("팀에 가입시킨다.")
-            void it_returns_member_to_join_team(){
-                //given
-                String code = "invitationCode";
-                InvitationResponse invitationResponse = new InvitationResponse(team.getId(), MemberTeamRole.ADMIN);
+            String code;
+            InvitationResponse invitationResponse;
+            JoinTeamResponse response;
 
+            @BeforeEach
+            void setUp() {
+                code = "validInvitationCode";
+                invitationResponse = new InvitationResponse(team.getId(), MemberTeamRole.ADMIN);
                 when(redisService.getInvitationInfo(code)).thenReturn(invitationResponse);
                 when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
                 when(teamRepository.findById(team.getId())).thenReturn(Optional.of(team));
@@ -259,10 +289,12 @@ public class TeamCommandServiceTest {
                 when(participantMapper.toParticipant(MemberTeamRole.ADMIN, team, member)).thenReturn(participant);
                 when(teamMapper.toJoinTeamResponse(team)).thenReturn(new JoinTeamResponse(team.getId()));
 
-                //when
-                JoinTeamResponse response = teamCommandService.joinTeam(customOAuth2User, code);
+                response = teamCommandService.joinTeam(customOAuth2User, code);
+            }
 
-                //then
+            @Test
+            @DisplayName("팀에 가입시키고 현재 팀을 가입한 팀으로 변경한다.")
+            void it_returns_member_to_join_team(){
                 verify(participantRepository).save(participant);
                 verify(redisService).setMemberCurrentTeam(member.getId(), team.getId(), MemberTeamRole.ADMIN.name());
 
@@ -277,20 +309,33 @@ public class TeamCommandServiceTest {
     class Describe_leaveTeam{
 
         @Nested
-        @DisplayName("팀 멤버가 아닌 경우")
+        @DisplayName("팀에 속한 멤버가 아닌 경우")
         class Context_Not_Team_Member{
+
+            Long teamId;
+            Long memberId;
+            CustomException exception;
+
+            @BeforeEach
+            void setUp(){
+                member = createMember(3L);
+                team = createTeam(1L);
+
+                teamId = team.getId();
+                memberId = member.getId();
+
+                OAuth2UserDTO oauth2UserDTO = OAuth2UserDTO.from(member);
+                customOAuth2User = new CustomOAuth2User(oauth2UserDTO);
+
+                when(participantRepository.findByTeamIdAndMemberId(teamId, memberId)).thenReturn(Optional.empty());
+
+                exception = assertThrows(
+                        CustomException.class, () -> teamCommandService.leaveTeam(teamId, customOAuth2User));
+            }
 
             @Test
             @DisplayName("USER_NOT_IN_THAT_TEAM 에러를 반환한다.")
             void it_returns_UserNotInThatTeam(){
-                //given
-                when(participantRepository.findByTeamIdAndMemberId(team.getId(), member.getId())).thenReturn(Optional.empty());
-
-                //when
-                CustomException exception = assertThrows(
-                        CustomException.class, () -> teamCommandService.leaveTeam(team.getId(), customOAuth2User));
-
-                //then
                 assertEquals(TeamErrorCode.USER_NOT_IN_THAT_TEAM, exception.getErrorCode());
                 verify(participantRepository, never()).delete(any(Participant.class));
             }
@@ -300,17 +345,23 @@ public class TeamCommandServiceTest {
         @DisplayName("팀 멤버인 경우")
         class Context_Team_Member{
 
+            Long teamId;
+            Long memberId;
+
+            @BeforeEach
+            void setUp(){
+                teamId = team.getId();
+                memberId = member.getId();
+
+                when(participantRepository.findByTeamIdAndMemberId(teamId, memberId)).thenReturn(Optional.of(participant));
+                when(participantRepository.findFirstByMemberIdOrderByCreatedAtAsc(memberId)).thenReturn(Optional.of(participant));
+
+                teamCommandService.leaveTeam(teamId, customOAuth2User);
+            }
+
             @Test
-            @DisplayName("정상적으로 팀에서 나간다.")
+            @DisplayName("정상적으로 팀에서 나가고 현재 팀을 가장 최근 팀으로 변경한다.")
             void it_returns_member_to_leave_team(){
-                //given
-                when(participantRepository.findByTeamIdAndMemberId(team.getId(), member.getId())).thenReturn(Optional.of(participant));
-                when(participantRepository.findFirstByMemberIdOrderByCreatedAtAsc(member.getId())).thenReturn(Optional.of(participant));
-
-                //when
-                teamCommandService.leaveTeam(team.getId(), customOAuth2User);
-
-                //then
                 verify(participantRepository).delete(participant); // 참가자 삭제 확인
                 verify(redisService, times(1)).setMemberCurrentTeam(anyLong(), anyLong(), anyString());
             }
