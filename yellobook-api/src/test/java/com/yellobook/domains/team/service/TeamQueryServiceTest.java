@@ -8,7 +8,6 @@ import com.yellobook.domains.auth.service.RedisTeamService;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.dto.request.InvitationCodeRequest;
-import com.yellobook.domains.team.dto.response.GetTeamResponse;
 import com.yellobook.domains.team.dto.response.InvitationCodeResponse;
 import com.yellobook.domains.team.dto.response.TeamMemberListResponse;
 import com.yellobook.domains.team.entity.Participant;
@@ -28,6 +27,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -154,7 +154,7 @@ public class TeamQueryServiceTest {
     @DisplayName("findTeamMembers 메소드는")
     class Describe_findTeamMembers {
         @Nested
-        @DisplayName("TeamMember인 경우")
+        @DisplayName("팀원이 존재하는 경우")
         class Context_TeamMember{
             @Test
             @DisplayName("모든 팀원을 반환한다.")
@@ -174,17 +174,35 @@ public class TeamQueryServiceTest {
                 assertEquals(response, res);
             }
         }
+        @Nested
+        @DisplayName("팀원이 존재하지 않는 경우")
+        class Context_No_TeamMember_Exist{
+
+            @Test
+            @DisplayName("빈 리스트를 반환한다")
+            void it_returns_empty_list(){
+                TeamMemberListResponse response = new TeamMemberListResponse(Collections.emptyList());
+                when(teamRepository.findTeamMembers(team.getId())).thenReturn(response.members());
+                when(teamMapper.toTeamMemberListResponse(Collections.emptyList())).thenReturn(response);
+
+
+                TeamMemberListResponse res = teamQueryService.findTeamMembers(team.getId());
+
+                assertEquals(response, res);
+                assertNotNull(res);
+            }
+        }
     }
 
     @Nested
     @DisplayName("searchParticipants 메소드는")
     class Describe_searchParticipants {
         @Nested
-        @DisplayName("TeamMember인 경우")
-        class Context_TeamMember{
+        @DisplayName("TeamMember이면서 검색어로 시작하는 팀원이 존재하는 경우")
+        class Context_TeamMember_And_Exist_Team_Members_Start_With_Prefix {
             @Test
-            @DisplayName("검색어로 시작하는 팀원들을 반환한다.")
-            void it_returns_team_members_starts_with_prefix(){
+            @DisplayName("조건에 맞는 팀원들을 반환한다.")
+            void it_returns_team_members_match_the_condition(){
                 //given
                 String prefix = "test";
                 TeamMemberListResponse response = new TeamMemberListResponse(List.of(
@@ -195,9 +213,30 @@ public class TeamQueryServiceTest {
                 when(participantRepository.findMentionsByNamePrefix(prefix, team.getId())).thenReturn(response.members());
                 when(teamMapper.toTeamMemberListResponse(response.members())).thenReturn(response);
 
-
+                //when
                 TeamMemberListResponse res = teamQueryService.searchParticipants(teamMember, prefix);
 
+                //then
+                assertNotNull(res);
+                assertEquals(response, res);
+            }
+        }
+        @Nested
+        @DisplayName("TeamMember이지만 검색어로 시작하는 팀원이 없는 경우")
+        class Context_TeamMember_But_Not_Exist_Team_Members_Start_With_Prefix {
+
+            @Test
+            @DisplayName("빈 리스트를 반환한다")
+            void it_returns_empty_list(){
+                String prefix = "test";
+
+                TeamMemberListResponse response = new TeamMemberListResponse(Collections.emptyList());
+                when(participantRepository.findMentionsByNamePrefix(prefix, team.getId())).thenReturn(response.members());
+                when(teamMapper.toTeamMemberListResponse(Collections.emptyList())).thenReturn(response);
+
+                TeamMemberVO teamMember = TeamMemberVO.of(member.getId(),team.getId(), MemberTeamRole.ORDERER);
+
+                TeamMemberListResponse res = teamQueryService.searchParticipants(teamMember, prefix);
                 assertNotNull(res);
                 assertEquals(response, res);
             }

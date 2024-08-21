@@ -20,7 +20,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -92,7 +94,11 @@ public class TeamQueryService{
 
     public TeamMemberListResponse findTeamMembers(Long teamId){
         List<QueryTeamMember> members = teamRepository.findTeamMembers(teamId);
-        return teamMapper.toTeamMemberListResponse(members);
+
+        //members 가 null인 경우, emptyList를 반환하도록 설정
+        return teamMapper.toTeamMemberListResponse(
+                Objects.requireNonNullElse(members, Collections.emptyList())
+        );
     }
 
 
@@ -104,6 +110,9 @@ public class TeamQueryService{
         Long teamId = teamMember.getTeamId();
         List<QueryTeamMember> mentions = participantRepository.findMentionsByNamePrefix(name, teamId);
 
-        return teamMapper.toTeamMemberListResponse(mentions);
+        //mentions가 null인 경우, emptyList를 반환하도록 설정
+        return teamMapper.toTeamMemberListResponse(
+                Objects.requireNonNullElse(mentions, Collections.emptyList())
+        );
     }
 }
