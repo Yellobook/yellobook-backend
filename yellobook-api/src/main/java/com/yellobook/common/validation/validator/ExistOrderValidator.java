@@ -1,6 +1,6 @@
 package com.yellobook.common.validation.validator;
 
-import com.yellobook.common.annotation.ExistOrder;
+import com.yellobook.common.validation.annotation.ExistOrder;
 import com.yellobook.domains.order.service.OrderQueryService;
 import com.yellobook.error.code.OrderErrorCode;
 import jakarta.validation.ConstraintValidator;

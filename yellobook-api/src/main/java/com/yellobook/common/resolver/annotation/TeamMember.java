@@ -1,11 +1,14 @@
-package com.yellobook.common.annotation;
+package com.yellobook.common.resolver.annotation;
+
+import io.swagger.v3.oas.annotations.Parameter;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.METHOD)
+@Parameter(hidden = true)
+@Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TeamAdminOnly {
+public @interface TeamMember {
 }
