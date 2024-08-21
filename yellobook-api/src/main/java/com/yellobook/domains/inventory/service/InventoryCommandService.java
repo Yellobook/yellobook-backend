@@ -1,21 +1,24 @@
 package com.yellobook.domains.inventory.service;
 
-import com.yellobook.common.utils.ExcelReadUtil;
 import com.yellobook.common.utils.ParticipantUtil;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.inventory.dto.cond.ExcelProductCond;
 import com.yellobook.domains.inventory.dto.request.AddProductRequest;
+import com.yellobook.domains.inventory.dto.request.ModifyProductAmountRequest;
 import com.yellobook.domains.inventory.dto.response.AddInventoryResponse;
 import com.yellobook.domains.inventory.dto.response.AddProductResponse;
-import com.yellobook.domains.inventory.dto.request.ModifyProductAmountRequest;
-import com.yellobook.domains.inventory.mapper.InventoryMapper;
-import com.yellobook.domains.inventory.mapper.ProductMapper;
 import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.entity.Product;
+import com.yellobook.domains.inventory.mapper.InventoryMapper;
+import com.yellobook.domains.inventory.mapper.ProductMapper;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
+import com.yellobook.domains.inventory.utils.ExcelReadUtil;
+import com.yellobook.domains.team.entity.Team;
+import com.yellobook.domains.team.repository.TeamRepository;
 import com.yellobook.error.code.FileErrorCode;
 import com.yellobook.error.code.InventoryErrorCode;
+import com.yellobook.error.code.TeamErrorCode;
 import com.yellobook.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,8 +40,10 @@ import java.util.Optional;
 public class InventoryCommandService{
     private final InventoryRepository inventoryRepository;
     private final ProductRepository productRepository;
+    private final TeamRepository teamRepository;
     private final ProductMapper productMapper;
     private final InventoryMapper inventoryMapper;
+    private final ExcelReadUtil excelReadUtil;
 
     /**
      * 제품 추가 (관리자)
@@ -82,26 +90,34 @@ public class InventoryCommandService{
     /**
      * 재고 추가 (관리자)
      */
-    public AddInventoryResponse addInventory(MultipartFile file) {
-//        ParticipantUtil.forbidViewer(teamMember.getRole());
-//        ParticipantUtil.forbidOrderer(teamMember.getRole());
-        // 엑셀 파일 이름 저장
-        String fileName = file.getOriginalFilename();
-        log.info("[excel] fileName : {}", fileName);
+    public AddInventoryResponse addInventory(MultipartFile file, TeamMemberVO teamMember) {
+        ParticipantUtil.forbidViewer(teamMember.getRole());
+        ParticipantUtil.forbidOrderer(teamMember.getRole());
 
         List<ExcelProductCond> productConds;
         try{
-            productConds = ExcelReadUtil.read(file);
+            productConds = excelReadUtil.read(file);
         }catch (IOException e){
             throw new CustomException(FileErrorCode.FILE_IO_FAIL);
         }
 
-        // 반복문으로 로그 출력
+        // 재고 저장
+        Team team = teamRepository.findById(teamMember.getTeamId()).orElseThrow(() -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+        String inventoryTitle = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")) + " 재고현황";
+        Inventory newInventory = inventoryMapper.toInventory(team, inventoryTitle);
+        inventoryRepository.save(newInventory);
+        log.info("[EXCEL_INVENTORY] : id = {}, title = {}", newInventory.getId(), newInventory.getTitle());
+
+        // 제품 저장
+        List<Long> productIds = new ArrayList<>();
         for (ExcelProductCond productCond : productConds) {
-            log.info("[excel] {}", productCond);
+            Product newProduct = productMapper.toProduct(productCond, newInventory);
+            productRepository.save(newProduct);
+            productIds.add(newProduct.getId());
+            log.info("[EXCEL_PRODUCT] : id = {}", newProduct.getId());
         }
 
-        return null;
-        //return inventoryMapper.toAddInventoryResponse(inventoryId);
+        return inventoryMapper.toAddInventoryResponse(newInventory.getId(), productIds);
     }
+
 }

@@ -1,10 +1,7 @@
 package com.yellobook.domains.inventory.entity;
 
 import com.yellobook.domains.common.entity.BaseEntity;
-import com.yellobook.domains.inventory.entity.Inventory;
-
 import jakarta.persistence.*;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

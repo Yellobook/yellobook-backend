@@ -1,5 +1,6 @@
 package com.yellobook.domains.inventory.mapper;
 
+import com.yellobook.domains.inventory.dto.cond.ExcelProductCond;
 import com.yellobook.domains.inventory.dto.query.QueryProductName;
 import com.yellobook.domains.inventory.dto.query.QuerySubProduct;
 import com.yellobook.domains.inventory.dto.request.AddProductRequest;
@@ -24,6 +25,7 @@ public interface ProductMapper {
     Product toProduct(AddProductRequest addProductRequest, Inventory inventory);
     List<SubProductInfo> toSubProductInfo(List<QuerySubProduct> subProducts);
     AddProductResponse toAddProductResponse(Long productId);
+    Product toProduct(ExcelProductCond productCond, Inventory inventory);
 
     default GetProductsNameResponse toEmptyGetProductNameResponse(){
         return GetProductsNameResponse.builder()

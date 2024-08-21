@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -96,14 +97,13 @@ public class InventoryController {
         return ResponseFactory.noContent();
     }
 
-    // TODO : security Config에서 url 제거
-    @Operation(summary = "엑셀 파일 읽어서 제고 생성")
-    @PostMapping()
+    @Operation(summary = "엑셀 파일 읽어서 재고 생성")
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<SuccessResponse<AddInventoryResponse>> addInventory(
-            @RequestPart("file") MultipartFile file
-            //@TeamMember TeamMemberVO teamMember
+            @RequestPart("file") MultipartFile file,
+            @TeamMember TeamMemberVO teamMember
     ){
-        AddInventoryResponse response = inventoryCommandService.addInventory(file);
+        AddInventoryResponse response = inventoryCommandService.addInventory(file, teamMember);
         return ResponseFactory.created(response);
     }
 
