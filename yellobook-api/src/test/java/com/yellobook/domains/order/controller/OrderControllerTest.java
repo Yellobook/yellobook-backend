@@ -25,6 +25,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -63,7 +64,7 @@ class OrderControllerTest {
     @DisplayName("주문 작성")
     void makeOrder() throws Exception{
         //given
-        MakeOrderRequest request = MakeOrderRequest.builder().productId(1L).build();
+        MakeOrderRequest request = MakeOrderRequest.builder().productId(1L).date(LocalDate.now()).orderAmount(1).build();
         MakeOrderResponse response = MakeOrderResponse.builder().orderId(2L).build();
         when(orderCommandService.makeOrder(request, teamMemberVO)).thenReturn(response);
 

@@ -15,6 +15,7 @@ public enum FileErrorCode implements ErrorCode{
     ROW_HAS_EMPTY_CELL(HttpStatus.BAD_REQUEST, "FILE-005", "row에 빈 cell이 존재합니다."),
     FILE_IO_FAIL(HttpStatus.BAD_REQUEST, "FILE-006", "파일 IO에 실패했습니다."),
     SKU_DUPLICATE(HttpStatus.CONFLICT, "FILE-007", "중복된 SKU가 존재합니다."),
+    INT_OVER_ONE(HttpStatus.BAD_REQUEST, "FILE-008", "SKU, 구매가, 판매가, 현재 재고 수량은 0 이상이여야 합니다."),
     ;
 
     private final HttpStatus httpStatus;

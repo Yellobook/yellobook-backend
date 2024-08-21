@@ -1,6 +1,7 @@
 package com.yellobook.domains.order.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
@@ -17,7 +18,7 @@ public record MakeOrderRequest(
         @NotNull(message = "주문 날짜를 입력해주세요")
         LocalDate date,
         @Schema(description = "주문 수량", example = "100")
-        @NotNull(message = "주문 수량을 입력해주세요")
+        @NotNull(message = "주문 수량을 입력해주세요") @Min(value = 1, message = "주문 수량은 1개 이상이여야 합니다.")
         Integer orderAmount
 ){
 }

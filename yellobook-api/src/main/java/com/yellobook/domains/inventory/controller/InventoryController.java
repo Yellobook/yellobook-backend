@@ -13,6 +13,7 @@ import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,7 +70,7 @@ public class InventoryController {
     @PostMapping("/{inventoryId}")
     public ResponseEntity<SuccessResponse<AddProductResponse>> addProduct(
             @ExistInventory @PathVariable("inventoryId") Long inventoryId,
-            @RequestBody AddProductRequest requestDTO,
+            @Valid @RequestBody AddProductRequest requestDTO,
             @TeamMember TeamMemberVO teamMember
     ){
         AddProductResponse response = inventoryCommandService.addProduct(inventoryId, requestDTO, teamMember);
@@ -80,7 +81,7 @@ public class InventoryController {
     @PutMapping("/products/{productId}")
     public ResponseEntity<Void> modifyProductAmount(
             @ExistProduct @PathVariable("productId") Long productId,
-            @RequestBody ModifyProductAmountRequest requestDTO,
+            @Valid @RequestBody ModifyProductAmountRequest requestDTO,
             @TeamMember TeamMemberVO teamMember
     ){
         inventoryCommandService.modifyProductAmount(productId, requestDTO, teamMember);

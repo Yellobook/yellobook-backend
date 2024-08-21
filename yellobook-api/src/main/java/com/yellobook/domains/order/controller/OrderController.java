@@ -12,6 +12,7 @@ import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -29,7 +30,7 @@ public class OrderController {
     @Operation(summary = "[주문자] 주문 작성")
     @PostMapping("")
     public ResponseEntity<SuccessResponse<MakeOrderResponse>> makeOrder(
-            @RequestBody MakeOrderRequest requestDTO,
+            @Valid @RequestBody MakeOrderRequest requestDTO,
             @TeamMember TeamMemberVO teamMember
     ){
         MakeOrderResponse response = orderCommandService.makeOrder(requestDTO, teamMember);
@@ -50,7 +51,7 @@ public class OrderController {
     @PostMapping("/{orderId}/comment")
     public ResponseEntity<SuccessResponse<AddOrderCommentResponse>> addOrderComment(
             @ExistOrder @PathVariable("orderId") Long orderId,
-            @RequestBody AddOrderCommentRequest requestDTO,
+            @Valid @RequestBody AddOrderCommentRequest requestDTO,
             @TeamMember TeamMemberVO teamMember
     ){
         AddOrderCommentResponse response = orderCommandService.addOrderComment(orderId, teamMember, requestDTO);

@@ -136,7 +136,11 @@ public class ExcelReadUtil {
      */
     private Integer getIntCellValue(Cell cell){
         if(cell.getCellType() == CellType.NUMERIC){
-            return (int)cell.getNumericCellValue();
+            int num = (int)cell.getNumericCellValue();
+            if(num < 0){
+                throw new CustomException(FileErrorCode.INT_OVER_ONE);
+            }
+            return num;
         }
         throw new CustomException(FileErrorCode.CELL_INVALID_TYPE);
     }

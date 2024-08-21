@@ -230,7 +230,7 @@ class InventoryControllerTest {
     void addProduct() throws Exception{
         //given
         Long inventoryId = 1L;
-        AddProductRequest request = AddProductRequest.builder().build();
+        AddProductRequest request = AddProductRequest.builder().name("name").subProduct("sub").sku(1).purchasePrice(1).salePrice(1).amount(1).build();
         AddProductResponse response = AddProductResponse.builder().productId(1L).build();
         when(inventoryQueryService.existByInventoryId(inventoryId)).thenReturn(true);
         when(inventoryCommandService.addProduct(inventoryId, request, teamMemberVO)).thenReturn(response);
@@ -249,7 +249,7 @@ class InventoryControllerTest {
     void modifyProductAmount() throws Exception{
         //given
         Long productId = 1L;
-        ModifyProductAmountRequest request = ModifyProductAmountRequest.builder().build();
+        ModifyProductAmountRequest request = ModifyProductAmountRequest.builder().amount(5).build();
         when(inventoryQueryService.existByProductId(productId)).thenReturn(true);
         doNothing().when(inventoryCommandService).modifyProductAmount(productId, request, teamMemberVO);
 
