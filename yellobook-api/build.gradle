@@ -32,7 +32,7 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
 
-    //mapStruct
+    // mapStruct
     implementation 'org.mapstruct:mapstruct:1.5.3.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
 
@@ -42,6 +42,9 @@ dependencies {
     //test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'com.h2database:h2'
+
+    // testFixtures
+    testImplementation(testFixtures(project(":yellobook-domain")))
 }
 
 // application*.yml 설정파일 복사
