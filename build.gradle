@@ -3,11 +3,22 @@ plugins {
     id 'org.springframework.boot' version '3.3.1'
     id 'io.spring.dependency-management' version '1.1.5'
     id 'jacoco'
+    id 'org.sonarqube' version '4.4.1.3373'
 }
 
-/**
- * 루트 build.gradle 에 플러그인 설정을 추가하면 모든 서브프로젝트에 동일한 설정이 적용된다.
- */
+sonar {
+    properties {
+        property 'sonar.projectKey', 'Yellobook_yellobook-backend'
+        property 'sonar.organization', 'yellobook-server-sonar-cloud-key'
+        property 'sonar.host.url', 'https://sonarcloud.io'
+        property 'sonar.coverage.jacoco.xmlReportPaths', 'build/reports/jacoco/test/jacocoTestReport.xml'
+    }
+}
+
+group = 'com.yellobook'
+version = '1.0.0'
+
+// 루트 build.gradle 에 플러그인 설정을 추가하면 모든 서브프로젝트에 동일한 설정이 적용
 jacoco {
     toolVersion = '0.8.9'
 }
@@ -19,40 +30,17 @@ ext {
 
         // QueryDSL Q 클래스 제외
         for (qPattern in 'QA'..'QZ') {
-            excludes.add("**/${qPattern}*")
+            excludes.add('**/${qPattern}*')
         }
+
         excludes.addAll([
-                // main
-                "**/*Application*",
-                // 설정
-                "**/*Config*",
-                // 스프링 시큐리티
-                "**/security/**",
-                // DTO, VO
-                "**/*Dto*",
-                "**/*DTO*",
-                "**/*VO*",
-                // 요청, 응답 클래스
-                "**/response/**",
-                "**/request/**",
-                "**/*Request*",
-                "**/*Response*",
-                // 예외 클래스
-                "**/*Exception*",
-                "**/*ErrorCode*",
-                // 리졸버
-                "**/*Resolver*",
-                // AOP
-                "**/*Aspect*",
-                // 인터셉터, 필터
-                "**/*Interceptor*",
-                "**/*Filter*",
-                // enum
-                "**/enums/**",
-                // mapstruct
-                "**/mapper/**",
-                // 커스텀 애노테이션
-                "**/annotation/**"
+                '**/*Application*',
+                '**/*Config*',
+                '**/aop/**',
+                '**/error/**',
+                '**/validation/**',
+                '**/logging/**',
+                '**/response/**'
         ])
 
         return excludes
@@ -60,8 +48,6 @@ ext {
 }
 
 allprojects {
-    group = 'com.yellobook'
-    version = '1.0.0'
     sourceCompatibility = '17'
     targetCompatibility = '17'
 
@@ -101,65 +87,40 @@ subprojects {
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
     }
 
-    jacocoTestReport {
-        reports {
-            xml.required = false
-            csv.required = false
-            html.outputLocation = file("${buildDir}/jacocoTestReportHtml")
-        }
-
-        afterEvaluate  {
-            classDirectories.setFrom(
-                    files(classDirectories.files.collect {
-                        fileTree(dir: it, excludes: rootProject.ext.defineExcludes())
-                    })
-            )
-        }
-
-    }
-
-    tasks.named('test') {
+    test {
         useJUnitPlatform()
-        finalizedBy 'jacocoTestReport'
     }
 }
 
+jacocoTestReport {
+    // 서브프로젝트들의 태스크가 완료된 후 실행되도록 설정
+    dependsOn subprojects.collect {
+        it.tasks.named('check')
+    }
 
-tasks.register('jacocoRootReport', JacocoReport) {
+    // 서브프로젝트의 .exec 파일을 포함
+    executionData.from(fileTree(dir: '.', include: '**/build/jacoco/*.exec'))
+
+    // 리포트 생성에서 제외할 경로
+    def excludes = defineExcludes();
+
+    // 커버리지를 계산할 클래스 파일들의 디렉토리 설정
+    classDirectories.setFrom(files(subprojects.collect {
+        // 서브프로젝트들의 컴파일된 클래스 파일이 저장되는 디렉토리
+        it.sourceSets.main.output
+    }).asFileTree.matching {
+        exclude excludes
+    })
+
     reports {
         xml.required = true
         csv.required = false
-        html.outputLocation = file("${buildDir}/jacocoTestReportHtml")
-        xml.outputLocation = file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
-    }
-    /**
-     * 태스크 간 의존성을 설정해야 실행 순서를 보장할 수 있다.
-     *
-     * Possible solutions:
-     * 1. Declare task ':yellobook-domains:jacocoTestReport' as an input of ':jacocoRootReport'.
-     * 2. Declare an explicit dependency on ':yellobook-domain:jacocoTestReport' from ':jacocoRootReport' using Task#dependsOn.
-     * 3. Declare an explicit dependency on ':yellobook-domain:jacocoTestReport' from ':jacocoRootReport' using Task#mustRunAfter.
-     *
-     * Gradle 에서 제시한 2번 방법으로 태스크 의존을 설정해 실행 순서를 보장해야 제대로 실행된다.
-     * 각 서브 프로젝트의 jacocoTestReport 태스크가 완료된 후에 실행되도록 한다.
-     * subprojects 에 jacoco 플러그인을 apply 했으므로 jacocoTestReport 와 jacocoTestCoverageVerification 태스크가 자동으로 생성된다.
-     *
-     * Gradle 공식문서 참고
-     * https://docs.gradle.org/current/userguide/jacoco_plugin.html
-     */
-    dependsOn subprojects*.jacocoTestReport
-
-    // 서브 프로젝트의 모든 소스 디렉토리 추가
-    additionalSourceDirs.from = files(subprojects.sourceSets.main.allSource.srcDirs)
-    sourceDirectories.from = files(subprojects.sourceSets.main.allSource.srcDirs)
-    // 모든 서브 프로젝트의 Jacoco 실행 데이터 파일을 포함
-    executionData.from = fileTree(dir: '.', include: '**/build/jacoco/test.exec')
-
-    // 서브 프로젝트의 클래스 디렉토리를 파일 트리로 생성하고, excludes 에 해당하는 패턴을 제외
-    classDirectories.from = files(subprojects.sourceSets.main.output).asFileTree.matching {
-        exclude rootProject.ext.defineExcludes()
+        html.outputLocation = file('build/jacocoTestReportHtml')
+        xml.outputLocation = file('build/reports/jacoco/test/jacocoTestReport.xml')
     }
 }
+
+check.dependsOn jacocoTestReport
 
 if (project == rootProject) {
     bootJar {
@@ -167,6 +128,3 @@ if (project == rootProject) {
     }
 }
 
-tasks.named('check') {
-    finalizedBy 'jacocoRootReport'
-}

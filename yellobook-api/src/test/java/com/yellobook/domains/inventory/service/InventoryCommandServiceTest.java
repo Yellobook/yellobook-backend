@@ -112,22 +112,26 @@ class InventoryCommandServiceTest {
             AddProductRequest request = createAddProductRequest();
             Inventory inventory = createInventory();
             Product product = createProduct();
+            AddProductResponse expectResponse = AddProductResponse.builder().productId(1L).build();
+            when(productRepository.existsByInventoryIdAndSku(inventoryId, request.sku())).thenReturn(false);
             when(inventoryRepository.findById(1L)).thenReturn(Optional.of(inventory));
             when(productMapper.toProduct(request, inventory)).thenReturn(product);
-            when(productRepository.save(any(Product.class))).thenAnswer(invocation -> {
+            when(productRepository.save(product)).thenAnswer(invocation -> {
                 Product savedProduct = invocation.getArgument(0);
                 Field idField = Product.class.getDeclaredField("id");
                 idField.setAccessible(true);
                 idField.set(savedProduct, 1L);
                 return savedProduct;
             });
+            when(productMapper.toAddProductResponse(any())).thenReturn(expectResponse);
 
             //when
             AddProductResponse response = inventoryCommandService.addProduct(inventoryId, request, admin);
 
             //then
             assertThat(response).isNotNull();
-            assertThat(response.productId()).isEqualTo(1L);
+            assertThat(response).isSameAs(expectResponse);
+//                                assertThat(response.productId()).isEqualTo(1L);
         }
 
         private AddProductRequest createAddProductRequest(){

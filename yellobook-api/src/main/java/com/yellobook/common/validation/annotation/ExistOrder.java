@@ -1,4 +1,4 @@
-package com.yellobook.common.annotation;
+package com.yellobook.common.validation.annotation;
 
 
 import com.yellobook.common.validation.validator.ExistOrderValidator;

@@ -1,3 +1,18 @@
+sourceSets {
+    integrationTest {
+        java.srcDir "$projectDir/src/integration-test/java"
+        resources.srcDir "$projectDir/src/integration-test/resources"
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+    }
+}
+
+configurations {
+    integrationTestImplementation.extendsFrom implementation
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
 dependencies {
     implementation project(":yellobook-domain")
     implementation project(":yellobook-common")
@@ -17,22 +32,25 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
 
-    //mapStruct
+    // mapStruct
     implementation 'org.mapstruct:mapstruct:1.5.3.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
 
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-    // h2 db
-    runtimeOnly 'com.h2database:h2'
-
     //test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'com.h2database:h2'
-}
 
-processResources.dependsOn('copyConfig')
+    // Apache POI
+    implementation 'org.apache.poi:poi-ooxml:4.1.2'
+    implementation 'org.apache.poi:poi:4.1.2'
+    implementation 'org.apache.xmlbeans:xmlbeans:3.1.0'
+
+    // testFixtures
+    testImplementation(testFixtures(project(":yellobook-domain")))
+}
 
 // application*.yml 설정파일 복사
 tasks.register('copyConfig', Copy) {
@@ -41,11 +59,25 @@ tasks.register('copyConfig', Copy) {
     into 'src/main/resources'
 }
 
+tasks.register('integrationTest', Test) {
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    useJUnitPlatform()
+
+    // test 태스크가 없다면 실행되지 않는다.
+    mustRunAfter test
+}
+
+processResources.dependsOn('copyConfig')
+
+check.dependsOn integrationTest, test
+
 bootJar {
     enabled = true
 }
 
-// 일반 jar 파일 생성 비활성화
 jar {
     enabled = false
 }
+
+

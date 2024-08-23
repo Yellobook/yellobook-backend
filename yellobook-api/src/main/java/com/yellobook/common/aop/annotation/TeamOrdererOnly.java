@@ -1,4 +1,4 @@
-package com.yellobook.common.annotation;
+package com.yellobook.common.aop.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

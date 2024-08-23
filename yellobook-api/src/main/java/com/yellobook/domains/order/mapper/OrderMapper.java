@@ -31,8 +31,8 @@ public interface OrderMapper {
 
     AddOrderCommentResponse toAddOrderCommentResponse(Long commentId);
 
-    @Mapping(source = "role", target = "role")
-    CommentInfo toCommentInfo(QueryOrderComment orderCommentDTOs);  // TODO
+    @Mapping(source = "role", target = "role", qualifiedByName = "getRoleDescription")
+    CommentInfo toCommentInfo(QueryOrderComment orderCommentDTOs);
 
     default Order toOrder(MakeOrderRequest requestDTO, Member member, Team team, Product product){
         return Order.builder()
@@ -54,10 +54,6 @@ public interface OrderMapper {
     MakeOrderResponse toMakeOrderResponse(Long orderId);
 
     GetOrderResponse toGetOrderResponse(QueryOrder queryOrder);
-
-
-//    @Mapping(source = "comments", target = "comments")
-//    GetOrderCommentsResponse toGetOrderCommentsResponse(List<CommentInfo> comments);
 
     @Named("getRoleDescription")
     default String getRoleDescription(MemberTeamRole memberTeamRole){

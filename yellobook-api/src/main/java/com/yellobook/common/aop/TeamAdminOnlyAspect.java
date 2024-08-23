@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 public class TeamAdminOnlyAspect {
     RedisTeamService redisTeamService;
 
-    @Before("@annotation(com.yellobook.common.annotation.TeamAdminOnly)")
+    @Before("@annotation(com.yellobook.common.aop.annotation.TeamAdminOnly)")
     public void checkIsTeamAdmin(JoinPoint joinPoint) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         var principal = (CustomOAuth2User) authentication.getPrincipal();

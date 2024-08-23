@@ -1,6 +1,6 @@
 package com.yellobook.domains.schedule.controller;
 
-import com.yellobook.common.annotation.TeamMember;
+import com.yellobook.common.resolver.annotation.TeamMember;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.schedule.dto.request.DailyParam;
 import com.yellobook.domains.schedule.dto.request.MonthlyParam;

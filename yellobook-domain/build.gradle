@@ -1,3 +1,13 @@
+plugins {
+    id 'java-library'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+    id 'jacoco'
+    id "java-test-fixtures"
+    id "maven-publish"
+}
+
+
 dependencies {
     api 'org.springframework.boot:spring-boot-starter-data-jpa'
 
@@ -14,7 +24,10 @@ dependencies {
     implementation "p6spy:p6spy:3.9.1"
 
     // h2
-    runtimeOnly 'com.h2database:h2'
+    testRuntimeOnly 'com.h2database:h2'
+
+    // testFixtures 에 JUnit 의존성 추가
+    testFixturesImplementation 'org.junit.jupiter:junit-jupiter-api'
 }
 
 processResources.dependsOn('copyConfig')

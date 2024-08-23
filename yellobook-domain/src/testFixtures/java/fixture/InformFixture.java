@@ -1,0 +1,44 @@
+package fixture;
+
+import com.yellobook.domains.inform.entity.Inform;
+import com.yellobook.domains.inform.entity.InformMention;
+import com.yellobook.domains.member.entity.Member;
+import com.yellobook.domains.team.entity.Team;
+import support.ReflectionUtils;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+public class InformFixture {
+    private static final String INFORM_TITLE = "공지 및 일정";
+    private static final String INFORM_CONTENT = "내용";
+    private static final LocalDate INFORM_DATE = LocalDate.now();
+    private static final LocalDateTime INFORM_TIMESTAMP = LocalDateTime.now();
+
+    public static Inform createInform(Team team, Member member) {
+        return createInform(team, member, INFORM_DATE, INFORM_TITLE, INFORM_CONTENT, INFORM_TIMESTAMP);
+    }
+
+    public static Inform createInform(Team team, Member member, LocalDate date) {
+        return createInform(team, member, date, INFORM_TITLE, INFORM_CONTENT, INFORM_TIMESTAMP);
+    }
+
+    public static Inform createInform(Team team, Member member, LocalDate date, String title, String content, LocalDateTime timestamp) {
+        Inform inform = Inform.builder()
+                .title(title)
+                .content(content)
+                .date(date)
+                .team(team)
+                .member(member)
+                .build();
+        ReflectionUtils.setBaseTimeEntityFields(inform, timestamp);
+        return inform;
+    }
+
+    public static InformMention createInformMention(Inform inform, Member member) throws Exception {
+        return InformMention.builder()
+                .inform(inform)
+                .member(member)
+                .build();
+    }
+}

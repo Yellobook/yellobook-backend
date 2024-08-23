@@ -1,6 +1,6 @@
-package com.yellobook.common.validator;
+package com.yellobook.common.validation.validator;
 
-import com.yellobook.common.annotation.ExistInform;
+import com.yellobook.common.validation.annotation.ExistInform;
 import com.yellobook.domains.inform.repository.InformRepository;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
