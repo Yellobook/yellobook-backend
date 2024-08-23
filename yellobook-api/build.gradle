@@ -43,6 +43,11 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'com.h2database:h2'
 
+    // Apache POI
+    implementation 'org.apache.poi:poi-ooxml:4.1.2'
+    implementation 'org.apache.poi:poi:4.1.2'
+    implementation 'org.apache.xmlbeans:xmlbeans:3.1.0'
+
     // testFixtures
     testImplementation(testFixtures(project(":yellobook-domain")))
 }
