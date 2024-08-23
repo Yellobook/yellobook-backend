@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface ParticipantCustomRepository {
     List<QueryMemberJoinTeam> getMemberJoinTeam(Long memberId);
-    List<Participant> findMentionsByNamePrefix(String prefix, Long teamId);
+    List<QueryTeamMember> findMentionsByNamePrefix(String prefix, Long teamId);
 }

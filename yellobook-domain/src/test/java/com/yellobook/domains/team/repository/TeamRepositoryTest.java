@@ -1,5 +1,10 @@
 package com.yellobook.domains.team.repository;
 
+import com.yellobook.common.enums.MemberRole;
+import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.domains.member.entity.Member;
+import com.yellobook.domains.team.dto.query.QueryTeamMember;
+import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
 import com.yellobook.support.annotation.RepositoryTest;
 import jakarta.persistence.EntityManager;
@@ -10,6 +15,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+
+import java.util.List;
 
 @RepositoryTest
 @DisplayName("teamRepository 테스트")
@@ -88,5 +95,75 @@ public class TeamRepositoryTest {
                 .hasMessageContaining("could not execute statement");
         entityManager.clear();
         Assertions.assertThat(teamRepository.findAll()).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("모든 팀원 조회")
+    public void findAllTeamMembers(){
+        //given
+        Long teamId = 1L;
+        Team team = Team.builder()
+                .name("Development")
+                .phoneNumber("123-456-7890")
+                .address("1234 Test St")
+                .build();
+        entityManager.persist(team);
+
+        Participant participant1 = createParticipant(
+                "홍길동",
+                "hong@example.com",
+                MemberRole.USER,
+                team,
+                MemberTeamRole.ADMIN
+        );
+
+        Participant participant2 = createParticipant(
+                "홍명보",
+                "bo@example.com",
+                MemberRole.USER,
+                team,
+                MemberTeamRole.ORDERER
+        );
+
+        Participant participant3 = createParticipant(
+                "김철수",
+                "kim@example.com",
+                MemberRole.USER,
+                team,
+                MemberTeamRole.ORDERER
+        );
+
+        Participant participant4 = createParticipant(
+                "김홍도",
+                "kim1@example.com",
+                MemberRole.USER,
+                team,
+                MemberTeamRole.ORDERER
+        );
+
+        //when
+        List<QueryTeamMember> members = teamRepository.findTeamMembers(teamId);
+
+        //then
+        Assertions.assertThat(members.size()).isEqualTo(4);
+    }
+
+    private Participant createParticipant(String nickname, String email, MemberRole role, Team team, MemberTeamRole teamRole) {
+        Member member = Member.builder()
+                .nickname(nickname)
+                .email(email)
+                .role(role)
+                .build();
+        member.updateAllowance();
+        entityManager.persist(member);
+
+        Participant participant = Participant.builder()
+                .team(team)
+                .member(member)
+                .role(teamRole)
+                .build();
+        entityManager.persist(participant);
+
+        return participant;
     }
 }
