@@ -2,27 +2,24 @@ package com.yellobook.domains.inventory.service;
 
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.vo.TeamMemberVO;
+import com.yellobook.domains.inventory.dto.query.QueryInventory;
+import com.yellobook.domains.inventory.dto.query.QueryProduct;
 import com.yellobook.domains.inventory.dto.query.QueryProductName;
 import com.yellobook.domains.inventory.dto.query.QuerySubProduct;
+import com.yellobook.domains.inventory.dto.response.GetProductsNameResponse;
 import com.yellobook.domains.inventory.dto.response.GetProductsResponse;
 import com.yellobook.domains.inventory.dto.response.GetProductsResponse.ProductInfo;
+import com.yellobook.domains.inventory.dto.response.GetSubProductNameResponse;
 import com.yellobook.domains.inventory.dto.response.GetTotalInventoryResponse;
 import com.yellobook.domains.inventory.dto.response.GetTotalInventoryResponse.InventoryInfo;
 import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.mapper.InventoryMapper;
 import com.yellobook.domains.inventory.mapper.ProductMapper;
-import com.yellobook.domains.inventory.dto.query.QueryInventory;
-import com.yellobook.domains.inventory.dto.query.QueryProduct;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
-import com.yellobook.domains.inventory.dto.response.GetProductsNameResponse;
-import com.yellobook.domains.inventory.dto.response.GetSubProductNameResponse;
 import com.yellobook.error.code.AuthErrorCode;
 import com.yellobook.error.exception.CustomException;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -36,10 +33,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.assertArg;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class InventoryQueryServiceTest {
@@ -59,65 +55,97 @@ class InventoryQueryServiceTest {
     private final TeamMemberVO viewer = TeamMemberVO.of(3L, 1L, MemberTeamRole.VIEWER);
 
     @Nested
-    @DisplayName("전체 재고 현황 확인")
-    class GetTotalInventoryTests{
-        @Test
-        @DisplayName("뷰어는 전체 재고 현황 확인 불가능")
-        void viewCantGetTotalInventory(){
-            //given
-            Integer page = 1;
-            Integer size = 1;
-
-            //when & then
-            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
-                    inventoryQueryService.getTotalInventory(page, size, viewer));
-            Assertions.assertEquals(AuthErrorCode.VIEWER_NOT_ALLOWED, exception.getErrorCode());
+    @DisplayName("getTotalInventory 메소드는")
+    class Describe_GetTotalInventory{
+        @Nested
+        @DisplayName("뷰어라면")
+        class Context_Viewer{
+            Integer page;
+            Integer size;
+            @BeforeEach
+            void setUp_context(){
+                page = 1;
+                size = 1;
+            }
+            @Test
+            @DisplayName("전체 재고 현황 확인이 불가능하므로 예외를 반환한다.")
+            void it_throws_exception(){
+                CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                        inventoryQueryService.getTotalInventory(page, size, viewer));
+                Assertions.assertEquals(AuthErrorCode.VIEWER_NOT_ALLOWED, exception.getErrorCode());
+            }
         }
 
-        @Test
-        @DisplayName("제고가 존재하면 전체 재고 조회")
-        void getTotalInventory(){
-            //given
-            Integer page = 1;
-            Integer size = 5;
-            Pageable pageable = PageRequest.of(page-1, size);
-            List<QueryInventory> queryInventories = createInventoryDTOs();
-            List<InventoryInfo> inventoryInfos = createInventoryInfo();
-            when(inventoryRepository.getTotalInventory(admin.getTeamId(), pageable)).thenReturn(queryInventories);
-            when(inventoryMapper.toInventoryInfoList(queryInventories)).thenReturn(inventoryInfos);
+        @Nested
+        @DisplayName("재고가 존재하면")
+        class Context_Inventory_Exist{
+            Integer page;
+            Integer size;
+            Pageable pageable;
+            List<QueryInventory> queryInventories;
+            List<InventoryInfo> inventoryInfos;
+            GetTotalInventoryResponse expectResponse;
+            @BeforeEach
+            void setUp_context(){
+                page = 1;
+                size = 5;
+                pageable = PageRequest.of(page-1, size);
+                queryInventories = createInventoryDTOs();
+                inventoryInfos = createInventoryInfo();
+                expectResponse = GetTotalInventoryResponse.builder()
+                        .page(page).size(inventoryInfos.size()).inventories(inventoryInfos)
+                        .build();
+                when(inventoryRepository.getTotalInventory(admin.getTeamId(), pageable)).thenReturn(queryInventories);
+                when(inventoryMapper.toInventoryInfoList(queryInventories)).thenReturn(inventoryInfos);
+                when(inventoryMapper.toGetTotalInventoryResponse(page, inventoryInfos.size(), inventoryInfos)).thenReturn(expectResponse);
+            }
 
-            //when
-            GetTotalInventoryResponse response = inventoryQueryService.getTotalInventory(page, size, admin);
+            @Test
+            @DisplayName("전체 재고를 조회한다.")
+            void it_returns_total_inventory(){
+                GetTotalInventoryResponse response = inventoryQueryService.getTotalInventory(page, size, admin);
 
-            //then
-            verify(inventoryRepository).getTotalInventory(admin.getTeamId(), pageable);
-            verify(inventoryMapper).toInventoryInfoList(queryInventories);
-            assertThat(response.page()).isEqualTo(page);
-            assertThat(response.size()).isEqualTo(4);
-            assertThat(response.inventories()).isSameAs(inventoryInfos);
+                verify(inventoryRepository).getTotalInventory(admin.getTeamId(), pageable);
+                verify(inventoryMapper).toInventoryInfoList(queryInventories);
+                assertThat(response.page()).isEqualTo(expectResponse.page());
+                assertThat(response.size()).isEqualTo(expectResponse.size());
+                assertThat(response.inventories()).isSameAs(inventoryInfos);
+            }
         }
 
-        @Test
-        @DisplayName("제고가 없으면 빈 리스트를 반환한다.")
-        void getEmptyInventory(){
-            //given
-            Integer page = 1;
-            Integer size = 5;
-            Pageable pageable = PageRequest.of(page-1, size);
-            List<QueryInventory> queryInventories = Collections.emptyList();
-            List<InventoryInfo> inventoryInfos = Collections.emptyList();
-            when(inventoryRepository.getTotalInventory(admin.getTeamId(), pageable)).thenReturn(queryInventories);
-            when(inventoryMapper.toInventoryInfoList(queryInventories)).thenReturn(inventoryInfos);
+        @Nested
+        @DisplayName("재고가 없으면")
+        class Context_Empty_Inventory{
+            Integer page;
+            Integer size;
+            Pageable pageable;
+            List<QueryInventory> queryInventories;
+            List<InventoryInfo> inventoryInfos;
+            GetTotalInventoryResponse expectResponse;
 
-            //when
-            GetTotalInventoryResponse response = inventoryQueryService.getTotalInventory(page, size, admin);
+            @BeforeEach
+            void setUp_context(){
+                page = 1;
+                size = 5;
+                pageable = PageRequest.of(page-1, size);
+                queryInventories = Collections.emptyList();
+                inventoryInfos = Collections.emptyList();
+                expectResponse = GetTotalInventoryResponse.builder().page(page).size(0).inventories(Collections.emptyList()).build();
+                when(inventoryRepository.getTotalInventory(admin.getTeamId(), pageable)).thenReturn(queryInventories);
+                when(inventoryMapper.toInventoryInfoList(queryInventories)).thenReturn(inventoryInfos);
+                when(inventoryMapper.toGetTotalInventoryResponse(page, 0, inventoryInfos)).thenReturn(expectResponse);
+            }
+            @Test
+            @DisplayName("빈 리스트를 반환한다.")
+            void it_returns_empty_list(){
+                GetTotalInventoryResponse response = inventoryQueryService.getTotalInventory(page, size, admin);
 
-            //then
-            verify(inventoryRepository).getTotalInventory(admin.getTeamId(), pageable);
-            verify(inventoryMapper).toInventoryInfoList(queryInventories);
-            assertThat(response.page()).isEqualTo(page);
-            assertThat(response.size()).isEqualTo(0);
-            assertThat(response.inventories()).isSameAs(Collections.emptyList());
+                verify(inventoryRepository).getTotalInventory(admin.getTeamId(), pageable);
+                verify(inventoryMapper).toInventoryInfoList(queryInventories);
+                assertThat(response.page()).isEqualTo(expectResponse.page());
+                assertThat(response.size()).isEqualTo(expectResponse.size());
+                assertThat(response.inventories()).isSameAs(Collections.emptyList());
+            }
         }
 
         private List<QueryInventory> createInventoryDTOs(){
@@ -139,219 +167,280 @@ class InventoryQueryServiceTest {
     }
 
     @Nested
-    @DisplayName("특정 재고 일자 현황 조회")
-    class GetProductsByInventoryTests{
-        @Test
-        @DisplayName("뷰어는 전체 재고 현황 확인 불가능")
-        void viewerCantGetProducts(){
-            //given
+    @DisplayName("getProductsByInventory 메소드는")
+    class Describe_GetProductsByInventory{
+        @Nested
+        @DisplayName("뷰어라면")
+        class Context_Viewer{
             Long inventoryId = 1L;
 
-            //when & then
-            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
-                    inventoryQueryService.getProductsByInventory(inventoryId, viewer));
-            Assertions.assertEquals(AuthErrorCode.VIEWER_NOT_ALLOWED, exception.getErrorCode());
+            @Test
+            @DisplayName("전체 재고 현황 확인 불가능하므로 예외를 반환한다.")
+            void it_throws_exception(){
+                CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                        inventoryQueryService.getProductsByInventory(inventoryId, viewer));
+                Assertions.assertEquals(AuthErrorCode.VIEWER_NOT_ALLOWED, exception.getErrorCode());
+            }
         }
 
-        @Test
-        @DisplayName("재고를 가져오기 확인")
-        void checkOrderByName(){
-            //given
-            Long inventoryId = 1L;
-            List<QueryProduct> queryProducts = createProductDTOs();
-            List<ProductInfo> productInfos = createProductInfos();
-            when(productRepository.getProducts(inventoryId)).thenReturn(queryProducts);
-            when(productMapper.toProductInfo(queryProducts)).thenReturn(productInfos);
+        @Nested
+        @DisplayName("재고에 제품이 존재하면")
+        class Context_Product_Exist{
+            Long inventoryId;
+            List<QueryProduct> queryProducts;
+            GetProductsResponse expectResponse;
 
-            //when
-            GetProductsResponse response = inventoryQueryService.getProductsByInventory(inventoryId, admin);
+            @BeforeEach
+            void setUp_context(){
+                inventoryId = 1L;
+                queryProducts = createProductDTOs();
+                expectResponse = createGetProductsResponse();
+                when(productRepository.getProducts(inventoryId)).thenReturn(queryProducts);
+                when(productMapper.toGetProductsResponse(queryProducts)).thenReturn(expectResponse);
+            }
+            @Test
+            @DisplayName("제품들을 반환한다.")
+            void it_returns_products(){
+                GetProductsResponse response = inventoryQueryService.getProductsByInventory(inventoryId, admin);
 
-            //then
-            verify(productRepository).getProducts(inventoryId);
-            verify(productMapper).toProductInfo(queryProducts);
-            assertThat(response.products()).isSameAs(productInfos);
+                verify(productRepository).getProducts(inventoryId);
+                assertThat(response.products()).isSameAs(expectResponse.products());
+            }
         }
 
-        @Test
-        @DisplayName("재고가 없으면 빈 리스트 반환")
-        void getEmptyListProducts(){
-            //given
-            Long inventoryId = 1L;
-            List<QueryProduct> queryProducts = Collections.emptyList();
-            List<ProductInfo> productInfos = Collections.emptyList();
-            when(productRepository.getProducts(inventoryId)).thenReturn(queryProducts);
-            when(productMapper.toProductInfo(queryProducts)).thenReturn(productInfos);
+        @Nested
+        @DisplayName("재고에 제품이 없으면")
+        class Context_Empty_Product{
+            Long inventoryId;
+            @BeforeEach
+            void setUp_context(){
+                inventoryId = 1L;
+                List<QueryProduct> queryProducts = Collections.emptyList();
+                GetProductsResponse expectResponse = GetProductsResponse.builder().products(Collections.emptyList()).build();
+                when(productRepository.getProducts(inventoryId)).thenReturn(queryProducts);
+                when(productMapper.toGetProductsResponse(queryProducts)).thenReturn(expectResponse);
+            }
+            @Test
+            @DisplayName("빈 리스트를 반환한다.")
+            void it_returns_empty_list(){
+                GetProductsResponse response = inventoryQueryService.getProductsByInventory(inventoryId, admin);
 
-            //when
-            GetProductsResponse response = inventoryQueryService.getProductsByInventory(inventoryId, admin);
-
-            //then
-            verify(productRepository).getProducts(inventoryId);
-            verify(productMapper).toProductInfo(queryProducts);
-            assertThat(response.products()).isSameAs(Collections.emptyList());
+                verify(productRepository).getProducts(inventoryId);
+                assertThat(response.products()).isSameAs(Collections.emptyList());
+            }
         }
 
     }
 
     @Nested
-    @DisplayName("재고 검색")
-    class GetProductByKeywordAndInventoryTests{
-        @Test
-        @DisplayName("주문자는 재고 검색 불가능")
-        void ordererCantGetProducts(){
-            //given
-            Long inventoryId = 1L;
-            String keyword = "pro";
-
-            //when & then
-            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
-                    inventoryQueryService.getProductByKeywordAndInventory(inventoryId, keyword, orderer));
-            Assertions.assertEquals(AuthErrorCode.ORDERER_NOT_ALLOWED, exception.getErrorCode());
+    @DisplayName("getProductByKeywordAndInventory 메소드는")
+    class Describe_GetProductByKeywordAndInventory{
+        @Nested
+        @DisplayName("주문자라면")
+        class Context_Orderer{
+            Long inventoryId;
+            String keyword;
+            @BeforeEach
+            void setUp_context(){
+                inventoryId = 1L;
+                keyword = "pro";
+            }
+            @Test
+            @DisplayName("재고 검색 불가능하므로 예외를 반환한다.")
+            void it_throws_exception(){
+                CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                        inventoryQueryService.getProductByKeywordAndInventory(inventoryId, keyword, orderer));
+                Assertions.assertEquals(AuthErrorCode.ORDERER_NOT_ALLOWED, exception.getErrorCode());
+            }
         }
 
-        @Test
-        @DisplayName("뷰어는 재고 검색 불가능")
-        void viewerCantGetProducts(){
-            //given
-            Long inventoryId = 1L;
-            String keyword = "pro";
-
-            //when & then
-            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
-                    inventoryQueryService.getProductByKeywordAndInventory(inventoryId, keyword, viewer));
-            Assertions.assertEquals(AuthErrorCode.VIEWER_NOT_ALLOWED, exception.getErrorCode());
+        @Nested
+        @DisplayName("뷰어라면")
+        class Context_Viewer{
+            Long inventoryId;
+            String keyword;
+            @BeforeEach
+            void setUp_context(){
+                inventoryId = 1L;
+                keyword = "pro";
+            }
+            @Test
+            @DisplayName("재고 검색 불가능하므로 예외를 반환한다.")
+            void it_throws_exception(){
+                CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                        inventoryQueryService.getProductByKeywordAndInventory(inventoryId, keyword, viewer));
+                Assertions.assertEquals(AuthErrorCode.VIEWER_NOT_ALLOWED, exception.getErrorCode());
+            }
         }
 
-        @Test
-        @DisplayName("재고 검색 확인")
-        void getProducts(){
-            //given
-            Long inventoryId = 1L;
-            String keyword = "pro";
-            List<QueryProduct> queryProducts = createProductDTOs();
-            List<ProductInfo> productInfos = createProductInfos();
-            when(productRepository.getProducts(inventoryId, keyword)).thenReturn(queryProducts);
-            when(productMapper.toProductInfo(queryProducts)).thenReturn(productInfos);
+        @Nested
+        @DisplayName("검색 키워드를 제품명에 포함하는 제품이 존재하면")
+        class Context_Product_Contain_Keyword_Exist{
+            Long inventoryId;
+            String keyword;
+            GetProductsResponse expectResponse;
 
-            //when
-            GetProductsResponse response = inventoryQueryService.getProductByKeywordAndInventory(inventoryId, keyword, admin);
+            @BeforeEach
+            void setUp_context(){
+                inventoryId = 1L;
+                keyword = "pro";
+                List<QueryProduct> queryProducts = createProductDTOs();
+                expectResponse = createGetProductsResponse();
+                when(productRepository.getProducts(inventoryId, keyword)).thenReturn(queryProducts);
+                when(productMapper.toGetProductsResponse(queryProducts)).thenReturn(expectResponse);
+            }
 
-            //then
-            verify(productRepository).getProducts(inventoryId, keyword);
-            verify(productMapper).toProductInfo(queryProducts);
-            assertThat(response.products()).isSameAs(productInfos);
+            @Test
+            @DisplayName("제품을 반환한다.")
+            void it_returns_product(){
+                GetProductsResponse response = inventoryQueryService.getProductByKeywordAndInventory(inventoryId, keyword, admin);
+
+                verify(productRepository).getProducts(inventoryId, keyword);
+                assertThat(response.products()).isSameAs(expectResponse.products());
+            }
         }
 
-        @Test
-        @DisplayName("검색 결과가 없으면 빈 리스트 반환")
-        void getEmptyProducts(){
-            //given
-            Long inventoryId = 1L;
-            String keyword = "pro";
-            List<QueryProduct> queryProducts = Collections.emptyList();
-            List<ProductInfo> productInfos = Collections.emptyList();
-            when(productRepository.getProducts(inventoryId, keyword)).thenReturn(Collections.emptyList());
-            when(productMapper.toProductInfo(queryProducts)).thenReturn(productInfos);
+        @Nested
+        @DisplayName("검색 키워드를 제품명에 포함하는 제품이 존재하지 않으면")
+        class Context_Product_Contain_Keyword_Not_Exist{
+            Long inventoryId;
+            String keyword;
+            @BeforeEach
+            void setUp_context(){
+                inventoryId = 1L;
+                keyword = "pro";
+                List<QueryProduct> queryProducts = Collections.emptyList();
+                when(productRepository.getProducts(inventoryId, keyword)).thenReturn(Collections.emptyList());
+                when(productMapper.toGetProductsResponse(queryProducts)).thenReturn(GetProductsResponse.builder().products(Collections.emptyList()).build());
+            }
 
-            //when
-            GetProductsResponse response = inventoryQueryService.getProductByKeywordAndInventory(inventoryId, keyword, admin);
+            @Test
+            @DisplayName("빈 리스트를 반환한다.")
+            void it_returns_empty_list(){
+                GetProductsResponse response = inventoryQueryService.getProductByKeywordAndInventory(inventoryId, keyword, admin);
 
-            //then
-            verify(productRepository).getProducts(inventoryId, keyword);
-            verify(productMapper).toProductInfo(queryProducts);
-            assertThat(response.products()).isSameAs(Collections.emptyList());
+                verify(productRepository).getProducts(inventoryId, keyword);
+                assertThat(response.products()).isSameAs(Collections.emptyList());
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("getProductsName 메소드는")
+    class Describe_GetProductsName{
+        @Nested
+        @DisplayName("재고가 존재하지 않으면")
+        class Context_Inventory_Not_Exist{
+            String name;
+            @BeforeEach
+            void setUp_context(){
+                name = "product";
+                GetProductsNameResponse expectResult = GetProductsNameResponse.builder().names(Collections.emptyList()).build();
+                when(inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId())).thenReturn(Optional.empty());
+                when(productMapper.toEmptyGetProductNameResponse()).thenReturn(expectResult);
+
+            }
+
+            @Test
+            @DisplayName("빈 리스트를 반환한다.")
+            void it_returns_empty_list(){
+                GetProductsNameResponse response = inventoryQueryService.getProductsName(name, admin);
+
+                assertThat(response.names()).isEqualTo(Collections.emptyList());
+                verify(inventoryRepository).findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId());
+                verify(productMapper).toEmptyGetProductNameResponse();
+            }
+        }
+
+        @Nested
+        @DisplayName("재고가 존재하면")
+        class Context_Inventory_Exist{
+            String name;
+            Inventory inventory;
+            List<QueryProductName> productsName;
+            GetProductsNameResponse expectResponse;
+
+            @BeforeEach
+            void setUp_context(){
+                name = "product";
+                inventory = createInventory();
+                productsName = Collections.emptyList();
+                expectResponse = GetProductsNameResponse.builder().names(Collections.emptyList()).build();
+                when(inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId())).thenReturn(Optional.of(inventory));
+                when(productRepository.getProductsName(inventory.getId(), name)).thenReturn(productsName);
+                when(productMapper.toGetProductsNameResponse(productsName)).thenReturn(expectResponse);
+            }
+
+            @Test
+            @DisplayName("검색 키워드를 포함하고 있는 제품 이름을 반환한다.")
+            void it_returns_products_name_contain_keyword(){
+                GetProductsNameResponse response = inventoryQueryService.getProductsName(name, admin);
+
+                assertThat(response).isNotNull();
+                assertThat(response.names()).isEqualTo(expectResponse.names());
+                verify(inventoryRepository).findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId());
+                verify(productRepository).getProductsName(inventory.getId(), name);
+                verify(productMapper).toGetProductsNameResponse(productsName);
+            }
         }
 
     }
 
     @Nested
-    @DisplayName("제품 이름 검색")
-    class GetProductsNameTest{
-        @Test
-        @DisplayName("team에 제고가 존재하지 않으면 빈 리스트 반환")
-        void getEmptyProductName(){
-            //given
-            String name = "product";
-            GetProductsNameResponse expectResult = GetProductsNameResponse.builder().names(Collections.emptyList()).build();
-            when(inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId())).thenReturn(Optional.empty());
-            when(productMapper.toEmptyGetProductNameResponse()).thenReturn(expectResult);
+    @DisplayName("getSubProductName 메소드는")
+    class Describe_GetSubProductName{
+        @Nested
+        @DisplayName("재고가 존재하지 않으면")
+        class Context_Inventory_Not_Exist{
+            String name;
+            @BeforeEach
+            void setUp_context(){
+                name = "product";
+                GetSubProductNameResponse expectResult = GetSubProductNameResponse.builder().subProducts(Collections.emptyList()).build();
+                when(inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId())).thenReturn(Optional.empty());
+                when(productMapper.toEmptyGetSubProductNameResponse()).thenReturn(expectResult);
+            }
+            @Test
+            @DisplayName("빈 리스트를 반환한다.")
+            void it_returns_empty_list(){
+                GetSubProductNameResponse response = inventoryQueryService.getSubProductName(name, admin);
 
-            //when
-            GetProductsNameResponse response = inventoryQueryService.getProductsName(name, admin);
-
-            //then
-            assertThat(response.names()).isEqualTo(Collections.emptyList());
-            verify(inventoryRepository).findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId());
-            verify(productMapper).toEmptyGetProductNameResponse();
+                assertThat(response.subProducts()).isEqualTo(Collections.emptyList());
+                verify(inventoryRepository).findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId());
+                verify(productMapper).toEmptyGetSubProductNameResponse();
+            }
         }
 
-        @Test
-        @DisplayName("재고가 존재하면 해당 재고에 있는 제품 중 검색 키워드를 포함하고 있는 제품 이름 반환")
-        void getProductName(){
-            //given
-            String name = "product";
-            Inventory inventory = createInventory();
-            List<QueryProductName> productsName = Collections.emptyList();
-            GetProductsNameResponse expectResponse = GetProductsNameResponse.builder().names(Collections.emptyList()).build();
-            when(inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId())).thenReturn(Optional.of(inventory));
-            when(productRepository.getProductsName(inventory.getId(), name)).thenReturn(productsName);
-            when(productMapper.toGetProductsNameResponse(productsName)).thenReturn(expectResponse);
+        @Nested
+        @DisplayName("재고가 존재하면")
+        class Context_Inventory_Exist{
+            String name;
+            Inventory inventory;
+            List<QuerySubProduct> subProducts;
+            GetSubProductNameResponse expectResponse;
 
-            //when
-            GetProductsNameResponse response = inventoryQueryService.getProductsName(name, admin);
+            @BeforeEach
+            void setUp_context(){
+                name = "product";
+                inventory = createInventory();
+                subProducts = createQuerySubProducts();
+                expectResponse = createGetSubProductNameResponse();
+                when(inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId())).thenReturn(Optional.of(inventory));
+                when(productRepository.getSubProducts(inventory.getId(), name)).thenReturn(subProducts);
+                when(productMapper.toGetSubProductNameResponse(subProducts)).thenReturn(expectResponse);
 
-            //then
-            assertThat(response).isNotNull();
-            assertThat(response.names()).isEqualTo(expectResponse.names());
-            verify(inventoryRepository).findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId());
-            verify(productRepository).getProductsName(inventory.getId(), name);
-            verify(productMapper).toGetProductsNameResponse(productsName);
-        }
+            }
+            @Test
+            @DisplayName("제품 이름과 일치하는 제품의 정보를 반환한다.")
+            void it_returns_products_match_product_name(){
+                GetSubProductNameResponse response = inventoryQueryService.getSubProductName(name, admin);
 
-    }
-
-    @Nested
-    @DisplayName("제품 이름으로 하위 제품 조회")
-    class GetSubProductNameTest{
-        @Test
-        @DisplayName("team에 제고가 존재하지 않으면 빈 리스트 반환")
-        void getEmptySubProductName(){
-            //given
-            String name = "product";
-            GetSubProductNameResponse expectResult = GetSubProductNameResponse.builder().subProducts(Collections.emptyList()).build();
-            when(inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId())).thenReturn(Optional.empty());
-            when(productMapper.toEmptyGetSubProductNameResponse()).thenReturn(expectResult);
-
-            //when
-            GetSubProductNameResponse response = inventoryQueryService.getSubProductName(name, admin);
-
-            //then
-            assertThat(response.subProducts()).isEqualTo(Collections.emptyList());
-            verify(inventoryRepository).findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId());
-            verify(productMapper).toEmptyGetSubProductNameResponse();
-        }
-
-        @Test
-        @DisplayName("재고가 존재하면 해당 재고에 있는 제품 중 제품 이름과 일치하는 제품의 하위 제품 이름과 Id 반환")
-        void getSubProductName(){
-            //given
-            String name = "product";
-            Inventory inventory = createInventory();
-            List<QuerySubProduct> subProducts = createQuerySubProducts();
-            GetSubProductNameResponse expectResponse = createGetSubProductNameResponse();
-            when(inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId())).thenReturn(Optional.of(inventory));
-            when(productRepository.getSubProducts(inventory.getId(), name)).thenReturn(subProducts);
-            when(productMapper.toGetSubProductNameResponse(subProducts)).thenReturn(expectResponse);
-
-            //when
-            GetSubProductNameResponse response = inventoryQueryService.getSubProductName(name, admin);
-
-            //then
-            assertThat(response).isNotNull();
-            assertThat(response.subProducts()).isEqualTo(expectResponse.subProducts());
-            verify(inventoryRepository).findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId());
-            verify(productRepository).getSubProducts(inventory.getId(), name);
-            verify(productMapper).toGetSubProductNameResponse(subProducts);
+                assertThat(response).isNotNull();
+                assertThat(response.subProducts()).isEqualTo(expectResponse.subProducts());
+                verify(inventoryRepository).findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId());
+                verify(productRepository).getSubProducts(inventory.getId(), name);
+                verify(productMapper).toGetSubProductNameResponse(subProducts);
+            }
         }
 
         private List<QuerySubProduct> createQuerySubProducts(){
@@ -373,9 +462,7 @@ class InventoryQueryServiceTest {
                     .subProducts(subProductInfos)
                     .build();
         }
-
     }
-
 
     private List<QueryProduct> createProductDTOs(){
         List<QueryProduct> result = new ArrayList<>();
@@ -385,12 +472,12 @@ class InventoryQueryServiceTest {
         return result;
     }
 
-    private List<ProductInfo> createProductInfos(){
+    private GetProductsResponse createGetProductsResponse(){
         List<ProductInfo> result = new ArrayList<>();
         for(int i =0; i<5; i++){
             result.add(ProductInfo.builder().name("product").build());
         }
-        return result;
+        return GetProductsResponse.builder().products(result).build();
     }
 
     private Inventory createInventory(){

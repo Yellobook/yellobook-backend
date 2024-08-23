@@ -11,10 +11,12 @@ import com.yellobook.domains.member.service.MemberQueryService;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.convert.DataSizeUnit;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -52,7 +54,7 @@ class MemberControllerTest {
     private Authentication authentication;
 
     @BeforeEach
-    void setTeamMemberVO() throws Exception{
+    void setUp_Authentication(){
         Member member = Member.builder()
                 .memberId(1L)
                 .nickname("yellow")
@@ -68,21 +70,31 @@ class MemberControllerTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    @Test
-    @DisplayName("사용자 프로필 조회")
-    void getMemberProfile() throws Exception{
-        //given
-        ProfileResponse response = new ProfileResponse(1L, "yellow", "image", "email", Collections.emptyList());
-        when(memberQueryService.getMemberProfile(any(Long.class))).thenReturn(response);
+    @Nested
+    @DisplayName("getMemberProfile 메소드는")
+    class Describe_GetMemberProfile{
+        @Nested
+        @DisplayName("인증된 사용자가 프로필을 요청하면")
+        class Context_Member_Exist{
+            ProfileResponse response;
+            @BeforeEach
+            void setUp_Context(){
+                response = new ProfileResponse(1L, "yellow", "image", "email", Collections.emptyList());
+                when(memberQueryService.getMemberProfile(any(Long.class))).thenReturn(response);
+            }
 
-        //when & then
-        mockMvc.perform(get("/api/v1/members/profile")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .principal(authentication)
-                )
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.nickname", CoreMatchers.is(response.nickname())))
-                .andReturn();
+            @Test
+            @DisplayName("프로필 정보를 반환한다.")
+            void it_returns_profile() throws Exception{
+                mockMvc.perform(get("/api/v1/members/profile")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .principal(authentication)
+                        )
+                        .andDo(print())
+                        .andExpect(status().isOk())
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.data.nickname", CoreMatchers.is(response.nickname())))
+                        .andReturn();
+            }
+        }
     }
 }

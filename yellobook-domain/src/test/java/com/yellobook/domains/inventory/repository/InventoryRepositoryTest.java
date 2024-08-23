@@ -6,6 +6,7 @@ import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.team.entity.Team;
 import com.yellobook.support.annotation.RepositoryTest;
+import jakarta.annotation.sql.DataSourceDefinition;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +24,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryTest
-@DisplayName("Inventory 도메인 Repository Unit Test")
+@DisplayName("InventoryRepository Unit Test")
 public class InventoryRepositoryTest {
     @Autowired
     private InventoryRepository inventoryRepository;
@@ -36,9 +37,8 @@ public class InventoryRepositoryTest {
 
     private Team team;
 
-
     @BeforeEach
-    void setUpTeam(){
+    void setUp(){
         team = Team.builder()
                 .name("team1")
                 .phoneNumber("000-0000-0000")
@@ -48,74 +48,65 @@ public class InventoryRepositoryTest {
     }
 
     @Nested
-    @DisplayName("재고 전체 조회")
-    class getTotalInventoryTests{
+    @DisplayName("getTotalInventory 메소드는")
+    class Describe_GetTotalInventory{
+        Pageable pageable = PageRequest.of(0, 5);
 
-        @Test
-        @DisplayName("팀의 재고 중 날짜를 기준으로 내림차순 정렬으로 가져온다.")
-        void getInventoriesByDateDesc(){
-            //given
-            Long teamId = team.getId();
-            Pageable pageable = PageRequest.of(0, 5);
-            for(int i =0; i<6; i++){
-                Inventory inventory = Inventory.builder()
-                        .team(team)
-                        .title(String.format("2024년 08월 0%d일 재고현황", i))
-                        .build();
-                em.persist(inventory);
-            }
+        @Nested
+        @DisplayName("재고가 존재하지 않으면")
+        class Context_Inventory_Exist{
 
-            //when
-            List<QueryInventory> result = inventoryRepository.getTotalInventory(teamId, pageable);
+            @Test
+            @DisplayName("빈 리스트를 반환한다.")
+            void it_returns_empty_list(){
+                List<QueryInventory> result = inventoryRepository.getTotalInventory(team.getId(), pageable);
 
-            //then
-            assertThat(result.size()).isEqualTo(5);
-            for(int i=1; i<result.size(); i++){
-                assertThat(result.get(i-1).createdAt()).isAfterOrEqualTo(result.get(i).createdAt());
+                assertThat(result.size()).isEqualTo(0);
+                assertThat(result).isEmpty();
             }
         }
 
-        @Test
-        @DisplayName("팀에 재고가 존재하지 않으면 빈 리스트를 반환한다.")
-        void getEmptyInventories(){
-            //given
-            Long teamId = team.getId();
-            Pageable pageable = PageRequest.of(0, 5);
+        @Nested
+        @DisplayName("재고가 존재하면")
+        class Context_Inventory_Not_Exist{
 
-            //when
-            List<QueryInventory> result = inventoryRepository.getTotalInventory(teamId, pageable);
-
-            //then
-            assertThat(result.size()).isEqualTo(0);
-            assertThat(result).isEmpty();
-        }
-
-        @Test
-        @DisplayName("페이징이 잘 동작하는지 확인한다.")
-        void getInventoriesPagingApplied(){
-            //given
-            Long teamId = team.getId();
-            Pageable pageable = PageRequest.of(1, 5);
-            for(int i =0; i<6; i++){
-                Inventory inventory = Inventory.builder()
-                        .team(team)
-                        .title(String.format("2024년 08월 0%d일 재고현황", i))
-                        .build();
-                em.persist(inventory);
+            @BeforeEach
+            void setUp_context(){
+                for(int i =0; i<6; i++){
+                    Inventory inventory = Inventory.builder()
+                            .team(team)
+                            .title(String.format("2024년 08월 0%d일 재고현황", i))
+                            .build();
+                    em.persist(inventory);
+                }
             }
 
-            //when
-            List<QueryInventory> result = inventoryRepository.getTotalInventory(teamId, pageable);
+            @Test
+            @DisplayName("재고를 날짜를 기준으로 내림차순으로 정렬해서 반환한다.")
+            void it_returns_inventories_orderBy_createdAt_Desc(){
+                List<QueryInventory> result = inventoryRepository.getTotalInventory(team.getId(), pageable);
 
-            //then
-            assertThat(result.size()).isEqualTo(1);
+                assertThat(result.size()).isEqualTo(5);
+                for(int i=1; i<result.size(); i++){
+                    assertThat(result.get(i-1).createdAt()).isAfterOrEqualTo(result.get(i).createdAt());
+                }
+            }
+
+            @Test
+            @DisplayName("페이징을 반영해서 반환한다.")
+            void it_returns_inventories_by_paging(){
+                List<QueryInventory> result = inventoryRepository.getTotalInventory(team.getId(), pageable);
+
+                assertThat(result.size()).isEqualTo(5);
+            }
+
         }
 
     }
 
     @Nested
-    @DisplayName("제품")
-    class productsTests{
+    @DisplayName("getProducts 메소드는")
+    class Describe_GetProducts{
         private Inventory inventory;
 
         @BeforeEach
@@ -141,68 +132,119 @@ public class InventoryRepositoryTest {
         }
 
         @Nested
-        @DisplayName("제품 조회 테스트")
-        class getProductsTests{
+        @DisplayName("재고 id가 제공되면")
+        class Context_Inventoy_Id_Given{
+
             @Test
-            @DisplayName("제품명을 기준으로 오름차순 정렬이 되었는지 테스트")
-            void getProductsByNameAsc(){
-                //given
-                Long inventoryId = inventory.getId();
+            @DisplayName("제품명을 기준으로 오름차순으로 정렬해서 반환한다.")
+            void it_returns_products_orderBy_name_asc(){
+                List<QueryProduct> result = productRepository.getProducts(inventory.getId());
 
-                //when
-                List<QueryProduct> result = productRepository.getProducts(inventoryId);
-
-                //then
                 assertThat(result.size()).isEqualTo(5);
                 for(int i=1; i<result.size(); i++){
                     assertThat(result.get(i-1).name()).isLessThanOrEqualTo(result.get(i).name());
                 }
             }
+        }
 
-            @DisplayName("키워드를 포함한 제품을 조회하는지 테스트")
+        @Nested
+        @DisplayName("재고 id와 제품 이름 키워드가 제공되면")
+        class Describe_Inventory_Id_And_Keyword_Given{
             @ParameterizedTest
             @CsvSource(value = {
                     "product, 5",
                     "1, 1",
                     "품, 0"
             })
-            void getProductsByKeyword(String keyword, int total){
-                //given
-                Long inventoryId = inventory.getId();
+            @DisplayName("키워드를 제품명에 포함하는 제품을 반환한다.")
+            void it_returns_products_contain_keyword(String keyword, Integer total){
+                List<QueryProduct> result = productRepository.getProducts(inventory.getId(), keyword);
 
-                //when
-                List<QueryProduct> result = productRepository.getProducts(inventoryId, keyword);
-
-                //then
                 assertThat(result.size()).isEqualTo(total);
             }
         }
+    }
 
-        @Test
-        @DisplayName("제품 id로 제품 삭제되었는지 테스트")
-        void deleteProduct(){
-            //given
-            Long productId = 1L;
+    @Nested
+    @DisplayName("deleteById 메소드는")
+    class Describe_DeleteById{
 
-            //when
-            productRepository.deleteById(productId);
+        @BeforeEach
+        void setUpInventory(){
+            Inventory inventory = Inventory.builder()
+                    .team(team)
+                    .title("2024년 08월 06일 재고현황")
+                    .build();
+            em.persist(inventory);
 
-            //then
-            assertThat(productRepository.existsById(productId)).isFalse();
+            for(int i =0; i<5; i++){
+                Product product = Product.builder()
+                        .name(String.format("product%d", i))
+                        .subProduct(String.format("sub%d", i))
+                        .sku(i)
+                        .purchasePrice(i*1000)
+                        .salePrice(i*2000)
+                        .amount(i+100)
+                        .inventory(inventory)
+                        .build();
+                em.persist(product);
+            }
         }
 
-        @Test
-        @DisplayName("inventory Id와 sku로 제품이 존재하는지 테스트")
-        void getByInventoryIdAndSku(){
-            //given
-            Long inventoryId = inventory.getId();
+        @Nested
+        @DisplayName("제품 id가 제공되면")
+        class Context_Product_Id_Given{
+            Long productId = 1L;
+
+            @Test
+            @DisplayName("해당 제춤을 삭제한다.")
+            void it_delete_product(){
+                productRepository.deleteById(productId);
+
+                assertThat(productRepository.existsById(productId)).isFalse();
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("existsByInventoryIdAndSku 메소드는")
+    class Describe_ExistsByInventoryIdAndSku{
+        private Inventory inventory;
+
+        @BeforeEach
+        void setUpInventory(){
+            inventory = Inventory.builder()
+                    .team(team)
+                    .title("2024년 08월 06일 재고현황")
+                    .build();
+            em.persist(inventory);
+
+            for(int i =0; i<5; i++){
+                Product product = Product.builder()
+                        .name(String.format("product%d", i))
+                        .subProduct(String.format("sub%d", i))
+                        .sku(i)
+                        .purchasePrice(i*1000)
+                        .salePrice(i*2000)
+                        .amount(i+100)
+                        .inventory(inventory)
+                        .build();
+                em.persist(product);
+            }
+        }
+
+        @Nested
+        @DisplayName("재고 id와 sku가 제공되면")
+        class Context_Inventory_Id_And_Sku_Given{
             Integer sku = 1;
 
-            //when
-            boolean exist1 = productRepository.existsByInventoryIdAndSku(inventoryId, sku);
+            @Test
+            @DisplayName("해당 재고에 포함되고, 해당 sku와 동일한 sku를 갖는 제품이 존재하는지 확인한다.")
+            void it_exists_by_inventory_id_and_sku(){
+                boolean exist1 = productRepository.existsByInventoryIdAndSku(inventory.getId(), sku);
 
-            //then
-            assertThat(exist1).isTrue();
+                assertThat(exist1).isTrue();
+            }
         }
 
     }

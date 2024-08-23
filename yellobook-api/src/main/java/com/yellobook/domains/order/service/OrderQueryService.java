@@ -1,6 +1,7 @@
 package com.yellobook.domains.order.service;
 
 import com.yellobook.common.vo.TeamMemberVO;
+import com.yellobook.domains.order.dto.query.QueryOrderComment;
 import com.yellobook.domains.order.dto.response.GetOrderCommentsResponse;
 import com.yellobook.domains.order.dto.response.GetOrderCommentsResponse.CommentInfo;
 import com.yellobook.domains.order.dto.response.GetOrderResponse;
@@ -33,8 +34,8 @@ public class OrderQueryService {
         // 접근 권한 있는지 확인
         if(teamMemberVO.getMemberId().equals(order.getMember().getId()) || orderMentionRepository.existsByMemberIdAndOrderId(teamMemberVO.getMemberId(), orderId)){
             // 댓글 조회
-            List<CommentInfo> commentInfos = orderRepository.getOrderComments(orderId).stream().map(orderMapper::toCommentInfo).toList();
-            return GetOrderCommentsResponse.builder().comments(commentInfos).build();
+            List<QueryOrderComment> orderComments = orderRepository.getOrderComments(orderId);
+            return orderMapper.toGetOrderCommentsResponse(orderComments);
         }else{
             throw new CustomException(OrderErrorCode.ORDER_ACCESS_DENIED);
         }

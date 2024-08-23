@@ -3,22 +3,19 @@ package com.yellobook.domains.order.service;
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.enums.OrderStatus;
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domains.order.dto.response.GetOrderCommentsResponse;
-import com.yellobook.domains.order.dto.response.GetOrderCommentsResponse.CommentInfo;
-import com.yellobook.domains.order.dto.response.GetOrderResponse;
-import com.yellobook.domains.order.mapper.OrderMapper;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.order.dto.query.QueryOrder;
 import com.yellobook.domains.order.dto.query.QueryOrderComment;
+import com.yellobook.domains.order.dto.response.GetOrderCommentsResponse;
+import com.yellobook.domains.order.dto.response.GetOrderCommentsResponse.CommentInfo;
+import com.yellobook.domains.order.dto.response.GetOrderResponse;
 import com.yellobook.domains.order.entity.Order;
+import com.yellobook.domains.order.mapper.OrderMapper;
 import com.yellobook.domains.order.repository.OrderMentionRepository;
 import com.yellobook.domains.order.repository.OrderRepository;
 import com.yellobook.error.code.OrderErrorCode;
 import com.yellobook.error.exception.CustomException;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -34,6 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("OrderQueryService Unit Test")
 class OrderQueryServiceTest {
     @InjectMocks
     private OrderQueryService orderQueryService;
@@ -48,131 +46,162 @@ class OrderQueryServiceTest {
     private final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, MemberTeamRole.ORDERER);
 
     @Nested
-    @DisplayName("주문 댓글 조회")
-    class GetOrderComments{
-
-        @Test
-        @DisplayName("주문이 존재하지 않으면 주문 불가능")
-        void notValidOrder(){
-            //given
-            Long orderId = 1L;
-            when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
-
-            //when & then
-            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
-                    orderQueryService.getOrderComments(orderId, orderer));
-            Assertions.assertEquals(OrderErrorCode.ORDER_NOT_FOUND, exception.getErrorCode());
+    @DisplayName("getOrderComments 메소드는")
+    class Describe_getOrderComments{
+        @Nested
+        @DisplayName("주문이 존재하지 않으면")
+        class Context_Order_Not_Exist{
+            Long orderId;
+            @BeforeEach
+            void setUp_context(){
+                orderId = 1L;
+                when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+            }
+            @Test
+            @DisplayName("예외를 반환한다.")
+            void it_throws_exception(){
+                CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                        orderQueryService.getOrderComments(orderId, orderer));
+                Assertions.assertEquals(OrderErrorCode.ORDER_NOT_FOUND, exception.getErrorCode());
+            }
         }
 
-        @Test
-        @DisplayName("해당 주문의 주문자가 아니거나 관리자가 아니면 댓글 조회 불가능")
-        void cantAccessOrderComment(){
-            //given
-            Long orderId = 1L;
-            Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 1L);  // orderMember : 1L, member : 2L
-            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-            when(orderMentionRepository.existsByMemberIdAndOrderId(orderer.getMemberId(), orderId)).thenReturn(false);
-
-            //when & then
-            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
-                    orderQueryService.getOrderComments(orderId, orderer));
-            Assertions.assertEquals(OrderErrorCode.ORDER_ACCESS_DENIED, exception.getErrorCode());
+        @Nested
+        @DisplayName("해당 주문의 주문자, 관리자가 아니면")
+        class Context_Not_Order_Orderer_Or_Admin{
+            Long orderId;
+            @BeforeEach
+            void setUp_context(){
+                orderId = 1L;
+                Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 1L);  // orderMember : 1L, member : 2L
+                when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+                when(orderMentionRepository.existsByMemberIdAndOrderId(orderer.getMemberId(), orderId)).thenReturn(false);
+            }
+            @Test
+            @DisplayName("예외를 반환한다.")
+            void it_throws_exception(){
+                CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                        orderQueryService.getOrderComments(orderId, orderer));
+                Assertions.assertEquals(OrderErrorCode.ORDER_ACCESS_DENIED, exception.getErrorCode());
+            }
         }
 
-        @Test
-        @DisplayName("댓글 조회가 잘 되는지 확인")
-        void getOrderComments(){
-            //given
-            Long orderId = 1L;
-            Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 2L);  // orderMember : 2L, member : 2L
-            CommentInfo commentInfo = CommentInfo.builder().content("content").role("주문자").build();
+        @Nested
+        @DisplayName("댓글이 없으면")
+        class Context_Empty_OrderComment{
+            Long orderId;
+            @BeforeEach
+            void setUp_context(){
+                orderId = 1L;
+                Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 2L);  // orderMember : 2L, member : 2L
+                GetOrderCommentsResponse expectResponse = GetOrderCommentsResponse.builder().comments(Collections.emptyList()).build();
 
-            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-            when(orderRepository.getOrderComments(orderId)).thenReturn(List.of(QueryOrderComment.builder().build()));
-            when(orderMapper.toCommentInfo(any(QueryOrderComment.class))).thenReturn(commentInfo);
+                when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+                when(orderRepository.getOrderComments(orderId)).thenReturn(Collections.emptyList());
+                when(orderMapper.toGetOrderCommentsResponse(any())).thenReturn(expectResponse);
+            }
+            @Test
+            @DisplayName("빈 리스트를 반환한다.")
+            void getEmptyOrderComments(){
+                GetOrderCommentsResponse response = orderQueryService.getOrderComments(orderId, orderer);
 
-            //when
-            GetOrderCommentsResponse response = orderQueryService.getOrderComments(orderId, orderer);
-
-            //then
-            assertThat(response).isNotNull();
-            assertThat(response.comments().size()).isEqualTo(1);
+                assertThat(response).isNotNull();
+                assertThat(response.comments().size()).isEqualTo(0);
+                assertThat(response.comments()).isEmpty();
+            }
         }
 
-        @Test
-        @DisplayName("주문 댓글이 없으면 빈 리스트 반환")
-        void getEmptyOrderComments(){
-            //given
-            Long orderId = 1L;
-            Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 2L);  // orderMember : 2L, member : 2L
+        @Nested
+        @DisplayName("댓글이 존재하면")
+        class Context_OrderComment_Exist{
+            Long orderId;
+            @BeforeEach
+            void setUp_context(){
+                orderId = 1L;
+                Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 2L);  // orderMember : 2L, member : 2L
+                CommentInfo commentInfo = CommentInfo.builder().content("content").role("주문자").build();
+                GetOrderCommentsResponse expectResponse = GetOrderCommentsResponse.builder().comments(Collections.singletonList(commentInfo)).build();
 
-            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-            when(orderRepository.getOrderComments(orderId)).thenReturn(Collections.emptyList());
+                when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+                when(orderRepository.getOrderComments(orderId)).thenReturn(List.of(QueryOrderComment.builder().build()));
+                when(orderMapper.toGetOrderCommentsResponse(any())).thenReturn(expectResponse);
+            }
+            @Test
+            @DisplayName("주문의 댓글을 반환한다.")
+            void getOrderComments(){
+                GetOrderCommentsResponse response = orderQueryService.getOrderComments(orderId, orderer);
 
-            //when
-            GetOrderCommentsResponse response = orderQueryService.getOrderComments(orderId, orderer);
-
-            //then
-            assertThat(response).isNotNull();
-            assertThat(response.comments().size()).isEqualTo(0);
-            assertThat(response.comments()).isEmpty();
+                assertThat(response).isNotNull();
+                assertThat(response.comments().size()).isEqualTo(1);
+            }
         }
-
-
     }
 
     @Nested
-    @DisplayName("주문 단건 조회")
-    class GetOrderTests{
-        @Test
-        @DisplayName("주문이 존재하지 않으면 주문 불가능")
-        void notValidOrder(){
-            //given
-            Long orderId = 1L;
-            when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
-
-            //when & then
-            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
-                    orderQueryService.getOrder(orderId, orderer));
-            Assertions.assertEquals(OrderErrorCode.ORDER_NOT_FOUND, exception.getErrorCode());
+    @DisplayName("getOrder 메소드는")
+    class Describe_GetOrder{
+        @Nested
+        @DisplayName("주문이 존재하지 않으면")
+        class Context_Order_Not_Exist{
+            Long orderId;
+            @BeforeEach
+            void setUp_context(){
+                orderId = 1L;
+                when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+            }
+            @Test
+            @DisplayName("예외를 반환한다.")
+            void it_throws_exception(){
+                CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                        orderQueryService.getOrder(orderId, orderer));
+                Assertions.assertEquals(OrderErrorCode.ORDER_NOT_FOUND, exception.getErrorCode());
+            }
         }
 
-        @Test
-        @DisplayName("해당 주문의 주문자가 아니거나 관리자가 아니면 댓글 조회 불가능")
-        void cantAccessOrder(){
-            //given
-            Long orderId = 1L;
-            Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 1L);  // orderMember : 1L, member : 2L
-            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-            when(orderMentionRepository.existsByMemberIdAndOrderId(orderer.getMemberId(), orderId)).thenReturn(false);
-
-            //when & then
-            CustomException exception = Assertions.assertThrows(CustomException.class, () ->
-                    orderQueryService.getOrder(orderId, orderer));
-            Assertions.assertEquals(OrderErrorCode.ORDER_ACCESS_DENIED, exception.getErrorCode());
+        @Nested
+        @DisplayName("해당 주문의 주문자가 아니거나 관리자가 아니면")
+        class Context_Not_Order_Orderer_Or_Admin{
+            Long orderId;
+            @BeforeEach
+            void setUp_context(){
+                orderId = 1L;
+                Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 1L);  // orderMember : 1L, member : 2L
+                when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+                when(orderMentionRepository.existsByMemberIdAndOrderId(orderer.getMemberId(), orderId)).thenReturn(false);
+            }
+            @Test
+            @DisplayName("예외를 반환한다.")
+            void it_throws_exception(){
+                CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                        orderQueryService.getOrder(orderId, orderer));
+                Assertions.assertEquals(OrderErrorCode.ORDER_ACCESS_DENIED, exception.getErrorCode());
+            }
         }
 
-        @Test
-        @DisplayName("주문 조회가 잘 되는지 확인")
-        void getOrder(){
-            //given
-            Long orderId = 1L;
-            Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 2L);  // orderMember : 2L, member : 2L
-            QueryOrder queryOrder = QueryOrder.builder().build();
-            GetOrderResponse expectResponse = GetOrderResponse.builder().build();
+        @Nested
+        @DisplayName("주문이 존재하면")
+        class Context_Order_Exist{
+            Long orderId;
+            @BeforeEach
+            void setUp_context(){
+                orderId = 1L;
+                Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 2L);  // orderMember : 2L, member : 2L
+                QueryOrder queryOrder = QueryOrder.builder().build();
+                GetOrderResponse expectResponse = GetOrderResponse.builder().build();
 
-            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-            when(orderRepository.getOrder(orderId)).thenReturn(queryOrder);
-            when(orderMapper.toGetOrderResponse(queryOrder)).thenReturn(expectResponse);
+                when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+                when(orderRepository.getOrder(orderId)).thenReturn(queryOrder);
+                when(orderMapper.toGetOrderResponse(queryOrder)).thenReturn(expectResponse);
+            }
+            @Test
+            @DisplayName("주문 정보를 반환한다.")
+            void getOrder(){
+                GetOrderResponse response = orderQueryService.getOrder(orderId, orderer);
 
-            //when
-            GetOrderResponse response = orderQueryService.getOrder(orderId, orderer);
-
-            //then
-            assertThat(response).isNotNull();
+                assertThat(response).isNotNull();
+            }
         }
     }
-
 
     private Order createOrderMember(OrderStatus status, Long memberId){
         Member member = createMember(memberId);
@@ -191,6 +220,5 @@ class OrderQueryServiceTest {
         }
         return member;
     }
-
 
 }

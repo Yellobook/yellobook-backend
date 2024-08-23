@@ -41,7 +41,7 @@ public class InventoryCommandService{
         Inventory inventory = inventoryRepository.findById(inventoryId).orElseThrow(() -> new CustomException(InventoryErrorCode.INVENTORY_NOT_FOUND) );
         Product newProduct = productMapper.toProduct(requestDTO, inventory);
         Long productId = productRepository.save(newProduct).getId();
-        return AddProductResponse.builder().productId(productId).build();
+        return productMapper.toAddProductResponse(productId);
     }
 
     /**

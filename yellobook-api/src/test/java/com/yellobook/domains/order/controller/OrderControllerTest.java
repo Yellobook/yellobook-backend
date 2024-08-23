@@ -13,9 +13,7 @@ import com.yellobook.domains.order.dto.response.MakeOrderResponse;
 import com.yellobook.domains.order.service.OrderCommandService;
 import com.yellobook.domains.order.service.OrderQueryService;
 import org.hamcrest.CoreMatchers;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,135 +57,217 @@ class OrderControllerTest {
                 .thenReturn(teamMemberVO);
     }
 
-    @Test
-    @DisplayName("주문 작성")
-    void makeOrder() throws Exception{
-        //given
-        MakeOrderRequest request = MakeOrderRequest.builder().productId(1L).build();
-        MakeOrderResponse response = MakeOrderResponse.builder().orderId(2L).build();
-        when(orderCommandService.makeOrder(request, teamMemberVO)).thenReturn(response);
+    @Nested
+    @DisplayName("makeOrder 메소드는")
+    class Describe_MakeOrder{
+        @Nested
+        @DisplayName("주문을 생성하면")
+        class Context_Order_Given {
+            MakeOrderRequest request;
+            MakeOrderResponse response;
 
-        //when & then
-        mockMvc.perform(post("/api/v1/orders")
-                .content(objectMapper.writeValueAsString(request))
-                .contentType("application/json;charset=UTF-8"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.orderId", CoreMatchers.is(response.orderId().intValue())))
-                .andDo(print())
-                .andReturn();
+            @BeforeEach
+            void setUp_context(){
+                request = MakeOrderRequest.builder().productId(1L).build();
+                response = MakeOrderResponse.builder().orderId(2L).build();
+                when(orderCommandService.makeOrder(request, teamMemberVO)).thenReturn(response);
+            }
+
+            @Test
+            @DisplayName("새로운 주문을 추가한다.")
+            void it_adds_new_order() throws Exception{
+                mockMvc.perform(post("/api/v1/orders")
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType("application/json;charset=UTF-8"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.data.orderId", CoreMatchers.is(response.orderId().intValue())))
+                        .andDo(print())
+                        .andReturn();
+            }
+        }
     }
 
-    @Test
-    @DisplayName("주문 조회 - 주문이 존재 할때")
-    void getOrder() throws Exception{
-        //given
-        Long orderId = 1L;
-        GetOrderResponse response = GetOrderResponse.builder().writer("writer").build();
-        when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
-        when(orderQueryService.getOrder(orderId, teamMemberVO)).thenReturn(response);
+    @Nested
+    @DisplayName("getOrder 메소드는")
+    class Describe_GetOrder{
+        @Nested
+        @DisplayName("유효한 주문 Id이면")
+        class Context_Order_Id_Exist{
+            Long orderId;
+            GetOrderResponse response;
 
-        //when & then
-        mockMvc.perform(get("/api/v1/orders/{orderId}", orderId)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.writer", CoreMatchers.is(response.writer())))
-                .andReturn();
+            @BeforeEach
+            void setUp_context(){
+                orderId = 1L;
+                response = GetOrderResponse.builder().writer("writer").build();
+                when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
+                when(orderQueryService.getOrder(orderId, teamMemberVO)).thenReturn(response);
+            }
+            @Test
+            @DisplayName("해당 주문을 반환한다.")
+            void it_returns_order() throws Exception{
+                mockMvc.perform(get("/api/v1/orders/{orderId}", orderId)
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.data.writer", CoreMatchers.is(response.writer())))
+                        .andReturn();
+            }
+        }
+
+        @Nested
+        @DisplayName("유효한 주문 Id가 아니면")
+        class Context_Order_Id_Not_Exist{
+            Long orderId;
+            @BeforeEach
+            void setUp_context(){
+                orderId = 1L;
+                when(orderQueryService.existsByOrderId(orderId)).thenReturn(false);
+            }
+            @Test
+            @DisplayName("상태 코드 400을 반환한다.")
+            void it_returns_400() throws Exception{
+                mockMvc.perform(get("/api/v1/orders/{orderId}", orderId)
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isBadRequest())
+                        .andReturn();
+            }
+        }
     }
 
-    @Test
-    @DisplayName("@ExistOrder - 주문이 존재 안하면 예외 발생")
-    void validExistOrder() throws Exception{
-        //given
-        Long orderId = 1L;
-        when(orderQueryService.existsByOrderId(orderId)).thenReturn(false);
+    @Nested
+    @DisplayName("addOrderComment 메서드는")
+    class Describe_AddOrderComment{
+        @Nested
+        @DisplayName("유효한 주문 Id이면")
+        class Context_Product_Id_Exist{
+            Long orderId;
+            AddOrderCommentRequest request;
+            AddOrderCommentResponse response;
 
-        //when & then
-        mockMvc.perform(get("/api/v1/orders/{orderId}", orderId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andReturn();
+            @BeforeEach
+            void setUp_context(){
+                orderId = 1L;
+                request = AddOrderCommentRequest.builder().content("content").build();
+                response = AddOrderCommentResponse.builder().commentId(1L).build();
+                when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
+                when(orderCommandService.addOrderComment(orderId, teamMemberVO, request)).thenReturn(response);
+            }
+            @Test
+            @DisplayName("해당 주문에 댓글을 추가한다.")
+            void it_adds_new_order_comment() throws Exception{
+                mockMvc.perform(post("/api/v1/orders/{orderId}/comment", orderId)
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType("application/json;charset=UTF-8"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.data.commentId", CoreMatchers.is(response.commentId().intValue())))
+                        .andDo(print())
+                        .andReturn();
+            }
+        }
     }
 
-    @Test
-    @DisplayName("주문에 댓글 달기 - 주문이 존재 할 때")
-    void addOrderComment() throws Exception{
-        //given
-        Long orderId = 1L;
-        AddOrderCommentRequest request = AddOrderCommentRequest.builder().content("content").build();
-        AddOrderCommentResponse response = AddOrderCommentResponse.builder().commentId(1L).build();
-        when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
-        when(orderCommandService.addOrderComment(orderId, teamMemberVO, request)).thenReturn(response);
+    @Nested
+    @DisplayName("getOrderComments 메소드는")
+    class Describe_GetOrderComments{
+        @Nested
+        @DisplayName("유효한 주문 Id이면")
+        class Context_Product_Id_Exist {
+            Long orderId;
+            GetOrderCommentsResponse response;
 
-        //when & then
-        mockMvc.perform(post("/api/v1/orders/{orderId}/comment", orderId)
-                .content(objectMapper.writeValueAsString(request))
-                .contentType("application/json;charset=UTF-8"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.commentId", CoreMatchers.is(response.commentId().intValue())))
-                .andDo(print())
-                .andReturn();
+            @BeforeEach
+            void setUp_context(){
+                orderId = 1L;
+                response = GetOrderCommentsResponse.builder().comments(Collections.emptyList()).build();
+                when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
+                when(orderQueryService.getOrderComments(orderId, teamMemberVO)).thenReturn(response);
+            }
+            @Test
+            @DisplayName("주문 댓글 조회 - 주문이 존재 할 때")
+            void it_returns_order_comments() throws Exception{
+                mockMvc.perform(get("/api/v1/orders/{orderId}/comment", orderId)
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.data.comments", CoreMatchers.is(response.comments())))
+                        .andReturn();
+            }
+        }
     }
 
-    @Test
-    @DisplayName("주문 댓글 조회 - 주문이 존재 할 때")
-    void getOrderComments() throws Exception{
-        //given
-        Long orderId = 1L;
-        GetOrderCommentsResponse response = GetOrderCommentsResponse.builder().comments(Collections.emptyList()).build();
-        when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
-        when(orderQueryService.getOrderComments(orderId, teamMemberVO)).thenReturn(response);
 
-        //when & then
-        mockMvc.perform(get("/api/v1/orders/{orderId}/comment", orderId)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.comments", CoreMatchers.is(response.comments())))
-                .andReturn();
+    @Nested
+    @DisplayName("modifyRequestOrder")
+    class Describe_ModifyRequestOrder{
+        @Nested
+        @DisplayName("유효한 주문 Id이면")
+        class Context_Product_Id_Exist {
+            Long orderId;
+            @BeforeEach
+            void setUp_context(){
+                orderId = 1L;
+                when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
+                doNothing().when(orderCommandService).modifyRequestOrder(orderId, teamMemberVO);
+            }
+            @Test
+            @DisplayName("주문 정정 요청 - 주문이 존재 할 때")
+            void it_modify_request_order() throws Exception{
+                mockMvc.perform(patch("/api/v1/orders/{orderId}/correction", orderId)
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isNoContent())
+                        .andReturn();
+            }
+        }
     }
 
-    @Test
-    @DisplayName("주문 정정 요청 - 주문이 존재 할 때")
-    void modifyRequestOrder() throws Exception{
-        //given
-        Long orderId = 1L;
-        when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
-        doNothing().when(orderCommandService).modifyRequestOrder(orderId, teamMemberVO);
 
-        //when & then
-        mockMvc.perform(patch("/api/v1/orders/{orderId}/correction", orderId)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent())
-                .andReturn();
+    @Nested
+    @DisplayName("confirmOrder 메소드는")
+    class Describe_ConfirmOrder{
+        @Nested
+        @DisplayName("유효한 주문 Id이면")
+        class Context_Product_Id_Exist {
+            Long orderId;
+
+            @BeforeEach
+            void setUp_context(){
+                orderId = 1L;
+                when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
+                doNothing().when(orderCommandService).confirmOrder(orderId, teamMemberVO);
+            }
+            @Test
+            @DisplayName("주문을 확정한다.")
+            void it_confirms_order() throws Exception{
+                mockMvc.perform(patch("/api/v1/orders/{orderId}/confirm", orderId)
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isNoContent())
+                        .andReturn();
+            }
+        }
     }
 
-    @Test
-    @DisplayName("주문 확정 - 주문이 존재 할 때")
-    void confirmOrder() throws Exception{
-        //given
-        Long orderId = 1L;
-        when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
-        doNothing().when(orderCommandService).confirmOrder(orderId, teamMemberVO);
+    @Nested
+    @DisplayName("cancelOrder 메소드는")
+    class Describe_CancelOrder{
+        @Nested
+        @DisplayName("유효한 주문 Id이면")
+        class Context_Product_Id_Exist {
+            Long orderId;
 
-        //when & then
-        mockMvc.perform(patch("/api/v1/orders/{orderId}/confirm", orderId)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent())
-                .andReturn();
+            @BeforeEach
+            void setUp_context(){
+                orderId = 1L;
+                when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
+                doNothing().when(orderCommandService).cancelOrder(orderId, teamMemberVO);
+            }
+
+            @Test
+            @DisplayName("주문을 취소한다.")
+            void it_cancel_order() throws Exception{
+                mockMvc.perform(delete("/api/v1/orders/{orderId}", orderId)
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isNoContent())
+                        .andReturn();
+            }
+        }
     }
-
-    @Test
-    @DisplayName("주문 취소 - 주문이 존재할 때")
-    void cancelOrder() throws Exception{
-        //given
-        Long orderId = 1L;
-        when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
-        doNothing().when(orderCommandService).cancelOrder(orderId, teamMemberVO);
-
-        //when & then
-        mockMvc.perform(delete("/api/v1/orders/{orderId}", orderId)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent())
-                .andReturn();
-    }
-
 }
