@@ -1,7 +1,7 @@
 package com.yellobook.domains.order.controller;
 
-import com.yellobook.common.annotation.ExistOrder;
-import com.yellobook.common.annotation.TeamMember;
+import com.yellobook.common.validation.annotation.ExistOrder;
+import com.yellobook.common.resolver.annotation.TeamMember;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.order.dto.request.AddOrderCommentRequest;
 import com.yellobook.domains.order.dto.request.MakeOrderRequest;

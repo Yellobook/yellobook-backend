@@ -1,6 +1,6 @@
 package com.yellobook.domains.inventory.controller;
 
-import com.yellobook.common.annotation.TeamMember;
+import com.yellobook.common.resolver.annotation.TeamMember;
 import com.yellobook.common.validation.annotation.ExistInventory;
 import com.yellobook.common.validation.annotation.ExistProduct;
 import com.yellobook.common.vo.TeamMemberVO;

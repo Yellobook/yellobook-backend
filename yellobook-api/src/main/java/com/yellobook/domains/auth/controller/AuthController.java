@@ -16,7 +16,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -29,9 +28,6 @@ import java.io.IOException;
 @RequestMapping("/api/v1/auth")
 @Tag(name = "\uD83D\uDD11 인증", description = "Auth API")
 public class AuthController {
-
-    @Value("${frontend.auth-redirect-url}")
-    private String authRedirectUrl;
 
     private final AuthService authService;
     private final CookieService cookieService;
@@ -68,14 +64,4 @@ public class AuthController {
         authService.logout(oAuth2User.getMemberId(), accessToken);
         return ResponseFactory.noContent();
     }
-
-    @Operation(summary = "회원 탈퇴")
-    @PatchMapping("/deactivate")
-    public ResponseEntity<SuccessResponse<String>> deactivate(
-            @AuthenticationPrincipal CustomOAuth2User oAuth2User
-    ) {
-//        authService.deactivate(oAuth2User);
-        return null;
-    }
-
 }
