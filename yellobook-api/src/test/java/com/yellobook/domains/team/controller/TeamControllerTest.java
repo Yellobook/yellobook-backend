@@ -163,21 +163,22 @@ public class TeamControllerTest {
         @DisplayName("특정 접두사")
         void searchMembers_withPrefix() throws Exception {
             // given
-            String name = "@john";
-            MentionDTO mentionDTO = new MentionDTO(List.of(2L));
+            String name = "john";
+            TeamMemberListResponse response = new TeamMemberListResponse(
+                    List.of(new QueryTeamMember(2L,"john")));
 
             when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
             when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
                     .thenReturn(teamMemberVO);
 
-            when(teamQueryService.searchParticipants(teamMemberVO, name)).thenReturn(mentionDTO);
+            when(teamQueryService.searchParticipants(teamMemberVO, name)).thenReturn(response);
 
             // when & then
             mockMvc.perform(get("/api/v1/teams/members/search")
                             .param("name", name)
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data.ids[0]", CoreMatchers.is(2)))
+                    .andExpect(jsonPath("$.data.members[0].memberId", CoreMatchers.is(2)))
                     .andDo(print());
         }
     }
