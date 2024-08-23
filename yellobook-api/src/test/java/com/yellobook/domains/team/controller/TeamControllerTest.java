@@ -10,7 +10,6 @@ import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.auth.security.oauth2.dto.OAuth2UserDTO;
 import com.yellobook.domains.auth.service.RedisTeamService;
 import com.yellobook.domains.member.entity.Member;
-import com.yellobook.domains.team.dto.MentionDTO;
 import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.dto.request.InvitationCodeRequest;
 import com.yellobook.domains.team.dto.request.CreateTeamRequest;
@@ -23,7 +22,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -58,14 +56,10 @@ public class TeamControllerTest {
     @MockBean
     private RedisTeamService redisTeamService;
 
-    @Mock
     private CustomOAuth2User customOAuth2User;
 
     @MockBean
     private TeamMemberArgumentResolver teamMemberArgumentResolver;
-
-
-    private final TeamMemberVO teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
 
     @BeforeEach
     void setUp() throws Exception {
@@ -83,158 +77,323 @@ public class TeamControllerTest {
         customOAuth2User = new CustomOAuth2User(oauth2UserDTO);
     }
 
-    @Test
-    @DisplayName("팀 생성")
-    public void createTeam_Success() throws Exception {
-        // Given
-        CreateTeamRequest request = new CreateTeamRequest("nike", "01000000000", "경기도", MemberTeamRole.ADMIN);
-        CreateTeamResponse response = new CreateTeamResponse(1L, LocalDateTime.now());
+    @Nested
+    @DisplayName("createTeam 메소드는")
+    class Describe_createTeam{
 
-        when(teamCommandService.createTeam(any(CreateTeamRequest.class), any(CustomOAuth2User.class)))
-                .thenReturn(response);
+        @Nested
+        @DisplayName("유효한 요청인 경우")
+        class Context_Valid_Request{
+            CreateTeamRequest request;
+            CreateTeamResponse response;
 
-        // when & then
-        mockMvc.perform(post("/api/v1/teams")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-                )
-                .andExpect(status().isCreated());
-    }
+            @BeforeEach
+            void setUp(){
+                request = new CreateTeamRequest("nike", "01000000000", "경기도", MemberTeamRole.ADMIN);
+                response = new CreateTeamResponse(1L, LocalDateTime.now());
 
-    @Test
-    @DisplayName("팀 불러오기")
-    public void getTeamTest() throws Exception {
-        //given
-        Long teamId = 1L;
-        GetTeamResponse response = GetTeamResponse.builder().teamId(1L).name("나이키").phoneNumber("01000000000").address("경기도").build();
+                when(teamCommandService.createTeam(any(CreateTeamRequest.class), any(CustomOAuth2User.class)))
+                        .thenReturn(response);
+            }
 
-        when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
-        when(teamQueryService.findByTeamId(any(), any())).thenReturn(response);
-
-        //when & then
-        mockMvc.perform(get("/api/v1/teams/{teamId}", teamId)
-                        .content(objectMapper.writeValueAsString(response))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.teamId", CoreMatchers.is(response.teamId().intValue())))
-                .andDo(print());
-    }
-
-    @Test
-    @DisplayName("@ExistTeam - 해당 팀이 존재하지 않을 때 예외 발생")
-    public void validTeamTest() throws Exception {
-        //given
-        Long teamId = 1L;
-        when(teamQueryService.existsByTeamId(teamId)).thenReturn(false);
-
-        //when & then
-        mockMvc.perform(get("/api/v1/teams/{teamId}", teamId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andReturn();
+            @Test
+            @DisplayName("201 Created를 반환한다.")
+            void it_returns_201_created() throws Exception {
+                mockMvc.perform(post("/api/v1/teams")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                        )
+                        .andExpect(status().isCreated());
+            }
+        }
     }
 
     @Nested
-    @DisplayName("팀 내의 멤버 검색")
-    class TeamMemberSearch{
-        @Test
-        @DisplayName("모든 멤버")
-        void searchMembers_everyone() throws Exception {
-            // given
-            TeamMemberListResponse response = new TeamMemberListResponse(
-                    List.of(new QueryTeamMember(1L,"test1"),
-                            new QueryTeamMember(2L, "test2")));
+    @DisplayName("getTeam 메소드는")
+    class Describe_getTeam{
 
-            when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
-            when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
-                    .thenReturn(teamMemberVO);
+        @Nested
+        @DisplayName("존재하는 팀을 불러오는 경우")
+        class Context_Exist_Team{
 
-            when(teamQueryService.findTeamMembers(1L)).thenReturn(response);
+            Long teamId;
+            GetTeamResponse response;
 
-            // when & then
-            mockMvc.perform(get("/api/v1/teams/members")
-                            .contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data.members.size()").value(2))
-                    .andDo(print());
-        }
+            @BeforeEach
+            void setUp(){
+                teamId = 1L;
+                response = GetTeamResponse.builder().teamId(1L).name("나이키").phoneNumber("01000000000").address("경기도").build();
 
-        @Test
-        @DisplayName("특정 접두사")
-        void searchMembers_withPrefix() throws Exception {
-            // given
-            String name = "john";
-            TeamMemberListResponse response = new TeamMemberListResponse(
-                    List.of(new QueryTeamMember(2L,"john")));
+                when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
+                when(teamQueryService.findByTeamId(any(), any())).thenReturn(response);
+            }
 
-            when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
-            when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
-                    .thenReturn(teamMemberVO);
-
-            when(teamQueryService.searchParticipants(teamMemberVO, name)).thenReturn(response);
-
-            // when & then
-            mockMvc.perform(get("/api/v1/teams/members/search")
-                            .param("name", name)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data.members[0].memberId", CoreMatchers.is(2)))
-                    .andDo(print());
+            @Test
+            @DisplayName("200 OK, 그리고 해당 팀에 대한 정보를 반환한다.")
+            void it_returns_200_ok_and_get_team() throws Exception {
+                mockMvc.perform(get("/api/v1/teams/{teamId}", teamId)
+                                .content(objectMapper.writeValueAsString(response))
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.data.teamId", CoreMatchers.is(response.teamId().intValue())))
+                        .andDo(print());
+            }
         }
     }
 
-    @Test
-    @DisplayName("팀 초대하기")
-    public void inviteTeamTest() throws Exception {
-        // given
-        Long teamId = 1L;
-        String expectedInviteUrl = "https://example.com/invite";
-        InvitationCodeResponse response = InvitationCodeResponse.builder()
-                .inviteUrl(expectedInviteUrl)
-                .build();
+    @Nested
+    @DisplayName("ExistTeam 애노테이션은")
+    class Describe_ExistTeam_Annotation{
 
-        InvitationCodeRequest request = new InvitationCodeRequest(MemberTeamRole.ADMIN);
-        when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
-        when(teamQueryService.makeInvitationCode(any(), any(), any())).thenReturn(response);
+        @Nested
+        @DisplayName("해당 팀이 존재하지 않은 경우")
+        class Context_Not_Exist_Team{
 
-        //when & then
-        mockMvc.perform(post("/api/v1/teams/{teamId}/invite", teamId)
-                        .content(objectMapper.writeValueAsString(request))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.data.inviteUrl", equalTo(response.inviteUrl())));
+            Long teamId;
+
+            @BeforeEach
+            void setUp(){
+                teamId = 1L;
+
+                when(teamQueryService.existsByTeamId(teamId)).thenReturn(false);
+            }
+
+            @Test
+            @DisplayName("400 Bad Request를 반환한다.")
+            void it_returns_400_bad_request() throws Exception {
+                mockMvc.perform(get("/api/v1/teams/{teamId}", teamId)
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isBadRequest())
+                        .andReturn();
+            }
+        }
+
+        @Nested
+        @DisplayName("해당 팀이 존재하는 경우")
+        class Context_Exist_Team{
+
+            Long teamId;
+
+            @BeforeEach
+            void setUp(){
+                teamId = 1L;
+
+                when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
+            }
+
+            @Test
+            @DisplayName("200 Ok를 반환한다.")
+            void it_returns_200_ok() throws Exception {
+                mockMvc.perform(get("/api/v1/teams/{teamId}", teamId)
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isOk())
+                        .andReturn();
+            }
+        }
     }
 
-    @Test
-    @DisplayName("팀 참가하기")
-    public void joinTeamTest() throws Exception {
-        //given
-        Long teamId = 1L;
-        String code = "team:code";
-        JoinTeamResponse response = new JoinTeamResponse(1L);
-        when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
-        when(teamCommandService.joinTeam(any(), any())).thenReturn(response);
+    @Nested
+    @DisplayName("getTeamMembers메소드는")
+    class Describe_getTeamMembers{
 
-        //when & then
-        mockMvc.perform(post("/api/v1/teams/invitation")
-                        .param("code", code)
-                        .requestAttr("customOAuth2User", customOAuth2User)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.teamId", CoreMatchers.is(1)));
+        @Nested
+        @DisplayName("팀 내에 멤버가 존재한다면")
+        class Context_Exist_TeamMember{
+            TeamMemberListResponse response;
+            TeamMemberVO teamMemberVO;
+
+            @BeforeEach
+            void setUp() throws Exception {
+                teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
+                response = new TeamMemberListResponse(
+                        List.of(new QueryTeamMember(1L,"test1"),
+                                new QueryTeamMember(2L, "test2")));
+
+                when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
+                when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                        .thenReturn(teamMemberVO);
+
+                when(teamQueryService.findTeamMembers(1L)).thenReturn(response);
+            }
+
+            @Test
+            @DisplayName("200 OK, 그리고 팀에 속하는 모든 멤버를 반환한다.")
+            void it_returns_200_ok_and_all_team_members() throws Exception {
+                mockMvc.perform(get("/api/v1/teams/members")
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.data.members.size()").value(2))
+                        .andDo(print());
+            }
+        }
     }
 
-    @Test
-    @DisplayName("팀 나가기")
-    public void leaveTeamTest() throws Exception {
-        //given
-        Long teamId = 1L;
-        when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
-        doNothing().when(teamCommandService).leaveTeam(teamId, customOAuth2User);
+    @Nested
+    @DisplayName("searchMembers 메소드는")
+    class Describe_searchMembers{
 
-        // when & then
-        mockMvc.perform(delete("/api/v1/teams/{teamId}/leave", teamId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+        @Nested
+        @DisplayName("특정 접두사로 시작하는 멤버가 존재하면")
+        class Context_Exist_TeamMember_Starts_With_Prefix{
+
+            String name;
+            TeamMemberListResponse response;
+            TeamMemberVO teamMemberVO;
+
+            @BeforeEach
+            void setUp() throws Exception {
+                name = "john";
+                response = new TeamMemberListResponse(
+                        List.of(new QueryTeamMember(2L,"john")));
+
+                when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
+                when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                        .thenReturn(teamMemberVO);
+
+                when(teamQueryService.searchParticipants(teamMemberVO, name)).thenReturn(response);
+            }
+
+            @Test
+            @DisplayName("200 OK, 그리고 해당 멤버들을 리스트로 반환한다.")
+            void it_returns_200_ok_and_list_of_matching_members() throws Exception {
+                mockMvc.perform(get("/api/v1/teams/members/search")
+                                .param("name", name)
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.data.members[0].memberId", CoreMatchers.is(2)))
+                        .andDo(print());
+            }
+        }
+
+        @Nested
+        @DisplayName("특정 접두사로 시작하는 멤버가 존재하지 않는다면")
+        class Context_Not_Exist_TeamMember_Starts_With_Prefix{
+
+            String name;
+            TeamMemberListResponse response;
+            TeamMemberVO teamMemberVO;
+
+            @BeforeEach
+            void setUp() throws Exception {
+                name = "john";
+                response = new TeamMemberListResponse(List.of());
+                when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
+                when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                        .thenReturn(teamMemberVO);
+
+                when(teamQueryService.searchParticipants(teamMemberVO, name)).thenReturn(response);
+            }
+
+            @Test
+            @DisplayName("200 OK, 그리고 빈 리스트를 반환한다.")
+            void it_returns_200_ok_and_empty_list() throws Exception {
+                mockMvc.perform(get("/api/v1/teams/members/search")
+                                .param("name", name)
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.data.members.size()").value(0))
+                        .andDo(print());
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("inviteTeam 메소드는")
+    class Describe_inviteTeam{
+
+        @Nested
+        @DisplayName("정상적인 요청이라면")
+        class Context_Valid_Request{
+
+            Long teamId;
+            String expectedInviteUrl;
+            InvitationCodeRequest request;
+            InvitationCodeResponse response;
+
+            @BeforeEach
+            void setUp() throws Exception {
+                teamId = 1L;
+                expectedInviteUrl = "https://example.com/invite";
+                response = InvitationCodeResponse.builder()
+                        .inviteUrl(expectedInviteUrl)
+                        .build();
+                request = new InvitationCodeRequest(MemberTeamRole.ADMIN);
+
+                when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
+                when(teamQueryService.makeInvitationCode(any(), any(), any())).thenReturn(response);
+            }
+
+            @Test
+            @DisplayName("201 Created, 그리고 생성된 초대 코드를 반환한다")
+            void it_returns_201_created_and_invitation_code() throws Exception {
+                mockMvc.perform(post("/api/v1/teams/{teamId}/invite", teamId)
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isCreated())
+                        .andExpect(jsonPath("$.data.inviteUrl", equalTo(response.inviteUrl())));
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("joinTeam 메소드는")
+    class Describe_joinTeam{
+
+        @Nested
+        @DisplayName("유효한 초대 코드인 경우")
+        class Context_Valid_Invitation_Code{
+
+            Long teamId;
+            String code;
+            JoinTeamResponse response;
+
+            @BeforeEach
+            void setUp(){
+                teamId = 1L;
+                code = "team:code";
+                response = new JoinTeamResponse(1L);
+
+                when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
+                when(teamCommandService.joinTeam(any(), any())).thenReturn(response);
+            }
+
+            @Test
+            @DisplayName("200 Ok, 그리고 팀 id를 반환한다.")
+            void it_returns_200_ok_and_team_id() throws Exception {
+                mockMvc.perform(post("/api/v1/teams/invitation")
+                                .param("code", code)
+                                .requestAttr("customOAuth2User", customOAuth2User)
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.data.teamId", CoreMatchers.is(1)));
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("leaveTeam 메소드는")
+    class Describe_leaveTeam{
+
+        @Nested
+        @DisplayName("팀에 속한 멤버가 요청을 하는 경우")
+        class Context_Team_Member{
+
+            Long teamId;
+
+            @BeforeEach
+            void setUp(){
+                teamId = 1L;
+                when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
+                doNothing().when(teamCommandService).leaveTeam(teamId, customOAuth2User);
+            }
+
+            @Test
+            @DisplayName("204 NoContent를 반환한다.")
+            void it_returns_204_no_content() throws Exception {
+                mockMvc.perform(delete("/api/v1/teams/{teamId}/leave", teamId)
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isNoContent());
+            }
+        }
     }
 }
