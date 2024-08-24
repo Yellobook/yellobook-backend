@@ -57,6 +57,7 @@ public class TeamControllerTest {
     private RedisTeamService redisTeamService;
 
     private CustomOAuth2User customOAuth2User;
+    private final Long teamId = 1L;
 
     @MockBean
     private TeamMemberArgumentResolver teamMemberArgumentResolver;
@@ -115,13 +116,10 @@ public class TeamControllerTest {
         @Nested
         @DisplayName("존재하는 팀을 불러오는 경우")
         class Context_Exist_Team{
-
-            Long teamId;
             GetTeamResponse response;
 
             @BeforeEach
             void setUp(){
-                teamId = 1L;
                 response = GetTeamResponse.builder().teamId(1L).name("나이키").phoneNumber("01000000000").address("경기도").build();
 
                 when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
@@ -149,12 +147,8 @@ public class TeamControllerTest {
         @DisplayName("해당 팀이 존재하지 않은 경우")
         class Context_Not_Exist_Team{
 
-            Long teamId;
-
             @BeforeEach
             void setUp(){
-                teamId = 1L;
-
                 when(teamQueryService.existsByTeamId(teamId)).thenReturn(false);
             }
 
@@ -172,12 +166,8 @@ public class TeamControllerTest {
         @DisplayName("해당 팀이 존재하는 경우")
         class Context_Exist_Team{
 
-            Long teamId;
-
             @BeforeEach
             void setUp(){
-                teamId = 1L;
-
                 when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
             }
 
@@ -304,15 +294,12 @@ public class TeamControllerTest {
         @Nested
         @DisplayName("정상적인 요청이라면")
         class Context_Valid_Request{
-
-            Long teamId;
             String expectedInviteUrl;
             InvitationCodeRequest request;
             InvitationCodeResponse response;
 
             @BeforeEach
             void setUp() throws Exception {
-                teamId = 1L;
                 expectedInviteUrl = "https://example.com/invite";
                 response = InvitationCodeResponse.builder()
                         .inviteUrl(expectedInviteUrl)
@@ -342,15 +329,12 @@ public class TeamControllerTest {
         @Nested
         @DisplayName("유효한 초대 코드인 경우")
         class Context_Valid_Invitation_Code{
-
-            Long teamId;
             String code;
             JoinTeamResponse response;
 
             @BeforeEach
             void setUp(){
-                teamId = 1L;
-                code = "team:code";
+                code = "code";
                 response = new JoinTeamResponse(1L);
 
                 when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
@@ -378,11 +362,8 @@ public class TeamControllerTest {
         @DisplayName("팀에 속한 멤버가 요청을 하는 경우")
         class Context_Team_Member{
 
-            Long teamId;
-
             @BeforeEach
             void setUp(){
-                teamId = 1L;
                 when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
                 doNothing().when(teamCommandService).leaveTeam(teamId, customOAuth2User);
             }
