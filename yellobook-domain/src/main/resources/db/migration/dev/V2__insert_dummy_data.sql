@@ -39,13 +39,15 @@ DO
 $$
     DECLARE
         i              INT;
+        product_sku       INT := 1000;
         product_amount INT := 10000;
     BEGIN
         FOR i IN 1..10
             LOOP
+                product_sku := product_sku + 1;
                 INSERT INTO products (inventory_id, name, sub_product, sku, purchase_price, sale_price, amount,
                                       created_at, updated_at)
-                VALUES (1, '상품' || i, '서브제품' || i, 1001, 100000, 150000, product_amount, '2024-08-17 10:00:00',
+                VALUES (1, '상품' || i, '서브제품' || i, product_sku, 100000, 150000, product_amount, '2024-08-17 10:00:00',
                         '2024-08-17 10:00:00');
             END LOOP;
     END
@@ -60,13 +62,13 @@ $$
         first_day          DATE := date_trunc('month', current_date)::DATE;
         last_day           DATE := (date_trunc('month', current_date) + INTERVAL '1 month - 1 day')::DATE;
         -- 주문/공지 날짜 (년:월:일)
-        schedule_day       DATE;
+        schedule_day       DATE := first_day;
         -- 주문 시간 (기본값)
         base_time          TIME := TIME '10:00:00';
         -- 데이터베이스 삽입 시간
         created_at         TIMESTAMP;
         -- 주문 1건당 주문 상품 개수 (기본값)
-        order_amount       INT  := 100;
+        order_amount       INT  := 10;
         -- 누적 주문 개수
         order_cnt          INT  := 0;
         -- 누적 주문 댓글 개수
@@ -77,10 +79,10 @@ $$
         inform_comment_cnt INT  := 0;
     BEGIN
         -- 주문과 공지 데이터 추가
-        FOR schedule_day IN first_day..last_day
+        WHILE schedule_day <= last_day
             LOOP
                 -- 주문 데이터 추가
-                FOR i IN 1..5
+                FOR i IN 1..10
                     LOOP
                         order_cnt := order_cnt + 1;
                         created_at := schedule_day + (base_time + INTERVAL '1 minute' * (order_cnt - 1));
@@ -95,21 +97,21 @@ $$
                         VALUES (1, order_cnt, schedule_day + TIME '10:00:00', schedule_day + TIME '10:00:00');
 
                         -- 주문 건당 관리자 댓글 5개, 주문자 댓글 5개
-                        FOR j in 1..5
+                        FOR j in 1..10
                             LOOP
                                 order_comment_cnt := order_comment_cnt + 1;
                                 INSERT INTO order_comments (content, member_id, order_id, created_at, updated_at)
-                                VALUES ('주문자' || order_cnt || ' 댓글' || order_comment_cnt, 1, order_cnt,
+                                VALUES ('주문자 댓글' || order_comment_cnt, 1, order_cnt,
                                         schedule_day + TIME '10:15:00', NULL);
                                 order_comment_cnt := order_comment_cnt + 1;
                                 INSERT INTO order_comments (content, member_id, order_id, created_at, updated_at)
-                                VALUES ('관리자' || order_cnt || ' 댓글' || order_comment_cnt, 1, order_cnt,
+                                VALUES ('관리자 댓글' || order_comment_cnt, 1, order_cnt,
                                         schedule_day + TIME '10:15:01', NULL);
                             END LOOP;
                     END LOOP;
 
                 -- 공지 및 업무 데이터 추가
-                FOR i IN 1..5
+                FOR i IN 1..10
                     LOOP
                         inform_cnt := inform_cnt + 1;
                         created_at := schedule_day + (base_time + INTERVAL '1 minute' * (inform_cnt - 1));
@@ -122,25 +124,26 @@ $$
                         VALUES (2, inform_cnt, schedule_day + TIME '11:00:00', NULL),
                                (3, inform_cnt, schedule_day + TIME '11:00:00', NULL);
 
-                        -- 공지 건당   댓글 5개, 작성자 댓글 5개
-                        FOR j IN 1..5
+                        -- 공지 건당 댓글 10개, 작성자 댓글 10개
+                        FOR j IN 1..10
                             LOOP
                                 inform_comment_cnt := inform_comment_cnt + 1;
                                 INSERT INTO inform_comments (content, member_id, inform_id, created_at, updated_at)
-                                VALUES ('작성자' || inform_cnt || ' 댓글' || inform_comment_cnt, 1, inform_cnt,
+                                VALUES ('작성자 댓글' || inform_comment_cnt, 1, inform_cnt,
                                         schedule_day + TIME '11:15:00', NULL);
 
                                 inform_comment_cnt := inform_comment_cnt + 1;
                                 INSERT INTO inform_comments (content, member_id, inform_id, created_at, updated_at)
-                                VALUES ('관리자' || inform_cnt || ' 댓글' || inform_comment_cnt, 2, inform_cnt,
+                                VALUES ('관리자 댓글' || inform_comment_cnt, 2, inform_cnt,
                                         schedule_day + TIME '11:15:01', NULL);
 
                                 inform_comment_cnt := inform_comment_cnt + 1;
                                 INSERT INTO inform_comments (content, member_id, inform_id, created_at, updated_at)
-                                VALUES ('뷰어' || inform_cnt || ' 댓글' || inform_comment_cnt, 3, inform_cnt,
+                                VALUES ('뷰어 댓글' || inform_comment_cnt, 3, inform_cnt,
                                         schedule_day + TIME '11:15:02', NULL);
                             END LOOP;
                     END LOOP;
+                schedule_day := schedule_day + INTERVAL '1 day';
             END LOOP;
     END
 $$;
