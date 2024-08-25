@@ -1,5 +1,6 @@
 package com.yellobook.domains.inform.service;
 
+import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.auth.service.RedisTeamService;
 import com.yellobook.domains.inform.dto.request.CreateInformCommentRequest;
 import com.yellobook.domains.inform.dto.request.CreateInformRequest;
@@ -86,6 +87,24 @@ public class InformCommandService {
 
         log.info("[INFORM_INFO] 공지및 일정 ID_{} 삭제", inform.getId());
         informRepository.deleteById(informId);
+    }
+
+    public void increaseViewCount(Long informId, TeamMemberVO teamMemberVO){
+        Inform inform = informRepository.findById(informId)
+                .orElseThrow(() -> new CustomException(InformErrorCode.INFORM_NOT_FOUND));
+
+        List<InformMention> mentions = informMentionRepository.findByInformId(informId);
+        boolean isMentioned = mentions
+                .stream()
+                .anyMatch(mention -> mention.getMember().getId().equals(teamMemberVO.getMemberId()));
+
+        // 언급된 사용자이거나, 본인이 작성했을 경우
+        if(isMentioned || inform.getMember().getId().equals(teamMemberVO.getMemberId())){
+            inform.updateView();
+        }
+        else{
+            throw new CustomException(InformErrorCode.NOT_MENTIONED);
+        }
     }
 
 
