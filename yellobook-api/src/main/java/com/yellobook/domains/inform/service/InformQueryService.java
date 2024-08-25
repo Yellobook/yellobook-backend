@@ -1,12 +1,10 @@
 package com.yellobook.domains.inform.service;
 
-import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.inform.dto.response.GetInformResponse;
 import com.yellobook.domains.inform.mapper.InformMapper;
 import com.yellobook.domains.inform.entity.Inform;
 import com.yellobook.domains.inform.entity.InformComment;
 import com.yellobook.domains.inform.entity.InformMention;
-import com.yellobook.domains.inform.repository.InformCommentRepository;
 import com.yellobook.domains.inform.repository.InformMentionRepository;
 import com.yellobook.domains.inform.repository.InformRepository;
 import com.yellobook.domains.member.entity.Member;
@@ -25,7 +23,6 @@ import java.util.List;
 public class InformQueryService {
     private final InformRepository informRepository;
     private final InformMentionRepository informMentionRepository;
-    private final InformCommentRepository informCommentRepository;
     private final InformMapper informMapper;
 
     public GetInformResponse getInformById(Long memberId, Long informId){

@@ -8,7 +8,6 @@ import com.yellobook.domains.inform.dto.response.CreateInformCommentResponse;
 import com.yellobook.domains.inform.dto.response.CreateInformResponse;
 import com.yellobook.domains.inform.mapper.CommentMapper;
 import com.yellobook.domains.inform.mapper.InformMapper;
-import com.yellobook.domains.team.service.TeamQueryService;
 import com.yellobook.domains.inform.entity.Inform;
 import com.yellobook.domains.inform.entity.InformComment;
 import com.yellobook.domains.inform.entity.InformMention;
@@ -40,7 +39,6 @@ public class InformCommandService {
     private final InformMapper informMapper;
     private final ParticipantRepository participantRepository;
     private final RedisTeamService redisService;
-    private final TeamQueryService teamQueryService;
     private final MemberRepository memberRepository;
     private final InformMentionRepository informMentionRepository;
     private final InformCommentRepository informCommentRepository;
