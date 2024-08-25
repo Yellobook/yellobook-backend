@@ -1,6 +1,8 @@
 package com.yellobook.domains.inform.controller;
 
+import com.yellobook.common.resolver.annotation.TeamMember;
 import com.yellobook.common.validation.annotation.ExistInform;
+import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.inform.dto.request.CreateInformCommentRequest;
 import com.yellobook.domains.inform.dto.request.CreateInformRequest;
@@ -56,6 +58,16 @@ public class InformController {
     ){
         var result = informQueryService.getInformById(customOAuth2User.getMemberId(), informId);
         return ResponseFactory.success(result);
+    }
+
+    @PutMapping("/{informId}")
+    @Operation(summary = "조회수 증가", description = "조회하는 공지의 조회수 증가 API입니다.")
+    public ResponseEntity<Void> increaseInformView(
+            @ExistInform @PathVariable("informId") Long informId,
+            @TeamMember TeamMemberVO teamMemberVO
+    ){
+        informCommandService.increaseViewCount(informId, teamMemberVO);
+        return ResponseFactory.noContent();
     }
 
 
