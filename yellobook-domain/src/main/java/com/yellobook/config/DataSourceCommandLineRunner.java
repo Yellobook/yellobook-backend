@@ -1,11 +1,12 @@
 package com.yellobook.config;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class DataSourceCommandLineRunner implements CommandLineRunner {
-
     @Value("${spring.datasource.url}")
     private String datasourceUrl;
 
@@ -17,8 +18,8 @@ public class DataSourceCommandLineRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("Datasource URL: " + datasourceUrl);
-        System.out.println("Datasource Username: " + datasourceUsername);
-        System.out.println("Datasource Driver: " + datasourceDriver);
+        log.info("Datasource URL: {}", datasourceUrl);
+        log.info("Datasource Username: {}", datasourceUsername);
+        log.info("Datasource Driver: {}", datasourceDriver);
     }
 }
