@@ -1,28 +1,27 @@
 package com.yellobook.domains.inventory.controller;
 
-import com.yellobook.common.annotation.TeamMember;
+import com.yellobook.common.resolver.annotation.TeamMember;
 import com.yellobook.common.validation.annotation.ExistInventory;
 import com.yellobook.common.validation.annotation.ExistProduct;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.inventory.dto.request.AddProductRequest;
 import com.yellobook.domains.inventory.dto.request.ModifyProductAmountRequest;
-import com.yellobook.domains.inventory.dto.response.AddProductResponse;
-import com.yellobook.domains.inventory.dto.response.GetProductsResponse;
-import com.yellobook.domains.inventory.dto.response.GetTotalInventoryResponse;
+import com.yellobook.domains.inventory.dto.response.*;
 import com.yellobook.domains.inventory.service.InventoryCommandService;
 import com.yellobook.domains.inventory.service.InventoryQueryService;
-import com.yellobook.domains.inventory.dto.response.GetProductsNameResponse;
-import com.yellobook.domains.inventory.dto.response.GetSubProductNameResponse;
 import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("api/v1/inventories")
@@ -81,18 +80,18 @@ public class InventoryController {
     @PostMapping("/{inventoryId}")
     public ResponseEntity<SuccessResponse<AddProductResponse>> addProduct(
             @ExistInventory @PathVariable("inventoryId") Long inventoryId,
-            @RequestBody AddProductRequest requestDTO,
+            @Valid @RequestBody AddProductRequest requestDTO,
             @TeamMember TeamMemberVO teamMember
     ){
         AddProductResponse response = inventoryCommandService.addProduct(inventoryId, requestDTO, teamMember);
-        return ResponseFactory.success(response);
+        return ResponseFactory.created(response);
     }
 
     @Operation(summary = "제품 수량 수정")
     @PutMapping("/products/{productId}")
     public ResponseEntity<Void> modifyProductAmount(
             @ExistProduct @PathVariable("productId") Long productId,
-            @RequestBody ModifyProductAmountRequest requestDTO,
+            @Valid @RequestBody ModifyProductAmountRequest requestDTO,
             @TeamMember TeamMemberVO teamMember
     ){
         inventoryCommandService.modifyProductAmount(productId, requestDTO, teamMember);
@@ -107,6 +106,16 @@ public class InventoryController {
     ){
         inventoryCommandService.deleteProduct(productId, teamMember);
         return ResponseFactory.noContent();
+    }
+
+    @Operation(summary = "엑셀 파일 읽어서 재고 생성")
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<SuccessResponse<AddInventoryResponse>> addInventory(
+            @RequestPart("file") MultipartFile file,
+            @TeamMember TeamMemberVO teamMember
+    ){
+        AddInventoryResponse response = inventoryCommandService.addInventory(file, teamMember);
+        return ResponseFactory.created(response);
     }
 
     @Operation(summary = "제품 이름으로 제품 조회")
@@ -128,4 +137,5 @@ public class InventoryController {
         GetSubProductNameResponse response = inventoryQueryService.getSubProductName(name, teamMember);
         return ResponseFactory.success(response);
     }
+
 }

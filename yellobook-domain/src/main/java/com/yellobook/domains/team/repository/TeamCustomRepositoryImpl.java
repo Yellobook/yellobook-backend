@@ -28,8 +28,8 @@ public class TeamCustomRepositoryImpl implements  TeamCustomRepository {
                                 member.nickname.as("nickname")
                         )
                 )
-                .from(team)
-                .join(team, participant.team)
+                .from(participant)
+                .join(participant.team, team)
                 .join(participant.member, member)
                 .where(team.id.eq(teamId))
                 .fetch();

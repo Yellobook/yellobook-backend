@@ -1,7 +1,6 @@
 package com.yellobook.domains.team.service;
 
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domains.team.dto.MentionDTO;
 import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.mapper.ParticipantMapper;
 import com.yellobook.domains.team.entity.Participant;
@@ -21,7 +20,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -93,7 +94,11 @@ public class TeamQueryService{
 
     public TeamMemberListResponse findTeamMembers(Long teamId){
         List<QueryTeamMember> members = teamRepository.findTeamMembers(teamId);
-        return teamMapper.toTeamMemberListResponse(members);
+
+        //members 가 null인 경우, emptyList를 반환하도록 설정
+        return teamMapper.toTeamMemberListResponse(
+                Objects.requireNonNullElse(members, Collections.emptyList())
+        );
     }
 
 
@@ -101,25 +106,13 @@ public class TeamQueryService{
         return teamRepository.existsById(teamId);
     }
 
-    public MentionDTO searchParticipants(TeamMemberVO teamMember, String name){
-        List<Participant> mentions;
+    public TeamMemberListResponse searchParticipants(TeamMemberVO teamMember, String name){
         Long teamId = teamMember.getTeamId();
+        List<QueryTeamMember> mentions = participantRepository.findMentionsByNamePrefix(name, teamId);
 
-        if(name.trim().equalsIgnoreCase("everyone")){
-            mentions = participantRepository.findAllByTeamId(teamId);
-        }
-        else if(name.startsWith("@")){
-            String prefix = name.substring(1);
-            mentions = participantRepository.findMentionsByNamePrefix(prefix, teamId);
-        }
-        else {
-            return new MentionDTO(List.of());
-        }
-        List<Long> participantIds = mentions.stream()
-                .map(Participant::getId)
-                .collect(Collectors.toList());
-
-        // 변환된 ID 리스트를 사용하여 MentionDTO 생성
-        return participantMapper.toMentionDTO(participantIds);
+        //mentions가 null인 경우, emptyList를 반환하도록 설정
+        return teamMapper.toTeamMemberListResponse(
+                Objects.requireNonNullElse(mentions, Collections.emptyList())
+        );
     }
 }

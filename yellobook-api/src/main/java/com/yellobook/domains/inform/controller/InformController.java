@@ -1,6 +1,6 @@
 package com.yellobook.domains.inform.controller;
 
-import com.yellobook.common.annotation.ExistInform;
+import com.yellobook.common.validation.annotation.ExistInform;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.inform.dto.request.CreateInformCommentRequest;
 import com.yellobook.domains.inform.dto.request.CreateInformRequest;

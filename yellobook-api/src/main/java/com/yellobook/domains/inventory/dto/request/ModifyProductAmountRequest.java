@@ -1,6 +1,7 @@
 package com.yellobook.domains.inventory.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
@@ -8,7 +9,7 @@ import lombok.Builder;
 @Builder
 public record ModifyProductAmountRequest(
         @Schema(description = "수정할 수량")
-        @NotNull
+        @NotNull @Min(value = 0, message = "수정할 수량은 0보다 커야합니다.")
         Integer amount
 ) {
 }
