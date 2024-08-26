@@ -176,4 +176,33 @@ public class InformControllerTest {
             }
         }
     }
+
+    @Nested
+    @DisplayName("getInform 메소드는")
+    class Describe_getInform{
+
+        @Nested
+        @DisplayName("inform이 존재하는 경우")
+        class Context_Exist_Inform{
+
+            GetInformResponse response;
+
+            @BeforeEach
+            void setUp() {
+                response = new GetInformResponse("test", "test", List.of(),10, List.of(), LocalDate.now());
+
+                when(informRepository.existsById(informId)).thenReturn(true);
+                when(informQueryService.getInformById(customOAuth2User.getMemberId(), informId)).thenReturn(response);
+            }
+
+            @Test
+            @DisplayName("200 Ok, 그리고 해당 inform의 내용을 반환한다.")
+            void it_returns_200_ok() throws Exception{
+                mockMvc.perform(get("/api/v1/informs/{informId}", informId)
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isOk())
+                        .andDo(print());
+            }
+        }
+    }
 }
