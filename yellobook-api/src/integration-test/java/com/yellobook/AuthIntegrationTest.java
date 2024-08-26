@@ -13,7 +13,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
@@ -121,7 +120,6 @@ public class AuthIntegrationTest {
             Response response;
 
             @Transactional
-            @Commit
             @BeforeEach
             void prepare() {
                 var member = createMember(false);
@@ -158,5 +156,89 @@ public class AuthIntegrationTest {
         }
     }
 
+    @Nested
+    @DisplayName("agreeToTerms 메서드는")
+    class Describe_agreeToTerms {
+        final String url = "/api/v1/auth/terms";
 
+        @Nested
+        @DisplayName("존재하는 회원이라면")
+        class Context_exist_member {
+            Response response;
+
+            @Transactional
+            @BeforeEach
+            void prepare() {
+                var member = createMember(false);
+                memberRepository.save(member);
+
+                Long memberId = member.getId();
+                var allowanceToken = jwtService.createAllowanceToken(memberId);
+
+                var request = AllowanceRequest.builder()
+                        .token(allowanceToken)
+                        .build();
+
+                response = RestAssured.given()
+                        .log().all()
+                        .body(request)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .post(url);
+            }
+
+            @Test
+            @DisplayName("200 상태코드로 응답해야 한다.")
+            void it_return_200() {
+                response.then().statusCode(200);
+            }
+
+            @Test
+            @DisplayName("응답 data 에 accessToken 과 refreshToken 포함해야 한다.")
+            void it_return_tokens() {
+                response.then().body("data", allOf(hasKey("accessToken"), hasKey("refreshToken")));
+            }
+        }
+
+        @Nested
+        @DisplayName("존재하지 않는 회원이라면")
+        class Context_not_exist_member {
+            Response response;
+
+            @Transactional
+            @BeforeEach
+            void prepare() {
+                var allowanceToken = jwtService.createAllowanceToken(9999L);
+
+                var request = AllowanceRequest.builder()
+                        .token(allowanceToken)
+                        .build();
+
+                response = RestAssured.given()
+                        .log().all()
+                        .body(request)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .post(url);
+            }
+
+            @Test
+            @DisplayName("401 상태코드로 응답해야 한다.")
+            void it_return_tokens_with_200() {
+                response.then().statusCode(401);
+            }
+
+            @Test
+            @DisplayName("AUTH_015 에러코드를 반환해야 한다.")
+            void it_contains_error_code() {
+                response.then().body("code", equalTo("AUTH_015"));
+            }
+
+            @Test
+            @DisplayName("에러 메시지를 포함해야 한다.")
+            void it_contains_message() {
+                response.then().body("message", equalTo("가입한 사용자가 존재하지 않습니다."));
+            }
+        }
+    }
 }
