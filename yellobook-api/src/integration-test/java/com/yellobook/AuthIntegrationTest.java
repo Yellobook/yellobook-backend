@@ -77,14 +77,13 @@ public class AuthIntegrationTest {
 
         @Nested
         @DisplayName("쿠키로 받은 refresh 토큰이 정상적이라면")
-        class Context_exist_member {
+        class Context_refresh_token_is_valid {
             Response response;
 
             @Value("${cookie.refresh-name}")
             private String refreshTokenName;
 
             @Transactional
-            @Commit
             @BeforeEach
             void prepare() {
                 var member = createMember(false);
@@ -148,7 +147,7 @@ public class AuthIntegrationTest {
             @Test
             @DisplayName("AUTH-010 에러코드를 반환해야 한다.")
             void it_contains_error_code() {
-                response.then().body("code", equalTo("AUTH_010"));
+                response.then().body("code", equalTo("AUTH-010"));
             }
 
             @Test
