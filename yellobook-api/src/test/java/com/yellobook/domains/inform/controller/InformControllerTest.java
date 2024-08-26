@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yellobook.common.resolver.TeamMemberArgumentResolver;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.auth.security.oauth2.dto.OAuth2UserDTO;
+import com.yellobook.domains.inform.dto.request.CreateInformCommentRequest;
 import com.yellobook.domains.inform.dto.request.CreateInformRequest;
+import com.yellobook.domains.inform.dto.response.CreateInformCommentResponse;
 import com.yellobook.domains.inform.dto.response.CreateInformResponse;
+import com.yellobook.domains.inform.dto.response.GetInformResponse;
 import com.yellobook.domains.inform.repository.InformRepository;
 import com.yellobook.domains.inform.service.InformCommandService;
 import com.yellobook.domains.inform.service.InformQueryService;
@@ -29,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -145,6 +149,30 @@ public class InformControllerTest {
                                 .content(objectMapper.writeValueAsString(request)))
                         .andExpect(status().isCreated())
                         .andDo(print());
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("deleteInform 메소드는")
+    class Describe_deleteInform{
+
+        @Nested
+        @DisplayName("inform이 존재하는 경우")
+        class Context_Exist_Inform{
+
+            @BeforeEach
+            void setUp() {
+                when(informRepository.existsById(informId)).thenReturn(true);
+                doNothing().when(informCommandService).deleteInform(informId, 1L);
+            }
+
+            @Test
+            @DisplayName("204 NoContent를 반환한다.")
+            void it_returns_204_no_content()throws Exception{
+                mockMvc.perform(delete("/api/v1/informs/{informId}", informId)
+                                .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isNoContent());
             }
         }
     }
