@@ -300,7 +300,7 @@ class InventoryControllerTest {
             @BeforeEach
             void setUp_context(){
                 inventoryId = 1L;
-                request = AddProductRequest.builder().build();
+                request = AddProductRequest.builder().name("name").subProduct("sub").sku(0).purchasePrice(1).salePrice(1).amount(0).build();
                 response = AddProductResponse.builder().productId(1L).build();
                 when(inventoryQueryService.existByInventoryId(inventoryId)).thenReturn(true);
                 when(inventoryCommandService.addProduct(inventoryId, request, teamMemberVO)).thenReturn(response);
@@ -312,7 +312,7 @@ class InventoryControllerTest {
                 mockMvc.perform(post("/api/v1/inventories/{inventoryId}", inventoryId)
                                 .content(objectMapper.writeValueAsString(request))
                                 .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isOk())
+                        .andExpect(status().isCreated())
                         .andExpect(jsonPath("$.data.productId", CoreMatchers.is(response.productId().intValue())))
                         .andReturn();
             }
@@ -356,7 +356,7 @@ class InventoryControllerTest {
             @BeforeEach
             void setUp_context(){
                 productId = 1L;
-                request = ModifyProductAmountRequest.builder().build();
+                request = ModifyProductAmountRequest.builder().amount(100).build();
                 when(inventoryQueryService.existByProductId(productId)).thenReturn(true);
                 doNothing().when(inventoryCommandService).modifyProductAmount(productId, request, teamMemberVO);
             }

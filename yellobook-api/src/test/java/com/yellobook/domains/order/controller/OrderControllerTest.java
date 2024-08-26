@@ -70,7 +70,7 @@ class OrderControllerTest {
 
             @BeforeEach
             void setUp_context(){
-                request = MakeOrderRequest.builder().productId(1L).build();
+                request = MakeOrderRequest.builder().productId(1L).orderAmount(1).date(LocalDate.now()).build();
                 response = MakeOrderResponse.builder().orderId(2L).build();
                 when(orderCommandService.makeOrder(request, teamMemberVO)).thenReturn(response);
             }
