@@ -34,6 +34,12 @@ dependencies {
     testFixturesImplementation 'org.junit.jupiter:junit-jupiter-api'
 }
 
+configurations {
+    configureEach {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
+}
+
 processResources.dependsOn('copyConfig')
 
 tasks.register('copyConfig', Copy) {

@@ -17,16 +17,27 @@ dependencies {
     implementation project(":yellobook-domain")
     implementation project(":yellobook-common")
 
+    // testFixtures
+    testImplementation(testFixtures(project(":yellobook-domain")))
+
     // spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+    // Apache POI
+    implementation 'org.apache.poi:poi-ooxml:4.1.2'
+    implementation 'org.apache.poi:poi:4.1.2'
+    implementation 'org.apache.xmlbeans:xmlbeans:3.1.0'
+
     // jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
     implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+
+    // spring boot test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     // lombok (test)
     testCompileOnly 'org.projectlombok:lombok'
@@ -39,17 +50,15 @@ dependencies {
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-    //test
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'com.h2database:h2'
+    // rest assured
+    integrationTestImplementation 'io.rest-assured:rest-assured:5.3.1'
+    integrationTestImplementation 'io.rest-assured:json-path:5.3.1'
 
-    // Apache POI
-    implementation 'org.apache.poi:poi-ooxml:4.1.2'
-    implementation 'org.apache.poi:poi:4.1.2'
-    implementation 'org.apache.xmlbeans:xmlbeans:3.1.0'
-
-    // testFixtures
-    testImplementation(testFixtures(project(":yellobook-domain")))
+    // testcontainers
+    integrationTestImplementation 'org.testcontainers:testcontainers:1.20.1'
+    integrationTestImplementation 'org.testcontainers:junit-jupiter:1.20.1'
+    integrationTestImplementation "org.testcontainers:postgresql:1.20.1"
+    integrationTestImplementation "com.redis:testcontainers-redis:2.2.2"
 }
 
 // application*.yml 설정파일 복사

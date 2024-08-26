@@ -47,6 +47,13 @@ allprojects {
     }
 }
 
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 subprojects {
     apply plugin: 'java-library'
     apply plugin: 'org.springframework.boot'
@@ -93,7 +100,7 @@ jacocoTestReport {
     executionData.from(fileTree(dir: '.', include: '**/build/jacoco/*.exec'))
 
     // 리포트 생성에서 제외할 경로
-    def excludes = defineExcludes();
+    def excludes = defineExcludes()
 
     // 커버리지를 계산할 클래스 파일들의 디렉토리 설정
     classDirectories.setFrom(files(subprojects.collect {
