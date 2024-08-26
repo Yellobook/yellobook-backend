@@ -205,4 +205,36 @@ public class InformControllerTest {
             }
         }
     }
+
+    @Nested
+    @DisplayName("addComment 메소드는")
+    class Describe_addComment{
+
+        @Nested
+        @DisplayName("유효한 요청이 들어왔을 경우")
+        class Context_Valid_Request{
+
+            CreateInformCommentRequest request;
+            CreateInformCommentResponse response;
+
+            @BeforeEach
+            void setUp() {
+                request = new CreateInformCommentRequest("test");
+                response = new CreateInformCommentResponse(1L, LocalDateTime.now());
+
+                when(informRepository.existsById(informId)).thenReturn(true);
+                when(informCommandService.addComment(informId, customOAuth2User.getMemberId(), request)).thenReturn(response);
+            }
+
+            @Test
+            @DisplayName("201 Created를 반환한다.")
+            void it_returns_201_created()throws Exception{
+                mockMvc.perform(post("/api/v1/informs/{informId}/comment", informId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                        .andExpect(status().isCreated())
+                        .andDo(print());
+            }
+        }
+    }
 }
