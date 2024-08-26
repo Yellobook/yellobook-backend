@@ -4,11 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yellobook.common.resolver.TeamMemberArgumentResolver;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.auth.security.oauth2.dto.OAuth2UserDTO;
-import com.yellobook.domains.inform.dto.request.CreateInformCommentRequest;
 import com.yellobook.domains.inform.dto.request.CreateInformRequest;
-import com.yellobook.domains.inform.dto.response.CreateInformCommentResponse;
 import com.yellobook.domains.inform.dto.response.CreateInformResponse;
-import com.yellobook.domains.inform.dto.response.GetInformResponse;
 import com.yellobook.domains.inform.repository.InformRepository;
 import com.yellobook.domains.inform.service.InformCommandService;
 import com.yellobook.domains.inform.service.InformQueryService;
@@ -32,7 +29,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -118,6 +114,37 @@ public class InformControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isBadRequest())
                         .andReturn();
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("createInform 메소드는")
+    class Describe_createInform{
+
+        @Nested
+        @DisplayName("유효한 요청의 경우")
+        class Context_Valid_Request {
+
+            CreateInformRequest request;
+            CreateInformResponse response;
+
+            @BeforeEach
+            void setUp() {
+                request = new CreateInformRequest("test1", "01012345678", List.of(), LocalDate.now());
+                response = new CreateInformResponse(1L, LocalDateTime.now());
+
+                when(informCommandService.createInform(1L, request)).thenReturn(response);
+            }
+
+            @Test
+            @DisplayName("201 Created를 반환한다.")
+            void it_returns_201_created()throws Exception{
+                mockMvc.perform(post("/api/v1/informs")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                        .andExpect(status().isCreated())
+                        .andDo(print());
             }
         }
     }
