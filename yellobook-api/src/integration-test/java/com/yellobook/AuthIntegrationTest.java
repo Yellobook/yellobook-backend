@@ -241,4 +241,96 @@ public class AuthIntegrationTest {
             }
         }
     }
+
+    @Nested
+    @DisplayName("logout 메서드는")
+    class Describe_logout {
+        final String url = "/api/v1/auth/logout";
+
+        @Nested
+        @DisplayName("로그인한 사용자일 경우")
+        class Context_logged_in_member {
+            Response response;
+
+            @Transactional
+            @BeforeEach
+            void prepare() {
+                var member = createMember();
+                memberRepository.save(member);
+
+                Long memberId = member.getId();
+                var accessToken = jwtService.createAccessToken(memberId);
+                jwtService.createRefreshToken(memberId);
+
+                response = RestAssured.given()
+                        .header("Authorization", "Bearer " + accessToken)
+                        .log().all()
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .post(url);
+            }
+
+            @Test
+            @DisplayName("204 상태코드로 응답해야 한다.")
+            void it_returns_204() {
+                response.then().statusCode(204);
+            }
+        }
+
+        @Nested
+        @DisplayName("accessToken 이 존재하지 않을 경우")
+        class Context_access_token_not_provided {
+            Response response;
+
+            @Transactional
+            @BeforeEach
+            void prepare() {
+                response = RestAssured.given()
+                        .log().all()
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .post(url);
+            }
+
+            @Test
+            @DisplayName("401 상태코드로 응답해야 한다.")
+            void it_returns_204() {
+                response.then().statusCode(401);
+            }
+        }
+
+        @Nested
+        @DisplayName("로그인이 만료되었을 경우")
+        class Context_not_exist_member {
+            Response response;
+
+            @Value("${jwt.access.secret}")
+            private String accessTokenSecret;
+
+            @Transactional
+            @BeforeEach
+            void prepare() {
+                var member = createMember();
+                memberRepository.save(member);
+
+                Long memberId = member.getId();
+                var accessTokenSecretKey = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(accessTokenSecret));
+
+                var accessToken = JwtTestUtil.createExpiredToken(memberId, accessTokenSecretKey);
+
+                response = RestAssured.given()
+                        .header("Authorization", "Bearer " + accessToken)
+                        .log().all()
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .post(url);
+            }
+
+            @Test
+            @DisplayName("401 상태코드로 응답해야 한다.")
+            void it_returns_204() {
+                response.then().statusCode(401);
+            }
+        }
+    }
 }
