@@ -39,7 +39,7 @@ public class AuthService {
             throw new CustomException(AuthErrorCode.ACCESS_DENIED);
         }
         String newAccessToken = jwtService.createAccessToken(memberId);
-        return RefreshResponse.builder().accessToken(newAccessToken).build();
+        return authMapper.toRefreshResponse(newAccessToken);
     }
 
 
