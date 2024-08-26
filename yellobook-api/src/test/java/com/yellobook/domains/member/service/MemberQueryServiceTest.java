@@ -36,7 +36,7 @@ class MemberQueryServiceTest {
     private MemberMapper memberMapper;
 
     @Nested
-    @DisplayName("getMemberProfile 메서드는")
+    @DisplayName("getMemberProfile 메소드는")
     class Describe_GetMemberProfile{
         @Nested
         @DisplayName("사용자가 존재하면")

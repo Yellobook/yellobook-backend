@@ -38,6 +38,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("InventoryQueryService Unit Test")
 class InventoryQueryServiceTest {
     @InjectMocks
     private InventoryQueryService inventoryQueryService;

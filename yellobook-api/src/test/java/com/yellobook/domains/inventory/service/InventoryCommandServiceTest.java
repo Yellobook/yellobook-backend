@@ -18,7 +18,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.NestedTestConfiguration;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
@@ -333,6 +332,48 @@ class InventoryCommandServiceTest {
                 .salePrice(111)
                 .amount(111)
                 .build();
+    }
+
+    @Nested
+    @DisplayName("increaseInventoryView 메소드는")
+    class Describe_IncreaseInventoryView{
+        @Nested
+        @DisplayName("뷰어면")
+        class Context_Viewer{
+            Long inventoryId;
+            @BeforeEach
+            void setUp_context(){
+                inventoryId = 1L;
+
+            }
+            @Test
+            @DisplayName("조회수를 증가할 수 없으므로 예외를 반환한다.")
+            void it_throws_exception(){
+                CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                        inventoryCommandService.increaseInventoryView(inventoryId, viewer));
+                Assertions.assertEquals(AuthErrorCode.VIEWER_NOT_ALLOWED, exception.getErrorCode());
+            }
+        }
+
+        @Nested
+        @DisplayName("조회수를 증가할 수 있으면")
+        class Context_Can_Increase_View{
+            Long inventoryId;
+            Inventory inventory;
+            @BeforeEach
+            void setUp_context(){
+                inventoryId = 1L;
+                inventory = createInventory();
+                when(inventoryRepository.findById(inventoryId)).thenReturn(Optional.of(inventory));
+            }
+            @Test
+            @DisplayName("조회수를 증가한다.")
+            void it_increases_view(){
+                inventoryCommandService.increaseInventoryView(inventoryId, admin);
+
+                assertThat(inventory.getView()).isEqualTo(1L);
+            }
+        }
     }
 
 }

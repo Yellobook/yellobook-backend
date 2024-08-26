@@ -36,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(OrderController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(MockitoExtension.class)
+@DisplayName("OrderController Unit Test")
 class OrderControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -183,7 +184,7 @@ class OrderControllerTest {
                 when(orderQueryService.getOrderComments(orderId, teamMemberVO)).thenReturn(response);
             }
             @Test
-            @DisplayName("주문 댓글 조회 - 주문이 존재 할 때")
+            @DisplayName("주문 댓글 조회를 한다.")
             void it_returns_order_comments() throws Exception{
                 mockMvc.perform(get("/api/v1/orders/{orderId}/comment", orderId)
                                 .contentType(MediaType.APPLICATION_JSON))
@@ -196,7 +197,7 @@ class OrderControllerTest {
 
 
     @Nested
-    @DisplayName("modifyRequestOrder")
+    @DisplayName("modifyRequestOrder 메소드는")
     class Describe_ModifyRequestOrder{
         @Nested
         @DisplayName("유효한 주문 Id이면")
@@ -209,7 +210,7 @@ class OrderControllerTest {
                 doNothing().when(orderCommandService).modifyRequestOrder(orderId, teamMemberVO);
             }
             @Test
-            @DisplayName("주문 정정 요청 - 주문이 존재 할 때")
+            @DisplayName("주문 정정 요청을 수행한다.")
             void it_modify_request_order() throws Exception{
                 mockMvc.perform(patch("/api/v1/orders/{orderId}/correction", orderId)
                                 .contentType(MediaType.APPLICATION_JSON))

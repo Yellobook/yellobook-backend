@@ -35,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(InventoryController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(MockitoExtension.class)
+@DisplayName("InventoryController Unit Test")
 class InventoryControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -392,6 +393,30 @@ class InventoryControllerTest {
             void it_deletes_product() throws Exception{
                 mockMvc.perform(delete("/api/v1/inventories/products/{productId}", productId)
                                 .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isNoContent())
+                        .andReturn();
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("increaseInventoryView 메소드는")
+    class Describe_IncreaseInventoryView{
+        @Nested
+        @DisplayName("유효한 재고 Id면")
+        class Context_Inventory_Id_Exist{
+            Long inventoryId;
+            @BeforeEach
+            void setUp_context(){
+                inventoryId = 1L;
+                when(inventoryQueryService.existByInventoryId(inventoryId)).thenReturn(true);
+                doNothing().when(inventoryCommandService).increaseInventoryView(inventoryId, teamMemberVO);
+            }
+            @Test
+            @DisplayName("재고 조회수를 증가한다.")
+            void it_increases_view() throws Exception{
+                mockMvc.perform(patch("/api/v1/inventories/{inventoryId}/views", inventoryId)
+                        .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isNoContent())
                         .andReturn();
             }
