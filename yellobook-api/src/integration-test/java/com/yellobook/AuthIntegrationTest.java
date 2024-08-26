@@ -68,4 +68,96 @@ public class AuthIntegrationTest {
         registry.add("spring.data.redis.host", redis::getHost);
         registry.add("spring.data.redis.port", () -> redis.getMappedPort(REDIS_PORT));
     }
+
+
+    @Nested
+    @DisplayName("reissueToken 메서드는")
+    class Describe_reissueToken {
+        final String url = "/api/v1/auth/token/reissue";
+
+        @Nested
+        @DisplayName("쿠키로 받은 refresh 토큰이 정상적이라면")
+        class Context_exist_member {
+            Response response;
+
+            @Value("${cookie.refresh-name}")
+            private String refreshTokenName;
+
+            @Transactional
+            @Commit
+            @BeforeEach
+            void prepare() {
+                var member = createMember(false);
+                memberRepository.save(member);
+
+                Long memberId = member.getId();
+                var accessToken = jwtService.createAccessToken(memberId);
+                var refreshToken = jwtService.createRefreshToken(memberId);
+
+                response = RestAssured.given()
+                        .cookie(refreshTokenName, refreshToken)
+                        .header("Authorization", "Bearer " + accessToken)
+                        .log().all()
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .post(url);
+            }
+
+            @Test
+            @DisplayName("200 상태코드로 응답해야 한다.")
+            void it_return_200() {
+                response.then().statusCode(200);
+            }
+
+            @Test
+            @DisplayName("accessToken 을 재발급해야 한다.")
+            void it_return_new_access_token() {
+                response.then().body("data", hasKey("accessToken"));
+            }
+        }
+
+        @Nested
+        @DisplayName("쿠키에 refresh 토큰이 없다면")
+        class Context_refresh_token_not_exist_in_cookie {
+            Response response;
+
+            @Transactional
+            @Commit
+            @BeforeEach
+            void prepare() {
+                var member = createMember(false);
+                memberRepository.save(member);
+
+                Long memberId = member.getId();
+                var accessToken = jwtService.createAccessToken(memberId);
+
+                response = RestAssured.given()
+                        .header("Authorization", "Bearer " + accessToken)
+                        .log().all()
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .post(url);
+            }
+
+            @Test
+            @DisplayName("401 상태코드로 응답해야 한다.")
+            void it_return_200() {
+                response.then().statusCode(401);
+            }
+
+            @Test
+            @DisplayName("AUTH-010 에러코드를 반환해야 한다.")
+            void it_contains_error_code() {
+                response.then().body("code", equalTo("AUTH_010"));
+            }
+
+            @Test
+            @DisplayName("에러 메시지를 포함해야 한다.")
+            void it_contains_message() {
+                response.then().body("message", equalTo("쿠키에 refreshToken 이 없습니다."));
+            }
+        }
+    }
+
+
 }
