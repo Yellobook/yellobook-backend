@@ -153,4 +153,66 @@ public class InformCommandServiceTest {
             }
         }
     }
+
+    @Nested
+    @DisplayName("deleteInform 메소드는")
+    class Describe_deleteInform{
+
+        @Nested
+        @DisplayName("작성자의 삭제 요청이 아닌 경우")
+        class Context_Not_Request_From_Writer{
+
+            CustomException exception;
+            Member writerMember;
+
+            @BeforeEach
+            void setUp() {
+                writerMember = mock(Member.class);
+                when(writerMember.getId()).thenReturn(999L);
+
+                Inform inform = mock(Inform.class);
+                when(inform.getMember()).thenReturn(writerMember);
+                when(informRepository.findById(anyLong())).thenReturn(Optional.of(inform));
+
+                exception = assertThrows(CustomException.class, () -> {
+                    informCommandService.deleteInform(1L, member.getId());  // 테스트할 메서드 호출
+                });
+            }
+
+            @Test
+            @DisplayName("INFORM_MEMBER_NOT_MATCH 에러를 반환한다.")
+            void it_returns_inform_member_not_match(){
+                assertEquals(InformErrorCode.INFORM_MEMBER_NOT_MATCH, exception.getErrorCode());
+            }
+        }
+
+        @Nested
+        @DisplayName("작성자의 삭제 요청인 경우")
+        class Context_Request_From_Writer{
+
+            Member writer;
+            Inform inform;
+
+            @BeforeEach
+            void setUp() {
+                writer = mock(Member.class);
+                when(writer.getId()).thenReturn(1L);
+
+                inform = mock(Inform.class);
+                when(inform.getId()).thenReturn(2L);
+                when(inform.getMember()).thenReturn(writer);
+                when(informRepository.findById(anyLong())).thenReturn(Optional.of(inform));
+
+                doNothing().when(informRepository).deleteById(anyLong());
+            }
+
+            @Test
+            @DisplayName("inform을 삭제한다.")
+            void it_returns_deleted_inform(){
+                informCommandService.deleteInform(inform.getId(), writer.getId());
+
+                verify(informRepository).deleteById(anyLong());
+            }
+        }
+    }
 }
