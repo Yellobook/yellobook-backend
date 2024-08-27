@@ -1,16 +1,17 @@
 # YelloBook - 옐로북 <a href="https://yellobook.site"><img src="./images/logo.png" align="left" width="100"></a>
 
 [![codecov](https://codecov.io/gh/Yellobook/yellobook-backend/branch/develop/graph/badge.svg?token=ZDMLLQDDTN)](https://codecov.io/gh/Yellobook/yellobook-backend)
-[![CI Status](https://github.com/Yellobook/yellobook-backend/actions/workflows/coverage.yml/badge.svg)](https://github.com/Yellobook/yellobook-backend/actions)
-[![CD Status](https://github.com/Yellobook/yellobook-backend/actions/workflows/deploy.yml/badge.svg)](https://github.com/Yellobook/yellobook-backend/actions)
-
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Yellobook_yellobook-backend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Yellobook_yellobook-backend)
+[![CI Status](https://github.com/Yellobook/yellobook-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/Yellobook/yellobook-backend/actions)
+[![CD Status](https://github.com/Yellobook/yellobook-backend/actions/workflows/cd.yml/badge.svg)](https://github.com/Yellobook/yellobook-backend/actions)
+ 
 ## 1. 기술 스택
 
 ### Backend
 - Java 17
 - Gradle 8.8
 - Spring Boot 3.3.1
-- Postgres 13.x
+- Postgres 16.x
 - Redis 7.x
 - Spring Data JPA
 - QueryDSL
@@ -80,7 +81,7 @@ Jira 의 Scrum 기반 개발 프로세스를 이용한다.
 - `refactor/[Refactor]`: 코드 리팩토링
 - `test/[Test]`: 테스트 코드, 리팩토링 테스트 코드 추가
 - `chore/[Chore]`: 빌드 업무 수정, 패키지 매니저 수정
--  merge: 브랜치 병합, 병합 충돌 해결
+-  `merge`: 브랜치 병합, 병합 충돌 해결
  
 
 ### Commit 규칙

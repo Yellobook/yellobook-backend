@@ -6,15 +6,6 @@ plugins {
     id 'org.sonarqube' version '4.4.1.3373'
 }
 
-sonar {
-    properties {
-        property 'sonar.projectKey', 'Yellobook_yellobook-backend'
-        property 'sonar.organization', 'yellobook-server-sonar-cloud-key'
-        property 'sonar.host.url', 'https://sonarcloud.io'
-        property 'sonar.coverage.jacoco.xmlReportPaths', 'build/reports/jacoco/test/jacocoTestReport.xml'
-    }
-}
-
 group = 'com.yellobook'
 version = '1.0.0'
 
@@ -117,6 +108,14 @@ jacocoTestReport {
         csv.required = false
         html.outputLocation = file('build/jacocoTestReportHtml')
         xml.outputLocation = file('build/reports/jacoco/test/jacocoTestReport.xml')
+    }
+}
+
+sonar {
+    properties {
+        property 'sonar.projectKey', 'Yellobook_yellobook-backend'
+        property 'sonar.organization', 'yellobook-server-sonar-cloud-key'
+        property 'sonar.host.url', 'https://sonarcloud.io'
     }
 }
 
