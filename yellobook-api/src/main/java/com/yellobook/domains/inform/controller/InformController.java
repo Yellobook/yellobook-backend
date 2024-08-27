@@ -1,7 +1,8 @@
 package com.yellobook.domains.inform.controller;
 
+import com.yellobook.common.resolver.annotation.TeamMember;
 import com.yellobook.common.validation.annotation.ExistInform;
-import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
+import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.inform.dto.request.CreateInformCommentRequest;
 import com.yellobook.domains.inform.dto.request.CreateInformRequest;
 import com.yellobook.domains.inform.dto.response.CreateInformCommentResponse;
@@ -15,7 +16,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,9 +32,9 @@ public class InformController {
     @Operation(summary = "공지 작성", description = "새로운 공지를 생성하는 API 입니다.")
     public ResponseEntity<SuccessResponse<CreateInformResponse>> createInform(
             @RequestBody CreateInformRequest request,
-            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
+            @TeamMember TeamMemberVO teamMemberVO
     ) {
-        var result = informCommandService.createInform(customOAuth2User.getMemberId(), request);
+        var result = informCommandService.createInform(teamMemberVO.getMemberId(), request);
         return ResponseFactory.created(result);
     }
 
@@ -42,9 +42,9 @@ public class InformController {
     @Operation(summary = "공지 삭제", description = "등록된 공지를 삭제하는 API 입니다.")
     public ResponseEntity<Void> deleteInform(
             @ExistInform @PathVariable("informId") Long informId,
-            @AuthenticationPrincipal CustomOAuth2User oAuth2User
+            @TeamMember TeamMemberVO teamMemberVO
     ){
-        informCommandService.deleteInform(informId, oAuth2User.getMemberId());
+        informCommandService.deleteInform(informId, teamMemberVO.getMemberId());
         return ResponseFactory.noContent();
     }
 
@@ -52,9 +52,9 @@ public class InformController {
     @Operation(summary = "공지목록 조회", description = "등록된 공지를 조회하는 API 입니다.")
     public ResponseEntity<SuccessResponse<GetInformResponse>> getInform(
             @ExistInform @PathVariable("informId") Long informId,
-            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
+            @TeamMember TeamMemberVO teamMemberVO
     ){
-        var result = informQueryService.getInformById(customOAuth2User.getMemberId(), informId);
+        var result = informQueryService.getInformById(teamMemberVO.getMemberId(), informId);
         return ResponseFactory.success(result);
     }
 
@@ -63,10 +63,10 @@ public class InformController {
     @Operation(summary = "공지 댓글 작성", description = "공지에 댓글을 작성하는 API 입니다.")
     public ResponseEntity<SuccessResponse<CreateInformCommentResponse>> addComment(
             @ExistInform @PathVariable("informId") Long informId,
-            @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+            @TeamMember TeamMemberVO teamMemberVO,
             @RequestBody CreateInformCommentRequest request
     ){
-        var result = informCommandService.addComment(informId, customOAuth2User.getMemberId(), request);
+        var result = informCommandService.addComment(informId, teamMemberVO.getMemberId(), request);
         return ResponseFactory.created(result);
     }
 }
