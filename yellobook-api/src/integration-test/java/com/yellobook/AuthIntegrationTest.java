@@ -11,8 +11,11 @@ import io.jsonwebtoken.security.Keys;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,8 +33,7 @@ public class AuthIntegrationTest {
     private static final String REDIS_DOCKER_IMAGE_TAG = "redis:7-alpine";
     private static final int REDIS_PORT = 6379;
 
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(TEST_CONTAINER_IMAGE_TAG)
-            .withInitScript("schema.sql");
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(TEST_CONTAINER_IMAGE_TAG);
 
     static GenericContainer<?> redis = new GenericContainer<>(REDIS_DOCKER_IMAGE_TAG)
             .withExposedPorts(REDIS_PORT);
@@ -44,6 +46,12 @@ public class AuthIntegrationTest {
 
     @CustomAutowired
     private MemberRepository memberRepository;
+
+    @MockBean
+    ClientRegistrationRepository clientRegistrationRepository;
+
+    @MockBean
+    OAuth2AuthorizedClientRepository authorizedClientRepository;
 
     @BeforeAll
     static void beforeAll() {
