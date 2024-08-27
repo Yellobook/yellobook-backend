@@ -316,7 +316,6 @@ public class AuthIntegrationTest extends IntegrationTestSupport {
 
                 Long memberId = member.getId();
                 var accessTokenSecretKey = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(accessTokenSecret));
-
                 var accessToken = JwtTestUtil.createExpiredToken(memberId, accessTokenSecretKey);
 
                 response = RestAssured.given()
