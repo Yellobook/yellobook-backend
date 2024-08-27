@@ -53,15 +53,15 @@ public class TeamController {
 
     @DeleteMapping("/{teamId}/leave")
     @Operation(summary = "팀 나가기", description = "팀원이 본인이 속한 팀에서 나가기 위한 API입니다.")
-    public ResponseEntity<SuccessResponse<LeaveTeamResponse>> leaveTeam(
+    public ResponseEntity<Void> leaveTeam(
             @ExistTeam @PathVariable("teamId") Long teamId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
-        LeaveTeamResponse response = teamCommandService.leaveTeam(teamId, customOAuth2User);
-        return ResponseFactory.success(response);
+        teamCommandService.leaveTeam(teamId, customOAuth2User);
+        return ResponseFactory.noContent();
     }
 
-    @GetMapping("/invitation")
+    @PostMapping("/invitation")
     @Operation(summary = "팀 참가", description = "멤버가 팀에 참가하는 API입니다.")
     public ResponseEntity<SuccessResponse<JoinTeamResponse>> joinTeam(
             @RequestParam("code") String code,
