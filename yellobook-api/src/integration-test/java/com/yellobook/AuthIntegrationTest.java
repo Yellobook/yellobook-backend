@@ -44,16 +44,14 @@ public class AuthIntegrationTest extends IntegrationTestSupport {
             @Transactional
             @BeforeEach
             void prepare() {
-                var member = createMember(false);
+                var member = createMember();
                 memberRepository.save(member);
 
                 Long memberId = member.getId();
-                var accessToken = jwtService.createAccessToken(memberId);
                 var refreshToken = jwtService.createRefreshToken(memberId);
 
                 response = RestAssured.given()
                         .cookie(refreshTokenName, refreshToken)
-                        .header("Authorization", "Bearer " + accessToken)
                         .log().all()
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when()
@@ -81,14 +79,10 @@ public class AuthIntegrationTest extends IntegrationTestSupport {
             @Transactional
             @BeforeEach
             void prepare() {
-                var member = createMember(false);
+                var member = createMember();
                 memberRepository.save(member);
 
-                Long memberId = member.getId();
-                var accessToken = jwtService.createAccessToken(memberId);
-
                 response = RestAssured.given()
-                        .header("Authorization", "Bearer " + accessToken)
                         .log().all()
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when()
@@ -110,7 +104,55 @@ public class AuthIntegrationTest extends IntegrationTestSupport {
             @Test
             @DisplayName("에러 메시지를 포함해야 한다.")
             void it_contains_message() {
-                response.then().body("message", equalTo("쿠키에 refreshToken 이 없습니다."));
+                response.then().body("message", equalTo("쿠키에 리프레시 토큰이 없습니다."));
+            }
+        }
+
+        @Nested
+        @DisplayName("쿠키에 refresh 토큰이 만료되었다면")
+        class Context_refresh_token_is_expired {
+            Response response;
+
+            @Value("${cookie.refresh-name}")
+            private String refreshTokenName;
+
+            @Value("${jwt.refresh.secret}")
+            private String refreshTokenSecret;
+
+            @Transactional
+            @BeforeEach
+            void prepare() {
+                var member = createMember();
+                memberRepository.save(member);
+
+                Long memberId = member.getId();
+                var refreshTokenSecretKey = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(refreshTokenSecret));
+                var refreshToken = JwtTestUtil.createExpiredToken(memberId, refreshTokenSecretKey);
+
+                response = RestAssured.given()
+                        .cookie(refreshTokenName, refreshToken)
+                        .log().all()
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .when()
+                        .post(url);
+            }
+
+            @Test
+            @DisplayName("401 상태코드로 응답해야 한다.")
+            void it_return_200() {
+                response.then().statusCode(401);
+            }
+
+            @Test
+            @DisplayName("AUTH-005 에러코드를 반환해야 한다.")
+            void it_contains_error_code() {
+                response.then().body("code", equalTo("AUTH-005"));
+            }
+
+            @Test
+            @DisplayName("에러 메시지를 포함해야 한다.")
+            void it_contains_message() {
+                response.then().body("message", equalTo("리프레시 토큰의 유효기간이 만료되었습니다."));
             }
         }
     }
