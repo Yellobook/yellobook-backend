@@ -215,4 +215,82 @@ public class InformCommandServiceTest {
             }
         }
     }
+
+    @Nested
+    @DisplayName("addComment 메소드는")
+    class Describe_addComment{
+
+        @Nested
+        @DisplayName("언급되지 않은 사용자의 요청인 경우")
+        class Context_Request_From_Not_Mentioned{
+
+            CreateInformCommentRequest request;
+            CustomException exception;
+            Member notMentioned;
+            Inform wrotenInform;
+
+            @BeforeEach
+            void setUp() {
+                request = new CreateInformCommentRequest("test");
+                notMentioned = Member.builder().memberId(99L).build();
+                wrotenInform = mock(Inform.class);
+                when(wrotenInform.getMember()).thenReturn(member);
+                when(wrotenInform.getId()).thenReturn(2L);
+
+                when(informRepository.findById(wrotenInform.getId())).thenReturn(Optional.of(wrotenInform));
+                when(informMentionRepository.findByInformId(wrotenInform.getId())).thenReturn(List.of(
+                        InformMention.builder().inform(wrotenInform).member(mock(Member.class)).build()
+                ));
+                exception = assertThrows(CustomException.class, () -> {
+                    informCommandService.addComment(wrotenInform.getId(), notMentioned.getId(), request);
+                });
+            }
+
+            @Test
+            @DisplayName("NOT_MENTIONED 에러를 반환한다.")
+            void it_returns_not_mentioned(){
+                assertEquals(InformErrorCode.NOT_MENTIONED, exception.getErrorCode());
+            }
+        }
+
+        @Nested
+        @DisplayName("언급된 사용자, 혹은 작성자의 요청인 경우")
+        class Context_Request_From_Mentioned_Or_Writer{
+
+            CreateInformCommentRequest request;
+            InformComment comment;
+            Member mentionedMember;
+            Inform inform;
+
+            @BeforeEach
+            void setUp() {
+                request = new CreateInformCommentRequest("test");
+                mentionedMember = mock(Member.class);
+                inform = mock(Inform.class);
+
+                when(mentionedMember.getId()).thenReturn(1L);
+
+                when(memberRepository.findById(mentionedMember.getId())).thenReturn(Optional.of(mentionedMember));
+                when(inform.getMember()).thenReturn(mentionedMember);
+                comment = InformComment.builder().inform(inform).member(mentionedMember).content("test").build();
+                when(informRepository.findById(inform.getId())).thenReturn(Optional.of(inform));
+                when(informCommentRepository.save(any(InformComment.class))).thenReturn(comment);
+                when(commentMapper.toCreateInformCommentResponse(any(InformComment.class)))
+                        .thenReturn(new CreateInformCommentResponse(1L, comment.getCreatedAt()));
+
+                when(informMentionRepository.findByInformId(inform.getId())).thenReturn(List.of(
+                        new InformMention(inform, mentionedMember)
+                ));
+            }
+
+            @Test
+            @DisplayName("댓글을 저장하고 성공 응답을 반환한다.")
+            void it_returns_saved_comment_and_response(){
+                CreateInformCommentResponse response = informCommandService.addComment(inform.getId(), mentionedMember.getId(), request);
+
+                assertNotNull(response);
+                verify(informCommentRepository).save(any(InformComment.class));
+            }
+        }
+    }
 }
