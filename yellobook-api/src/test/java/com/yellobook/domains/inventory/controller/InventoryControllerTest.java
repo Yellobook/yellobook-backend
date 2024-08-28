@@ -6,16 +6,13 @@ import com.yellobook.common.resolver.TeamMemberArgumentResolver;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.inventory.dto.request.AddProductRequest;
 import com.yellobook.domains.inventory.dto.request.ModifyProductAmountRequest;
-import com.yellobook.domains.inventory.dto.response.AddProductResponse;
-import com.yellobook.domains.inventory.dto.response.GetProductsResponse;
-import com.yellobook.domains.inventory.dto.response.GetTotalInventoryResponse;
+import com.yellobook.domains.inventory.dto.response.*;
 import com.yellobook.domains.inventory.service.InventoryCommandService;
 import com.yellobook.domains.inventory.service.InventoryQueryService;
-import com.yellobook.domains.inventory.dto.response.GetProductsNameResponse;
-import com.yellobook.domains.inventory.dto.response.GetSubProductNameResponse;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -24,8 +21,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -274,6 +273,49 @@ class InventoryControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andReturn();
+    }
+
+    @Nested
+    @DisplayName("addInventory 메소드는")
+    class Describe_AddInventory{
+        @Nested
+        @DisplayName("파일이 주어지면")
+        class Context_File_Given{
+            MockMultipartFile file;
+            AddInventoryResponse response;
+            @BeforeEach
+            void setUp_context(){
+                file = new MockMultipartFile("file", "test.xlsx", MediaType.APPLICATION_OCTET_STREAM_VALUE, "some data".getBytes());
+                response = AddInventoryResponse.builder().inventoryId(1L).productIds(Arrays.asList(1L, 2L, 3L)).build();
+                when(inventoryCommandService.addInventory(file, teamMemberVO)).thenReturn(response);
+            }
+            @Test
+            @DisplayName("상태 코드 201을 반환한다.")
+            void it_returns_201() throws Exception{
+                mockMvc.perform(multipart("/api/v1/inventories")
+                                .file(file)
+                                .contentType(MediaType.MULTIPART_FORM_DATA))
+                        .andExpect(status().isCreated())
+                        .andExpect(jsonPath("$.data.inventoryId", CoreMatchers.is(response.inventoryId().intValue())))
+                        .andDo(print())
+                        .andReturn();
+            }
+        }
+
+        @Nested
+        @DisplayName("파일이 주어지지 않으면")
+        class Context_File_Not_Given{
+
+            @Test
+            @DisplayName("상태 코드 400을 반환한다.")
+            void it_returns_400() throws Exception{
+                mockMvc.perform(multipart("/api/v1/inventories")
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                        .andExpect(status().isBadRequest())
+                        .andDo(print())
+                        .andReturn();
+            }
+        }
     }
 
 }
