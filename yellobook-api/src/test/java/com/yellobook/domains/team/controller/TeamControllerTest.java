@@ -2,7 +2,6 @@ package com.yellobook.domains.team.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yellobook.common.enums.MemberRole;
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.resolver.TeamMemberArgumentResolver;
 import com.yellobook.common.vo.TeamMemberVO;
@@ -16,6 +15,8 @@ import com.yellobook.domains.team.dto.request.CreateTeamRequest;
 import com.yellobook.domains.team.dto.response.*;
 import com.yellobook.domains.team.service.TeamCommandService;
 import com.yellobook.domains.team.service.TeamQueryService;
+import com.yellobook.domains.team.util.SecurityUtil;
+import fixture.MemberFixture;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -55,28 +56,11 @@ public class TeamControllerTest {
     private TeamQueryService teamQueryService;
     @MockBean
     private RedisTeamService redisTeamService;
-
-    private CustomOAuth2User customOAuth2User;
-    private final Long teamId = 1L;
-
     @MockBean
     private TeamMemberArgumentResolver teamMemberArgumentResolver;
 
-    @BeforeEach
-    void setUp() throws Exception {
-        Member member = Member.builder()
-                .memberId(1L)
-                .nickname("test")
-                .email("test@example.com")
-                .profileImage("profileImage.png")
-                .allowance(true)
-                .role(MemberRole.USER)
-                .build();
-
-        OAuth2UserDTO oauth2UserDTO = OAuth2UserDTO.from(member);
-
-        customOAuth2User = new CustomOAuth2User(oauth2UserDTO);
-    }
+    private final Long teamId = 1L;
+    private final Member member = MemberFixture.createMember();
 
     @Nested
     @DisplayName("createTeam 메소드는")
@@ -88,12 +72,19 @@ public class TeamControllerTest {
             CreateTeamRequest request;
             CreateTeamResponse response;
 
+            CustomOAuth2User customOAuth2User;
+
             @BeforeEach
             void setUp(){
+                OAuth2UserDTO oauth2UserDTO = OAuth2UserDTO.from(member);
+                customOAuth2User = new CustomOAuth2User(oauth2UserDTO);
+
+                SecurityUtil.setAuthentication(customOAuth2User);
+
                 request = new CreateTeamRequest("nike", "01000000000", "경기도", MemberTeamRole.ADMIN);
                 response = new CreateTeamResponse(1L, LocalDateTime.now());
 
-                when(teamCommandService.createTeam(any(CreateTeamRequest.class), any(CustomOAuth2User.class)))
+                when(teamCommandService.createTeam(request, customOAuth2User.getMemberId()))
                         .thenReturn(response);
             }
 
@@ -116,14 +107,20 @@ public class TeamControllerTest {
         @Nested
         @DisplayName("존재하는 팀을 불러오는 경우")
         class Context_Exist_Team{
+            CustomOAuth2User customOAuth2User;
             GetTeamResponse response;
 
             @BeforeEach
             void setUp(){
+                OAuth2UserDTO oauth2UserDTO = OAuth2UserDTO.from(member);
+                customOAuth2User = new CustomOAuth2User(oauth2UserDTO);
+
+                SecurityUtil.setAuthentication(customOAuth2User);
+
                 response = GetTeamResponse.builder().teamId(1L).name("나이키").phoneNumber("01000000000").address("경기도").build();
 
                 when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
-                when(teamQueryService.findByTeamId(any(), any())).thenReturn(response);
+                when(teamQueryService.findByTeamId(teamId, customOAuth2User.getMemberId())).thenReturn(response);
             }
 
             @Test
@@ -165,9 +162,15 @@ public class TeamControllerTest {
         @Nested
         @DisplayName("해당 팀이 존재하는 경우")
         class Context_Exist_Team{
+            CustomOAuth2User customOAuth2User;
 
             @BeforeEach
             void setUp(){
+                OAuth2UserDTO oauth2UserDTO = OAuth2UserDTO.from(member);
+                customOAuth2User = new CustomOAuth2User(oauth2UserDTO);
+
+                SecurityUtil.setAuthentication(customOAuth2User);
+
                 when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
             }
 
@@ -235,12 +238,13 @@ public class TeamControllerTest {
                 name = "john";
                 response = new TeamMemberListResponse(
                         List.of(new QueryTeamMember(2L,"john")));
+                teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
 
                 when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
                 when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
                         .thenReturn(teamMemberVO);
 
-                when(teamQueryService.searchParticipants(teamMemberVO, name)).thenReturn(response);
+                when(teamQueryService.searchParticipants(teamMemberVO.getTeamId(), name)).thenReturn(response);
             }
 
             @Test
@@ -267,11 +271,13 @@ public class TeamControllerTest {
             void setUp() throws Exception {
                 name = "john";
                 response = new TeamMemberListResponse(List.of());
+                teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
+
                 when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
                 when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
                         .thenReturn(teamMemberVO);
 
-                when(teamQueryService.searchParticipants(teamMemberVO, name)).thenReturn(response);
+                when(teamQueryService.searchParticipants(teamMemberVO.getTeamId(), name)).thenReturn(response);
             }
 
             @Test
@@ -297,6 +303,7 @@ public class TeamControllerTest {
             String expectedInviteUrl;
             InvitationCodeRequest request;
             InvitationCodeResponse response;
+            TeamMemberVO teamMemberVO;
 
             @BeforeEach
             void setUp() throws Exception {
@@ -305,6 +312,10 @@ public class TeamControllerTest {
                         .inviteUrl(expectedInviteUrl)
                         .build();
                 request = new InvitationCodeRequest(MemberTeamRole.ADMIN);
+                teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
+
+                when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
+                when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any())).thenReturn(teamMemberVO);
 
                 when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
                 when(teamQueryService.makeInvitationCode(any(), any(), any())).thenReturn(response);
@@ -331,9 +342,14 @@ public class TeamControllerTest {
         class Context_Valid_Invitation_Code{
             String code;
             JoinTeamResponse response;
+            CustomOAuth2User customOAuth2User;
 
             @BeforeEach
             void setUp(){
+                OAuth2UserDTO oauth2UserDTO = OAuth2UserDTO.from(member);
+                customOAuth2User = new CustomOAuth2User(oauth2UserDTO);
+
+                SecurityUtil.setAuthentication(customOAuth2User);
                 code = "code";
                 response = new JoinTeamResponse(1L);
 
@@ -362,10 +378,18 @@ public class TeamControllerTest {
         @DisplayName("팀에 속한 멤버가 요청을 하는 경우")
         class Context_Team_Member{
 
+            TeamMemberVO teamMemberVO;
+
             @BeforeEach
-            void setUp(){
+            void setUp() throws Exception {
+                teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
+
+                when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
+                when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                        .thenReturn(teamMemberVO);
+
                 when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
-                doNothing().when(teamCommandService).leaveTeam(teamId, customOAuth2User);
+                doNothing().when(teamCommandService).leaveTeam(teamId, teamMemberVO.getMemberId());
             }
 
             @Test
