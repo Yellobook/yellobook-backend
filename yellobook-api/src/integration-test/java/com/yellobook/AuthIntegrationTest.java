@@ -3,9 +3,8 @@ package com.yellobook;
 import com.yellobook.domains.auth.dto.request.AllowanceRequest;
 import com.yellobook.domains.auth.service.JwtService;
 import com.yellobook.domains.member.repository.MemberRepository;
-import com.yellobook.support.IntegrationTestSupport;
+import com.yellobook.support.IntegrationTest;
 import com.yellobook.support.annotation.CustomAutowired;
-import com.yellobook.support.annotation.IntegrationTest;
 import com.yellobook.support.utils.JwtTestUtil;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -19,9 +18,8 @@ import io.restassured.RestAssured;
 import static fixture.MemberFixture.*;
 import static org.hamcrest.Matchers.*;
 
-@IntegrationTest
 @DisplayName("AuthController Integration Test")
-public class AuthIntegrationTest extends IntegrationTestSupport {
+public class AuthIntegrationTest extends IntegrationTest {
     @CustomAutowired
     private JwtService jwtService;
 
