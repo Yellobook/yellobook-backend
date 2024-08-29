@@ -93,7 +93,8 @@ public class InformCommandService {
             Long informId,
             Long memberId,
             CreateInformCommentRequest request) {
-        Inform inform = informRepository.findById(informId).get();
+        Inform inform = informRepository.findById(informId)
+                .orElseThrow(() -> new CustomException(InformErrorCode.INFORM_NOT_FOUND));
 
         List<InformMention> mentions = informMentionRepository.findByInformId(informId);
 

@@ -1,6 +1,5 @@
 package com.yellobook.domains.inform.service;
 
-import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.inform.dto.response.GetInformResponse;
 import com.yellobook.domains.inform.mapper.InformMapper;
 import com.yellobook.domains.inform.entity.Inform;
@@ -29,7 +28,8 @@ public class InformQueryService {
     private final InformMapper informMapper;
 
     public GetInformResponse getInformById(Long memberId, Long informId){
-        Inform inform = informRepository.findById(informId).get();
+        Inform inform = informRepository.findById(informId)
+                .orElseThrow(() -> new CustomException(InformErrorCode.INFORM_NOT_FOUND));
         Long writerId = inform.getMember().getId();
 
         // 공지및 일정의 언급들
