@@ -37,6 +37,7 @@ jobs:
           # 캐시가 존재하지 않을 경우 복원 시도
           restore-keys: ${{ runner.os }}-sonar
 
+
       - name: Gradle 캐시 설정
         uses: actions/cache@v3
         with:
@@ -44,11 +45,14 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
 
-      - name: Gradle 빌드 후 SonarCloud 정적분석
+      - name: Gradle 빌드
+        run: ./gradlew clean build
+
+      - name: SonarCloud 정적분석
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew clean build sonar --info
+        run: ./gradlew sonar --info
 
       - name: CodeCoverage 업로드
         uses: codecov/codecov-action@v3

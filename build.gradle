@@ -123,6 +123,8 @@ sonar {
         property 'sonar.projectKey', 'Yellobook_yellobook-backend'
         property 'sonar.organization', 'yellobook-server-sonar-cloud-key'
         property 'sonar.host.url', 'https://sonarcloud.io'
+        // 빌드 후 생성된 리포트 활용
+        property "sonar.coverage.jacoco.xmlReportPaths", layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml").get().asFile.absolutePath
     }
 }
 
