@@ -45,7 +45,7 @@ class MemberQueryServiceTest {
             ProfileResponse expectResponse;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 memberId = 1L;
                 Member member = createMember();
                 List<QueryMemberJoinTeam> queryMemberJoinTeams = createQueryMemberJoinTeam();
@@ -75,7 +75,7 @@ class MemberQueryServiceTest {
         class Context_Member_Not_Exist{
             Long memberId;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 memberId = 1L;
                 when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
             }
@@ -99,7 +99,7 @@ class MemberQueryServiceTest {
             TermAllowanceResponse expectResponse;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 memberId = 1L;
                 member = createMember();
                 expectResponse = createAllowanceResponse(member.getAllowance());
@@ -122,7 +122,7 @@ class MemberQueryServiceTest {
         class Context_Member_Not_Exist{
             Long memberId;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 memberId = 1L;
                 when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
             }

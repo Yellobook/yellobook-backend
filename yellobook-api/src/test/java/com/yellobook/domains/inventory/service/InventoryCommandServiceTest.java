@@ -30,7 +30,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("InventoryCommandService Unit Test")
 class InventoryCommandServiceTest {
-
     @InjectMocks
     private InventoryCommandService inventoryCommandService;
     @Mock
@@ -53,7 +52,7 @@ class InventoryCommandServiceTest {
             Long inventoryId;
             AddProductRequest request;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 inventoryId = 1L;
                 request = createAddProductRequest();
             }
@@ -72,7 +71,7 @@ class InventoryCommandServiceTest {
             Long inventoryId;
             AddProductRequest request;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 inventoryId = 1L;
                 request = createAddProductRequest();
             }
@@ -92,7 +91,7 @@ class InventoryCommandServiceTest {
             AddProductRequest request;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 inventoryId = 1L;
                 request = createAddProductRequest();
                 when(productRepository.existsByInventoryIdAndSku(1L, request.sku())).thenReturn(true);
@@ -112,7 +111,7 @@ class InventoryCommandServiceTest {
             Long inventoryId;
             AddProductRequest request;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 inventoryId = 1L;
                 request = createAddProductRequest();
                 when(inventoryRepository.findById(1L)).thenReturn(Optional.empty());
@@ -134,7 +133,7 @@ class InventoryCommandServiceTest {
             AddProductResponse expectResponse;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 inventoryId = 1L;
                 request = createAddProductRequest();
                 Inventory inventory = createInventory();
@@ -183,7 +182,7 @@ class InventoryCommandServiceTest {
             Long productId;
             ModifyProductAmountRequest request;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 productId = 1L;
                 request = createModifyProductAmountRequest();
             }
@@ -202,7 +201,7 @@ class InventoryCommandServiceTest {
             Long productId;
             ModifyProductAmountRequest request;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 productId = 1L;
                 request = createModifyProductAmountRequest();
             }
@@ -221,7 +220,7 @@ class InventoryCommandServiceTest {
             Long productId;
             ModifyProductAmountRequest request;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 productId = 1L;
                 request = createModifyProductAmountRequest();
                 when(productRepository.findById(productId)).thenReturn(Optional.empty());
@@ -242,7 +241,7 @@ class InventoryCommandServiceTest {
             ModifyProductAmountRequest request;
             Product product;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 productId = 1L;
                 request = createModifyProductAmountRequest();
                 product = createProduct();
@@ -270,7 +269,7 @@ class InventoryCommandServiceTest {
         class Context_Orderer{
             Long productId;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 productId = 1L;
             }
             @Test
@@ -287,7 +286,7 @@ class InventoryCommandServiceTest {
         class Context_Viewer{
             Long productId;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 productId = 1L;
             }
             @Test
@@ -304,7 +303,7 @@ class InventoryCommandServiceTest {
         class Context_Can_Delete_Product{
             Long productId;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 productId = 1L;
             }
             @Test
@@ -342,7 +341,7 @@ class InventoryCommandServiceTest {
         class Context_Viewer{
             Long inventoryId;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 inventoryId = 1L;
 
             }
@@ -361,7 +360,7 @@ class InventoryCommandServiceTest {
             Long inventoryId;
             Inventory inventory;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 inventoryId = 1L;
                 inventory = createInventory();
                 when(inventoryRepository.findById(inventoryId)).thenReturn(Optional.of(inventory));

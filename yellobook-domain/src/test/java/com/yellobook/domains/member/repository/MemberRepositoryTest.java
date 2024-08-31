@@ -44,7 +44,7 @@ public class MemberRepositoryTest {
         @DisplayName("해당 이메일이 존재하면")
         class Context_Email_Exist{
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 entityManager.persist(member);
             }
 

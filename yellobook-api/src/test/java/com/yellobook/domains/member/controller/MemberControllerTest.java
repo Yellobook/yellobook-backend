@@ -79,7 +79,7 @@ class MemberControllerTest {
         class Context_Member_Exist{
             ProfileResponse response;
             @BeforeEach
-            void setUp_Context(){
+            void setUpContext(){
                 response = new ProfileResponse(1L, "yellow", "image", "email", Collections.emptyList());
                 when(memberQueryService.getMemberProfile(any(Long.class))).thenReturn(response);
             }

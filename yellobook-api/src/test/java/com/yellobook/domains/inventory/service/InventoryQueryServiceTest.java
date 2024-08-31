@@ -64,7 +64,7 @@ class InventoryQueryServiceTest {
             Integer page;
             Integer size;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 page = 1;
                 size = 1;
             }
@@ -87,7 +87,7 @@ class InventoryQueryServiceTest {
             List<InventoryInfo> inventoryInfos;
             GetTotalInventoryResponse expectResponse;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 page = 1;
                 size = 5;
                 pageable = PageRequest.of(page-1, size);
@@ -125,7 +125,7 @@ class InventoryQueryServiceTest {
             GetTotalInventoryResponse expectResponse;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 page = 1;
                 size = 5;
                 pageable = PageRequest.of(page-1, size);
@@ -192,7 +192,7 @@ class InventoryQueryServiceTest {
             GetProductsResponse expectResponse;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 inventoryId = 1L;
                 queryProducts = createProductDTOs();
                 expectResponse = createGetProductsResponse();
@@ -214,7 +214,7 @@ class InventoryQueryServiceTest {
         class Context_Empty_Product{
             Long inventoryId;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 inventoryId = 1L;
                 List<QueryProduct> queryProducts = Collections.emptyList();
                 GetProductsResponse expectResponse = GetProductsResponse.builder().products(Collections.emptyList()).build();
@@ -242,7 +242,7 @@ class InventoryQueryServiceTest {
             Long inventoryId;
             String keyword;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 inventoryId = 1L;
                 keyword = "pro";
             }
@@ -261,7 +261,7 @@ class InventoryQueryServiceTest {
             Long inventoryId;
             String keyword;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 inventoryId = 1L;
                 keyword = "pro";
             }
@@ -282,7 +282,7 @@ class InventoryQueryServiceTest {
             GetProductsResponse expectResponse;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 inventoryId = 1L;
                 keyword = "pro";
                 List<QueryProduct> queryProducts = createProductDTOs();
@@ -307,7 +307,7 @@ class InventoryQueryServiceTest {
             Long inventoryId;
             String keyword;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 inventoryId = 1L;
                 keyword = "pro";
                 List<QueryProduct> queryProducts = Collections.emptyList();
@@ -334,7 +334,7 @@ class InventoryQueryServiceTest {
         class Context_Inventory_Not_Exist{
             String name;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 name = "product";
                 GetProductsNameResponse expectResult = GetProductsNameResponse.builder().names(Collections.emptyList()).build();
                 when(inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId())).thenReturn(Optional.empty());
@@ -362,7 +362,7 @@ class InventoryQueryServiceTest {
             GetProductsNameResponse expectResponse;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 name = "product";
                 inventory = createInventory();
                 productsName = Collections.emptyList();
@@ -395,7 +395,7 @@ class InventoryQueryServiceTest {
         class Context_Inventory_Not_Exist{
             String name;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 name = "product";
                 GetSubProductNameResponse expectResult = GetSubProductNameResponse.builder().subProducts(Collections.emptyList()).build();
                 when(inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId())).thenReturn(Optional.empty());
@@ -421,7 +421,7 @@ class InventoryQueryServiceTest {
             GetSubProductNameResponse expectResponse;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 name = "product";
                 inventory = createInventory();
                 subProducts = createQuerySubProducts();

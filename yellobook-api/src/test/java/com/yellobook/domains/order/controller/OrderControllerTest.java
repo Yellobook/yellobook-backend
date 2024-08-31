@@ -69,7 +69,7 @@ class OrderControllerTest {
             MakeOrderResponse response;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 request = MakeOrderRequest.builder().productId(1L).orderAmount(1).date(LocalDate.now()).build();
                 response = MakeOrderResponse.builder().orderId(2L).build();
                 when(orderCommandService.makeOrder(request, teamMemberVO)).thenReturn(response);
@@ -99,7 +99,7 @@ class OrderControllerTest {
             GetOrderResponse response;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 response = GetOrderResponse.builder().writer("writer").build();
                 when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
@@ -121,7 +121,7 @@ class OrderControllerTest {
         class Context_Order_Id_Not_Exist{
             Long orderId;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 when(orderQueryService.existsByOrderId(orderId)).thenReturn(false);
             }
@@ -147,7 +147,7 @@ class OrderControllerTest {
             AddOrderCommentResponse response;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 request = AddOrderCommentRequest.builder().content("content").build();
                 response = AddOrderCommentResponse.builder().commentId(1L).build();
@@ -178,7 +178,7 @@ class OrderControllerTest {
             GetOrderCommentsResponse response;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 response = GetOrderCommentsResponse.builder().comments(Collections.emptyList()).build();
                 when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
@@ -205,7 +205,7 @@ class OrderControllerTest {
         class Context_Product_Id_Exist {
             Long orderId;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
                 doNothing().when(orderCommandService).modifyRequestOrder(orderId, teamMemberVO);
@@ -231,7 +231,7 @@ class OrderControllerTest {
             Long orderId;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
                 doNothing().when(orderCommandService).confirmOrder(orderId, teamMemberVO);
@@ -256,7 +256,7 @@ class OrderControllerTest {
             Long orderId;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
                 doNothing().when(orderCommandService).cancelOrder(orderId, teamMemberVO);

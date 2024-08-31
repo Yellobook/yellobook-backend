@@ -67,7 +67,7 @@ class InventoryControllerTest {
             Integer size;
             GetTotalInventoryResponse response;
             @BeforeEach
-            void setUp_Context(){
+            void setUpContext(){
                 page = 1;
                 size = 5;
                 response = GetTotalInventoryResponse.builder().page(page).size(0)
@@ -96,7 +96,7 @@ class InventoryControllerTest {
             Integer size;
             GetTotalInventoryResponse response;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 page = 0;
                 size = 5;
                 response = GetTotalInventoryResponse.builder().page(page).size(0)
@@ -125,7 +125,7 @@ class InventoryControllerTest {
             GetTotalInventoryResponse response;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 page = 1;
                 size = 0;
                 response = GetTotalInventoryResponse.builder().page(page).size(0)
@@ -157,7 +157,7 @@ class InventoryControllerTest {
             GetProductsResponse response;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 inventoryId = 1L;
                 response = GetProductsResponse.builder().products(Collections.emptyList()).build();
                 when(inventoryQueryService.getProductsByInventory(inventoryId, teamMemberVO)).thenReturn(response);
@@ -181,7 +181,7 @@ class InventoryControllerTest {
             Long inventoryId;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 inventoryId = 1L;
                 when(inventoryQueryService.existByInventoryId(inventoryId)).thenReturn(false);
             }
@@ -208,7 +208,7 @@ class InventoryControllerTest {
             GetProductsNameResponse response;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 name = "product";
                 response = GetProductsNameResponse.builder().build();
                 when(inventoryQueryService.getProductsName(name, teamMemberVO)).thenReturn(response);
@@ -235,7 +235,7 @@ class InventoryControllerTest {
             String name;
             GetSubProductNameResponse response;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 name = "product";
                 response = GetSubProductNameResponse.builder().build();
                 when(inventoryQueryService.getSubProductName(name, teamMemberVO)).thenReturn(response);
@@ -266,7 +266,7 @@ class InventoryControllerTest {
             GetProductsResponse response;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 inventoryId = 1L;
                 keyword = "product";
                 response = GetProductsResponse.builder().products(Collections.emptyList()).build();
@@ -298,7 +298,7 @@ class InventoryControllerTest {
             AddProductResponse response;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 inventoryId = 1L;
                 request = AddProductRequest.builder().name("name").subProduct("sub").sku(0).purchasePrice(1).salePrice(1).amount(0).build();
                 response = AddProductResponse.builder().productId(1L).build();
@@ -329,7 +329,7 @@ class InventoryControllerTest {
             ModifyProductAmountRequest request;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 productId = 1L;
                 request = ModifyProductAmountRequest.builder().build();
                 when(inventoryQueryService.existByProductId(productId)).thenReturn(false);
@@ -354,7 +354,7 @@ class InventoryControllerTest {
             ModifyProductAmountRequest request;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 productId = 1L;
                 request = ModifyProductAmountRequest.builder().amount(100).build();
                 when(inventoryQueryService.existByProductId(productId)).thenReturn(true);
@@ -382,7 +382,7 @@ class InventoryControllerTest {
             Long productId;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 productId = 1L;
                 when(inventoryQueryService.existByProductId(productId)).thenReturn(true);
                 doNothing().when(inventoryCommandService).deleteProduct(productId, teamMemberVO);
@@ -407,7 +407,7 @@ class InventoryControllerTest {
         class Context_Inventory_Id_Exist{
             Long inventoryId;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 inventoryId = 1L;
                 when(inventoryQueryService.existByInventoryId(inventoryId)).thenReturn(true);
                 doNothing().when(inventoryCommandService).increaseInventoryView(inventoryId, teamMemberVO);

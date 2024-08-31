@@ -73,7 +73,7 @@ class OrderCommandServiceTest {
             Long orderId;
             Order order;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 order = createOrderAmount(OrderStatus.PENDING_CONFIRM);
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
@@ -97,7 +97,7 @@ class OrderCommandServiceTest {
             Order order;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 order = createOrderAmount(OrderStatus.CONFIRMED);
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
@@ -120,7 +120,7 @@ class OrderCommandServiceTest {
             Long orderId;
             Order order;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 order = createOrderAmount(OrderStatus.PENDING_CONFIRM);
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
@@ -148,7 +148,7 @@ class OrderCommandServiceTest {
             Long orderId;
             Order order;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 order = createOrderAmount(OrderStatus.PENDING_CONFIRM);
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
@@ -172,7 +172,7 @@ class OrderCommandServiceTest {
             Long orderId;
             Order order;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 order = createOrderAmount(OrderStatus.PENDING_MODIFY);
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
@@ -194,7 +194,7 @@ class OrderCommandServiceTest {
             Long orderId;
             Order order;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 order = createOrderAmount(10, 100);
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
@@ -219,7 +219,7 @@ class OrderCommandServiceTest {
             Long orderId;
             Order order;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 order = createOrderAmount(100, 10);
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
@@ -248,7 +248,7 @@ class OrderCommandServiceTest {
             Long orderId;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 Order order = createOrderMember(OrderStatus.PENDING_MODIFY, 2L);
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
@@ -269,7 +269,7 @@ class OrderCommandServiceTest {
         class Context_Order_Not_Pending_Modify{
             Long orderId;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 Order order = createOrderMember(OrderStatus.CONFIRMED, 1L);
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
@@ -292,7 +292,7 @@ class OrderCommandServiceTest {
             Order order;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 order = createOrderMember(OrderStatus.PENDING_MODIFY, 1L);
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
@@ -320,7 +320,7 @@ class OrderCommandServiceTest {
             AddOrderCommentRequest request;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 1L);  // orderMember : 1L
                 Member member = createMember(orderer.getMemberId());  // member : 2L
@@ -348,7 +348,7 @@ class OrderCommandServiceTest {
             AddOrderCommentRequest request;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 2L);  // orderMember : 2L
                 Member member = createMember(admin.getMemberId());  // member : 1L
@@ -377,7 +377,7 @@ class OrderCommandServiceTest {
             AddOrderCommentResponse expectResponse;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 1L);  // orderMember : 1L
                 Member member = createMember(admin.getMemberId());  // member : 1L
@@ -421,7 +421,7 @@ class OrderCommandServiceTest {
         class Context_Admin{
             MakeOrderRequest request;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 request = createMakeOrderRequest(10);
                 Member member = createMember(admin.getMemberId());
                 Team team = createTeam(admin.getTeamId());
@@ -444,7 +444,7 @@ class OrderCommandServiceTest {
         class Context_Viewer{
             MakeOrderRequest request;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 request = createMakeOrderRequest(10);
                 Member member = createMember(viewer.getMemberId());
                 Team team = createTeam(viewer.getTeamId());
@@ -468,7 +468,7 @@ class OrderCommandServiceTest {
             MakeOrderRequest request;
             Team team;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 request = createMakeOrderRequest(10);
                 Member member = createMember(orderer.getMemberId());
                 team = createTeam(orderer.getTeamId());
@@ -495,7 +495,7 @@ class OrderCommandServiceTest {
             Team team;
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 request = createMakeOrderRequest(10);
                 Member member = createMember(orderer.getMemberId());
                 team = createTeam(orderer.getTeamId());
@@ -524,7 +524,7 @@ class OrderCommandServiceTest {
             MakeOrderRequest request;
             Team team;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 request = createMakeOrderRequest(1111);
                 Member member = createMember(orderer.getMemberId());
                 team = createTeam(orderer.getTeamId());

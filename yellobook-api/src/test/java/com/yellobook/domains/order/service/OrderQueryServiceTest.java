@@ -53,7 +53,7 @@ class OrderQueryServiceTest {
         class Context_Order_Not_Exist{
             Long orderId;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
             }
@@ -71,7 +71,7 @@ class OrderQueryServiceTest {
         class Context_Not_Order_Orderer_Or_Admin{
             Long orderId;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 1L);  // orderMember : 1L, member : 2L
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
@@ -91,7 +91,7 @@ class OrderQueryServiceTest {
         class Context_Empty_OrderComment{
             Long orderId;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 2L);  // orderMember : 2L, member : 2L
                 GetOrderCommentsResponse expectResponse = GetOrderCommentsResponse.builder().comments(Collections.emptyList()).build();
@@ -116,7 +116,7 @@ class OrderQueryServiceTest {
         class Context_OrderComment_Exist{
             Long orderId;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 2L);  // orderMember : 2L, member : 2L
                 CommentInfo commentInfo = CommentInfo.builder().content("content").role("주문자").build();
@@ -145,7 +145,7 @@ class OrderQueryServiceTest {
         class Context_Order_Not_Exist{
             Long orderId;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
             }
@@ -163,7 +163,7 @@ class OrderQueryServiceTest {
         class Context_Not_Order_Orderer_Or_Admin{
             Long orderId;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 1L);  // orderMember : 1L, member : 2L
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
@@ -183,7 +183,7 @@ class OrderQueryServiceTest {
         class Context_Order_Exist{
             Long orderId;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 orderId = 1L;
                 Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 2L);  // orderMember : 2L, member : 2L
                 QueryOrder queryOrder = QueryOrder.builder().build();

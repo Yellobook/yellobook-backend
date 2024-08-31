@@ -71,7 +71,7 @@ public class InventoryRepositoryTest {
         class Context_Inventory_Not_Exist{
 
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 for(int i =0; i<6; i++){
                     Inventory inventory = Inventory.builder()
                             .team(team)
@@ -110,7 +110,7 @@ public class InventoryRepositoryTest {
         private Inventory inventory;
 
         @BeforeEach
-        void setUpInventory(){
+        void setUpContext(){
             inventory = Inventory.builder()
                     .team(team)
                     .title("2024년 08월 06일 재고현황")
@@ -170,7 +170,7 @@ public class InventoryRepositoryTest {
     class Describe_DeleteById{
 
         @BeforeEach
-        void setUpInventory(){
+        void setUpContext(){
             Inventory inventory = Inventory.builder()
                     .team(team)
                     .title("2024년 08월 06일 재고현황")
