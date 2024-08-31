@@ -21,7 +21,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @ActiveProfiles("integration-test")
 public abstract class IntegrationTest {
 
-    private final static String TEST_CONTAINER_IMAGE_TAG = "postgres:16";
+    private static final String TEST_CONTAINER_IMAGE_TAG = "postgres:16";
     private static final String REDIS_DOCKER_IMAGE_TAG = "redis:7-alpine";
     private static final int REDIS_PORT = 6379;
 
