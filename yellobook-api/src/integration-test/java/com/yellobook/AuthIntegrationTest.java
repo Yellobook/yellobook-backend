@@ -41,7 +41,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 
             @Transactional
             @BeforeEach
-            void prepare() {
+            void setUpContext() {
                 var member = createMember();
                 memberRepository.save(member);
 
@@ -76,7 +76,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 
             @Transactional
             @BeforeEach
-            void prepare() {
+            void setUpContext() {
                 var member = createMember();
                 memberRepository.save(member);
 
@@ -119,7 +119,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 
             @Transactional
             @BeforeEach
-            void prepare() {
+            void setUpContext() {
                 var member = createMember();
                 memberRepository.save(member);
 
@@ -167,7 +167,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 
             @Transactional
             @BeforeEach
-            void prepare() {
+            void setUpContext() {
                 var member = createMember(false);
                 memberRepository.save(member);
 
@@ -206,7 +206,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 
             @Transactional
             @BeforeEach
-            void prepare() {
+            void setUpContext() {
                 var allowanceToken = jwtService.createAllowanceToken(9999L);
 
                 var request = AllowanceRequest.builder()
@@ -253,7 +253,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 
             @Transactional
             @BeforeEach
-            void prepare() {
+            void setUpContext() {
                 var member = createMember();
                 memberRepository.save(member);
 
@@ -283,7 +283,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 
             @Transactional
             @BeforeEach
-            void prepare() {
+            void setUpContext() {
                 response = RestAssured.given()
                         .log().all()
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -308,7 +308,7 @@ public class AuthIntegrationTest extends IntegrationTest {
 
             @Transactional
             @BeforeEach
-            void prepare() {
+            void setUpContext() {
                 var member = createMember();
                 memberRepository.save(member);
 
