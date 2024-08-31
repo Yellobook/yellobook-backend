@@ -1,16 +1,11 @@
 package com.yellobook.domains.schedule.repository;
 
-import com.yellobook.common.enums.MemberRole;
-import com.yellobook.common.enums.OrderStatus;
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domains.common.entity.BaseEntity;
 import com.yellobook.domains.inform.entity.Inform;
-import com.yellobook.domains.inform.entity.InformMention;
 import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.order.entity.Order;
-import com.yellobook.domains.order.entity.OrderMention;
 import com.yellobook.domains.schedule.dto.DailyCond;
 import com.yellobook.domains.schedule.dto.EarliestCond;
 import com.yellobook.domains.schedule.dto.MonthlyCond;
@@ -20,7 +15,6 @@ import com.yellobook.domains.schedule.dto.query.QuerySchedule;
 import com.yellobook.domains.schedule.dto.query.QueryUpcomingSchedule;
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.enums.ScheduleType;
-import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
 import com.yellobook.support.annotation.RepositoryTest;
 import jakarta.persistence.EntityManager;
@@ -28,14 +22,21 @@ import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
-import java.util.Optional;
 import java.util.List;
 
+import static fixture.InformFixture.createInform;
+import static fixture.InformFixture.createInformMention;
+import static fixture.InventoryFixture.createInventory;
+import static fixture.InventoryFixture.createProduct;
+import static fixture.MemberFixture.createMember;
+import static fixture.OrderFixture.createOrder;
+import static fixture.OrderFixture.createOrderMention;
+import static fixture.TeamFixture.createParticipant;
+import static fixture.TeamFixture.createTeam;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -50,7 +51,7 @@ public class ScheduleRepositoryTest {
     EntityManager em;
 
     // 오늘 날짜
-    private final LocalDate today = LocalDate.of(2024,  8, 3);
+    private final LocalDate today = LocalDate.of(2024, 8, 3);
 
     // 서비스 사용자
     private final TeamMemberVO admin1 = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
@@ -64,11 +65,12 @@ public class ScheduleRepositoryTest {
 
     /**
      * 테스트 데이터
-     *
-     * 주문자1은 8.3, 8.5, 8.6 ... 총 주문 10개 (2일 간격)
-     * 주문자2는 8.4, 8.6 ... 총 주문 10개 (2일 간격)
-     * 뷰어1은 8.3, 8.4, 8.5 ... 총 공지 및 일정 10개 (1일 간격)
-     * 관리자가 태그된 공지 및 일정 총 10개 (뷰어1이 작성한 모든 공지 및 일정에 태그)
+     * <p>
+     * 오늘 날짜: 8월 3일
+     * 주문자1: 8.3, 8.5, 8.6 ... 총 주문 10개 (2일 간격)
+     * 주문자2: 8.4, 8.6 ... 총 주문 10개 (2일 간격)
+     * 뷰어1: 8.3, 8.4, 8.5 ... 총 공지 및 일정 10개 (1일 간격)
+     * 관리자: 태그된 공지 및 일정 총 10개 (뷰어1이 작성한 모든 공지 및 일정에 태그)
      */
     @BeforeEach
     void setUp() throws Exception {
@@ -101,358 +103,359 @@ public class ScheduleRepositoryTest {
     }
 
     @Nested
-    @DisplayName("findEarliestOrder 는")
-    class findEarliestOrderTests {
+    @DisplayName("findEarliestOrder 메소드는")
+    class Describe_findEarliestOrder {
 
-        @Test
-        @DisplayName("주문자라면 팀에서 자신이 주문한 주문 중 내일부터 가장 이른 주문을 가져와야 한다.")
-        void testFindEarliestOrderForOrderer() {
-            // given
-            var cond = EarliestCond.builder()
-                    .teamMember(orderer1)
-                    .today(today)
-                    .build();
+        @Nested
+        @DisplayName("주문자라면")
+        class Context_orderer {
+            final EarliestCond cond = EarliestCond.builder().teamMember(orderer1).today(today).build();
+            QueryUpcomingSchedule schedule;
 
-            // when
-            Optional<QueryUpcomingSchedule> result = scheduleRepository.findEarliestOrder(cond);
+            @BeforeEach
+            void setUpContext() {
+                schedule = scheduleRepository.findEarliestOrder(cond).orElseThrow(() -> new IllegalStateException("주문자의 주문이 없습니다."));
+            }
 
-            // then
-            assertThat(result).isPresent();
-            QueryUpcomingSchedule schedule = result.get();
-            assertThat(schedule.title()).isEqualTo("제품1 서브제품1 1개");
-            assertThat(schedule.day()).isEqualTo("2024-08-05");
-            assertThat(schedule.scheduleType()).isEqualTo(ScheduleType.ORDER);
+            @Test
+            @DisplayName("자신이 주문한 주문 중 내일부터 가장 이른 주문을 가져와야 한다.")
+            void it_returns_earliest_order_starting_from_tomorrow_that_user_placed() {
+                assertThat(schedule.title()).isEqualTo("제품 서브제품 1개");
+                assertThat(schedule.day()).isEqualTo("2024-08-05");
+                assertThat(schedule.scheduleType()).isEqualTo(ScheduleType.ORDER);
+            }
         }
 
-        @Test
-        @DisplayName("관리자라면 팀에서 모든 주문 중 내일부터 가장 이른 주문을 가져와야 한다.")
-        void testFindEarliestOrderForAdmin() {
-            // given
-            var cond = EarliestCond.builder()
-                    .teamMember(admin1)
-                    .today(today)
-                    .build();
+        @Nested
+        @DisplayName("관리자라면")
+        class Context_admin {
+            final EarliestCond cond = EarliestCond.builder().teamMember(admin1).today(today).build();
 
-            // when
-            Optional<QueryUpcomingSchedule> result = scheduleRepository.findEarliestOrder(cond);
+            private QueryUpcomingSchedule schedule;
 
-            // then
-            assertThat(result).isPresent();
-            QueryUpcomingSchedule schedule = result.get();
-            assertThat(schedule.title()).isEqualTo("제품1 서브제품1 1개");
-            assertThat(schedule.day()).isEqualTo("2024-08-04");
-            assertThat(schedule.scheduleType()).isEqualTo(ScheduleType.ORDER);
+            @BeforeEach
+            void setUpContext() {
+                schedule = scheduleRepository.findEarliestOrder(cond).orElseThrow(() -> new IllegalStateException("관리자가 확인할 수 있는 주문이 없습니다."));
+            }
+
+            @Test
+            @DisplayName("팀에서 모든 주문 중 내일부터 가장 이른 주문을 가져와야 한다.")
+            void it_returns_earliest_order_starting_from_tomorrow_for_the_team() {
+                assertThat(schedule.title()).isEqualTo("제품 서브제품 1개");
+                assertThat(schedule.day()).isEqualTo("2024-08-04");
+                assertThat(schedule.scheduleType()).isEqualTo(ScheduleType.ORDER);
+            }
         }
     }
 
     @Nested
-    @DisplayName("findEarliestInform 는")
+    @DisplayName("findEarliestInform 메소드는")
     class findEarliestInformTests {
 
-        @Test
-        @DisplayName("사용자와 관련된 공지 및 일정 중 내일부터 가장 이른 공지 및 일정 을 가져와야 한다.")
-        void testFindEarliestInformForMember() {
-            // given
-            var cond = EarliestCond.builder()
-                    .today(today)
-                    .teamMember(viewer1)
-                    .build();
+        @Nested
+        @DisplayName("사용자와 관련된 공지 및 일정이 존재한다면")
+        class Context_relatedUser {
+            final EarliestCond cond = EarliestCond.builder().today(today).teamMember(viewer1).build();
+            private QueryUpcomingSchedule schedule;
 
-            // when
-            Optional<QueryUpcomingSchedule> result = scheduleRepository.findEarliestInform(cond);
+            @BeforeEach
+            void setUpContext() {
+                schedule = scheduleRepository.findEarliestInform(cond).orElseThrow(() -> new IllegalStateException("공지 및 일정이 없습니다."));
+            }
 
-            // then
-            assertThat(result).isPresent();
-            QueryUpcomingSchedule schedule = result.get();
-
-            assertThat(schedule.title()).isEqualTo("공지 및 일정");
-            assertThat(schedule.day()).isEqualTo("2024-08-04");;
-            assertThat(schedule.scheduleType()).isEqualTo(ScheduleType.INFORM);
+            @Test
+            @DisplayName("내일부터 가장 이른 공지를 가져와야 한다.")
+            void it_returns_earliest_inform_starting_from_tomorrow() {
+                assertThat(schedule.title()).isEqualTo("공지 및 일정");
+                assertThat(schedule.day()).isEqualTo("2024-08-04");
+                assertThat(schedule.scheduleType()).isEqualTo(ScheduleType.INFORM);
+            }
         }
     }
+
+
     @Nested
-    @DisplayName("searchMonthlyOrders 는")
+    @DisplayName("searchMonthlyOrders 메소드는")
     class searchMonthlyOrdersTests {
 
-        @Test
-        @DisplayName("관리자라면 키워드가 포함된 이번달 모든 주문들을 가져와야 한다.")
-        void testSearchMonthlyOrdersForAdmin() {
-            // given
-            int year = today.getYear();
-            int month = today.getMonthValue();
-            var cond = SearchMonthlyCond.builder()
-                    .keyword("제품")
-                    .teamMember(admin1)
-                    .year(year)
-                    .month(month)
-                    .build();
+        @Nested
+        @DisplayName("관리자라면")
+        class Context_admin {
+            final int year = today.getYear();
+            final int month = today.getMonthValue();
+            final SearchMonthlyCond cond = SearchMonthlyCond.builder().keyword("제품").teamMember(admin1).year(year).month(month).build();
+            private List<QuerySchedule> schedules;
 
-            // when
-            List<QuerySchedule> result = scheduleRepository.searchMonthlyOrders(cond);
+            @BeforeEach
+            void setUpContext() {
+                schedules = scheduleRepository.searchMonthlyOrders(cond);
+            }
 
-            // then
-            assertThat(result.size()).isEqualTo(20);
-            result.forEach(schedule -> {
-                assertThat(schedule.scheduleType()).isEqualTo(ScheduleType.ORDER);
-                assertThat(schedule.date().getYear()).isEqualTo(year);
-                assertThat(schedule.date().getMonthValue()).isEqualTo(month);
-            });
-
+            @Test
+            @DisplayName("이번달 모든 주문을 가져와야 한다.")
+            void it_returns_all_monthly_orders_for_admin() {
+                assertThat(schedules.size()).isEqualTo(20);
+                schedules.forEach(schedule -> {
+                    assertThat(schedule.scheduleType()).isEqualTo(ScheduleType.ORDER);
+                    assertThat(schedule.date().getYear()).isEqualTo(today.getYear());
+                    assertThat(schedule.date().getMonthValue()).isEqualTo(today.getMonthValue());
+                });
+            }
         }
 
-        @Test
-        @DisplayName("주문자라면 키워드가 포함된 이번달 본인이 주문한 주문들을 가져와야 한다.")
-        void testSearchMonthlyOrdersForOrderer() {
-            // given
-            int year = today.getYear();
-            int month = today.getMonthValue();
-            var cond = SearchMonthlyCond.builder()
-                    .keyword("제품")
-                    .teamMember(orderer1)
-                    .year(year)
-                    .month(month)
-                    .build();
+        @Nested
+        @DisplayName("주문자라면")
+        class Context_orderer {
+            final int year = today.getYear();
+            final int month = today.getMonthValue();
+            final SearchMonthlyCond cond = SearchMonthlyCond.builder().keyword("제품").teamMember(orderer1).year(year).month(month).build();
+            private List<QuerySchedule> schedules;
 
-            // when
-            List<QuerySchedule> result = scheduleRepository.searchMonthlyOrders(cond);
+            @BeforeEach
+            void setUpContext() {
+                schedules = scheduleRepository.searchMonthlyOrders(cond);
+            }
 
-            // then
-            assertThat(result.size()).isEqualTo(10);
-            result.forEach(schedule -> {
-                assertThat(schedule.scheduleType()).isEqualTo(ScheduleType.ORDER);
-                assertThat(schedule.date().getYear()).isEqualTo(year);
-                assertThat(schedule.date().getMonthValue()).isEqualTo(month);
-            });
-
+            @Test
+            @DisplayName("이번달 본인이 주문한 주문을 가져와야 한다.")
+            void it_returns_all_monthly_orders_for_orderer() {
+                assertThat(schedules.size()).isEqualTo(10);
+                schedules.forEach(schedule -> {
+                    assertThat(schedule.scheduleType()).isEqualTo(ScheduleType.ORDER);
+                    assertThat(schedule.date().getYear()).isEqualTo(today.getYear());
+                    assertThat(schedule.date().getMonthValue()).isEqualTo(today.getMonthValue());
+                });
+            }
         }
 
-        @Test
-        @DisplayName("존재하지 않는 키워드로 검색 시 빈 리스트를 반환해야 한다.")
-        void testSearchMonthlyOrdersWithNonExistentKeyword() {
-            // given
-            var cond = SearchMonthlyCond.builder()
-                    .keyword("없는키워드")
-                    .teamMember(orderer1)
-                    .year(baseTime.getYear())
-                    .month(baseTime.getMonthValue())
-                    .build();
+        @Nested
+        @DisplayName("키워드가 존재하지 않는다면")
+        class Context_invalid_keyword {
+            final SearchMonthlyCond cond = SearchMonthlyCond.builder().keyword("없는키워드").teamMember(orderer1).year(today.getYear()).month(today.getMonthValue()).build();
+            private List<QuerySchedule> schedules;
 
-            // when
-            List<QuerySchedule> result = scheduleRepository.searchMonthlyOrders(cond);
+            @BeforeEach
+            void setUpContext() {
+                schedules = scheduleRepository.searchMonthlyOrders(cond);
+            }
 
-            // then
-            assertThat(result).isEmpty();
+            @Test
+            @DisplayName("빈 리스트를 반환해야 한다.")
+            void it_returns_empty_list_for_invalid_keyword() {
+                assertThat(schedules).isEmpty();
+            }
         }
 
-        @Test
-        @DisplayName("주문 목록을 시간순으로 정렬해서 반환해야 한다.")
-        void testSearchMonthlyOrdersSortedOrder() {
-            // given
-            int year = today.getYear();
-            int month = today.getMonthValue();
-            var cond = SearchMonthlyCond.builder()
-                    .keyword("제품")
-                    .teamMember(orderer1)
-                    .year(year)
-                    .month(month)
-                    .build();
+        @Nested
+        @DisplayName("검색결과에 맞는 일정들이 존재한다면")
+        class Context_SortedOrders {
+            final int year = today.getYear();
+            final int month = today.getMonthValue();
+            final SearchMonthlyCond cond = SearchMonthlyCond.builder().keyword("제품").teamMember(orderer1).year(year).month(month).build();
 
-            // when
-            List<QuerySchedule> result = scheduleRepository.searchMonthlyOrders(cond);
+            List<QuerySchedule> schedule;
 
-            // then
-            assertThat(result).isNotEmpty();
-            assertThat(result).isSortedAccordingTo(Comparator.comparing(QuerySchedule::date));
+            @BeforeEach
+            void setUpContext() {
+                schedule = scheduleRepository.searchMonthlyOrders(cond);
+            }
+
+            @Test
+            @DisplayName("이를 정렬해서 반환해야 한다.")
+            void it_returns_sorted_orders() {
+                assertThat(schedule).isNotEmpty();
+                assertThat(schedule).isSortedAccordingTo(Comparator.comparing(QuerySchedule::date));
+            }
         }
     }
 
     @Nested
-    @DisplayName("searchMonthlyInforms는")
+    @DisplayName("searchMonthlyInforms 메소드는")
     class searchMonthlyInformsTests {
 
-        @Test
-        @DisplayName("키워드가 포함된 이번달 자신이 작성한 일정목록을 반환해야 한다.")
-        void testSearchMonthlyInformsWritten() {
-            // given
-            int year = today.getYear();
-            int month = today.getMonthValue();
-            var cond = SearchMonthlyCond.builder()
-                    .keyword("일정")
-                    .teamMember(viewer1)
-                    .year(year)
-                    .month(month)
-                    .build();
+        @Nested
+        @DisplayName("자신이 작성한 일정 목록이 존재한다면")
+        class Context_Written {
+            final SearchMonthlyCond cond = SearchMonthlyCond.builder().keyword("일정").teamMember(viewer1).year(today.getYear()).month(today.getMonthValue()).build();
 
-            // when
-            List<QuerySchedule> result = scheduleRepository.searchMonthlyInforms(cond);
+            List<QuerySchedule> schedules;
 
-            // then
-            assertThat(result.size()).isEqualTo(10);
+            @BeforeEach
+            void setUpContext() {
+                schedules = scheduleRepository.searchMonthlyInforms(cond);
+            }
 
+            @Test
+            @DisplayName("이를 반환해야 한다.")
+            void it_returns_written_informs() {
+                assertThat(schedules.size()).isEqualTo(10);
+            }
         }
 
-        @Test
-        @DisplayName("키워드가 포함된 이번달 자신이 멘션된 일정목록을 반환해야 한다.")
-        void testSearchMonthlyInformsMentioned() {
-            // given
-            int year = today.getYear();
-            int month = today.getMonthValue();
-            var cond = SearchMonthlyCond.builder()
-                    .keyword("일정")
-                    .teamMember(admin1)
-                    .year(year)
-                    .month(month)
-                    .build();
-            // when
-            List<QuerySchedule> result = scheduleRepository.searchMonthlyInforms(cond);
+        @Nested
+        @DisplayName("자신이 멘션된 일정 목록이 존재한다면")
+        class Context_Mentioned {
+            final SearchMonthlyCond cond = SearchMonthlyCond.builder().keyword("일정").teamMember(admin1).year(today.getYear()).month(today.getMonthValue()).build();
 
-            // then
-            assertThat(result.size()).isEqualTo(10);
+            List<QuerySchedule> schedules;
+
+            @BeforeEach
+            void setUpContext() {
+                schedules = scheduleRepository.searchMonthlyInforms(cond);
+            }
+
+            @Test
+            @DisplayName("이를 반환해야 한다.")
+            void it_returns_mentioned_informs() {
+                assertThat(schedules.size()).isEqualTo(10);
+            }
         }
     }
 
+
     @Nested
-    @DisplayName("findMonthlyOrders 는")
+    @DisplayName("findMonthlyOrders 메소드는")
     class findMonthlyOrdersTests {
 
-        @Test
-        @DisplayName("관리자일 경우 팀의 해당 월의 주문들을 모두 가져와야 한다.")
-        void testFindMonthlyOrdersAdmin() {
-            // given
-            int year = today.getYear();
-            int month = today.getMonthValue();
-            var cond = MonthlyCond.builder()
-                    .teamMember(admin1)
-                    .year(year)
-                    .month(month)
-                    .build();
+        @Nested
+        @DisplayName("관리자일 경우")
+        class Context_admin {
+            final int year = today.getYear();
+            final int month = today.getMonthValue();
+            final MonthlyCond cond = MonthlyCond.builder().teamMember(admin1).year(year).month(month).build();
+            private List<QueryMonthlySchedule> schedules;
 
+            @BeforeEach
+            void setUpContext() {
+                schedules = scheduleRepository.findMonthlyOrders(cond);
+            }
 
-            // when
-            List<QueryMonthlySchedule> result = scheduleRepository.findMonthlyOrders(cond);
-
-            // then
-            assertThat(result.size()).isEqualTo(20);
+            @Test
+            @DisplayName("팀의 해당 월의 모든 주문을 가져와야 한다.")
+            void it_returns_all_monthly_orders_for_admin() {
+                assertThat(schedules.size()).isEqualTo(20);
+            }
         }
 
-        @Test
-        @DisplayName("주문자일 경우 팀의 해당 월의 자신이 주문한 주문들을 모두 가져와야 한다.")
-        void testFindMonthlyOrdersOrderer() {
-            // given
-            int year = today.getYear();
-            int month = today.getMonthValue();
-            var cond = MonthlyCond.builder()
-                    .teamMember(orderer1)
-                    .year(year)
-                    .month(month)
-                    .build();
+        @Nested
+        @DisplayName("주문자일 경우")
+        class Context_orderer {
+            final int year = today.getYear();
+            final int month = today.getMonthValue();
+            final MonthlyCond cond = MonthlyCond.builder().teamMember(orderer1).year(year).month(month).build();
+            private List<QueryMonthlySchedule> schedules;
 
-            // when
-            List<QueryMonthlySchedule> result = scheduleRepository.findMonthlyOrders(cond);
+            @BeforeEach
+            void setUpContext() {
+                schedules = scheduleRepository.findMonthlyOrders(cond);
+            }
 
-            // then
-            assertThat(result.size()).isEqualTo(10);
+            @Test
+            @DisplayName("팀의 해당 월의 자신이 주문한 주문을 모두 가져와야 한다.")
+            void it_returns_all_monthly_orders_for_orderer() {
+                assertThat(schedules.size()).isEqualTo(10);
+            }
         }
     }
 
     @Nested
-    @DisplayName("findMonthlyInforms 는")
+    @DisplayName("findMonthlyInforms 메소드는")
     class findMonthlyInformsTests {
 
-        @Test
-        @DisplayName("사용자와 연관된 월의 공지 및 일정을 모두 가져와야 한다.")
-        void testFindMonthlyOrdersAdmin() {
-            // given
-            int year = today.getYear();
-            int month = today.getMonthValue();
-            var cond = MonthlyCond.builder()
-                    .teamMember(viewer1)
-                    .year(year)
-                    .month(month)
-                    .build();
+        @Nested
+        @DisplayName("사용자와 연관된 공지일 경우")
+        class Context_relatedUser {
+            final int year = today.getYear();
+            final int month = today.getMonthValue();
+            final MonthlyCond cond = MonthlyCond.builder().teamMember(viewer1).year(year).month(month).build();
+            private List<QueryMonthlySchedule> schedules;
 
-            // when
-            List<QueryMonthlySchedule> result = scheduleRepository.findMonthlyInforms(cond);
+            @BeforeEach
+            void setUpContext() {
+                schedules = scheduleRepository.findMonthlyInforms(cond);
+            }
 
-            // then
-           assertThat(result.size()).isEqualTo(10);
+            @Test
+            @DisplayName("월의 공지 및 일정을 모두 가져와야 한다.")
+            void it_returns_all_monthly_informs_for_user() {
+                assertThat(schedules.size()).isEqualTo(10);
+            }
         }
     }
 
     @Nested
-    @DisplayName("findDailyInforms 는")
+    @DisplayName("findDailyInforms 메소드는")
     class findDailyInformsTests {
 
-        @Test
-        @DisplayName("특정 날짜의 공지 및 일정목록을 반환해야 한다.")
-        void testFindDailyInforms() {
-            // given
-            int year = today.getYear();
-            int month = today.getMonthValue();
-            int day = today.getDayOfMonth();
-            var cond = DailyCond.builder()
-                    .year(year)
-                    .month(month)
-                    .day(day)
-                    .teamMember(viewer1)
-                    .build();
+        @Nested
+        @DisplayName("특정 날짜가 주어진 경우")
+        class Context_specificDate {
+            final int year = today.getYear();
+            final int month = today.getMonthValue();
+            final int day = today.getDayOfMonth();
+            final DailyCond cond = DailyCond.builder().year(year).month(month).day(day).teamMember(viewer1).build();
+            private List<QuerySchedule> schedules;
 
+            @BeforeEach
+            void setUpContext() {
+                schedules = scheduleRepository.findDailyInforms(cond);
+            }
 
-            // when
-            List<QuerySchedule> result = scheduleRepository.findDailyInforms(cond);
-
-            // then
-            assertThat(result.size()).isEqualTo(1);
+            @Test
+            @DisplayName("공지 및 일정목록을 반환해야 한다.")
+            void it_returns_daily_informs() {
+                assertThat(schedules.size()).isEqualTo(1);
+            }
         }
     }
 
     @Nested
-    @DisplayName("findDailyOrders 는")
+    @DisplayName("findDailyOrders 메소드는")
     class findDailyOrdersTests {
 
-        @Test
-        @DisplayName("특정 날짜의 주문목록을 반환해야 한다.")
-        void testFindDailyOrders() {
-            // given
-            int year = today.getYear();
-            int month = today.getMonthValue();
-            int day = today.getDayOfMonth();
-            var cond = DailyCond.builder()
-                    .year(year)
-                    .month(month)
-                    .day(day)
-                    .teamMember(orderer1)
-                    .build();
+        @Nested
+        @DisplayName("특정 날짜가 주어진 경우")
+        class Context_specificDate {
+            final int year = today.getYear();
+            final int month = today.getMonthValue();
+            final int day = today.getDayOfMonth();
+            final DailyCond cond = DailyCond.builder().year(year).month(month).day(day).teamMember(orderer1).build();
+            private List<QuerySchedule> schedules;
 
-            // when
-            List<QuerySchedule> result = scheduleRepository.findDailyOrders(cond);
+            @BeforeEach
+            void setUpContext() {
+                schedules = scheduleRepository.findDailyOrders(cond);
+            }
 
-            // then
-            assertThat(result.size()).isEqualTo(1);
+            @Test
+            @DisplayName("주문목록을 반환해야 한다.")
+            void it_returns_daily_orders() {
+                assertThat(schedules.size()).isEqualTo(1);
+            }
         }
     }
 
 
-    private void initData() throws Exception{
+    private void initData() throws Exception {
         // 팀 생성
         Team team = createTeam();
         em.persist(team);
 
-        // 사용자 3명 생성
-        Member adm1 = createMember(admin1);
+        // 사용자 4명 생성
+        Member adm1 = createMember();
         em.persist(adm1);
-        Member ord1 = createMember(orderer1);
+        Member ord1 = createMember();
         em.persist(ord1);
-        Member ord2 = createMember(orderer2);
+        Member ord2 = createMember();
         em.persist(ord2);
-        Member view1 = createMember(viewer1);
+        Member view1 = createMember();
         em.persist(view1);
 
         // 팀에 사용자 배정
-        participate(team, adm1, MemberTeamRole.ADMIN);
-        participate(team, ord1, MemberTeamRole.ORDERER);
-        participate(team, ord2, MemberTeamRole.ORDERER);
-        participate(team, view1, MemberTeamRole.VIEWER);
+        em.persist(createParticipant(team, adm1, MemberTeamRole.ADMIN));
+        em.persist(createParticipant(team, ord1, MemberTeamRole.ORDERER));
+        em.persist(createParticipant(team, ord2, MemberTeamRole.ORDERER));
+        em.persist(createParticipant(team, view1, MemberTeamRole.VIEWER));
 
         // 재고 현황 생성
         Inventory inventory = createInventory(team);
@@ -465,137 +468,27 @@ public class ScheduleRepositoryTest {
 
         // 주문자1이 오늘부터 2일 간격으로 총 10개 주문을 생성
         for (int i = 0; i < 10; i++) {
-            LocalDate date = baseTime.plusDays(i* 2L).toLocalDate();
+            LocalDate date = baseTime.plusDays(i * 2L).toLocalDate();
             Order order = createOrder(team, ord1, product, date);
             em.persist(order);
         }
 
         // 주문자2가 내일부터 2일 간격으로 총 10개의 주문을 생성
         for (int i = 0; i < 10; i++) {
-            LocalDate date = baseTime.plusDays(i* 2L+ 1).toLocalDate();
+            LocalDate date = baseTime.plusDays(i * 2L + 1).toLocalDate();
             Order order = createOrder(team, ord2, product, date);
             em.persist(order);
+            em.persist(createOrderMention(order, adm1));
         }
 
-        // 뷰어가 오늘 부터 1일 간격으로 총10 개를 공지및 일정을 작성하고 각각에 대해 관리자만 태그
-        for (int i = 0; i< 10; i++) {
+        // 뷰어가 오늘 부터 1일 간격으로 총10 개의 공지를 작성하고 각각에 대해 관리자만 태그
+        for (int i = 0; i < 10; i++) {
             LocalDate date = baseTime.plusDays(i).toLocalDate();
             Inform inform = createInform(team, view1, date);
             em.persist(inform);
-            InformMention informMention = createInformMention(inform, adm1);
-            em.persist(informMention);
+            em.persist(createInformMention(inform, adm1));
         }
     }
-
-    private Order createOrder(Team team, Member member, Product product, LocalDate orderDate) throws Exception {
-        Order order = Order.builder()
-                .view(1)
-                .memo("메모")
-                .date(orderDate)
-                .orderStatus(OrderStatus.CONFIRMED)
-                .orderAmount(1)
-                .team(team)
-                .member(member)
-                .product(product)
-                .build();
-        setBaseTimeEntityFields(order, baseTime);
-        return order;
-    }
-
-    private OrderMention createOrderMention(Order order, Member member) throws Exception {
-         return OrderMention.builder()
-                .order(order)
-                .member(member)
-                .build();
-    }
-
-    private InformMention createInformMention(Inform inform, Member member) throws Exception {
-        return InformMention.builder()
-                .inform(inform)
-                .member(member)
-                .build();
-    }
-
-    private Inform createInform(Team team, Member member, LocalDate date) throws  Exception{
-        Inform inform = Inform.builder()
-                .title("공지 및 일정")
-                .content("내용")
-                .date(date)
-                .team(team)
-                .member(member)
-                .build();
-        setBaseTimeEntityFields(inform, baseTime);
-        return inform;
-    }
-
-    private Product createProduct(Inventory inventory) {
-        return Product.builder()
-                .name("제품1")
-                .subProduct("서브제품1")
-                .sku(1)
-                .purchasePrice(100)
-                .salePrice(150)
-                .amount(100)
-                .inventory(inventory)
-                .build();
-    }
-
-
-    private Inventory createInventory(Team team) {
-        return Inventory.builder()
-                .team(team)
-                .title("2024년 08월 06일 재고현황")
-                .build();
-    }
-
-    private void participate(Team team, Member member, MemberTeamRole role) {
-        Participant participant = Participant.builder()
-                .team(team)
-                .member(member)
-                .role(role)
-                .build();
-        em.persist(participant);
-    }
-
-    private Member createMember(TeamMemberVO teamMember) throws Exception {
-        Member member = Member.builder()
-                .nickname(String.format("사용자%d", teamMember.getMemberId()))
-                .email(String.format("user%d@example.com", teamMember.getMemberId()))
-                .profileImage(String.format("profile%d.png", teamMember.getMemberId()))
-                .role(MemberRole.USER)
-                .allowance(true)
-                .build();
-        setBaseTimeEntityFields(member, baseTime);
-        return member;
-    }
-
-    private Team createTeam() throws Exception {
-        Team team = Team.builder()
-                .name("팀1")
-                .phoneNumber("010-1234-5678")
-                .address("서울특별시")
-                .build();
-        setBaseTimeEntityFields(team, baseTime);
-        return team;
-    }
-
-    /**
-     * createNativeQuery 로 JPQL 이 제공하지 않는  데이터베이스의 특정 기능을 사용할 수 있다.
-     */
-
-    /**
-     * BaseEntity 의 createdAt과 updatedAt 필드는 JPA Auditing을 통해 자동으로 설정된다.
-     * 테스트에서는 특정 시간 값을 설정해야 하므로 리플렉션을 사용하여 필드를 수동으로 설정한다.
-     */
-    private void setBaseTimeEntityFields(Object entity, LocalDateTime timestamp) throws Exception {
-        Field createdAtField = BaseEntity.class.getDeclaredField("createdAt");
-        Field updatedAtField = BaseEntity.class.getDeclaredField("updatedAt");
-        createdAtField.setAccessible(true);
-        updatedAtField.setAccessible(true);
-        createdAtField.set(entity, timestamp);
-        updatedAtField.set(entity, timestamp);
-    }
-
 }
 
 
