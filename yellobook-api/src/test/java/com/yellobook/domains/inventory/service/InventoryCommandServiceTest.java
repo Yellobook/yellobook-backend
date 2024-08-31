@@ -4,13 +4,13 @@ import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.inventory.dto.cond.ExcelProductCond;
 import com.yellobook.domains.inventory.dto.request.AddProductRequest;
+import com.yellobook.domains.inventory.dto.request.ModifyProductAmountRequest;
 import com.yellobook.domains.inventory.dto.response.AddInventoryResponse;
 import com.yellobook.domains.inventory.dto.response.AddProductResponse;
-import com.yellobook.domains.inventory.dto.request.ModifyProductAmountRequest;
-import com.yellobook.domains.inventory.mapper.InventoryMapper;
-import com.yellobook.domains.inventory.mapper.ProductMapper;
 import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.entity.Product;
+import com.yellobook.domains.inventory.mapper.InventoryMapper;
+import com.yellobook.domains.inventory.mapper.ProductMapper;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
 import com.yellobook.domains.inventory.utils.ExcelReadUtil;
@@ -22,7 +22,6 @@ import com.yellobook.error.code.InventoryErrorCode;
 import com.yellobook.error.code.TeamErrorCode;
 import com.yellobook.error.exception.CustomException;
 import fixture.InventoryFixture;
-import fixture.TeamFixture;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,11 +33,11 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static fixture.TeamFixture.createTeam;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -298,7 +297,7 @@ class InventoryCommandServiceTest {
         class Context_Orderer{
             MultipartFile file;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 file = mock(MultipartFile.class);
             }
             @Test
@@ -315,7 +314,7 @@ class InventoryCommandServiceTest {
         class Context_Viewer{
             MultipartFile file;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 file = mock(MultipartFile.class);
             }
             @Test
@@ -332,7 +331,7 @@ class InventoryCommandServiceTest {
         class Context_File_IO_Fail{
             MultipartFile file;
             @BeforeEach
-            void setUp_context() throws java.io.IOException {
+            void setUpContext() throws java.io.IOException {
                 file = mock(MultipartFile.class);
                 when(excelReadUtil.read(file)).thenThrow(new IOException());
             }
@@ -350,7 +349,7 @@ class InventoryCommandServiceTest {
         class Context_Team_Not_Exist{
             MultipartFile file;
             @BeforeEach
-            void setUp_context() throws IOException{
+            void setUpContext() throws IOException{
                 file = mock(MultipartFile.class);
                 Long teamId = 1L;
                 List<ExcelProductCond> productConds = Collections.emptyList();
@@ -373,11 +372,11 @@ class InventoryCommandServiceTest {
             MultipartFile file;
             AddInventoryResponse expectResponse;
             @BeforeEach
-            void setUp_context() throws IOException{
+            void setUpContext() throws IOException{
                 file = mock(MultipartFile.class);
 
                 Long teamId = 1L;
-                Team team = TeamFixture.createTeam();
+                Team team = createTeam();
                 List<ExcelProductCond> productConds = createProductList();
                 when(excelReadUtil.read(file)).thenReturn(productConds);
                 when(teamRepository.findById(teamId)).thenReturn(Optional.of(team));

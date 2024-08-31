@@ -284,7 +284,7 @@ class InventoryControllerTest {
             MockMultipartFile file;
             AddInventoryResponse response;
             @BeforeEach
-            void setUp_context(){
+            void setUpContext(){
                 file = new MockMultipartFile("file", "test.xlsx", MediaType.APPLICATION_OCTET_STREAM_VALUE, "some data".getBytes());
                 response = AddInventoryResponse.builder().inventoryId(1L).productIds(Arrays.asList(1L, 2L, 3L)).build();
                 when(inventoryCommandService.addInventory(file, teamMemberVO)).thenReturn(response);

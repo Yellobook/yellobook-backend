@@ -40,7 +40,7 @@ class ExcelReadUtilTest {
         class Context_File_IO_Fail{
             MultipartFile file;
             @BeforeEach
-            void setUp_context() throws IOException{
+            void setUpContext() throws IOException{
                 file = mock(MultipartFile.class);
                 when(file.getInputStream()).thenThrow(new IOException());
             }
@@ -56,7 +56,7 @@ class ExcelReadUtilTest {
         class Context_File_Empty{
             MultipartFile file;
             @BeforeEach
-            void setUp_context() throws IOException{
+            void setUpContext() throws IOException{
                 file = mock(MultipartFile.class);
                 when(file.getInputStream()).thenReturn(new ByteArrayInputStream(new byte[0]));
             }
@@ -74,7 +74,7 @@ class ExcelReadUtilTest {
         class Context_File_Type_Not_Xlsx{
             MultipartFile file;
             @BeforeEach
-            void setUp_context() throws IOException{
+            void setUpContext() throws IOException{
                 file = mock(MultipartFile.class);
                 byte[] invalidContent = "This is not an Excel file.".getBytes();
                 when(file.getInputStream()).thenReturn(new ByteArrayInputStream(invalidContent));
@@ -94,7 +94,7 @@ class ExcelReadUtilTest {
         class Context_Integer_Cell_Not_Integer{
             MultipartFile file;
             @BeforeEach
-            void setUp_context() throws IOException{
+            void setUpContext() throws IOException{
                 List<List<Object>> content = Arrays.asList(
                         Arrays.asList("제품1", "하위제품1", 1, 2, 3, 4),
                         Arrays.asList("제품2", "하위제품2", "잘못된 값", 6, 7, 8)
@@ -115,7 +115,7 @@ class ExcelReadUtilTest {
         class Context_Integer_Cell_Less_Than_0{
             MultipartFile file;
             @BeforeEach
-            void setUp_context() throws IOException{
+            void setUpContext() throws IOException{
                 List<List<Object>> content = Arrays.asList(
                         Arrays.asList("제품1", "하위제품1", -1, 2, 3, 4),
                         Arrays.asList("제품2", "하위제품2", 5, 6, 7, 8)
@@ -136,7 +136,7 @@ class ExcelReadUtilTest {
         class Context_String_Cell_Not_String{
             MultipartFile file;
             @BeforeEach
-            void setUp_context() throws IOException{
+            void setUpContext() throws IOException{
                 List<List<Object>> content = Arrays.asList(
                         Arrays.asList("제품1", 10, 1, 2, 3, 4),
                         Arrays.asList("제품2", "하위제품2", 5, 6, 7, 8)
@@ -157,7 +157,7 @@ class ExcelReadUtilTest {
         class Context_SKU_Duplicate{
             MultipartFile file;
             @BeforeEach
-            void setUp_context() throws IOException{
+            void setUpContext() throws IOException{
                 List<List<Object>> content = Arrays.asList(
                         Arrays.asList("제품1", "하위제품1", 1, 2, 3, 4),
                         Arrays.asList("제품2", "하위제품2", 1, 6, 7, 8)
@@ -178,7 +178,7 @@ class ExcelReadUtilTest {
         class Context_Empty_Cell_Exist{
             MultipartFile file;
             @BeforeEach
-            void setUp_context() throws IOException{
+            void setUpContext() throws IOException{
                 List<List<Object>> content = Arrays.asList(
                         Arrays.asList("제품1", "하위제품1", 1, 2, 3, 4),
                         Arrays.asList("제품2", "하위제품2", 6, 7, 8)
@@ -199,7 +199,7 @@ class ExcelReadUtilTest {
         class Context_File_Valid{
             MultipartFile file;
             @BeforeEach
-            void setUp_context() throws IOException{
+            void setUpContext() throws IOException{
                 List<List<Object>> content = Arrays.asList(
                         Arrays.asList("제품1", "하위제품1", 1, 2, 3, 4),
                         Arrays.asList("제품2", "하위제품2", 5, 6, 7, 8)
