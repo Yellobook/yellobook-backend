@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class InformFixture {
-    private static final String INFORM_TITLE = "공지 및 일정";
+    private static final String INFORM_TITLE = "공지";
     private static final String INFORM_CONTENT = "내용";
     private static final LocalDate INFORM_DATE = LocalDate.now();
     private static final LocalDateTime INFORM_TIMESTAMP = LocalDateTime.now();
@@ -35,7 +35,7 @@ public class InformFixture {
         return inform;
     }
 
-    public static InformMention createInformMention(Inform inform, Member member) throws Exception {
+    public static InformMention createInformMention(Inform inform, Member member) {
         return InformMention.builder()
                 .inform(inform)
                 .member(member)
