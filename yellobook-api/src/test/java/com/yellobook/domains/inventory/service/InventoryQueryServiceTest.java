@@ -2,21 +2,21 @@ package com.yellobook.domains.inventory.service;
 
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.vo.TeamMemberVO;
+import com.yellobook.domains.inventory.dto.query.QueryInventory;
+import com.yellobook.domains.inventory.dto.query.QueryProduct;
 import com.yellobook.domains.inventory.dto.query.QueryProductName;
 import com.yellobook.domains.inventory.dto.query.QuerySubProduct;
+import com.yellobook.domains.inventory.dto.response.GetProductsNameResponse;
 import com.yellobook.domains.inventory.dto.response.GetProductsResponse;
 import com.yellobook.domains.inventory.dto.response.GetProductsResponse.ProductInfo;
+import com.yellobook.domains.inventory.dto.response.GetSubProductNameResponse;
 import com.yellobook.domains.inventory.dto.response.GetTotalInventoryResponse;
 import com.yellobook.domains.inventory.dto.response.GetTotalInventoryResponse.InventoryInfo;
 import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.mapper.InventoryMapper;
 import com.yellobook.domains.inventory.mapper.ProductMapper;
-import com.yellobook.domains.inventory.dto.query.QueryInventory;
-import com.yellobook.domains.inventory.dto.query.QueryProduct;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
-import com.yellobook.domains.inventory.dto.response.GetProductsNameResponse;
-import com.yellobook.domains.inventory.dto.response.GetSubProductNameResponse;
 import com.yellobook.error.code.AuthErrorCode;
 import com.yellobook.error.exception.CustomException;
 import org.junit.jupiter.api.Assertions;
@@ -36,10 +36,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.assertArg;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class InventoryQueryServiceTest {

@@ -2,33 +2,45 @@ package com.yellobook.domains.inventory.service;
 
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.vo.TeamMemberVO;
+import com.yellobook.domains.inventory.dto.cond.ExcelProductCond;
 import com.yellobook.domains.inventory.dto.request.AddProductRequest;
-import com.yellobook.domains.inventory.dto.response.AddProductResponse;
 import com.yellobook.domains.inventory.dto.request.ModifyProductAmountRequest;
-import com.yellobook.domains.inventory.mapper.ProductMapper;
+import com.yellobook.domains.inventory.dto.response.AddInventoryResponse;
+import com.yellobook.domains.inventory.dto.response.AddProductResponse;
 import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.entity.Product;
+import com.yellobook.domains.inventory.mapper.InventoryMapper;
+import com.yellobook.domains.inventory.mapper.ProductMapper;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
+import com.yellobook.domains.inventory.utils.ExcelReadUtil;
+import com.yellobook.domains.team.entity.Team;
+import com.yellobook.domains.team.repository.TeamRepository;
 import com.yellobook.error.code.AuthErrorCode;
+import com.yellobook.error.code.FileErrorCode;
 import com.yellobook.error.code.InventoryErrorCode;
+import com.yellobook.error.code.TeamErrorCode;
 import com.yellobook.error.exception.CustomException;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import fixture.InventoryFixture;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
+import static fixture.TeamFixture.createTeam;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class InventoryCommandServiceTest {
@@ -40,7 +52,13 @@ class InventoryCommandServiceTest {
     @Mock
     private ProductRepository productRepository;
     @Mock
+    private TeamRepository teamRepository;
+    @Mock
     private ProductMapper productMapper;
+    @Mock
+    private InventoryMapper inventoryMapper;
+    @Mock
+    private ExcelReadUtil excelReadUtil;
 
     private final TeamMemberVO admin = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
     private final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, MemberTeamRole.ORDERER);
@@ -269,6 +287,147 @@ class InventoryCommandServiceTest {
                 .salePrice(111)
                 .amount(111)
                 .build();
+    }
+
+    @Nested
+    @DisplayName("addInventory 메소드는")
+    class Describe_AddInventory{
+        @Nested
+        @DisplayName("주문자면")
+        class Context_Orderer{
+            MultipartFile file;
+            @BeforeEach
+            void setUpContext(){
+                file = mock(MultipartFile.class);
+            }
+            @Test
+            @DisplayName("재고를 추가할 수 없으므로 예외를 반환한다.")
+            void it_throws_exception(){
+                CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                        inventoryCommandService.addInventory(file, orderer));
+                Assertions.assertEquals(AuthErrorCode.ORDERER_NOT_ALLOWED, exception.getErrorCode());
+            }
+        }
+
+        @Nested
+        @DisplayName("뷰어면")
+        class Context_Viewer{
+            MultipartFile file;
+            @BeforeEach
+            void setUpContext(){
+                file = mock(MultipartFile.class);
+            }
+            @Test
+            @DisplayName("재고를 추가할 수 없으므로 예외를 반환한다.")
+            void it_throws_exception(){
+                CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                        inventoryCommandService.addInventory(file, viewer));
+                Assertions.assertEquals(AuthErrorCode.VIEWER_NOT_ALLOWED, exception.getErrorCode());
+            }
+        }
+
+        @Nested
+        @DisplayName("파일 IO에 실패하면")
+        class Context_File_IO_Fail{
+            MultipartFile file;
+            @BeforeEach
+            void setUpContext() throws java.io.IOException {
+                file = mock(MultipartFile.class);
+                when(excelReadUtil.read(file)).thenThrow(new IOException());
+            }
+            @Test
+            @DisplayName("재고를 추가할 수 없으므로 예외를 반환한다.")
+            void it_throws_exception(){
+                CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                        inventoryCommandService.addInventory(file, admin));
+                Assertions.assertEquals(FileErrorCode.FILE_IO_FAIL, exception.getErrorCode());
+            }
+        }
+
+        @Nested
+        @DisplayName("팀 스페이스가 존재하지 않으면")
+        class Context_Team_Not_Exist{
+            MultipartFile file;
+            @BeforeEach
+            void setUpContext() throws IOException{
+                file = mock(MultipartFile.class);
+                Long teamId = 1L;
+                List<ExcelProductCond> productConds = Collections.emptyList();
+                when(excelReadUtil.read(file)).thenReturn(productConds);
+                when(teamRepository.findById(teamId)).thenReturn(Optional.empty());
+            }
+
+            @Test
+            @DisplayName("재고를 추가할 수 없으므로 예외를 반환한다.")
+            void it_throws_exception(){
+                CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                        inventoryCommandService.addInventory(file, admin));
+                Assertions.assertEquals(TeamErrorCode.TEAM_NOT_FOUND, exception.getErrorCode());
+            }
+        }
+
+        @Nested
+        @DisplayName("제품 정보가 제공되면")
+        class Context_Product_Info_Given{
+            MultipartFile file;
+            AddInventoryResponse expectResponse;
+            @BeforeEach
+            void setUpContext() throws IOException{
+                file = mock(MultipartFile.class);
+
+                Long teamId = 1L;
+                Team team = createTeam();
+                List<ExcelProductCond> productConds = createProductList();
+                when(excelReadUtil.read(file)).thenReturn(productConds);
+                when(teamRepository.findById(teamId)).thenReturn(Optional.of(team));
+
+                String inventoryTitle = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")) + " 재고현황";
+                Inventory newInventory = InventoryFixture.createInventory(inventoryTitle, team);
+                when(inventoryMapper.toInventory(team,inventoryTitle)).thenReturn(newInventory);
+                when(inventoryRepository.save(newInventory)).thenAnswer(invocation -> {
+                    Inventory savedInventory = invocation.getArgument(0);
+                    Field idField = Inventory.class.getDeclaredField("id");
+                    idField.setAccessible(true);
+                    idField.set(savedInventory, 1L); // ID를 주입
+                    return savedInventory;
+                });
+
+                Product newProduct = InventoryFixture.createProduct(newInventory);
+                when(productMapper.toProduct(any(ExcelProductCond.class), any())).thenReturn(newProduct);
+                when(productRepository.save(newProduct)).thenAnswer(invocation -> {
+                    Product savedProduct = invocation.getArgument(0);
+                    Field idField = Product.class.getDeclaredField("id");
+                    idField.setAccessible(true);
+                    idField.set(savedProduct, 1L);
+                    return savedProduct;
+                });
+
+                expectResponse = AddInventoryResponse.builder().inventoryId(1L).productIds(List.of(1L)).build();
+                when(inventoryMapper.toAddInventoryResponse(anyLong(), anyList())).thenReturn(expectResponse);
+            }
+
+            @Test
+            @DisplayName("재고와 제품을 저장한다.")
+            void it_save_inventory_and_product(){
+                AddInventoryResponse response = inventoryCommandService.addInventory(file, admin);
+
+                assertThat(response.inventoryId()).isEqualTo(expectResponse.inventoryId());
+                assertThat(1).isEqualTo(expectResponse.productIds().size());
+            }
+        }
+
+        private List<ExcelProductCond> createProductList(){
+            return List.of(
+                    ExcelProductCond.builder()
+                            .name("상품 A")
+                            .subProduct("서브 A1")
+                            .sku(1001)
+                            .purchasePrice(5000)
+                            .salePrice(7000)
+                            .amount(100)
+                            .build()
+            );
+        }
     }
 
 }
