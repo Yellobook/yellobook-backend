@@ -7,6 +7,7 @@ import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.auth.service.AuthService;
 import com.yellobook.domains.auth.service.CookieService;
 import com.yellobook.domains.auth.service.JwtService;
+import com.yellobook.domains.auth.utils.JwtUtil;
 import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,13 +15,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -59,7 +62,7 @@ public class AuthController {
             HttpServletRequest request,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
     ) {
-        String accessToken = jwtService.resolveAccessToken(request);
+        String accessToken = JwtUtil.resolveAccessToken(request);
         authService.logout(oAuth2User.getMemberId(), accessToken);
         return ResponseFactory.noContent();
     }
