@@ -41,6 +41,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+
 @ExtendWith(MockitoExtension.class)
 @DisplayName("InventoryQueryService Unit Test")
 class InventoryQueryServiceTest {

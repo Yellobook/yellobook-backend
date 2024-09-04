@@ -49,7 +49,7 @@ public class AuthController {
             @Valid @RequestBody AllowanceRequest request,
             HttpServletResponse response
     ) throws IOException {
-        var result = authService.updateAllowance(request.getToken());
+        var result = authService.updateAllowance(request.token());
         return ResponseFactory.success(result);
     }
 
@@ -58,7 +58,6 @@ public class AuthController {
     public ResponseEntity<Void> logout(
             HttpServletRequest request,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
-
     ) {
         String accessToken = jwtService.resolveAccessToken(request);
         authService.logout(oAuth2User.getMemberId(), accessToken);

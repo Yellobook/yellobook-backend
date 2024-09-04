@@ -33,6 +33,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         Set<String> excludePaths = new HashSet<>(Set.of(
+                "/api/v1/auth/token/reissue",
                 "/api/v1/auth/terms",
                 "/api/v1/dev"
         ));

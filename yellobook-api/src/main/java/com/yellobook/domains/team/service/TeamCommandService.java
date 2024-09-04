@@ -61,7 +61,7 @@ public class TeamCommandService {
         }
     }
 
-    public LeaveTeamResponse leaveTeam(Long teamId, CustomOAuth2User customOAuth2User) {
+    public void leaveTeam(Long teamId, CustomOAuth2User customOAuth2User) {
         Long memberId = customOAuth2User.getMemberId();
 
         Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)
@@ -81,8 +81,6 @@ public class TeamCommandService {
                             tempParticipant.getRole().name()
                     );
                 });
-
-        return teamMapper.toLeaveTeamResponse(teamId);
     }
 
     public JoinTeamResponse joinTeam(CustomOAuth2User customOAuth2User, String code) {

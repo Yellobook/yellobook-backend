@@ -124,6 +124,7 @@ public class SecurityConfig {
                                 "/api/v1",
                                 "/api/v1/health",
                                 "/api/v1/auth/terms",
+                                "/api/v1/auth/token/reissue",
                                 "/api/v1/dev/**"
                         ).permitAll()
                         // 이외 요청 모두 jwt 필터를 타도록 설정
