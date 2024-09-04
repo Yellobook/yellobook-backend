@@ -1,5 +1,11 @@
 package com.yellobook.domains.member.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.yellobook.common.enums.MemberRole;
 import com.yellobook.common.resolver.TeamMemberArgumentResolver;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
@@ -8,6 +14,7 @@ import com.yellobook.domains.member.dto.response.ProfileResponse;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.member.service.MemberCommandService;
 import com.yellobook.domains.member.service.MemberQueryService;
+import java.util.Collections;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,14 +32,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import java.util.Collections;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(MemberController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -55,7 +54,7 @@ class MemberControllerTest {
     private Authentication authentication;
 
     @BeforeEach
-    void setUp_Authentication(){
+    void setUp() {
         Member member = Member.builder()
                 .memberId(1L)
                 .nickname("yellow")
@@ -68,32 +67,35 @@ class MemberControllerTest {
         OAuth2UserDTO oauth2UserDTO = OAuth2UserDTO.from(member);
         CustomOAuth2User user = new CustomOAuth2User(oauth2UserDTO);
         authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        SecurityContextHolder.getContext()
+                .setAuthentication(authentication);
     }
 
     @Nested
     @DisplayName("getMemberProfile 메소드는")
-    class Describe_GetMemberProfile{
+    class Describe_GetMemberProfile {
         @Nested
         @DisplayName("인증된 사용자가 프로필을 요청하면")
-        class Context_Member_Exist{
+        class Context_member_exist {
             ProfileResponse response;
+
             @BeforeEach
-            void setUpContext(){
-                response = new ProfileResponse(1L, "yellow", "image", "email", Collections.emptyList());
+            void setUpContext() {
+                response = new ProfileResponse(1L, "사용자", "profile.png", "example@gmail.com", Collections.emptyList());
                 when(memberQueryService.getMemberProfile(any(Long.class))).thenReturn(response);
             }
 
             @Test
             @DisplayName("프로필 정보를 반환한다.")
-            void it_returns_profile() throws Exception{
+            void it_returns_profile() throws Exception {
                 mockMvc.perform(get("/api/v1/members/profile")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .principal(authentication)
                         )
                         .andDo(print())
                         .andExpect(status().isOk())
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.data.nickname", CoreMatchers.is(response.nickname())))
+                        .andExpect(
+                                MockMvcResultMatchers.jsonPath("$.data.nickname", CoreMatchers.is(response.nickname())))
                         .andReturn();
             }
         }

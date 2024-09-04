@@ -1,5 +1,16 @@
 package com.yellobook.domains.order.service;
 
+import static fixture.InventoryFixture.createProduct;
+import static fixture.MemberFixture.createMember;
+import static fixture.OrderFixture.createOrder;
+import static fixture.OrderFixture.createOrderComment;
+import static fixture.TeamFixture.createParticipant;
+import static fixture.TeamFixture.createTeam;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.enums.OrderStatus;
 import com.yellobook.common.vo.TeamMemberVO;
@@ -24,19 +35,17 @@ import com.yellobook.error.code.AuthErrorCode;
 import com.yellobook.error.code.InventoryErrorCode;
 import com.yellobook.error.code.OrderErrorCode;
 import com.yellobook.error.exception.CustomException;
-import org.aspectj.weaver.ast.Or;
-import org.junit.jupiter.api.*;
+import java.lang.reflect.Field;
+import java.util.Optional;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.NestedTestConfiguration;
-
-import java.lang.reflect.Field;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("OrderCommandService Unit Test")
@@ -66,22 +75,25 @@ class OrderCommandServiceTest {
 
     @Nested
     @DisplayName("modifyRequestOrder 메소드는")
-    class Describe_ModifyRequestOrder{
+    class Describe_ModifyRequestOrder {
         @Nested
         @DisplayName("해당 주문에 언급된 관리자가 아니면")
-        class Context_Not_Order_Admin{
+        class Context_not_order_admin {
             Long orderId;
             Order order;
+
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 orderId = 1L;
-                order = createOrderAmount(OrderStatus.PENDING_CONFIRM);
+                order = createOrder(null, null, null, OrderStatus.PENDING_CONFIRM);
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-                when(orderMentionRepository.existsByMemberIdAndOrderId(admin.getMemberId(), order.getId())).thenReturn(false);
+                when(orderMentionRepository.existsByMemberIdAndOrderId(admin.getMemberId(), order.getId())).thenReturn(
+                        false);
             }
+
             @Test
             @DisplayName("주문에 접근하지 못하기 때문에 예외를 반환한다.")
-            void it_throws_exception(){
+            void it_throws_exception() {
                 CustomException exception = Assertions.assertThrows(CustomException.class, () ->
                         orderCommandService.modifyRequestOrder(orderId, admin));
                 Assertions.assertEquals(OrderErrorCode.ORDER_ACCESS_DENIED, exception.getErrorCode());
@@ -92,20 +104,22 @@ class OrderCommandServiceTest {
 
         @Nested
         @DisplayName("주문 확인 상태이면")
-        class Context_Order_Confirmed{
+        class Context_order_confirmed {
             Long orderId;
             Order order;
 
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 orderId = 1L;
-                order = createOrderAmount(OrderStatus.CONFIRMED);
+                order = createOrder(null, null, null, OrderStatus.CONFIRMED);
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-                when(orderMentionRepository.existsByMemberIdAndOrderId(admin.getMemberId(), order.getId())).thenReturn(true);
+                when(orderMentionRepository.existsByMemberIdAndOrderId(admin.getMemberId(), order.getId())).thenReturn(
+                        true);
             }
+
             @Test
             @DisplayName("주문 정정 요청이 불가능하기 때문에 예외를 반환한다.")
-            void it_throws_exception(){
+            void it_throws_exception() {
                 CustomException exception = Assertions.assertThrows(CustomException.class, () ->
                         orderCommandService.modifyRequestOrder(orderId, admin));
                 Assertions.assertEquals(OrderErrorCode.ORDER_CONFIRMED_CANT_MODIFY, exception.getErrorCode());
@@ -116,19 +130,22 @@ class OrderCommandServiceTest {
 
         @Nested
         @DisplayName("주문 정정 요청이 가능하면")
-        class Context_Can_Request_Modify_Order{
+        class Context_can_request_modify_order {
             Long orderId;
             Order order;
+
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 orderId = 1L;
-                order = createOrderAmount(OrderStatus.PENDING_CONFIRM);
+                order = createOrder(null, null, null, OrderStatus.PENDING_CONFIRM);
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-                when(orderMentionRepository.existsByMemberIdAndOrderId(admin.getMemberId(), order.getId())).thenReturn(true);
+                when(orderMentionRepository.existsByMemberIdAndOrderId(admin.getMemberId(), order.getId())).thenReturn(
+                        true);
             }
+
             @Test
             @DisplayName("주문 정정 요청을 수행한다.")
-            void it_request_modify_order(){
+            void it_request_modify_order() {
                 orderCommandService.modifyRequestOrder(orderId, admin);
 
                 assertThat(order.getOrderStatus()).isEqualTo(OrderStatus.PENDING_MODIFY);
@@ -141,23 +158,25 @@ class OrderCommandServiceTest {
 
     @Nested
     @DisplayName("confirmOrder 메소드는")
-    class Describe_ConfirmOrder{
+    class Describe_ConfirmOrder {
         @Nested
         @DisplayName("해당 주문에 언급된 관리자가 아니면")
-        class Context_Not_Order_Admin{
+        class Context_not_order_admin {
             Long orderId;
             Order order;
+
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 orderId = 1L;
-                order = createOrderAmount(OrderStatus.PENDING_CONFIRM);
+                order = createOrder(null, null, null, OrderStatus.PENDING_CONFIRM);
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-                when(orderMentionRepository.existsByMemberIdAndOrderId(admin.getMemberId(), order.getId())).thenReturn(false);
+                when(orderMentionRepository.existsByMemberIdAndOrderId(admin.getMemberId(), order.getId())).thenReturn(
+                        false);
             }
 
             @Test
             @DisplayName("해당 주문에 접근할 수 없기 때문에 예외를 반환한다.")
-            void it_throws_exception(){
+            void it_throws_exception() {
                 CustomException exception = Assertions.assertThrows(CustomException.class, () ->
                         orderCommandService.confirmOrder(orderId, admin));
                 Assertions.assertEquals(OrderErrorCode.ORDER_ACCESS_DENIED, exception.getErrorCode());
@@ -168,19 +187,22 @@ class OrderCommandServiceTest {
 
         @Nested
         @DisplayName("주문 정정 요청 상태이면")
-        class Context_Order_Pending_Modify{
+        class Context_order_pending_modify {
             Long orderId;
             Order order;
+
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 orderId = 1L;
-                order = createOrderAmount(OrderStatus.PENDING_MODIFY);
+                order = createOrder(null, null, null, OrderStatus.PENDING_MODIFY);
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-                when(orderMentionRepository.existsByMemberIdAndOrderId(admin.getMemberId(), order.getId())).thenReturn(true);
+                when(orderMentionRepository.existsByMemberIdAndOrderId(admin.getMemberId(), order.getId())).thenReturn(
+                        true);
             }
+
             @Test
             @DisplayName("주문 확정이 불가능하기 때문에 예외를 반환한다.")
-            void it_throws_exception(){
+            void it_throws_exception() {
                 CustomException exception = Assertions.assertThrows(CustomException.class, () ->
                         orderCommandService.confirmOrder(orderId, admin));
                 Assertions.assertEquals(OrderErrorCode.ORDER_PENDING_MODIFY_CANT_CONFIRM, exception.getErrorCode());
@@ -188,22 +210,26 @@ class OrderCommandServiceTest {
                 verify(orderMentionRepository).existsByMemberIdAndOrderId(admin.getMemberId(), order.getId());
             }
         }
+
         @Nested
         @DisplayName("현재 재고 수량보다 많은 수량의 주문이면")
-        class Context_Exceed_Amount{
+        class Context_exceed_amount {
             Long orderId;
             Order order;
+
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 orderId = 1L;
-                order = createOrderAmount(10, 100);
+                Product product = createProduct(null, 10);
+                order = createOrder(null, null, product, OrderStatus.PENDING_CONFIRM, 100);
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-                when(orderMentionRepository.existsByMemberIdAndOrderId(admin.getMemberId(), order.getId())).thenReturn(true);
+                when(orderMentionRepository.existsByMemberIdAndOrderId(admin.getMemberId(), order.getId())).thenReturn(
+                        true);
             }
 
             @Test
             @DisplayName("주문 확정이 불가능하므로 예외를 반환한다.")
-            void it_throws_exception(){
+            void it_throws_exception() {
                 CustomException exception = Assertions.assertThrows(CustomException.class, () ->
                         orderCommandService.confirmOrder(orderId, admin));
                 Assertions.assertEquals(OrderErrorCode.ORDER_AMOUNT_EXCEED, exception.getErrorCode());
@@ -215,24 +241,28 @@ class OrderCommandServiceTest {
 
         @Nested
         @DisplayName("주문 확정이 가능하면")
-        class Context_Can_Confirm_Order{
+        class Context_can_confirm_order {
             Long orderId;
             Order order;
+
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 orderId = 1L;
-                order = createOrderAmount(100, 10);
+                Product product = createProduct(null, 100);
+                order = createOrder(null, null, product, OrderStatus.PENDING_CONFIRM, 10);
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-                when(orderMentionRepository.existsByMemberIdAndOrderId(admin.getMemberId(), order.getId())).thenReturn(true);
+                when(orderMentionRepository.existsByMemberIdAndOrderId(admin.getMemberId(), order.getId())).thenReturn(
+                        true);
             }
 
             @Test
             @DisplayName("주문 확정을 수행한다.")
-            void it_confirms_order(){
+            void it_confirms_order() {
                 orderCommandService.confirmOrder(orderId, admin);
 
                 assertThat(order.getOrderStatus()).isEqualTo(OrderStatus.CONFIRMED);
-                assertThat(order.getProduct().getAmount()).isEqualTo(100-10);
+                assertThat(order.getProduct()
+                        .getAmount()).isEqualTo(100 - 10);
                 verify(orderRepository).findById(orderId);
                 verify(orderMentionRepository).existsByMemberIdAndOrderId(admin.getMemberId(), order.getId());
             }
@@ -241,22 +271,23 @@ class OrderCommandServiceTest {
 
     @Nested
     @DisplayName("cancelOrder 메소드는")
-    class Describe_CancelOrder{
+    class Describe_CancelOrder {
         @Nested
         @DisplayName("내가 작성한 주문이 아니면")
-        class Context_Not_My_Order{
+        class Context_not_my_order {
             Long orderId;
 
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 orderId = 1L;
-                Order order = createOrderMember(OrderStatus.PENDING_MODIFY, 2L);
+                Member member = createMemberWithId(2L);
+                Order order = createOrder(null, member, null, OrderStatus.PENDING_MODIFY);
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
             }
 
             @Test
             @DisplayName("취소가 불가능하기 때문에 예외를 반환한다.")
-            void it_throws_exception(){
+            void it_throws_exception() {
                 CustomException exception = Assertions.assertThrows(CustomException.class, () ->
                         orderCommandService.cancelOrder(orderId, admin));
                 Assertions.assertEquals(OrderErrorCode.ORDER_ACCESS_DENIED, exception.getErrorCode());
@@ -266,18 +297,20 @@ class OrderCommandServiceTest {
 
         @Nested
         @DisplayName("주문 정정 상태가 아니면")
-        class Context_Order_Not_Pending_Modify{
+        class Context_order_not_pending_modify {
             Long orderId;
+
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 orderId = 1L;
-                Order order = createOrderMember(OrderStatus.CONFIRMED, 1L);
+                Member member = createMemberWithId(1L);
+                Order order = createOrder(null, member, null, OrderStatus.CONFIRMED);
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
             }
 
             @Test
             @DisplayName("취소가 불가능하기 때문에 예외를 반환한다.")
-            void it_throws_exception(){
+            void it_throws_exception() {
                 CustomException exception = Assertions.assertThrows(CustomException.class, () ->
                         orderCommandService.cancelOrder(orderId, admin));
                 Assertions.assertEquals(OrderErrorCode.ORDER_CANT_CANCEL, exception.getErrorCode());
@@ -287,20 +320,21 @@ class OrderCommandServiceTest {
 
         @Nested
         @DisplayName("주문 취소가 가능하면")
-        class Context_Can_Cancel_Order{
+        class Context_can_cancel_order {
             Long orderId;
             Order order;
 
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 orderId = 1L;
-                order = createOrderMember(OrderStatus.PENDING_MODIFY, 1L);
+                Member member = createMemberWithId(1L);
+                order = createOrder(null, member, null, OrderStatus.PENDING_MODIFY);
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
             }
 
             @Test
             @DisplayName("주문을 취소한다.")
-            void it_cancel_order(){
+            void it_cancel_order() {
                 orderCommandService.cancelOrder(orderId, admin);
 
                 verify(orderRepository).findById(orderId);
@@ -312,27 +346,29 @@ class OrderCommandServiceTest {
 
     @Nested
     @DisplayName("addOrderComment 메소드는")
-    class Describe_AddOrderComment{
+    class Describe_AddOrderComment {
         @Nested
         @DisplayName("해당 주문의 주문자가 아니면")
-        class Context_Not_Order_Orderer{
+        class Context_not_order_orderer {
             Long orderId;
             AddOrderCommentRequest request;
 
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 orderId = 1L;
-                Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 1L);  // orderMember : 1L
-                Member member = createMember(orderer.getMemberId());  // member : 2L
+                Member orderMember = createMemberWithId(1L);
+                Order order = createOrder(null, orderMember, null, OrderStatus.PENDING_CONFIRM); // 1L
+                Member member = createMemberWithId(orderer.getMemberId());  // member : 2L
                 request = createAddOrderCommentRequest();
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
                 when(memberRepository.findById(orderer.getMemberId())).thenReturn(Optional.of(member));
-                when(orderMentionRepository.existsByMemberIdAndOrderId(member.getId(), order.getId())).thenReturn(false);
+                when(orderMentionRepository.existsByMemberIdAndOrderId(member.getId(), order.getId())).thenReturn(
+                        false);
             }
 
             @Test
             @DisplayName("댓글 작성이 불가능하기 때문에 예외를 반환한다.")
-            void it_throws_exception(){
+            void it_throws_exception() {
                 CustomException exception = Assertions.assertThrows(CustomException.class, () ->
                         orderCommandService.addOrderComment(orderId, orderer, request));
                 Assertions.assertEquals(OrderErrorCode.ORDER_ACCESS_DENIED, exception.getErrorCode());
@@ -343,23 +379,26 @@ class OrderCommandServiceTest {
 
         @Nested
         @DisplayName("해당 주문에 언급된 관리자가 아니면")
-        class Context_Not_Order_Admin{
+        class Context_not_order_admin {
             Long orderId;
             AddOrderCommentRequest request;
 
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 orderId = 1L;
-                Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 2L);  // orderMember : 2L
-                Member member = createMember(admin.getMemberId());  // member : 1L
+                Member orderMember = createMemberWithId(2L);
+                Order order = createOrder(null, orderMember, null, OrderStatus.PENDING_CONFIRM); // 2L
+                Member member = createMemberWithId(admin.getMemberId());  // member : 1L
                 request = createAddOrderCommentRequest();
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
                 when(memberRepository.findById(admin.getMemberId())).thenReturn(Optional.of(member));
-                when(orderMentionRepository.existsByMemberIdAndOrderId(member.getId(), order.getId())).thenReturn(false);
+                when(orderMentionRepository.existsByMemberIdAndOrderId(member.getId(), order.getId())).thenReturn(
+                        false);
             }
+
             @Test
             @DisplayName("댓글 작성이 불가능하기 때문에 예외를 반환한다.")
-            void it_throws_exception(){
+            void it_throws_exception() {
                 CustomException exception = Assertions.assertThrows(CustomException.class, () ->
                         orderCommandService.addOrderComment(orderId, admin, request));
                 Assertions.assertEquals(OrderErrorCode.ORDER_ACCESS_DENIED, exception.getErrorCode());
@@ -370,21 +409,24 @@ class OrderCommandServiceTest {
 
         @Nested
         @DisplayName("해당 주문의 주문자가 맞으면")
-        class Context_Order_Orderer{
+        class Context_order_orderer {
             Long orderId;
             Long commentId;
             AddOrderCommentRequest request;
             AddOrderCommentResponse expectResponse;
 
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 orderId = 1L;
-                Order order = createOrderMember(OrderStatus.PENDING_CONFIRM, 1L);  // orderMember : 1L
-                Member member = createMember(admin.getMemberId());  // member : 1L
+                Member orderMember = createMemberWithId(1L);
+                Order order = createOrder(null, orderMember, null, OrderStatus.PENDING_CONFIRM); // 1L
+                Member member = createMemberWithId(admin.getMemberId());  // member : 1L
                 request = createAddOrderCommentRequest();
                 OrderComment comment = createOrderCommentWithId(1L);
                 commentId = 1L;
-                expectResponse = AddOrderCommentResponse.builder().commentId(1L).build();
+                expectResponse = AddOrderCommentResponse.builder()
+                        .commentId(1L)
+                        .build();
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
                 when(memberRepository.findById(admin.getMemberId())).thenReturn(Optional.of(member));
                 when(orderMapper.toOrderComment(request, member, order)).thenReturn(comment);
@@ -394,7 +436,7 @@ class OrderCommandServiceTest {
 
             @Test
             @DisplayName("주문에 댓글을 추가한다.")
-            void it_adds_order_comment(){
+            void it_adds_order_comment() {
                 AddOrderCommentResponse response = orderCommandService.addOrderComment(orderId, admin, request);
 
                 assertThat(response).isNotNull();
@@ -406,7 +448,7 @@ class OrderCommandServiceTest {
             }
         }
 
-        private AddOrderCommentRequest createAddOrderCommentRequest(){
+        private AddOrderCommentRequest createAddOrderCommentRequest() {
             return AddOrderCommentRequest.builder()
                     .content("댓글 내용")
                     .build();
@@ -415,22 +457,24 @@ class OrderCommandServiceTest {
 
     @Nested
     @DisplayName("makeOrder 메소드는")
-    class Describe_MakeOrder{
+    class Describe_MakeOrder {
         @Nested
         @DisplayName("관리자라면")
-        class Context_Admin{
+        class Context_admin {
             MakeOrderRequest request;
+
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 request = createMakeOrderRequest(10);
-                Member member = createMember(admin.getMemberId());
-                Team team = createTeam(admin.getTeamId());
+                Member member = createMemberWithId(admin.getMemberId());
+                Team team = createTeamWithId(admin.getTeamId());
                 when(memberRepository.findById(admin.getMemberId())).thenReturn(Optional.of(member));
                 when(teamRepository.findById(admin.getTeamId())).thenReturn(Optional.of(team));
             }
+
             @Test
             @DisplayName("주문 생성이 불가능하므로 예외를 반환한다.")
-            void it_throws_exception(){
+            void it_throws_exception() {
                 CustomException exception = Assertions.assertThrows(CustomException.class, () ->
                         orderCommandService.makeOrder(request, admin));
                 Assertions.assertEquals(AuthErrorCode.ADMIN_NOT_ALLOWED, exception.getErrorCode());
@@ -441,19 +485,21 @@ class OrderCommandServiceTest {
 
         @Nested
         @DisplayName("뷰어라면")
-        class Context_Viewer{
+        class Context_viewer {
             MakeOrderRequest request;
+
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 request = createMakeOrderRequest(10);
-                Member member = createMember(viewer.getMemberId());
-                Team team = createTeam(viewer.getTeamId());
+                Member member = createMemberWithId(viewer.getMemberId());
+                Team team = createTeamWithId(viewer.getTeamId());
                 when(memberRepository.findById(viewer.getMemberId())).thenReturn(Optional.of(member));
                 when(teamRepository.findById(viewer.getTeamId())).thenReturn(Optional.of(team));
             }
+
             @Test
             @DisplayName("주문 생성이 불가능하므로 예외를 반환한다.")
-            void it_throws_exception(){
+            void it_throws_exception() {
                 CustomException exception = Assertions.assertThrows(CustomException.class, () ->
                         orderCommandService.makeOrder(request, viewer));
                 Assertions.assertEquals(AuthErrorCode.VIEWER_NOT_ALLOWED, exception.getErrorCode());
@@ -464,21 +510,24 @@ class OrderCommandServiceTest {
 
         @Nested
         @DisplayName("관리자가 없는 팀 스페이스라면")
-        class Context_Team_Admin_Not_Exist{
+        class Context_team_admin_not_exist {
             MakeOrderRequest request;
             Team team;
+
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 request = createMakeOrderRequest(10);
-                Member member = createMember(orderer.getMemberId());
-                team = createTeam(orderer.getTeamId());
+                Member member = createMemberWithId(orderer.getMemberId());
+                team = createTeamWithId(orderer.getTeamId());
                 when(memberRepository.findById(orderer.getMemberId())).thenReturn(Optional.of(member));
                 when(teamRepository.findById(orderer.getTeamId())).thenReturn(Optional.of(team));
-                when(participantRepository.findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN)).thenReturn(Optional.empty());
+                when(participantRepository.findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN)).thenReturn(
+                        Optional.empty());
             }
+
             @Test
             @DisplayName("주문 생성이 불가능하므로 예외를 반환한다.")
-            void it_throws_exception(){
+            void it_throws_exception() {
                 CustomException exception = Assertions.assertThrows(CustomException.class, () ->
                         orderCommandService.makeOrder(request, orderer));
                 Assertions.assertEquals(OrderErrorCode.ORDER_CREATION_NOT_ALLOWED, exception.getErrorCode());
@@ -490,24 +539,26 @@ class OrderCommandServiceTest {
 
         @Nested
         @DisplayName("존재하지 않는 제품이면")
-        class Context_Product_Not_Exists{
+        class Context_product_not_exists {
             MakeOrderRequest request;
             Team team;
 
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 request = createMakeOrderRequest(10);
-                Member member = createMember(orderer.getMemberId());
-                team = createTeam(orderer.getTeamId());
-                Participant participant = createParticipant(team);
+                Member member = createMemberWithId(orderer.getMemberId());
+                team = createTeamWithId(orderer.getTeamId());
+                Participant participant = createParticipant(team, member, MemberTeamRole.ADMIN);
                 when(memberRepository.findById(orderer.getMemberId())).thenReturn(Optional.of(member));
                 when(teamRepository.findById(orderer.getTeamId())).thenReturn(Optional.of(team));
-                when(participantRepository.findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN)).thenReturn(Optional.of(participant));
+                when(participantRepository.findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN)).thenReturn(
+                        Optional.of(participant));
                 when(productRepository.findById(request.productId())).thenReturn(Optional.empty());
             }
+
             @Test
             @DisplayName("주문 생성이 불가능하므로 예외를 반환한다.")
-            void it_throws_exception(){
+            void it_throws_exception() {
                 CustomException exception = Assertions.assertThrows(CustomException.class, () ->
                         orderCommandService.makeOrder(request, orderer));
                 Assertions.assertEquals(InventoryErrorCode.PRODUCT_NOT_FOUND, exception.getErrorCode());
@@ -520,25 +571,27 @@ class OrderCommandServiceTest {
 
         @Nested
         @DisplayName("주문 수량이 제품 수량보다 많으면")
-        class Context_Exceed_Amount{
+        class Context_exceed_amount {
             MakeOrderRequest request;
             Team team;
+
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 request = createMakeOrderRequest(1111);
-                Member member = createMember(orderer.getMemberId());
-                team = createTeam(orderer.getTeamId());
-                Participant participant = createParticipant(team);
-                Product product = Product.builder().amount(10).build();
+                Member member = createMemberWithId(orderer.getMemberId());
+                team = createTeamWithId(orderer.getTeamId());
+                Participant participant = createParticipant(team, member, MemberTeamRole.ADMIN);
+                Product product = createProduct(null);
                 when(memberRepository.findById(orderer.getMemberId())).thenReturn(Optional.of(member));
                 when(teamRepository.findById(orderer.getTeamId())).thenReturn(Optional.of(team));
-                when(participantRepository.findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN)).thenReturn(Optional.of(participant));
+                when(participantRepository.findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN)).thenReturn(
+                        Optional.of(participant));
                 when(productRepository.findById(request.productId())).thenReturn(Optional.of(product));
             }
 
             @Test
             @DisplayName("주문 생성이 불가능하므로 예외를 반환한다.")
-            void it_throws_exception(){
+            void it_throws_exception() {
                 CustomException exception = Assertions.assertThrows(CustomException.class, () ->
                         orderCommandService.makeOrder(request, orderer));
                 Assertions.assertEquals(OrderErrorCode.ORDER_AMOUNT_EXCEED, exception.getErrorCode());
@@ -549,27 +602,17 @@ class OrderCommandServiceTest {
             }
         }
 
-        private MakeOrderRequest createMakeOrderRequest(Integer orderAmount){
-            return MakeOrderRequest.builder().productId(1L).orderAmount(orderAmount).build();
+        private MakeOrderRequest createMakeOrderRequest(Integer orderAmount) {
+            return MakeOrderRequest.builder()
+                    .productId(1L)
+                    .orderAmount(orderAmount)
+                    .build();
         }
     }
 
-    private Order createOrderAmount(OrderStatus status){
-        return Order.builder().orderStatus(status).build();
-    }
 
-    private Order createOrderAmount(Integer productAmount, Integer orderAmount){
-        Product product = Product.builder().amount(productAmount).build();
-        return Order.builder().orderStatus(OrderStatus.PENDING_CONFIRM).product(product).orderAmount(orderAmount).build();
-    }
-
-    private Order createOrderMember(OrderStatus status, Long memberId){
-        Member member = createMember(memberId);
-        return Order.builder().member(member).orderStatus(status).build();
-    }
-
-    private Member createMember(Long memberId){
-        Member member = Member.builder().build();
+    private Member createMemberWithId(Long memberId) {
+        Member member = createMember();
         try {
             Field idField = Member.class.getDeclaredField("id");
             idField.setAccessible(true);
@@ -581,8 +624,8 @@ class OrderCommandServiceTest {
         return member;
     }
 
-    private Team createTeam(Long teamId){
-        Team team = Team.builder().name("team").address("address").phoneNumber("aaa").build();
+    private Team createTeamWithId(Long teamId) {
+        Team team = createTeam();
         try {
             Field idField = Team.class.getDeclaredField("id");
             idField.setAccessible(true);
@@ -594,13 +637,8 @@ class OrderCommandServiceTest {
         return team;
     }
 
-    private Participant createParticipant(Team team){
-        Member member = Member.builder().build();
-        return Participant.builder().member(member).team(team).role(MemberTeamRole.ADMIN).build();
-    }
-
-    private OrderComment createOrderCommentWithId(Long commentId){
-        OrderComment comment = OrderComment.builder().build();
+    private OrderComment createOrderCommentWithId(Long commentId) {
+        OrderComment comment = createOrderComment(null, null);
         try {
             Field idField = OrderComment.class.getDeclaredField("id");
             idField.setAccessible(true);

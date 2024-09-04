@@ -1,5 +1,16 @@
 package com.yellobook.domains.order.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.resolver.TeamMemberArgumentResolver;
@@ -12,8 +23,13 @@ import com.yellobook.domains.order.dto.response.GetOrderResponse;
 import com.yellobook.domains.order.dto.response.MakeOrderResponse;
 import com.yellobook.domains.order.service.OrderCommandService;
 import com.yellobook.domains.order.service.OrderQueryService;
+import java.time.LocalDate;
+import java.util.Collections;
 import org.hamcrest.CoreMatchers;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,17 +38,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.time.LocalDate;
-import java.util.Collections;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(OrderController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -52,8 +57,9 @@ class OrderControllerTest {
     private TeamMemberArgumentResolver teamMemberArgumentResolver;
 
     private final TeamMemberVO teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
+
     @BeforeEach
-    void setTeamMemberVO() throws Exception{
+    void setTeamMemberVO() throws Exception {
         when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
         when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
                 .thenReturn(teamMemberVO);
@@ -61,28 +67,35 @@ class OrderControllerTest {
 
     @Nested
     @DisplayName("makeOrder 메소드는")
-    class Describe_MakeOrder{
+    class Describe_MakeOrder {
         @Nested
         @DisplayName("주문을 생성하면")
-        class Context_Order_Given {
+        class Context_order_given {
             MakeOrderRequest request;
             MakeOrderResponse response;
 
             @BeforeEach
-            void setUpContext(){
-                request = MakeOrderRequest.builder().productId(1L).orderAmount(1).date(LocalDate.now()).build();
-                response = MakeOrderResponse.builder().orderId(2L).build();
+            void setUpContext() {
+                request = MakeOrderRequest.builder()
+                        .productId(1L)
+                        .orderAmount(1)
+                        .date(LocalDate.now())
+                        .build();
+                response = MakeOrderResponse.builder()
+                        .orderId(2L)
+                        .build();
                 when(orderCommandService.makeOrder(request, teamMemberVO)).thenReturn(response);
             }
 
             @Test
             @DisplayName("새로운 주문을 추가한다.")
-            void it_adds_new_order() throws Exception{
+            void it_adds_new_order() throws Exception {
                 mockMvc.perform(post("/api/v1/orders")
                                 .content(objectMapper.writeValueAsString(request))
                                 .contentType("application/json;charset=UTF-8"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.data.orderId", CoreMatchers.is(response.orderId().intValue())))
+                        .andExpect(jsonPath("$.data.orderId", CoreMatchers.is(response.orderId()
+                                .intValue())))
                         .andDo(print())
                         .andReturn();
             }
@@ -91,23 +104,26 @@ class OrderControllerTest {
 
     @Nested
     @DisplayName("getOrder 메소드는")
-    class Describe_GetOrder{
+    class Describe_GetOrder {
         @Nested
         @DisplayName("유효한 주문 Id이면")
-        class Context_Order_Id_Exist{
+        class Context_order_id_exist {
             Long orderId;
             GetOrderResponse response;
 
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 orderId = 1L;
-                response = GetOrderResponse.builder().writer("writer").build();
+                response = GetOrderResponse.builder()
+                        .writer("writer")
+                        .build();
                 when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
                 when(orderQueryService.getOrder(orderId, teamMemberVO)).thenReturn(response);
             }
+
             @Test
             @DisplayName("해당 주문을 반환한다.")
-            void it_returns_order() throws Exception{
+            void it_returns_order() throws Exception {
                 mockMvc.perform(get("/api/v1/orders/{orderId}", orderId)
                                 .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isOk())
@@ -118,16 +134,18 @@ class OrderControllerTest {
 
         @Nested
         @DisplayName("유효한 주문 Id가 아니면")
-        class Context_Order_Id_Not_Exist{
+        class Context_order_id_not_exist {
             Long orderId;
+
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 orderId = 1L;
                 when(orderQueryService.existsByOrderId(orderId)).thenReturn(false);
             }
+
             @Test
             @DisplayName("상태 코드 400을 반환한다.")
-            void it_returns_400() throws Exception{
+            void it_returns_400() throws Exception {
                 mockMvc.perform(get("/api/v1/orders/{orderId}", orderId)
                                 .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isBadRequest())
@@ -138,30 +156,36 @@ class OrderControllerTest {
 
     @Nested
     @DisplayName("addOrderComment 메서드는")
-    class Describe_AddOrderComment{
+    class Describe_AddOrderComment {
         @Nested
         @DisplayName("유효한 주문 Id이면")
-        class Context_Product_Id_Exist{
+        class Context_product_id_exist {
             Long orderId;
             AddOrderCommentRequest request;
             AddOrderCommentResponse response;
 
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 orderId = 1L;
-                request = AddOrderCommentRequest.builder().content("content").build();
-                response = AddOrderCommentResponse.builder().commentId(1L).build();
+                request = AddOrderCommentRequest.builder()
+                        .content("content")
+                        .build();
+                response = AddOrderCommentResponse.builder()
+                        .commentId(1L)
+                        .build();
                 when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
                 when(orderCommandService.addOrderComment(orderId, teamMemberVO, request)).thenReturn(response);
             }
+
             @Test
             @DisplayName("해당 주문에 댓글을 추가한다.")
-            void it_adds_new_order_comment() throws Exception{
+            void it_adds_new_order_comment() throws Exception {
                 mockMvc.perform(post("/api/v1/orders/{orderId}/comment", orderId)
                                 .content(objectMapper.writeValueAsString(request))
                                 .contentType("application/json;charset=UTF-8"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.data.commentId", CoreMatchers.is(response.commentId().intValue())))
+                        .andExpect(jsonPath("$.data.commentId", CoreMatchers.is(response.commentId()
+                                .intValue())))
                         .andDo(print())
                         .andReturn();
             }
@@ -170,23 +194,26 @@ class OrderControllerTest {
 
     @Nested
     @DisplayName("getOrderComments 메소드는")
-    class Describe_GetOrderComments{
+    class Describe_GetOrderComments {
         @Nested
         @DisplayName("유효한 주문 Id이면")
-        class Context_Product_Id_Exist {
+        class Context_product_id_exist {
             Long orderId;
             GetOrderCommentsResponse response;
 
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 orderId = 1L;
-                response = GetOrderCommentsResponse.builder().comments(Collections.emptyList()).build();
+                response = GetOrderCommentsResponse.builder()
+                        .comments(Collections.emptyList())
+                        .build();
                 when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
                 when(orderQueryService.getOrderComments(orderId, teamMemberVO)).thenReturn(response);
             }
+
             @Test
             @DisplayName("주문 댓글 조회를 한다.")
-            void it_returns_order_comments() throws Exception{
+            void it_returns_order_comments() throws Exception {
                 mockMvc.perform(get("/api/v1/orders/{orderId}/comment", orderId)
                                 .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isOk())
@@ -199,20 +226,23 @@ class OrderControllerTest {
 
     @Nested
     @DisplayName("modifyRequestOrder 메소드는")
-    class Describe_ModifyRequestOrder{
+    class Describe_ModifyRequestOrder {
         @Nested
         @DisplayName("유효한 주문 Id이면")
-        class Context_Product_Id_Exist {
+        class Context_product_id_exist {
             Long orderId;
+
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 orderId = 1L;
                 when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
-                doNothing().when(orderCommandService).modifyRequestOrder(orderId, teamMemberVO);
+                doNothing().when(orderCommandService)
+                        .modifyRequestOrder(orderId, teamMemberVO);
             }
+
             @Test
             @DisplayName("주문 정정 요청을 수행한다.")
-            void it_modify_request_order() throws Exception{
+            void it_modify_request_order() throws Exception {
                 mockMvc.perform(patch("/api/v1/orders/{orderId}/correction", orderId)
                                 .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isNoContent())
@@ -224,21 +254,23 @@ class OrderControllerTest {
 
     @Nested
     @DisplayName("confirmOrder 메소드는")
-    class Describe_ConfirmOrder{
+    class Describe_ConfirmOrder {
         @Nested
         @DisplayName("유효한 주문 Id이면")
-        class Context_Product_Id_Exist {
+        class Context_product_id_exist {
             Long orderId;
 
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 orderId = 1L;
                 when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
-                doNothing().when(orderCommandService).confirmOrder(orderId, teamMemberVO);
+                doNothing().when(orderCommandService)
+                        .confirmOrder(orderId, teamMemberVO);
             }
+
             @Test
             @DisplayName("주문을 확정한다.")
-            void it_confirms_order() throws Exception{
+            void it_confirms_order() throws Exception {
                 mockMvc.perform(patch("/api/v1/orders/{orderId}/confirm", orderId)
                                 .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isNoContent())
@@ -249,22 +281,23 @@ class OrderControllerTest {
 
     @Nested
     @DisplayName("cancelOrder 메소드는")
-    class Describe_CancelOrder{
+    class Describe_CancelOrder {
         @Nested
         @DisplayName("유효한 주문 Id이면")
-        class Context_Product_Id_Exist {
+        class Context_product_id_exist {
             Long orderId;
 
             @BeforeEach
-            void setUpContext(){
+            void setUpContext() {
                 orderId = 1L;
                 when(orderQueryService.existsByOrderId(orderId)).thenReturn(true);
-                doNothing().when(orderCommandService).cancelOrder(orderId, teamMemberVO);
+                doNothing().when(orderCommandService)
+                        .cancelOrder(orderId, teamMemberVO);
             }
 
             @Test
             @DisplayName("주문을 취소한다.")
-            void it_cancel_order() throws Exception{
+            void it_cancel_order() throws Exception {
                 mockMvc.perform(delete("/api/v1/orders/{orderId}", orderId)
                                 .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isNoContent())
