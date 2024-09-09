@@ -1,5 +1,10 @@
 package com.yellobook.domains.inform;
 
+import static fixture.InformFixture.createInform;
+import static fixture.MemberFixture.createMember;
+import static fixture.TeamFixture.createTeam;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.yellobook.common.enums.MemberRole;
 import com.yellobook.domains.inform.entity.Inform;
 import com.yellobook.domains.inform.entity.InformMention;
@@ -7,20 +12,14 @@ import com.yellobook.domains.inform.repository.InformMentionRepository;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.team.entity.Team;
 import com.yellobook.support.annotation.RepositoryTest;
-import fixture.InformFixture;
-import fixture.MemberFixture;
-import fixture.TeamFixture;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryTest
 public class InformMentionRepositoryTest {
@@ -31,47 +30,49 @@ public class InformMentionRepositoryTest {
     @PersistenceContext
     private EntityManager em;
 
-    private Member member;
-    private Team team;
-    private Inform inform;
-    private Long informId;
-
-    @BeforeEach
-    void setUp() {
-        member = MemberFixture.createMember();
-        team = TeamFixture.createTeam();
-
-        em.persist(team);
-        em.persist(member);
-
-        inform = InformFixture.createInform(team, member);
-        em.persist(inform);
-
-        informId = inform.getId();
-    }
-
     @Nested
     @DisplayName("saveAll 메소드는")
-    class Describe_SaveAll{
+    class Describe_SaveAll {
 
         @Nested
         @DisplayName("유효한 mention 리스트가 주어졌을 때")
-        class Context_Valid {
+        class Context_valid {
 
+            Member member;
+            Team team;
+            Inform inform;
             List<InformMention> mentions;
             Member member2;
 
             @BeforeEach
             void setUp() {
+                member = createMember();
+                team = createTeam();
+
+                em.persist(team);
+                em.persist(member);
+
+                inform = createInform(team, member);
+                em.persist(inform);
+
                 member2 = Member.builder()
-                        .nickname("test2").allowance(true)
-                        .email("tt@tt").role(MemberRole.USER)
-                        .profileImage("ds.png").memberId(2L).build();
+                        .nickname("test2")
+                        .allowance(true)
+                        .email("tt@tt")
+                        .role(MemberRole.USER)
+                        .profileImage("ds.png")
+                        .build();
 
-                em.merge(member2);
+                em.persist(member2);
 
-                InformMention mention1 = InformMention.builder().inform(inform).member(member).build();
-                InformMention mention2 = InformMention.builder().inform(inform).member(member2).build();
+                InformMention mention1 = InformMention.builder()
+                        .inform(inform)
+                        .member(member)
+                        .build();
+                InformMention mention2 = InformMention.builder()
+                        .inform(inform)
+                        .member(member2)
+                        .build();
 
                 mentions = List.of(mention1, mention2);
             }
@@ -88,7 +89,7 @@ public class InformMentionRepositoryTest {
 
         @Nested
         @DisplayName("빈 리스트가 주어졌을 때")
-        class Context_Empty {
+        class Context_empty {
 
             List<InformMention> mentions;
 
@@ -109,24 +110,41 @@ public class InformMentionRepositoryTest {
 
     @Nested
     @DisplayName("findByInformId 메소드는")
-    class Describe_FindByInformId{
+    class Describe_FindByInformId {
 
         @Nested
         @DisplayName("해당하는 inform 안에 mention 이 존재하는 경우")
-        class Context_Exist_InformMention{
+        class Context_exist_informmention {
 
+            Member member;
+            Team team;
+            Inform inform;
+            Long informId;
             List<InformMention> mentions;
 
             @BeforeEach
             void setUp() {
-                InformMention informMention = InformMention.builder().inform(inform).member(member).build();
+                member = createMember();
+                team = createTeam();
+
+                em.persist(team);
+                em.persist(member);
+
+                inform = createInform(team, member);
+                em.persist(inform);
+                informId = inform.getId();
+
+                InformMention informMention = InformMention.builder()
+                        .inform(inform)
+                        .member(member)
+                        .build();
 
                 em.persist(informMention);
             }
 
             @Test
             @DisplayName("InformMention list를 반환한다.")
-            void it_returns_inform_mention_list(){
+            void it_returns_inform_mention_list() {
                 mentions = informMentionRepository.findByInformId(informId);
 
                 assertThat(mentions).isNotEmpty();
@@ -135,25 +153,38 @@ public class InformMentionRepositoryTest {
 
         @Nested
         @DisplayName("해당하는 inform 안에 mention이 존재하지 않는 경우")
-        class Context_Not_Exist_InformMention{
+        class Context_not_exist_informmention {
 
+            Member member;
+            Team team;
+            Inform inform;
+            Long informId;
             List<InformMention> mentions;
 
             @BeforeEach
             void setUp() {
+                member = createMember();
+                team = createTeam();
+
+                em.persist(team);
+                em.persist(member);
+
+                inform = createInform(team, member);
+                em.persist(inform);
+                informId = inform.getId();
                 mentions = informMentionRepository.findByInformId(informId);
             }
 
             @Test
             @DisplayName("빈 리스트를 반환한다.")
-            void it_returns_empty_mention_list(){
+            void it_returns_empty_mention_list() {
                 assertThat(mentions).isEmpty();
             }
         }
 
         @Nested
         @DisplayName("Inform이 존재하지 않는 경우")
-        class Context_Not_Exist_Inform{
+        class Context_not_exist_inform {
 
             Long nonExistentInformId = 99L;
             List<InformMention> mentions;
@@ -165,7 +196,7 @@ public class InformMentionRepositoryTest {
 
             @Test
             @DisplayName("빈 리스트를 반환한다.")
-            void it_returns_empty_mention_list(){
+            void it_returns_empty_mention_list() {
                 assertThat(mentions).isEmpty();
             }
         }
