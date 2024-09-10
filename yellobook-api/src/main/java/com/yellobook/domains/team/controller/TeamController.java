@@ -36,7 +36,7 @@ public class TeamController {
             @RequestBody CreateTeamRequest request,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ) {
-        CreateTeamResponse response = teamCommandService.createTeam(request, customOAuth2User);
+        CreateTeamResponse response = teamCommandService.createTeam(request, customOAuth2User.getMemberId());
         return ResponseFactory.created(response);
     }
 
@@ -45,9 +45,9 @@ public class TeamController {
     public ResponseEntity<SuccessResponse<InvitationCodeResponse>> inviteTeam(
             @ExistTeam @PathVariable("teamId") Long teamId,
             @RequestBody InvitationCodeRequest request,
-            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
+            @TeamMember TeamMemberVO teamMember
     ) {
-        InvitationCodeResponse response = teamQueryService.makeInvitationCode(teamId, request, customOAuth2User);
+        InvitationCodeResponse response = teamQueryService.makeInvitationCode(teamId, request, teamMember.getMemberId());
         return ResponseFactory.created(response);
     }
 
@@ -55,9 +55,9 @@ public class TeamController {
     @Operation(summary = "팀 나가기", description = "팀원이 본인이 속한 팀에서 나가기 위한 API입니다.")
     public ResponseEntity<Void> leaveTeam(
             @ExistTeam @PathVariable("teamId") Long teamId,
-            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
+            @TeamMember TeamMemberVO teamMember
     ){
-        teamCommandService.leaveTeam(teamId, customOAuth2User);
+        teamCommandService.leaveTeam(teamId, teamMember.getMemberId());
         return ResponseFactory.noContent();
     }
 
@@ -68,7 +68,7 @@ public class TeamController {
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
             HttpServletResponse res
     ){
-        JoinTeamResponse response = teamCommandService.joinTeam(customOAuth2User, code);
+        JoinTeamResponse response = teamCommandService.joinTeam(customOAuth2User.getMemberId(), code);
         return ResponseFactory.success(response);
     }
 
@@ -78,7 +78,7 @@ public class TeamController {
             @ExistTeam @PathVariable("teamId") Long teamId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
-        GetTeamResponse response = teamQueryService.findByTeamId(teamId, customOAuth2User);
+        GetTeamResponse response = teamQueryService.findByTeamId(teamId, customOAuth2User.getMemberId());
         return ResponseFactory.success(response);
     }
 
@@ -97,7 +97,7 @@ public class TeamController {
             @RequestParam("name") @NotBlank(message = "이름은 필수 입력 값입니다.") String name,
             @TeamMember TeamMemberVO teamMember
     ){
-        TeamMemberListResponse response = teamQueryService.searchParticipants(teamMember, name);
+        TeamMemberListResponse response = teamQueryService.searchParticipants(teamMember.getTeamId(), name);
         return ResponseFactory.success(response);
     }
 }

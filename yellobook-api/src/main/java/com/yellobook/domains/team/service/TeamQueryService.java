@@ -1,10 +1,8 @@
 package com.yellobook.domains.team.service;
 
-import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.mapper.ParticipantMapper;
 import com.yellobook.domains.team.entity.Participant;
-import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.auth.service.RedisTeamService;
 import com.yellobook.domains.team.dto.request.InvitationCodeRequest;
 import com.yellobook.domains.team.dto.response.*;
@@ -23,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -35,14 +32,12 @@ public class TeamQueryService{
     private final ParticipantRepository participantRepository;
     private final TeamMapper teamMapper;
     private final RedisTeamService redisService;
-    private final ParticipantMapper participantMapper;
 
     public InvitationCodeResponse makeInvitationCode(
             Long teamId,
             InvitationCodeRequest request,
-            CustomOAuth2User customOAuth2User
+            Long memberId
     ) {
-        Long memberId = customOAuth2User.getMemberId();
         MemberTeamRole role = request.role();
 
         Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)
@@ -75,17 +70,16 @@ public class TeamQueryService{
         }
     }
 
-    public GetTeamResponse findByTeamId(Long teamId, CustomOAuth2User customOAuth2User){
+    public GetTeamResponse findByTeamId(Long teamId, Long memberId){
         //팀 id를 가지고 팀에 대한 정보 가져오기
-        Long memberId = customOAuth2User.getMemberId();
-
         Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)
                 .orElseThrow(() ->{
                     log.warn("Cannot get team: Member ID = {}, Team ID = {}", memberId, teamId);
                     return new CustomException(TeamErrorCode.USER_NOT_IN_THAT_TEAM);
                 });
 
-        Team team = teamRepository.getReferenceById(teamId);
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(()->new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
 
         redisService.setMemberCurrentTeam(memberId,teamId,participant.getRole().name());
 
@@ -106,8 +100,7 @@ public class TeamQueryService{
         return teamRepository.existsById(teamId);
     }
 
-    public TeamMemberListResponse searchParticipants(TeamMemberVO teamMember, String name){
-        Long teamId = teamMember.getTeamId();
+    public TeamMemberListResponse searchParticipants(Long teamId, String name){
         List<QueryTeamMember> mentions = participantRepository.findMentionsByNamePrefix(name, teamId);
 
         //mentions가 null인 경우, emptyList를 반환하도록 설정
