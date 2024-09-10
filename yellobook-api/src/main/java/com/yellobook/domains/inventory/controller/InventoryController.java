@@ -55,6 +55,16 @@ public class InventoryController {
         return ResponseFactory.success(response);
     }
 
+    @Operation(summary = "재고 조회수 증가")
+    @PatchMapping("/{inventoryId}/views")
+    public ResponseEntity<Void> increaseInventoryView(
+            @ExistInventory @PathVariable("inventoryId") Long inventoryId,
+            @TeamMember TeamMemberVO teamMember
+    ){
+        inventoryCommandService.increaseInventoryView(inventoryId, teamMember);
+        return ResponseFactory.noContent();
+    }
+
     @Operation(summary = "재고 검색")
     @GetMapping("/{inventoryId}/search")
     public ResponseEntity<SuccessResponse<GetProductsResponse>> getProductByKeywordAndInventory(

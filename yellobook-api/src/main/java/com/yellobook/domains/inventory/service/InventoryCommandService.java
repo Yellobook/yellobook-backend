@@ -88,6 +88,16 @@ public class InventoryCommandService{
     }
 
     /**
+     * 재고 조회수 증가
+     */
+    public void increaseInventoryView(Long inventoryId, TeamMemberVO teamMember) {
+        ParticipantUtil.forbidViewer(teamMember.getRole());
+
+        Inventory inventory = inventoryRepository.findById(inventoryId).orElseThrow(() -> new CustomException(InventoryErrorCode.INVENTORY_NOT_FOUND));
+        inventory.increaseView();
+    }
+
+    /*
      * 재고 추가 (관리자)
      */
     public AddInventoryResponse addInventory(MultipartFile file, TeamMemberVO teamMember) {

@@ -4,6 +4,7 @@ import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.enums.OrderStatus;
 import com.yellobook.domains.order.dto.request.AddOrderCommentRequest;
 import com.yellobook.domains.order.dto.request.MakeOrderRequest;
+import com.yellobook.domains.order.dto.response.GetOrderCommentsResponse;
 import com.yellobook.domains.order.dto.response.GetOrderCommentsResponse.CommentInfo;
 import com.yellobook.domains.order.dto.response.AddOrderCommentResponse;
 import com.yellobook.domains.order.dto.response.GetOrderResponse;
@@ -20,6 +21,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @Mapper(componentModel = "spring")
@@ -60,4 +63,9 @@ public interface OrderMapper {
         return memberTeamRole.getDescription();
     }
 
+    default GetOrderCommentsResponse toGetOrderCommentsResponse(List<QueryOrderComment> orderComments){
+        return GetOrderCommentsResponse.builder()
+                .comments(orderComments.stream().map(this::toCommentInfo).toList())
+                .build();
+    }
 }
