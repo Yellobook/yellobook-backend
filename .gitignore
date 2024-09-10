@@ -54,3 +54,7 @@ infrastructure/monitoring/logs/*
 
 ### key
 *.pem
+
+### .DS_Store
+.DS_Store
+**/.DS_Store
