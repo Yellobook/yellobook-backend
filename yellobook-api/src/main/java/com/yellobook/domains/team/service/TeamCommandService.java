@@ -1,7 +1,6 @@
 package com.yellobook.domains.team.service;
 
 import com.yellobook.domains.auth.dto.InvitationResponse;
-import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.auth.service.RedisTeamService;
 import com.yellobook.domains.team.dto.request.*;
 import com.yellobook.domains.team.dto.response.*;
@@ -21,8 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -36,11 +33,11 @@ public class TeamCommandService {
     private final ParticipantMapper participantMapper;
     private final RedisTeamService redisService;
 
-    public CreateTeamResponse createTeam(CreateTeamRequest request, CustomOAuth2User customOAuth2User){
+    public CreateTeamResponse createTeam(CreateTeamRequest request, Long memberId){
 
-        Member member = memberRepository.findById(customOAuth2User.getMemberId())
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> {
-                    log.warn("Member {} not found.", customOAuth2User.getMemberId());
+                    log.warn("Member {} not found.", memberId);
                     return new CustomException(TeamErrorCode.MEMBER_NOT_FOUND);
                 });
         if(teamRepository.findByName(request.name()).isPresent()){
@@ -61,9 +58,7 @@ public class TeamCommandService {
         }
     }
 
-    public LeaveTeamResponse leaveTeam(Long teamId, CustomOAuth2User customOAuth2User) {
-        Long memberId = customOAuth2User.getMemberId();
-
+    public void leaveTeam(Long teamId, Long memberId) {
         Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)
                 .orElseThrow(() -> {
                     log.warn("Participant not found for Member ID = {} and Team ID = {}", memberId, teamId);
@@ -81,16 +76,13 @@ public class TeamCommandService {
                             tempParticipant.getRole().name()
                     );
                 });
-
-        return teamMapper.toLeaveTeamResponse(teamId);
     }
 
-    public JoinTeamResponse joinTeam(CustomOAuth2User customOAuth2User, String code) {
+    public JoinTeamResponse joinTeam(Long memberId, String code) {
 
         InvitationResponse invitationData = redisService.getInvitationInfo(code);
         Long teamId = invitationData.getTeamId();
         MemberTeamRole role = invitationData.getRole();
-        Long memberId = customOAuth2User.getMemberId();
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> {

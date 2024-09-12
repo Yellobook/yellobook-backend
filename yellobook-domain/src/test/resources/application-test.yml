@@ -13,6 +13,8 @@ spring:
       dialect: org.hibernate.dialect.H2Dialect
     show-sql: false
     database: h2
+  flyway:
+    enabled: false
 
 logging:
   level:

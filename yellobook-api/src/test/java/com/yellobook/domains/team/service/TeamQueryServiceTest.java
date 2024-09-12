@@ -52,7 +52,6 @@ public class TeamQueryServiceTest {
 
     @InjectMocks
     private TeamQueryService teamQueryService;
-
     private CustomOAuth2User customOAuth2User;
 
     private Member member;
@@ -88,7 +87,7 @@ public class TeamQueryServiceTest {
                 when(participantRepository.findByTeamIdAndMemberId(team.getId(), member.getId())).thenReturn(Optional.empty());
 
                 exception = assertThrows(
-                        CustomException.class, () -> teamQueryService.makeInvitationCode(team.getId(), request, customOAuth2User));
+                        CustomException.class, () -> teamQueryService.makeInvitationCode(team.getId(), request, 1L));
 
             }
 
@@ -126,7 +125,7 @@ public class TeamQueryServiceTest {
                         .thenReturn(Optional.of(adminPar));
 
                 exception = assertThrows(
-                        CustomException.class, () -> teamQueryService.makeInvitationCode(teamId, request, customOAuth2User));
+                        CustomException.class, () -> teamQueryService.makeInvitationCode(teamId, request, memberId));
             }
 
             @Test
@@ -155,7 +154,7 @@ public class TeamQueryServiceTest {
                 when(teamMapper.toInvitationCodeResponse(anyString()))
                         .thenReturn(new InvitationCodeResponse("http://invitation-url")); // 응답 매핑
 
-                response = teamQueryService.makeInvitationCode(team.getId(), request, customOAuth2User);
+                response = teamQueryService.makeInvitationCode(team.getId(), request, member.getId());
             }
 
             @Test
@@ -248,7 +247,7 @@ public class TeamQueryServiceTest {
                 when(participantRepository.findMentionsByNamePrefix(prefix, team.getId())).thenReturn(members);
                 when(teamMapper.toTeamMemberListResponse(members)).thenReturn(new TeamMemberListResponse(members));
 
-                res = teamQueryService.searchParticipants(teamMember, prefix);
+                res = teamQueryService.searchParticipants(teamMember.getTeamId(), prefix);
             }
 
             @Test
@@ -276,7 +275,7 @@ public class TeamQueryServiceTest {
                 when(participantRepository.findMentionsByNamePrefix(prefix, team.getId())).thenReturn(members);
                 when(teamMapper.toTeamMemberListResponse(members)).thenReturn(new TeamMemberListResponse(members));
 
-                res = teamQueryService.searchParticipants(teamMember, prefix);
+                res = teamQueryService.searchParticipants(teamMember.getTeamId(), prefix);
             }
 
             @Test
@@ -300,7 +299,7 @@ public class TeamQueryServiceTest {
                         .thenReturn(Optional.empty());
 
                 exception = assertThrows(
-                        CustomException.class, () -> teamQueryService.findByTeamId(team.getId(), customOAuth2User));
+                        CustomException.class, () -> teamQueryService.findByTeamId(team.getId(), customOAuth2User.getMemberId()));
             }
 
             @Test

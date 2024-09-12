@@ -94,7 +94,7 @@ public class TeamCommandServiceTest {
                 when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 
                 exception = assertThrows(CustomException.class, () -> {
-                    teamCommandService.createTeam(duplicateNameRequest, customOAuth2User);
+                    teamCommandService.createTeam(duplicateNameRequest, customOAuth2User.getMemberId());
                 });
             }
 
@@ -127,7 +127,7 @@ public class TeamCommandServiceTest {
                 when(teamMapper.toTeam(validRequest)).thenReturn(team);
                 when(teamMapper.toCreateTeamResponse(any(Team.class))).thenReturn(new CreateTeamResponse(1L, LocalDateTime.now()));
 
-                response = teamCommandService.createTeam(validRequest, customOAuth2User);
+                response = teamCommandService.createTeam(validRequest, customOAuth2User.getMemberId());
             }
 
             @Test
@@ -164,7 +164,7 @@ public class TeamCommandServiceTest {
                 when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
 
                 exception = assertThrows(CustomException.class, () -> {
-                    teamCommandService.joinTeam(customOAuth2User, code);
+                    teamCommandService.joinTeam(customOAuth2User.getMemberId(), code);
                 });
             }
 
@@ -195,7 +195,7 @@ public class TeamCommandServiceTest {
                 when(participantRepository.findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN)).thenReturn(Optional.of(participant));
 
                 exception = assertThrows(CustomException.class, () -> {
-                    teamCommandService.joinTeam(customOAuth2User, adminInvitationCode);
+                    teamCommandService.joinTeam(customOAuth2User.getMemberId(), adminInvitationCode);
                 });
             }
 
@@ -225,7 +225,7 @@ public class TeamCommandServiceTest {
                 when(teamRepository.findById(anyLong())).thenReturn(Optional.empty());
 
                 exception = assertThrows(CustomException.class, () -> {
-                    teamCommandService.joinTeam(customOAuth2User, notExistTeamCode);
+                    teamCommandService.joinTeam(customOAuth2User.getMemberId(), notExistTeamCode);
                 });
             }
 
@@ -258,7 +258,7 @@ public class TeamCommandServiceTest {
                 when(participantRepository.findByTeamIdAndMemberId(belongTeamId, 1L)).thenReturn(Optional.of(participant));
 
                 exception = assertThrows(CustomException.class, () -> {
-                    teamCommandService.joinTeam(customOAuth2User, belongTeamCode);
+                    teamCommandService.joinTeam(customOAuth2User.getMemberId(), belongTeamCode);
                 });
             }
 
@@ -289,7 +289,7 @@ public class TeamCommandServiceTest {
                 when(participantMapper.toParticipant(MemberTeamRole.ADMIN, team, member)).thenReturn(participant);
                 when(teamMapper.toJoinTeamResponse(team)).thenReturn(new JoinTeamResponse(team.getId()));
 
-                response = teamCommandService.joinTeam(customOAuth2User, code);
+                response = teamCommandService.joinTeam(customOAuth2User.getMemberId(), code);
             }
 
             @Test
@@ -330,7 +330,7 @@ public class TeamCommandServiceTest {
                 when(participantRepository.findByTeamIdAndMemberId(teamId, memberId)).thenReturn(Optional.empty());
 
                 exception = assertThrows(
-                        CustomException.class, () -> teamCommandService.leaveTeam(teamId, customOAuth2User));
+                        CustomException.class, () -> teamCommandService.leaveTeam(teamId, member.getId()));
             }
 
             @Test
@@ -356,7 +356,7 @@ public class TeamCommandServiceTest {
                 when(participantRepository.findByTeamIdAndMemberId(teamId, memberId)).thenReturn(Optional.of(participant));
                 when(participantRepository.findFirstByMemberIdOrderByCreatedAtAsc(memberId)).thenReturn(Optional.of(participant));
 
-                teamCommandService.leaveTeam(teamId, customOAuth2User);
+                teamCommandService.leaveTeam(teamId, memberId);
             }
 
             @Test
