@@ -9,15 +9,14 @@ import com.yellobook.error.code.CommonErrorCode;
 import com.yellobook.error.code.TeamErrorCode;
 import com.yellobook.error.exception.CustomException;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.List;
 
 @Slf4j
 @Component
@@ -26,6 +25,7 @@ public class RedisTeamService {
     private final RedisTemplate<String, String> redisTemplate;
     private final ParticipantRepository participantRepository;
     private final HttpServletRequest request;
+
     /**
      * 사용자가 위치한 팀 id 를 업데이트 또는 저장한다.
      */
@@ -50,7 +50,8 @@ public class RedisTeamService {
             // 사용자가 참여한 팀 목록을 조회
             Participant participant = participantRepository.findFirstByMemberIdOrderByCreatedAtAsc(memberId)
                     .orElseThrow(() -> new CustomException(TeamErrorCode.USER_NOT_JOINED_ANY_TEAM));
-            Long teamId = participant.getTeam().getId();
+            Long teamId = participant.getTeam()
+                    .getId();
             MemberTeamRole memberTeamRole = participant.getRole();
             // redis 에 저장
             setMemberCurrentTeam(memberId, teamId, memberTeamRole.name());
@@ -63,7 +64,7 @@ public class RedisTeamService {
             MemberTeamRole memberTeamRole = MemberTeamRole.valueOf(values.get(1));
             return TeamMemberVO.of(memberId, teamId, memberTeamRole);
         }
-        log.error("[TEAM_ERROR] 사용자 ID {}가 위치한 팀을 조회할 때 예상치 못한 값이 REDIS 에 들어가 있음: {}",memberId, values);
+        log.error("[TEAM_ERROR] 사용자 ID {}가 위치한 팀을 조회할 때 예상치 못한 값이 REDIS 에 들어가 있음: {}", memberId, values);
         throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
     }
 
@@ -73,20 +74,23 @@ public class RedisTeamService {
     }
 
     public String generateInvitationUrl(Long teamId, MemberTeamRole role) {
-        String code = UUID.randomUUID().toString();
+        String code = UUID.randomUUID()
+                .toString();
         String key = generateInvitaionKey(code);
         String value = teamId + ":" + role;
 
         // 15분 간 유효한 링크 설정
         //호스트 별로 다르게!
         //키를 도메인에 맞춰서
-        redisTemplate.opsForValue().set(key, value, 15, TimeUnit.MINUTES);
+        redisTemplate.opsForValue()
+                .set(key, value, 15, TimeUnit.MINUTES);
         String invitationUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         return invitationUrl + "/api/v1/invitation?code=" + code;
     }
 
     public InvitationResponse getInvitationInfo(String key) {
-        Object value = redisTemplate.opsForValue().get("team:invite:" + key);
+        Object value = redisTemplate.opsForValue()
+                .get("team:invite:" + key);
         if (value == null) {
             throw new CustomException(TeamErrorCode.INVITATION_NOT_FOUND);
         }
@@ -103,7 +107,8 @@ public class RedisTeamService {
 
         return new InvitationResponse(teamId, role);
     }
-    private String generateInvitaionKey(String code){
+
+    private String generateInvitaionKey(String code) {
         return "team:invite:" + code;
     }
 }

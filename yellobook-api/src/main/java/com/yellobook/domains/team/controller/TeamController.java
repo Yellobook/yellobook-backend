@@ -4,8 +4,13 @@ import com.yellobook.common.resolver.annotation.TeamMember;
 import com.yellobook.common.validation.annotation.ExistTeam;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
-import com.yellobook.domains.team.dto.response.*;
-import com.yellobook.domains.team.dto.request.*;
+import com.yellobook.domains.team.dto.request.CreateTeamRequest;
+import com.yellobook.domains.team.dto.request.InvitationCodeRequest;
+import com.yellobook.domains.team.dto.response.CreateTeamResponse;
+import com.yellobook.domains.team.dto.response.GetTeamResponse;
+import com.yellobook.domains.team.dto.response.InvitationCodeResponse;
+import com.yellobook.domains.team.dto.response.JoinTeamResponse;
+import com.yellobook.domains.team.dto.response.TeamMemberListResponse;
 import com.yellobook.domains.team.service.TeamCommandService;
 import com.yellobook.domains.team.service.TeamQueryService;
 import com.yellobook.response.ResponseFactory;
@@ -18,7 +23,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @Validated
@@ -31,7 +43,7 @@ public class TeamController {
     private final TeamQueryService teamQueryService;
 
     @PostMapping
-    @Operation(summary = "팀 만들기 API", description ="새로운 팀을 생성하는 API입니다.")
+    @Operation(summary = "팀 만들기 API", description = "새로운 팀을 생성하는 API입니다.")
     public ResponseEntity<SuccessResponse<CreateTeamResponse>> createTeam(
             @RequestBody CreateTeamRequest request,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
@@ -47,7 +59,8 @@ public class TeamController {
             @RequestBody InvitationCodeRequest request,
             @TeamMember TeamMemberVO teamMember
     ) {
-        InvitationCodeResponse response = teamQueryService.makeInvitationCode(teamId, request, teamMember.getMemberId());
+        InvitationCodeResponse response = teamQueryService.makeInvitationCode(teamId, request,
+                teamMember.getMemberId());
         return ResponseFactory.created(response);
     }
 
@@ -56,7 +69,7 @@ public class TeamController {
     public ResponseEntity<Void> leaveTeam(
             @ExistTeam @PathVariable("teamId") Long teamId,
             @TeamMember TeamMemberVO teamMember
-    ){
+    ) {
         teamCommandService.leaveTeam(teamId, teamMember.getMemberId());
         return ResponseFactory.noContent();
     }
@@ -67,7 +80,7 @@ public class TeamController {
             @RequestParam("code") String code,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
             HttpServletResponse res
-    ){
+    ) {
         JoinTeamResponse response = teamCommandService.joinTeam(customOAuth2User.getMemberId(), code);
         return ResponseFactory.success(response);
     }
@@ -77,7 +90,7 @@ public class TeamController {
     public ResponseEntity<SuccessResponse<GetTeamResponse>> getTeam(
             @ExistTeam @PathVariable("teamId") Long teamId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
-    ){
+    ) {
         GetTeamResponse response = teamQueryService.findByTeamId(teamId, customOAuth2User.getMemberId());
         return ResponseFactory.success(response);
     }
@@ -85,7 +98,7 @@ public class TeamController {
     @GetMapping("/members")
     @Operation(summary = "팀 내의 모든 멤버 조회")
     public ResponseEntity<SuccessResponse<TeamMemberListResponse>> getTeamMembers(
-         @TeamMember TeamMemberVO teamMember
+            @TeamMember TeamMemberVO teamMember
     ) {
         var result = teamQueryService.findTeamMembers(teamMember.getTeamId());
         return ResponseFactory.success(result);
@@ -96,7 +109,7 @@ public class TeamController {
     public ResponseEntity<SuccessResponse<TeamMemberListResponse>> searchMembers(
             @RequestParam("name") @NotBlank(message = "이름은 필수 입력 값입니다.") String name,
             @TeamMember TeamMemberVO teamMember
-    ){
+    ) {
         TeamMemberListResponse response = teamQueryService.searchParticipants(teamMember.getTeamId(), name);
         return ResponseFactory.success(response);
     }

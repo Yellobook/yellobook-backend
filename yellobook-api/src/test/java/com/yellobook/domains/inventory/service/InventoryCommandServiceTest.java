@@ -55,6 +55,9 @@ import org.springframework.web.multipart.MultipartFile;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("InventoryCommandService Unit Test")
 class InventoryCommandServiceTest {
+    private final TeamMemberVO admin = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
+    private final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, MemberTeamRole.ORDERER);
+    private final TeamMemberVO viewer = TeamMemberVO.of(3L, 1L, MemberTeamRole.VIEWER);
     @InjectMocks
     private InventoryCommandService inventoryCommandService;
     @Mock
@@ -70,14 +73,20 @@ class InventoryCommandServiceTest {
     @Mock
     private ExcelReadUtil excelReadUtil;
 
-    private final TeamMemberVO admin = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
-    private final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, MemberTeamRole.ORDERER);
-    private final TeamMemberVO viewer = TeamMemberVO.of(3L, 1L, MemberTeamRole.VIEWER);
-
-
     @Nested
     @DisplayName("addProduct 메소드는")
     class Describe_AddProduct {
+        private AddProductRequest createAddProductRequest() {
+            return AddProductRequest.builder()
+                    .name("name")
+                    .subProduct("sub")
+                    .sku(111)
+                    .purchasePrice(1000)
+                    .salePrice(2000)
+                    .amount(1000)
+                    .build();
+        }
+
         @Nested
         @DisplayName("주문자라면")
         class Context_Orderer {
@@ -202,22 +211,17 @@ class InventoryCommandServiceTest {
             }
         }
 
-        private AddProductRequest createAddProductRequest() {
-            return AddProductRequest.builder()
-                    .name("name")
-                    .subProduct("sub")
-                    .sku(111)
-                    .purchasePrice(1000)
-                    .salePrice(2000)
-                    .amount(1000)
-                    .build();
-        }
-
     }
 
     @Nested
     @DisplayName("modifyProductAmount 메소드는")
     class Describe_ModifyProductAmount {
+        private ModifyProductAmountRequest createModifyProductAmountRequest() {
+            return ModifyProductAmountRequest.builder()
+                    .amount(1000)
+                    .build();
+        }
+
         @Nested
         @DisplayName("주문자라면")
         class Context_Orderer {
@@ -304,12 +308,6 @@ class InventoryCommandServiceTest {
 
                 assertThat(product.getAmount()).isEqualTo(request.amount());
             }
-        }
-
-        private ModifyProductAmountRequest createModifyProductAmountRequest() {
-            return ModifyProductAmountRequest.builder()
-                    .amount(1000)
-                    .build();
         }
     }
 
@@ -424,6 +422,19 @@ class InventoryCommandServiceTest {
     @Nested
     @DisplayName("addInventory 메소드는")
     class Describe_AddInventory {
+        private List<ExcelProductCond> createProductList() {
+            return List.of(
+                    ExcelProductCond.builder()
+                            .name("상품 A")
+                            .subProduct("서브 A1")
+                            .sku(1001)
+                            .purchasePrice(5000)
+                            .salePrice(7000)
+                            .amount(100)
+                            .build()
+            );
+        }
+
         @Nested
         @DisplayName("주문자면")
         class Context_Orderer {
@@ -559,19 +570,6 @@ class InventoryCommandServiceTest {
                 assertThat(1).isEqualTo(expectResponse.productIds()
                         .size());
             }
-        }
-
-        private List<ExcelProductCond> createProductList() {
-            return List.of(
-                    ExcelProductCond.builder()
-                            .name("상품 A")
-                            .subProduct("서브 A1")
-                            .sku(1001)
-                            .purchasePrice(5000)
-                            .salePrice(7000)
-                            .amount(100)
-                            .build()
-            );
         }
     }
 

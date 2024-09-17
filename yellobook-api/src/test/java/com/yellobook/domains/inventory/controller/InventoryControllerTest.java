@@ -50,19 +50,17 @@ import org.springframework.test.web.servlet.MockMvc;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("InventoryController Unit Test")
 class InventoryControllerTest {
+    private final TeamMemberVO teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
-
     @MockBean
     private InventoryQueryService inventoryQueryService;
     @MockBean
     private InventoryCommandService inventoryCommandService;
     @MockBean
     private TeamMemberArgumentResolver teamMemberArgumentResolver;
-
-    private final TeamMemberVO teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
 
     @BeforeEach
     void setUp() throws Exception {

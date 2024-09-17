@@ -16,6 +16,7 @@ public class SecurityUtil {
                 );
 
         // SecurityContextHolder에 설정
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        SecurityContextHolder.getContext()
+                .setAuthentication(authentication);
     }
 }

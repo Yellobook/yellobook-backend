@@ -1,21 +1,36 @@
 package com.yellobook.domains.team.entity;
 
+import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.domains.common.entity.BaseEntity;
 import com.yellobook.domains.member.entity.Member;
-import com.yellobook.common.enums.MemberTeamRole;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "participants",
         uniqueConstraints = {
-            @UniqueConstraint(name = "uc_participant", columnNames = {"team_id", "member_id"})
+                @UniqueConstraint(name = "uc_participant", columnNames = {"team_id", "member_id"})
         }
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Participant extends BaseEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -39,7 +54,7 @@ public class Participant extends BaseEntity {
     }
 
     private void isValid(Team team, Member member, MemberTeamRole role) {
-        if(team == null|| member == null||role == null) {
+        if (team == null || member == null || role == null) {
             throw new IllegalArgumentException("null값이 존재합니다.");
         }
     }

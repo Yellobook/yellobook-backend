@@ -3,12 +3,12 @@ package com.yellobook.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-
 import java.util.List;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
-@JsonPropertyOrder({ "isSuccess", "code", "message", "errors" })
+@JsonPropertyOrder({"isSuccess", "code", "message", "errors"})
 public class ErrorResponse extends BaseResponse {
     @Schema(name = "에러 코드")
     private final String code;

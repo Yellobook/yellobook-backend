@@ -5,16 +5,15 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yellobook.domains.inventory.dto.query.QueryInventory;
 import com.yellobook.domains.inventory.entity.QInventory;
 import jakarta.persistence.EntityManager;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom{
+public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
-    public InventoryRepositoryCustomImpl(EntityManager em){
+    public InventoryRepositoryCustomImpl(EntityManager em) {
         this.queryFactory = new JPAQueryFactory(em);
     }
 

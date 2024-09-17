@@ -1,9 +1,8 @@
 package com.yellobook.support.utils;
 
 import io.jsonwebtoken.Jwts;
-
-import javax.crypto.SecretKey;
 import java.util.Date;
+import javax.crypto.SecretKey;
 
 public class JwtTestUtil {
     public static String createExpiredToken(Long memberId, SecretKey secretKey) {

@@ -1,14 +1,13 @@
 package com.yellobook.logging.dto;
 
+import java.util.Collections;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
-
-import java.util.Collections;
-import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
@@ -24,8 +23,10 @@ public class HttpLogMessage {
     private String requestBody;
     private String responseBody;
 
-    public static HttpLogMessage createInstance(ContentCachingRequestWrapper requestWrapper, ContentCachingResponseWrapper responseWrapper, double elapsedTime) {
-        String headers = Collections.list(requestWrapper.getHeaderNames()).stream()
+    public static HttpLogMessage createInstance(ContentCachingRequestWrapper requestWrapper,
+                                                ContentCachingResponseWrapper responseWrapper, double elapsedTime) {
+        String headers = Collections.list(requestWrapper.getHeaderNames())
+                .stream()
                 .map(header -> header + ": " + requestWrapper.getHeader(header))
                 .collect(Collectors.joining(", "));
 
@@ -48,14 +49,14 @@ public class HttpLogMessage {
     public String toPrettierLog() {
         return String.format(
                 """
-                
-                |[REQUEST] %s %s %s (%.3f)
-                |>> CLIENT_IP: %s
-                |>> HEADERS: %s
-                |>> REQUEST_PARAM: %s
-                |>> REQUEST_BODY: %s
-                |>> RESPONSE_BODY: %s
-                """,
+                                        
+                        |[REQUEST] %s %s %s (%.3f)
+                        |>> CLIENT_IP: %s
+                        |>> HEADERS: %s
+                        |>> REQUEST_PARAM: %s
+                        |>> REQUEST_BODY: %s
+                        |>> RESPONSE_BODY: %s
+                        """,
                 this.httpMethod,
                 this.requestUri,
                 this.httpStatus,

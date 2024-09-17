@@ -43,16 +43,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 @DisplayName("ScheduleRepository 테스트")
 public class ScheduleRepositoryTest {
 
-    @Autowired
-    private ScheduleRepository scheduleRepository;
-
-    @Autowired
-    TestEntityManager entityManager;
-
     private final TeamMemberVO adminVo = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
     private final TeamMemberVO ordererVo = TeamMemberVO.of(2L, 1L, MemberTeamRole.ORDERER);
     private final TeamMemberVO viewerVo = TeamMemberVO.of(3L, 1L, MemberTeamRole.VIEWER);
-
     private final LocalDate today = LocalDate.of(2024, 9, 1);
     private final int ORDERER_MONTHLY_ORDERS_COUNT = 30;
     private final int ADMIN_MONTHLY_ORDER_MENTIONS_COUNT = 30;
@@ -62,10 +55,82 @@ public class ScheduleRepositoryTest {
     private final int ORDERER_MONTHLY_INFORM_MENTIONS_COUNT = 0;
     private final int VIEWER_MONTHLY_INFORMS_COUNT = 30;
     private final int VIEWER_MONTHLY_INFORM_MENTIONS_COUNT = 30;
+    @Autowired
+    TestEntityManager entityManager;
+    @Autowired
+    private ScheduleRepository scheduleRepository;
 
     @BeforeEach
     void setUp() {
         initData();
+    }
+
+    private void initData() {
+        Team team = entityManager.persist(createTeam());
+
+        Member admin = entityManager.persist(createMember());
+        Member orderer = entityManager.persist(createMember());
+        Member viewer = entityManager.persist(createMember());
+
+        entityManager.persist(createParticipant(team, admin, MemberTeamRole.ADMIN));
+        entityManager.persist(createParticipant(team, orderer, MemberTeamRole.ORDERER));
+        entityManager.persist(createParticipant(team, viewer, MemberTeamRole.VIEWER));
+
+        Inventory inventory = entityManager.persist(createInventory(team));
+
+        Product product = entityManager.persist(createProduct(inventory));
+
+        for (int i = 0; i < 40; i++) {
+            LocalDate date = today.plusDays(i);
+            Order order = entityManager.persist(createOrder(team, orderer, product, date));
+            entityManager.persist(createOrderMention(order, admin));
+        }
+
+        for (int i = 0; i < 40; i++) {
+            LocalDate date = today.plusDays(i);
+            Inform inform = entityManager.persist(createInform(team, viewer, date));
+            entityManager.persist(createInformMention(inform, admin));
+        }
+
+        for (int i = 0; i < 40; i++) {
+            LocalDate date = today.plusDays(i);
+            Inform inform = entityManager.persist(createInform(team, orderer, date));
+            entityManager.persist(createInformMention(inform, viewer));
+        }
+        entityManager.flush();
+    }
+
+    private Long getMonthlyCountForMember(Long memberId, Class<?> entityType, LocalDate date) {
+        return entityManager.getEntityManager()
+                .createQuery("SELECT COUNT(e) FROM " + entityType.getSimpleName()
+                                + " e WHERE e.member.id = :memberId AND YEAR(e.date) = :year AND MONTH(e.date) = :month",
+                        Long.class)
+                .setParameter("memberId", memberId)
+                .setParameter("year", date.getYear())
+                .setParameter("month", date.getMonthValue())
+                .getSingleResult();
+    }
+
+    private Long getMonthlyInformMentionCountForMember(Long memberId, LocalDate date) {
+        return entityManager.getEntityManager()
+                .createQuery(
+                        "SELECT COUNT(im) FROM Inform i JOIN InformMention im ON i.id = im.inform.id WHERE im.member.id = :memberId AND YEAR(i.date) = :year AND MONTH(i.date) = :month",
+                        Long.class)
+                .setParameter("memberId", memberId)
+                .setParameter("year", date.getYear())
+                .setParameter("month", date.getMonthValue())
+                .getSingleResult();
+    }
+
+    private Long getMonthlyOrderMentionCountForMember(Long memberId, LocalDate date) {
+        return entityManager.getEntityManager()
+                .createQuery(
+                        "SELECT COUNT(om) FROM Order o JOIN OrderMention om ON o.id = om.order.id WHERE om.member.id = :memberId AND YEAR(o.date) = :year AND MONTH(o.date) = :month",
+                        Long.class)
+                .setParameter("memberId", memberId)
+                .setParameter("year", date.getYear())
+                .setParameter("month", date.getMonthValue())
+                .getSingleResult();
     }
 
     @Nested
@@ -235,7 +300,6 @@ public class ScheduleRepositoryTest {
             }
         }
     }
-
 
     @Nested
     @DisplayName("searchMonthlyOrders 메소드는")
@@ -435,7 +499,6 @@ public class ScheduleRepositoryTest {
         }
     }
 
-
     @Nested
     @DisplayName("findMonthlyOrders 메소드는")
     class Describe_findMonthlyOrders {
@@ -562,7 +625,6 @@ public class ScheduleRepositoryTest {
         }
     }
 
-
     @Nested
     @DisplayName("findDailyInforms 메소드는")
     class Describe_findDailyInforms {
@@ -638,7 +700,6 @@ public class ScheduleRepositoryTest {
         }
     }
 
-
     @Nested
     @DisplayName("findDailyOrders 메소드는")
     class Describe_findDailyOrders {
@@ -668,74 +729,6 @@ public class ScheduleRepositoryTest {
                 assertThat(schedules.size()).isEqualTo(1);
             }
         }
-    }
-
-    private void initData() {
-        Team team = entityManager.persist(createTeam());
-
-        Member admin = entityManager.persist(createMember());
-        Member orderer = entityManager.persist(createMember());
-        Member viewer = entityManager.persist(createMember());
-
-        entityManager.persist(createParticipant(team, admin, MemberTeamRole.ADMIN));
-        entityManager.persist(createParticipant(team, orderer, MemberTeamRole.ORDERER));
-        entityManager.persist(createParticipant(team, viewer, MemberTeamRole.VIEWER));
-
-        Inventory inventory = entityManager.persist(createInventory(team));
-
-        Product product = entityManager.persist(createProduct(inventory));
-
-        for (int i = 0; i < 40; i++) {
-            LocalDate date = today.plusDays(i);
-            Order order = entityManager.persist(createOrder(team, orderer, product, date));
-            entityManager.persist(createOrderMention(order, admin));
-        }
-
-        for (int i = 0; i < 40; i++) {
-            LocalDate date = today.plusDays(i);
-            Inform inform = entityManager.persist(createInform(team, viewer, date));
-            entityManager.persist(createInformMention(inform, admin));
-        }
-
-        for (int i = 0; i < 40; i++) {
-            LocalDate date = today.plusDays(i);
-            Inform inform = entityManager.persist(createInform(team, orderer, date));
-            entityManager.persist(createInformMention(inform, viewer));
-        }
-        entityManager.flush();
-    }
-
-    private Long getMonthlyCountForMember(Long memberId, Class<?> entityType, LocalDate date) {
-        return entityManager.getEntityManager()
-                .createQuery("SELECT COUNT(e) FROM " + entityType.getSimpleName()
-                                + " e WHERE e.member.id = :memberId AND YEAR(e.date) = :year AND MONTH(e.date) = :month",
-                        Long.class)
-                .setParameter("memberId", memberId)
-                .setParameter("year", date.getYear())
-                .setParameter("month", date.getMonthValue())
-                .getSingleResult();
-    }
-
-    private Long getMonthlyInformMentionCountForMember(Long memberId, LocalDate date) {
-        return entityManager.getEntityManager()
-                .createQuery(
-                        "SELECT COUNT(im) FROM Inform i JOIN InformMention im ON i.id = im.inform.id WHERE im.member.id = :memberId AND YEAR(i.date) = :year AND MONTH(i.date) = :month",
-                        Long.class)
-                .setParameter("memberId", memberId)
-                .setParameter("year", date.getYear())
-                .setParameter("month", date.getMonthValue())
-                .getSingleResult();
-    }
-
-    private Long getMonthlyOrderMentionCountForMember(Long memberId, LocalDate date) {
-        return entityManager.getEntityManager()
-                .createQuery(
-                        "SELECT COUNT(om) FROM Order o JOIN OrderMention om ON o.id = om.order.id WHERE om.member.id = :memberId AND YEAR(o.date) = :year AND MONTH(o.date) = :month",
-                        Long.class)
-                .setParameter("memberId", memberId)
-                .setParameter("year", date.getYear())
-                .setParameter("month", date.getMonthValue())
-                .getSingleResult();
     }
 }
 
