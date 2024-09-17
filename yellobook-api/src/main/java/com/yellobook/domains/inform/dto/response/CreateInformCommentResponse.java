@@ -1,9 +1,8 @@
 package com.yellobook.domains.inform.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-
 import java.time.LocalDateTime;
+import lombok.Builder;
 
 @Builder
 public record CreateInformCommentResponse(

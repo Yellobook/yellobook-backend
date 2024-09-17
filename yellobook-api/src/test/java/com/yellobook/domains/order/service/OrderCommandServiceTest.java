@@ -50,6 +50,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("OrderCommandService Unit Test")
 class OrderCommandServiceTest {
+    private final TeamMemberVO admin = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
+    private final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, MemberTeamRole.ORDERER);
+    private final TeamMemberVO viewer = TeamMemberVO.of(3L, 1L, MemberTeamRole.VIEWER);
     @InjectMocks
     private OrderCommandService orderCommandService;
     @Mock
@@ -69,9 +72,44 @@ class OrderCommandServiceTest {
     @Mock
     private OrderMapper orderMapper;
 
-    private final TeamMemberVO admin = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
-    private final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, MemberTeamRole.ORDERER);
-    private final TeamMemberVO viewer = TeamMemberVO.of(3L, 1L, MemberTeamRole.VIEWER);
+    private Member createMemberWithId(Long memberId) {
+        Member member = createMember();
+        try {
+            Field idField = Member.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(member, memberId);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to set member ID", e);
+        }
+        return member;
+    }
+
+    private Team createTeamWithId(Long teamId) {
+        Team team = createTeam();
+        try {
+            Field idField = Team.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(team, teamId);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to set member ID", e);
+        }
+        return team;
+    }
+
+    private OrderComment createOrderCommentWithId(Long commentId) {
+        OrderComment comment = createOrderComment(null, null);
+        try {
+            Field idField = OrderComment.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(comment, commentId);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to set order comment ID", e);
+        }
+        return comment;
+    }
 
     @Nested
     @DisplayName("modifyRequestOrder 메소드는")
@@ -347,6 +385,12 @@ class OrderCommandServiceTest {
     @Nested
     @DisplayName("addOrderComment 메소드는")
     class Describe_AddOrderComment {
+        private AddOrderCommentRequest createAddOrderCommentRequest() {
+            return AddOrderCommentRequest.builder()
+                    .content("댓글 내용")
+                    .build();
+        }
+
         @Nested
         @DisplayName("해당 주문의 주문자가 아니면")
         class Context_not_order_orderer {
@@ -447,17 +491,18 @@ class OrderCommandServiceTest {
                 verify(orderMapper).toAddOrderCommentResponse(commentId);
             }
         }
-
-        private AddOrderCommentRequest createAddOrderCommentRequest() {
-            return AddOrderCommentRequest.builder()
-                    .content("댓글 내용")
-                    .build();
-        }
     }
 
     @Nested
     @DisplayName("makeOrder 메소드는")
     class Describe_MakeOrder {
+        private MakeOrderRequest createMakeOrderRequest(Integer orderAmount) {
+            return MakeOrderRequest.builder()
+                    .productId(1L)
+                    .orderAmount(orderAmount)
+                    .build();
+        }
+
         @Nested
         @DisplayName("관리자라면")
         class Context_admin {
@@ -601,53 +646,6 @@ class OrderCommandServiceTest {
                 verify(productRepository).findById(request.productId());
             }
         }
-
-        private MakeOrderRequest createMakeOrderRequest(Integer orderAmount) {
-            return MakeOrderRequest.builder()
-                    .productId(1L)
-                    .orderAmount(orderAmount)
-                    .build();
-        }
-    }
-
-
-    private Member createMemberWithId(Long memberId) {
-        Member member = createMember();
-        try {
-            Field idField = Member.class.getDeclaredField("id");
-            idField.setAccessible(true);
-            idField.set(member, memberId);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to set member ID", e);
-        }
-        return member;
-    }
-
-    private Team createTeamWithId(Long teamId) {
-        Team team = createTeam();
-        try {
-            Field idField = Team.class.getDeclaredField("id");
-            idField.setAccessible(true);
-            idField.set(team, teamId);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to set member ID", e);
-        }
-        return team;
-    }
-
-    private OrderComment createOrderCommentWithId(Long commentId) {
-        OrderComment comment = createOrderComment(null, null);
-        try {
-            Field idField = OrderComment.class.getDeclaredField("id");
-            idField.setAccessible(true);
-            idField.set(comment, commentId);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to set order comment ID", e);
-        }
-        return comment;
     }
 
 }

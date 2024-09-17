@@ -1,7 +1,16 @@
 package com.yellobook.domains.inventory.entity;
 
 import com.yellobook.domains.common.entity.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,13 +20,14 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "products",
         uniqueConstraints = {
-            // 재고현황별 품번은 고유해야 한다.
-            @UniqueConstraint(name = "uc_inventory_sku", columnNames = {"inventory_id", "sku"})
+                // 재고현황별 품번은 고유해야 한다.
+                @UniqueConstraint(name = "uc_inventory_sku", columnNames = {"inventory_id", "sku"})
         }
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Product extends BaseEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**
@@ -64,7 +74,8 @@ public class Product extends BaseEntity {
     private Integer amount;
 
     @Builder
-    public Product(String name, String subProduct, Integer sku, Integer purchasePrice, Integer salePrice, Integer amount, Inventory inventory){
+    public Product(String name, String subProduct, Integer sku, Integer purchasePrice, Integer salePrice,
+                   Integer amount, Inventory inventory) {
         this.name = name;
         this.subProduct = subProduct;
         this.sku = sku;
@@ -74,11 +85,11 @@ public class Product extends BaseEntity {
         this.inventory = inventory;
     }
 
-    public void modifyAmount(Integer amount){
+    public void modifyAmount(Integer amount) {
         this.amount = amount;
     }
 
-    public void reduceAmount(Integer orderAmount){
+    public void reduceAmount(Integer orderAmount) {
         this.amount -= orderAmount;
     }
 }

@@ -45,6 +45,9 @@ import org.springframework.data.domain.Pageable;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("InventoryQueryService Unit Test")
 class InventoryQueryServiceTest {
+    private final TeamMemberVO admin = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
+    private final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, MemberTeamRole.ORDERER);
+    private final TeamMemberVO viewer = TeamMemberVO.of(3L, 1L, MemberTeamRole.VIEWER);
     @InjectMocks
     private InventoryQueryService inventoryQueryService;
     @Mock
@@ -56,13 +59,62 @@ class InventoryQueryServiceTest {
     @Mock
     private ProductMapper productMapper;
 
-    private final TeamMemberVO admin = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
-    private final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, MemberTeamRole.ORDERER);
-    private final TeamMemberVO viewer = TeamMemberVO.of(3L, 1L, MemberTeamRole.VIEWER);
+    private List<QueryProduct> createProductDTOs() {
+        List<QueryProduct> result = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            result.add(QueryProduct.builder()
+                    .name("product")
+                    .build());
+        }
+        return result;
+    }
+
+    private GetProductsResponse createGetProductsResponse() {
+        List<ProductInfo> result = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            result.add(ProductInfo.builder()
+                    .name("product")
+                    .build());
+        }
+        return GetProductsResponse.builder()
+                .products(result)
+                .build();
+    }
+
+    private Inventory createInventoryWithId() {
+        Inventory inventory = createInventory(null);
+        try {
+            Field idField = Inventory.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(inventory, 1L);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to set order comment ID", e);
+        }
+        return inventory;
+    }
 
     @Nested
     @DisplayName("getTotalInventory 메소드는")
     class Describe_GetTotalInventory {
+        private List<QueryInventory> createInventoryDTOs() {
+            List<QueryInventory> result = new ArrayList<>();
+            for (int i = 0; i < 4; i++) {
+                result.add(QueryInventory.builder()
+                        .build());
+            }
+            return result;
+        }
+
+        private List<InventoryInfo> createInventoryInfo() {
+            List<InventoryInfo> result = new ArrayList<>();
+            for (int i = 0; i < 4; i++) {
+                result.add(InventoryInfo.builder()
+                        .build());
+            }
+            return result;
+        }
+
         @Nested
         @DisplayName("뷰어라면")
         class Context_Viewer {
@@ -163,24 +215,6 @@ class InventoryQueryServiceTest {
                 assertThat(response.size()).isEqualTo(expectResponse.size());
                 assertThat(response.inventories()).isSameAs(Collections.emptyList());
             }
-        }
-
-        private List<QueryInventory> createInventoryDTOs() {
-            List<QueryInventory> result = new ArrayList<>();
-            for (int i = 0; i < 4; i++) {
-                result.add(QueryInventory.builder()
-                        .build());
-            }
-            return result;
-        }
-
-        private List<InventoryInfo> createInventoryInfo() {
-            List<InventoryInfo> result = new ArrayList<>();
-            for (int i = 0; i < 4; i++) {
-                result.add(InventoryInfo.builder()
-                        .build());
-            }
-            return result;
         }
 
     }
@@ -429,6 +463,44 @@ class InventoryQueryServiceTest {
     @Nested
     @DisplayName("getSubProductName 메소드는")
     class Describe_GetSubProductName {
+        private List<QuerySubProduct> createQuerySubProducts() {
+            return List.of(
+                    QuerySubProduct.builder()
+                            .productId(1L)
+                            .subProductName("SubProduct A")
+                            .build(),
+                    QuerySubProduct.builder()
+                            .productId(2L)
+                            .subProductName("SubProduct B")
+                            .build(),
+                    QuerySubProduct.builder()
+                            .productId(3L)
+                            .subProductName("SubProduct C")
+                            .build()
+            );
+        }
+
+        private GetSubProductNameResponse createGetSubProductNameResponse() {
+            List<GetSubProductNameResponse.SubProductInfo> subProductInfos = List.of(
+                    GetSubProductNameResponse.SubProductInfo.builder()
+                            .productId(1L)
+                            .subProductName("SubProduct A")
+                            .build(),
+                    GetSubProductNameResponse.SubProductInfo.builder()
+                            .productId(2L)
+                            .subProductName("SubProduct B")
+                            .build(),
+                    GetSubProductNameResponse.SubProductInfo.builder()
+                            .productId(3L)
+                            .subProductName("SubProduct C")
+                            .build()
+            );
+
+            return GetSubProductNameResponse.builder()
+                    .subProducts(subProductInfos)
+                    .build();
+        }
+
         @Nested
         @DisplayName("재고가 존재하지 않으면")
         class Context_Inventory_Not_Exist {
@@ -489,79 +561,6 @@ class InventoryQueryServiceTest {
                 verify(productMapper).toGetSubProductNameResponse(subProducts);
             }
         }
-
-        private List<QuerySubProduct> createQuerySubProducts() {
-            return List.of(
-                    QuerySubProduct.builder()
-                            .productId(1L)
-                            .subProductName("SubProduct A")
-                            .build(),
-                    QuerySubProduct.builder()
-                            .productId(2L)
-                            .subProductName("SubProduct B")
-                            .build(),
-                    QuerySubProduct.builder()
-                            .productId(3L)
-                            .subProductName("SubProduct C")
-                            .build()
-            );
-        }
-
-        private GetSubProductNameResponse createGetSubProductNameResponse() {
-            List<GetSubProductNameResponse.SubProductInfo> subProductInfos = List.of(
-                    GetSubProductNameResponse.SubProductInfo.builder()
-                            .productId(1L)
-                            .subProductName("SubProduct A")
-                            .build(),
-                    GetSubProductNameResponse.SubProductInfo.builder()
-                            .productId(2L)
-                            .subProductName("SubProduct B")
-                            .build(),
-                    GetSubProductNameResponse.SubProductInfo.builder()
-                            .productId(3L)
-                            .subProductName("SubProduct C")
-                            .build()
-            );
-
-            return GetSubProductNameResponse.builder()
-                    .subProducts(subProductInfos)
-                    .build();
-        }
-    }
-
-    private List<QueryProduct> createProductDTOs() {
-        List<QueryProduct> result = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            result.add(QueryProduct.builder()
-                    .name("product")
-                    .build());
-        }
-        return result;
-    }
-
-    private GetProductsResponse createGetProductsResponse() {
-        List<ProductInfo> result = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            result.add(ProductInfo.builder()
-                    .name("product")
-                    .build());
-        }
-        return GetProductsResponse.builder()
-                .products(result)
-                .build();
-    }
-
-    private Inventory createInventoryWithId() {
-        Inventory inventory = createInventory(null);
-        try {
-            Field idField = Inventory.class.getDeclaredField("id");
-            idField.setAccessible(true);
-            idField.set(inventory, 1L);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to set order comment ID", e);
-        }
-        return inventory;
     }
 
 }

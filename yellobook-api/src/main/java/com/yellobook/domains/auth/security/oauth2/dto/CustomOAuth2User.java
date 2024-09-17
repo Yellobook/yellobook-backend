@@ -1,13 +1,12 @@
 package com.yellobook.domains.auth.security.oauth2.dto;
 
 import com.yellobook.common.enums.MemberRole;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 @RequiredArgsConstructor
 public class CustomOAuth2User implements OAuth2User {
@@ -31,7 +30,8 @@ public class CustomOAuth2User implements OAuth2User {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> collection = new ArrayList<>();
-        collection.add((GrantedAuthority) () -> oauth2UserDTO.getRole().getRoleName());
+        collection.add((GrantedAuthority) () -> oauth2UserDTO.getRole()
+                .getRoleName());
         return collection;
     }
 

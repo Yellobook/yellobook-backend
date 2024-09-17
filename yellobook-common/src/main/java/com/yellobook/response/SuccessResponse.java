@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@JsonPropertyOrder({ "isSuccess", "message", "data" })
+@JsonPropertyOrder({"isSuccess", "message", "data"})
 @Schema(description = "성공 응답")
 public class SuccessResponse<T> extends BaseResponse {
     @Schema(description = "응답 데이터")

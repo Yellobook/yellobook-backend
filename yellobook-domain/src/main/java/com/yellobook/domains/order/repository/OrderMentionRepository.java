@@ -7,5 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface OrderMentionRepository extends JpaRepository<OrderMention, Long> {
     boolean existsByMemberIdAndOrderId(Long memberId, Long orderId);
+
     void deleteAllByOrderId(Long orderId);
 }

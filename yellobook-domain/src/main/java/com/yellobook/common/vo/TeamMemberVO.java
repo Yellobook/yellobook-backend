@@ -1,9 +1,8 @@
 package com.yellobook.common.vo;
 
 import com.yellobook.common.enums.MemberTeamRole;
-import lombok.Getter;
-
 import java.util.Objects;
+import lombok.Getter;
 
 @Getter
 public class TeamMemberVO {
@@ -26,9 +25,13 @@ public class TeamMemberVO {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o) {
+            return true;
+        }
         // null 및 클래스타입
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         TeamMemberVO teamUser = (TeamMemberVO) o;
         return memberId.equals(teamUser.memberId)
                 && teamId.equals(teamUser.teamId)

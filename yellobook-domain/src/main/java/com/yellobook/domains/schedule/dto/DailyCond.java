@@ -4,7 +4,7 @@ import com.yellobook.common.vo.TeamMemberVO;
 import lombok.Builder;
 
 @Builder
-public record DailyCond (
+public record DailyCond(
         int year,
         int month,
         int day,

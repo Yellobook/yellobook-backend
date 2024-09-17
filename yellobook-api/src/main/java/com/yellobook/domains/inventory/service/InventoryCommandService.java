@@ -20,24 +20,23 @@ import com.yellobook.error.code.FileErrorCode;
 import com.yellobook.error.code.InventoryErrorCode;
 import com.yellobook.error.code.TeamErrorCode;
 import com.yellobook.error.exception.CustomException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class InventoryCommandService{
+public class InventoryCommandService {
     private final InventoryRepository inventoryRepository;
     private final ProductRepository productRepository;
     private final TeamRepository teamRepository;
@@ -53,13 +52,15 @@ public class InventoryCommandService{
         ParticipantUtil.forbidOrderer(teamMember.getRole());
 
         // SKU 중복 확인 (inventory & sku)
-        if(productRepository.existsByInventoryIdAndSku(inventoryId, requestDTO.sku())){
+        if (productRepository.existsByInventoryIdAndSku(inventoryId, requestDTO.sku())) {
             throw new CustomException(InventoryErrorCode.SKU_ALREADY_EXISTS);
         }
 
-        Inventory inventory = inventoryRepository.findById(inventoryId).orElseThrow(() -> new CustomException(InventoryErrorCode.INVENTORY_NOT_FOUND) );
+        Inventory inventory = inventoryRepository.findById(inventoryId)
+                .orElseThrow(() -> new CustomException(InventoryErrorCode.INVENTORY_NOT_FOUND));
         Product newProduct = productMapper.toProduct(requestDTO, inventory);
-        Long productId = productRepository.save(newProduct).getId();
+        Long productId = productRepository.save(newProduct)
+                .getId();
         return productMapper.toAddProductResponse(productId);
     }
 
@@ -71,10 +72,11 @@ public class InventoryCommandService{
         ParticipantUtil.forbidOrderer(teamMember.getRole());
 
         Optional<Product> productOptional = productRepository.findById(productId);
-        if(productOptional.isEmpty()){
+        if (productOptional.isEmpty()) {
             throw new CustomException(InventoryErrorCode.PRODUCT_NOT_FOUND);  // 여기 이미 validation 했는데, 또 해야 하나...?
         }
-        productOptional.get().modifyAmount(requestDTO.amount());
+        productOptional.get()
+                .modifyAmount(requestDTO.amount());
     }
 
     /**
@@ -93,7 +95,8 @@ public class InventoryCommandService{
     public void increaseInventoryView(Long inventoryId, TeamMemberVO teamMember) {
         ParticipantUtil.forbidViewer(teamMember.getRole());
 
-        Inventory inventory = inventoryRepository.findById(inventoryId).orElseThrow(() -> new CustomException(InventoryErrorCode.INVENTORY_NOT_FOUND));
+        Inventory inventory = inventoryRepository.findById(inventoryId)
+                .orElseThrow(() -> new CustomException(InventoryErrorCode.INVENTORY_NOT_FOUND));
         inventory.increaseView();
     }
 
@@ -105,15 +108,17 @@ public class InventoryCommandService{
         ParticipantUtil.forbidOrderer(teamMember.getRole());
 
         List<ExcelProductCond> productConds;
-        try{
+        try {
             productConds = excelReadUtil.read(file);
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new CustomException(FileErrorCode.FILE_IO_FAIL);
         }
 
         // 재고 저장
-        Team team = teamRepository.findById(teamMember.getTeamId()).orElseThrow(() -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
-        String inventoryTitle = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")) + " 재고현황";
+        Team team = teamRepository.findById(teamMember.getTeamId())
+                .orElseThrow(() -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+        String inventoryTitle = LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")) + " 재고현황";
         Inventory newInventory = inventoryMapper.toInventory(team, inventoryTitle);
         inventoryRepository.save(newInventory);
         log.info("[EXCEL_INVENTORY] : id = {}, title = {}", newInventory.getId(), newInventory.getTitle());

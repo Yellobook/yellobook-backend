@@ -4,10 +4,9 @@ import com.yellobook.domains.inform.entity.Inform;
 import com.yellobook.domains.inform.entity.InformMention;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.team.entity.Team;
-import support.ReflectionUtils;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import support.ReflectionUtils;
 
 public class InformFixture {
     private static final String INFORM_TITLE = "공지";
@@ -23,7 +22,8 @@ public class InformFixture {
         return createInform(team, member, date, INFORM_TITLE, INFORM_CONTENT, INFORM_TIMESTAMP);
     }
 
-    public static Inform createInform(Team team, Member member, LocalDate date, String title, String content, LocalDateTime timestamp) {
+    public static Inform createInform(Team team, Member member, LocalDate date, String title, String content,
+                                      LocalDateTime timestamp) {
         Inform inform = Inform.builder()
                 .title(title)
                 .content(content)

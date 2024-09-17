@@ -38,9 +38,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("OrderQueryService Unit Test")
 class OrderQueryServiceTest {
+    private final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, MemberTeamRole.ORDERER);
     @InjectMocks
     private OrderQueryService orderQueryService;
-
     @Mock
     private OrderRepository orderRepository;
     @Mock
@@ -48,7 +48,18 @@ class OrderQueryServiceTest {
     @Mock
     private OrderMapper orderMapper;
 
-    private final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, MemberTeamRole.ORDERER);
+    private Member createMemberWithId(Long memberId) {
+        Member member = createMember();
+        try {
+            Field idField = Member.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(member, memberId);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to set member ID", e);
+        }
+        return member;
+    }
 
     @Nested
     @DisplayName("getOrderComments 메소드는")
@@ -239,19 +250,6 @@ class OrderQueryServiceTest {
                 assertThat(response).isNotNull();
             }
         }
-    }
-
-    private Member createMemberWithId(Long memberId) {
-        Member member = createMember();
-        try {
-            Field idField = Member.class.getDeclaredField("id");
-            idField.setAccessible(true);
-            idField.set(member, memberId);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to set member ID", e);
-        }
-        return member;
     }
 
 }

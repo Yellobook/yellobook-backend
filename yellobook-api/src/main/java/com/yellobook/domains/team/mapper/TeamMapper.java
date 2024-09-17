@@ -2,13 +2,16 @@ package com.yellobook.domains.team.mapper;
 
 import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.dto.request.CreateTeamRequest;
-import com.yellobook.domains.team.dto.response.*;
+import com.yellobook.domains.team.dto.response.CreateTeamResponse;
+import com.yellobook.domains.team.dto.response.GetTeamResponse;
+import com.yellobook.domains.team.dto.response.InvitationCodeResponse;
+import com.yellobook.domains.team.dto.response.JoinTeamResponse;
+import com.yellobook.domains.team.dto.response.TeamMemberListResponse;
 import com.yellobook.domains.team.entity.Team;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 @Mapper(componentModel = "spring")
@@ -17,6 +20,7 @@ public interface TeamMapper {
 
     @Mapping(source = "id", target = "teamId")
     CreateTeamResponse toCreateTeamResponse(Team team);
+
     InvitationCodeResponse toInvitationCodeResponse(String inviteUrl);
 
     @Mapping(source = "id", target = "teamId")

@@ -1,9 +1,8 @@
 package com.yellobook.domains.inventory.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-
 import java.util.List;
+import lombok.Builder;
 
 @Builder
 public record GetProductsNameResponse(

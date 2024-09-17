@@ -1,10 +1,9 @@
 package com.yellobook.domains.schedule.strategy;
 
 import com.yellobook.common.enums.MemberTeamRole;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -14,7 +13,8 @@ public class ScheduleStrategyFactory {
 
     public ScheduleStrategy getStrategy(MemberTeamRole role) {
         // 컴포넌트 스캔으로 등록된 빈 이름으로 선택
-        String beanName = role.name().toLowerCase() + "ScheduleStrategy";
+        String beanName = role.name()
+                .toLowerCase() + "ScheduleStrategy";
         return scheduleStrategies.get(beanName);
     }
 }

@@ -4,7 +4,7 @@ import com.yellobook.common.vo.TeamMemberVO;
 import lombok.Builder;
 
 @Builder
-public record MonthlyCond (
+public record MonthlyCond(
         int year,
         int month,
         TeamMemberVO teamMember
