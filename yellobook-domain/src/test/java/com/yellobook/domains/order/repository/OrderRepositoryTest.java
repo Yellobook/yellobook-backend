@@ -73,6 +73,11 @@ public class OrderRepositoryTest {
     @Nested
     @DisplayName("getOrderComments 메소드는")
     class Describe_GetOrderComments {
+        private OrderComment getOrderCommentById(Long commentId) {
+            return orderCommentRepository.findById(commentId)
+                    .orElseThrow(() -> new RuntimeException("OrderComment Not Found"));
+        }
+
         @Nested
         @DisplayName("주문이 존재하지 않으면")
         class Context_order_not_exist {
@@ -125,11 +130,6 @@ public class OrderRepositoryTest {
                 result.forEach(comment -> assertThat(getOrderCommentById(comment.commentId()).getOrder()
                         .getId()).isEqualTo(orderId));
             }
-        }
-
-        private OrderComment getOrderCommentById(Long commentId) {
-            return orderCommentRepository.findById(commentId)
-                    .orElseThrow(() -> new RuntimeException("OrderComment Not Found"));
         }
     }
 

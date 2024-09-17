@@ -5,8 +5,8 @@ import lombok.Builder;
 
 @Builder
 @Schema(description = "토큰 응답")
-public record RefreshResponse (
-    @Schema(description = "엑세스 토큰", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
-    String accessToken
+public record RefreshResponse(
+        @Schema(description = "엑세스 토큰", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+        String accessToken
 ) {
 }

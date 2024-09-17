@@ -17,7 +17,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Validated
@@ -43,7 +49,7 @@ public class InformController {
     public ResponseEntity<Void> deleteInform(
             @ExistInform @PathVariable("informId") Long informId,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
-    ){
+    ) {
         informCommandService.deleteInform(informId, oAuth2User.getMemberId());
         return ResponseFactory.noContent();
     }
@@ -53,7 +59,7 @@ public class InformController {
     public ResponseEntity<SuccessResponse<GetInformResponse>> getInform(
             @ExistInform @PathVariable("informId") Long informId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
-    ){
+    ) {
         var result = informQueryService.getInformById(customOAuth2User.getMemberId(), informId);
         return ResponseFactory.success(result);
     }
@@ -65,7 +71,7 @@ public class InformController {
             @ExistInform @PathVariable("informId") Long informId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
             @RequestBody CreateInformCommentRequest request
-    ){
+    ) {
         var result = informCommandService.addComment(informId, customOAuth2User.getMemberId(), request);
         return ResponseFactory.created(result);
     }

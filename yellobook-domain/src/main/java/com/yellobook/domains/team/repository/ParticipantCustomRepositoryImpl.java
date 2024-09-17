@@ -5,13 +5,10 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yellobook.domains.member.entity.QMember;
 import com.yellobook.domains.team.dto.query.QueryMemberJoinTeam;
 import com.yellobook.domains.team.dto.query.QueryTeamMember;
-import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.QParticipant;
-import com.yellobook.domains.team.entity.QTeam;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 @RequiredArgsConstructor

@@ -1,5 +1,10 @@
 package com.yellobook;
 
+import static fixture.MemberFixture.createMember;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasKey;
+
 import com.yellobook.domains.auth.dto.request.AllowanceRequest;
 import com.yellobook.domains.auth.service.JwtService;
 import com.yellobook.domains.member.repository.MemberRepository;
@@ -8,15 +13,15 @@ import com.yellobook.support.annotation.CustomAutowired;
 import com.yellobook.support.utils.JwtTestUtil;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
-import io.restassured.RestAssured;
-
-import static fixture.MemberFixture.*;
-import static org.hamcrest.Matchers.*;
 
 @DisplayName("AuthController Integration Test")
 public class AuthIntegrationTest extends IntegrationTest {
@@ -50,7 +55,8 @@ public class AuthIntegrationTest extends IntegrationTest {
 
                 response = RestAssured.given()
                         .cookie(refreshTokenName, refreshToken)
-                        .log().all()
+                        .log()
+                        .all()
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when()
                         .post(url);
@@ -59,13 +65,15 @@ public class AuthIntegrationTest extends IntegrationTest {
             @Test
             @DisplayName("200 상태코드로 응답해야 한다.")
             void it_return_200() {
-                response.then().statusCode(200);
+                response.then()
+                        .statusCode(200);
             }
 
             @Test
             @DisplayName("accessToken 을 재발급해야 한다.")
             void it_return_new_access_token() {
-                response.then().body("data", hasKey("accessToken"));
+                response.then()
+                        .body("data", hasKey("accessToken"));
             }
         }
 
@@ -81,7 +89,8 @@ public class AuthIntegrationTest extends IntegrationTest {
                 memberRepository.save(member);
 
                 response = RestAssured.given()
-                        .log().all()
+                        .log()
+                        .all()
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when()
                         .post(url);
@@ -90,19 +99,22 @@ public class AuthIntegrationTest extends IntegrationTest {
             @Test
             @DisplayName("401 상태코드로 응답해야 한다.")
             void it_return_200() {
-                response.then().statusCode(401);
+                response.then()
+                        .statusCode(401);
             }
 
             @Test
             @DisplayName("AUTH-010 에러코드를 반환해야 한다.")
             void it_contains_error_code() {
-                response.then().body("code", equalTo("AUTH-010"));
+                response.then()
+                        .body("code", equalTo("AUTH-010"));
             }
 
             @Test
             @DisplayName("에러 메시지를 포함해야 한다.")
             void it_contains_message() {
-                response.then().body("message", equalTo("쿠키에 리프레시 토큰이 없습니다."));
+                response.then()
+                        .body("message", equalTo("쿠키에 리프레시 토큰이 없습니다."));
             }
         }
 
@@ -129,7 +141,8 @@ public class AuthIntegrationTest extends IntegrationTest {
 
                 response = RestAssured.given()
                         .cookie(refreshTokenName, refreshToken)
-                        .log().all()
+                        .log()
+                        .all()
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when()
                         .post(url);
@@ -138,19 +151,22 @@ public class AuthIntegrationTest extends IntegrationTest {
             @Test
             @DisplayName("401 상태코드로 응답해야 한다.")
             void it_return_200() {
-                response.then().statusCode(401);
+                response.then()
+                        .statusCode(401);
             }
 
             @Test
             @DisplayName("AUTH-005 에러코드를 반환해야 한다.")
             void it_contains_error_code() {
-                response.then().body("code", equalTo("AUTH-005"));
+                response.then()
+                        .body("code", equalTo("AUTH-005"));
             }
 
             @Test
             @DisplayName("에러 메시지를 포함해야 한다.")
             void it_contains_message() {
-                response.then().body("message", equalTo("리프레시 토큰의 유효기간이 만료되었습니다."));
+                response.then()
+                        .body("message", equalTo("리프레시 토큰의 유효기간이 만료되었습니다."));
             }
         }
     }
@@ -179,7 +195,8 @@ public class AuthIntegrationTest extends IntegrationTest {
                         .build();
 
                 response = RestAssured.given()
-                        .log().all()
+                        .log()
+                        .all()
                         .body(request)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when()
@@ -189,13 +206,15 @@ public class AuthIntegrationTest extends IntegrationTest {
             @Test
             @DisplayName("200 상태코드로 응답해야 한다.")
             void it_return_200() {
-                response.then().statusCode(200);
+                response.then()
+                        .statusCode(200);
             }
 
             @Test
             @DisplayName("응답 data 에 accessToken 과 refreshToken 포함해야 한다.")
             void it_return_tokens() {
-                response.then().body("data", allOf(hasKey("accessToken"), hasKey("refreshToken")));
+                response.then()
+                        .body("data", allOf(hasKey("accessToken"), hasKey("refreshToken")));
             }
         }
 
@@ -214,7 +233,8 @@ public class AuthIntegrationTest extends IntegrationTest {
                         .build();
 
                 response = RestAssured.given()
-                        .log().all()
+                        .log()
+                        .all()
                         .body(request)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when()
@@ -224,19 +244,22 @@ public class AuthIntegrationTest extends IntegrationTest {
             @Test
             @DisplayName("401 상태코드로 응답해야 한다.")
             void it_return_tokens_with_200() {
-                response.then().statusCode(401);
+                response.then()
+                        .statusCode(401);
             }
 
             @Test
             @DisplayName("AUTH_015 에러코드를 반환해야 한다.")
             void it_contains_error_code() {
-                response.then().body("code", equalTo("AUTH_015"));
+                response.then()
+                        .body("code", equalTo("AUTH_015"));
             }
 
             @Test
             @DisplayName("에러 메시지를 포함해야 한다.")
             void it_contains_message() {
-                response.then().body("message", equalTo("가입한 사용자가 존재하지 않습니다."));
+                response.then()
+                        .body("message", equalTo("가입한 사용자가 존재하지 않습니다."));
             }
         }
     }
@@ -263,7 +286,8 @@ public class AuthIntegrationTest extends IntegrationTest {
 
                 response = RestAssured.given()
                         .header("Authorization", "Bearer " + accessToken)
-                        .log().all()
+                        .log()
+                        .all()
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when()
                         .post(url);
@@ -272,7 +296,8 @@ public class AuthIntegrationTest extends IntegrationTest {
             @Test
             @DisplayName("204 상태코드로 응답해야 한다.")
             void it_returns_204() {
-                response.then().statusCode(204);
+                response.then()
+                        .statusCode(204);
             }
         }
 
@@ -285,7 +310,8 @@ public class AuthIntegrationTest extends IntegrationTest {
             @BeforeEach
             void setUpContext() {
                 response = RestAssured.given()
-                        .log().all()
+                        .log()
+                        .all()
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when()
                         .post(url);
@@ -294,7 +320,8 @@ public class AuthIntegrationTest extends IntegrationTest {
             @Test
             @DisplayName("401 상태코드로 응답해야 한다.")
             void it_returns_204() {
-                response.then().statusCode(401);
+                response.then()
+                        .statusCode(401);
             }
         }
 
@@ -318,7 +345,8 @@ public class AuthIntegrationTest extends IntegrationTest {
 
                 response = RestAssured.given()
                         .header("Authorization", "Bearer " + accessToken)
-                        .log().all()
+                        .log()
+                        .all()
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .when()
                         .post(url);
@@ -327,7 +355,8 @@ public class AuthIntegrationTest extends IntegrationTest {
             @Test
             @DisplayName("401 상태코드로 응답해야 한다.")
             void it_returns_204() {
-                response.then().statusCode(401);
+                response.then()
+                        .statusCode(401);
             }
         }
     }

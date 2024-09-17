@@ -1,6 +1,6 @@
 dependencies {
     // swagger
-    api  'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+    api 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
     // validation
     api 'org.springframework.boot:spring-boot-starter-validation'

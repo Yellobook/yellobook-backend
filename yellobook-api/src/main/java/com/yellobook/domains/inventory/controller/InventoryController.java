@@ -6,7 +6,12 @@ import com.yellobook.common.validation.annotation.ExistProduct;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.inventory.dto.request.AddProductRequest;
 import com.yellobook.domains.inventory.dto.request.ModifyProductAmountRequest;
-import com.yellobook.domains.inventory.dto.response.*;
+import com.yellobook.domains.inventory.dto.response.AddInventoryResponse;
+import com.yellobook.domains.inventory.dto.response.AddProductResponse;
+import com.yellobook.domains.inventory.dto.response.GetProductsNameResponse;
+import com.yellobook.domains.inventory.dto.response.GetProductsResponse;
+import com.yellobook.domains.inventory.dto.response.GetSubProductNameResponse;
+import com.yellobook.domains.inventory.dto.response.GetTotalInventoryResponse;
 import com.yellobook.domains.inventory.service.InventoryCommandService;
 import com.yellobook.domains.inventory.service.InventoryQueryService;
 import com.yellobook.response.ResponseFactory;
@@ -20,7 +25,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -38,9 +53,9 @@ public class InventoryController {
     @GetMapping
     public ResponseEntity<SuccessResponse<GetTotalInventoryResponse>> getTotalInventory(
             @Min(value = 1, message = "page는 1 이상이여야 합니다.") @RequestParam("page") Integer page,
-            @Min(value = 1, message = "size는 1 이상이여야 합니다.")@RequestParam("size") Integer size,
+            @Min(value = 1, message = "size는 1 이상이여야 합니다.") @RequestParam("size") Integer size,
             @TeamMember TeamMemberVO teamMember
-            ){
+    ) {
         var result = inventoryQueryService.getTotalInventory(page, size, teamMember);
         return ResponseFactory.success(result);
     }
@@ -50,7 +65,7 @@ public class InventoryController {
     public ResponseEntity<SuccessResponse<GetProductsResponse>> getProductsByInventory(
             @ExistInventory @PathVariable("inventoryId") Long inventoryId,
             @TeamMember TeamMemberVO teamMember
-    ){
+    ) {
         GetProductsResponse response = inventoryQueryService.getProductsByInventory(inventoryId, teamMember);
         return ResponseFactory.success(response);
     }
@@ -60,7 +75,7 @@ public class InventoryController {
     public ResponseEntity<Void> increaseInventoryView(
             @ExistInventory @PathVariable("inventoryId") Long inventoryId,
             @TeamMember TeamMemberVO teamMember
-    ){
+    ) {
         inventoryCommandService.increaseInventoryView(inventoryId, teamMember);
         return ResponseFactory.noContent();
     }
@@ -71,8 +86,9 @@ public class InventoryController {
             @ExistInventory @PathVariable("inventoryId") Long inventoryId,
             @RequestParam("keyword") String keyword,
             @TeamMember TeamMemberVO teamMember
-    ){
-        GetProductsResponse response = inventoryQueryService.getProductByKeywordAndInventory(inventoryId, keyword, teamMember);
+    ) {
+        GetProductsResponse response = inventoryQueryService.getProductByKeywordAndInventory(inventoryId, keyword,
+                teamMember);
         return ResponseFactory.success(response);
     }
 
@@ -82,7 +98,7 @@ public class InventoryController {
             @ExistInventory @PathVariable("inventoryId") Long inventoryId,
             @Valid @RequestBody AddProductRequest requestDTO,
             @TeamMember TeamMemberVO teamMember
-    ){
+    ) {
         AddProductResponse response = inventoryCommandService.addProduct(inventoryId, requestDTO, teamMember);
         return ResponseFactory.created(response);
     }
@@ -93,7 +109,7 @@ public class InventoryController {
             @ExistProduct @PathVariable("productId") Long productId,
             @Valid @RequestBody ModifyProductAmountRequest requestDTO,
             @TeamMember TeamMemberVO teamMember
-    ){
+    ) {
         inventoryCommandService.modifyProductAmount(productId, requestDTO, teamMember);
         return ResponseFactory.noContent();
     }
@@ -103,7 +119,7 @@ public class InventoryController {
     public ResponseEntity<Void> deleteProduct(
             @ExistProduct @PathVariable("productId") Long productId,
             @TeamMember TeamMemberVO teamMember
-    ){
+    ) {
         inventoryCommandService.deleteProduct(productId, teamMember);
         return ResponseFactory.noContent();
     }
@@ -113,7 +129,7 @@ public class InventoryController {
     public ResponseEntity<SuccessResponse<AddInventoryResponse>> addInventory(
             @RequestPart("file") MultipartFile file,
             @TeamMember TeamMemberVO teamMember
-    ){
+    ) {
         AddInventoryResponse response = inventoryCommandService.addInventory(file, teamMember);
         return ResponseFactory.created(response);
     }
@@ -123,7 +139,7 @@ public class InventoryController {
     public ResponseEntity<SuccessResponse<GetProductsNameResponse>> getProductNames(
             @RequestParam("name") String name,
             @TeamMember TeamMemberVO teamMember
-    ){
+    ) {
         GetProductsNameResponse response = inventoryQueryService.getProductsName(name, teamMember);
         return ResponseFactory.success(response);
     }
@@ -133,7 +149,7 @@ public class InventoryController {
     public ResponseEntity<SuccessResponse<GetSubProductNameResponse>> getSubProductName(
             @RequestParam("name") String name,
             @TeamMember TeamMemberVO teamMember
-    ){
+    ) {
         GetSubProductNameResponse response = inventoryQueryService.getSubProductName(name, teamMember);
         return ResponseFactory.success(response);
     }

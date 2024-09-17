@@ -1,7 +1,6 @@
 package com.yellobook.domains.schedule.dto.query;
 
 import com.yellobook.common.enums.ScheduleType;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 

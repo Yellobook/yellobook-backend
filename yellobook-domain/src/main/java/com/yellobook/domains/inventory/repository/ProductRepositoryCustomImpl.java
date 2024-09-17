@@ -7,30 +7,29 @@ import com.yellobook.domains.inventory.dto.query.QueryProductName;
 import com.yellobook.domains.inventory.dto.query.QuerySubProduct;
 import com.yellobook.domains.inventory.entity.QProduct;
 import jakarta.persistence.EntityManager;
+import java.util.List;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public class ProductRepositoryCustomImpl implements ProductRepositoryCustom{
-    public ProductRepositoryCustomImpl(EntityManager em){
+public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
+    private final JPAQueryFactory queryFactory;
+
+    public ProductRepositoryCustomImpl(EntityManager em) {
         this.queryFactory = new JPAQueryFactory(em);
     }
-
-    private final JPAQueryFactory queryFactory;
 
     @Override
     public List<QueryProduct> getProducts(Long inventoryId) {
         QProduct product = QProduct.product;
 
         return queryFactory.select(Projections.constructor(QueryProduct.class,
-                    product.id.as("productId"),
-                    product.name,
-                    product.subProduct,
-                    product.sku,
-                    product.purchasePrice,
-                    product.salePrice,
-                    product.amount
+                        product.id.as("productId"),
+                        product.name,
+                        product.subProduct,
+                        product.sku,
+                        product.purchasePrice,
+                        product.salePrice,
+                        product.amount
                 ))
                 .from(product)
                 .where(product.inventory.id.eq(inventoryId))
@@ -63,7 +62,8 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom{
 
         return queryFactory.select(Projections.constructor(QueryProductName.class,
                         product.name
-                )).distinct()
+                ))
+                .distinct()
                 .from(product)
                 .where(product.inventory.id.eq(inventoryId), product.name.contains(productName.trim()))
                 .orderBy(product.name.asc())

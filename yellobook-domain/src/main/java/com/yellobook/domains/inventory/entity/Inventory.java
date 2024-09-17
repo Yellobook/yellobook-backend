@@ -2,15 +2,27 @@ package com.yellobook.domains.inventory.entity;
 
 import com.yellobook.domains.common.entity.BaseEntity;
 import com.yellobook.domains.team.entity.Team;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "inventories")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Inventory extends BaseEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**
@@ -21,8 +33,7 @@ public class Inventory extends BaseEntity {
     private Team team;
 
     /**
-     * 재고 현황 제목
-     * ex) 2024년 07월 24일 재고현황
+     * 재고 현황 제목 ex) 2024년 07월 24일 재고현황
      */
     @Column(nullable = false)
     private String title;
@@ -34,13 +45,13 @@ public class Inventory extends BaseEntity {
     private Integer view;
 
     @Builder
-    private Inventory(Team team, String title){
+    private Inventory(Team team, String title) {
         this.team = team;
         this.title = title;
         this.view = 0;
     }
 
-    public void increaseView(){
+    public void increaseView() {
         this.view += 1;
     }
 }

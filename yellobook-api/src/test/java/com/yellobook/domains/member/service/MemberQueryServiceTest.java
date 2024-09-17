@@ -41,6 +41,34 @@ class MemberQueryServiceTest {
     @Mock
     private MemberMapper memberMapper;
 
+    private List<QueryMemberJoinTeam> createQueryMemberJoinTeam() {
+        QueryMemberJoinTeam dto1 = QueryMemberJoinTeam.builder()
+                .role(MemberTeamRole.ADMIN)
+                .teamName("AAA")
+                .build();
+        QueryMemberJoinTeam dto2 = QueryMemberJoinTeam.builder()
+                .role(MemberTeamRole.ADMIN)
+                .teamName("BBB")
+                .build();
+        return List.of(dto1, dto2);
+    }
+
+    private ProfileResponse createProfileResponse(List<ParticipantInfo> participantInfos) {
+        return ProfileResponse.builder()
+                .memberId(1L)
+                .nickname("nickname")
+                .profileImage("image")
+                .email("email")
+                .teams(participantInfos)
+                .build();
+    }
+
+    private TermAllowanceResponse createAllowanceResponse(boolean allowance) {
+        return TermAllowanceResponse.builder()
+                .allowance(allowance)
+                .build();
+    }
+
     @Nested
     @DisplayName("getMemberProfile 메소드는")
     class Describe_GetMemberProfile {
@@ -149,35 +177,6 @@ class MemberQueryServiceTest {
                 verify(memberRepository).findById(memberId);
             }
         }
-    }
-
-    
-    private List<QueryMemberJoinTeam> createQueryMemberJoinTeam() {
-        QueryMemberJoinTeam dto1 = QueryMemberJoinTeam.builder()
-                .role(MemberTeamRole.ADMIN)
-                .teamName("AAA")
-                .build();
-        QueryMemberJoinTeam dto2 = QueryMemberJoinTeam.builder()
-                .role(MemberTeamRole.ADMIN)
-                .teamName("BBB")
-                .build();
-        return List.of(dto1, dto2);
-    }
-
-    private ProfileResponse createProfileResponse(List<ParticipantInfo> participantInfos) {
-        return ProfileResponse.builder()
-                .memberId(1L)
-                .nickname("nickname")
-                .profileImage("image")
-                .email("email")
-                .teams(participantInfos)
-                .build();
-    }
-
-    private TermAllowanceResponse createAllowanceResponse(boolean allowance) {
-        return TermAllowanceResponse.builder()
-                .allowance(allowance)
-                .build();
     }
 
 

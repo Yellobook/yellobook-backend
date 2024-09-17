@@ -1,14 +1,14 @@
 package support;
 
-import org.junit.jupiter.api.Assertions;
-
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
+import org.junit.jupiter.api.Assertions;
 
 public class ReflectionUtils {
     /**
      * 엔티티의 createdAt과 updatedAt 필드를 설정
-     * @param entity 엔티티 인스턴스
+     *
+     * @param entity    엔티티 인스턴스
      * @param timestamp 설정할 시간
      */
     public static void setBaseTimeEntityFields(Object entity, LocalDateTime timestamp) {

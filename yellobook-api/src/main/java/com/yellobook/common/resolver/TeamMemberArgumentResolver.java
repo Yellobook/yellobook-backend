@@ -33,8 +33,10 @@ public class TeamMemberArgumentResolver implements HandlerMethodArgumentResolver
 
     // 매개변수로 넣어줄 값을 제공
     @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
+                                  NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+        Authentication authentication = SecurityContextHolder.getContext()
+                .getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
             CustomOAuth2User customOauth2User = (CustomOAuth2User) authentication.getPrincipal();
             Long memberId = customOauth2User.getMemberId();

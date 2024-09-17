@@ -1,9 +1,9 @@
 package com.yellobook.support;
 
 import io.restassured.RestAssured;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.AfterAll;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -45,11 +45,6 @@ public abstract class IntegrationTest {
         redis.start();
     }
 
-    @BeforeEach
-    void beforeEach() {
-        RestAssured.port = port;
-    }
-
     @AfterAll
     static void afterAll() {
         redis.stop();
@@ -60,5 +55,10 @@ public abstract class IntegrationTest {
     static void configureProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.data.redis.host", redis::getHost);
         registry.add("spring.data.redis.port", () -> redis.getMappedPort(REDIS_PORT));
+    }
+
+    @BeforeEach
+    void beforeEach() {
+        RestAssured.port = port;
     }
 }

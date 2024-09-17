@@ -24,7 +24,8 @@ public class ScheduleService {
         return strategy.getUpcomingSchedules(teamMember);
     }
 
-    public SearchMonthlyScheduleResponse searchMonthlySchedules(MonthlySearchParam monthlySearchParam, TeamMemberVO teamMember) {
+    public SearchMonthlyScheduleResponse searchMonthlySchedules(MonthlySearchParam monthlySearchParam,
+                                                                TeamMemberVO teamMember) {
         ScheduleStrategy strategy = strategyFactory.getStrategy(teamMember.getRole());
         return strategy.searchMonthlySchedules(monthlySearchParam, teamMember);
     }

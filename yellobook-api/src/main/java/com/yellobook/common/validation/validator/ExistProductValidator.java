@@ -12,12 +12,14 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ExistProductValidator implements ConstraintValidator<ExistProduct, Long> {
     private final InventoryQueryService inventoryQueryService;
+
     @Override
     public boolean isValid(Long value, ConstraintValidatorContext context) {
         boolean isValid = inventoryQueryService.existByProductId(value);
-        if(!isValid){
+        if (!isValid) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate(InventoryErrorCode.PRODUCT_NOT_FOUND.toString()).addConstraintViolation();
+            context.buildConstraintViolationWithTemplate(InventoryErrorCode.PRODUCT_NOT_FOUND.toString())
+                    .addConstraintViolation();
         }
 
         return isValid;

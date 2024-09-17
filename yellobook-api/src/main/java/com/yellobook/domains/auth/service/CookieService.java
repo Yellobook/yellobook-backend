@@ -41,18 +41,19 @@ public class CookieService {
         Cookie[] cookies = request.getCookies();
         // 쿠키에 refreshToken 이름에 해당하는 쿠키가 있는지 검색
 
-        if (cookies == null || cookies.length  == 0) {
+        if (cookies == null || cookies.length == 0) {
             throw new CustomException(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND);
         }
 
         for (Cookie cookie : cookies) {
-            if (cookie != null && cookie.getName().equals(refreshTokenName)) {
+            if (cookie != null && cookie.getName()
+                    .equals(refreshTokenName)) {
                 refreshToken = cookie.getValue();
                 break;
             }
         }
 
-        if(refreshToken == null) {
+        if (refreshToken == null) {
             throw new CustomException(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND);
         }
         return refreshToken;
