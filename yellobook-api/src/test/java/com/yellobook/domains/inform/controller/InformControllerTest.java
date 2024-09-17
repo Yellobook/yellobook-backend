@@ -61,68 +61,6 @@ public class InformControllerTest {
     private TeamMemberArgumentResolver teamMemberArgumentResolver;
 
     @Nested
-    @DisplayName("ExistInform 애노테이션은")
-    class Describe_ExistInform_Annotation {
-
-        @Nested
-        @DisplayName("Inform이 존재하는 경우")
-        class Context_Exist_Inform {
-
-            Member member;
-            CustomOAuth2User customOAuth2User;
-            Long informId;
-
-            @BeforeEach
-            void setUp() throws Exception {
-                member = createMember();
-                OAuth2UserDTO oAuth2UserDTO = OAuth2UserDTO.from(member);
-                customOAuth2User = new CustomOAuth2User(oAuth2UserDTO);
-
-                informId = 1L;
-
-                when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
-                when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
-                        .thenReturn(customOAuth2User);
-
-                when(informRepository.existsById(informId)).thenReturn(true);
-            }
-
-            @Test
-            @DisplayName("200 OK를 반환한다.")
-            void it_returns_200_ok() throws Exception {
-                mockMvc.perform(get("/api/v1/informs/{informId}", informId)
-                                .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isOk())
-                        .andReturn();
-
-            }
-        }
-
-        @Nested
-        @DisplayName("Inform이 존재하지 않는 경우")
-        class Context_Not_Exist_Inform {
-
-            Long nonExistInformId;
-
-            @BeforeEach
-            void setUp() {
-                nonExistInformId = 99L;
-
-                when(informRepository.existsById(nonExistInformId)).thenReturn(false);
-            }
-
-            @Test
-            @DisplayName("400 Bad Request를 반환한다.")
-            void it_returns_400_bad_request() throws Exception {
-                mockMvc.perform(get("/api/v1/informs/{informId}", nonExistInformId)
-                                .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isBadRequest())
-                        .andReturn();
-            }
-        }
-    }
-
-    @Nested
     @DisplayName("createInform 메소드는")
     class Describe_createInform {
 

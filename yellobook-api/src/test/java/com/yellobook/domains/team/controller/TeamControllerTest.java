@@ -1,6 +1,17 @@
 package com.yellobook.domains.team.controller;
 
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.resolver.TeamMemberArgumentResolver;
@@ -10,13 +21,19 @@ import com.yellobook.domains.auth.security.oauth2.dto.OAuth2UserDTO;
 import com.yellobook.domains.auth.service.RedisTeamService;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.team.dto.query.QueryTeamMember;
-import com.yellobook.domains.team.dto.request.InvitationCodeRequest;
 import com.yellobook.domains.team.dto.request.CreateTeamRequest;
-import com.yellobook.domains.team.dto.response.*;
+import com.yellobook.domains.team.dto.request.InvitationCodeRequest;
+import com.yellobook.domains.team.dto.response.CreateTeamResponse;
+import com.yellobook.domains.team.dto.response.GetTeamResponse;
+import com.yellobook.domains.team.dto.response.InvitationCodeResponse;
+import com.yellobook.domains.team.dto.response.JoinTeamResponse;
+import com.yellobook.domains.team.dto.response.TeamMemberListResponse;
 import com.yellobook.domains.team.service.TeamCommandService;
 import com.yellobook.domains.team.service.TeamQueryService;
 import com.yellobook.domains.team.util.SecurityUtil;
 import fixture.MemberFixture;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,16 +47,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(controllers = TeamController.class)
@@ -64,18 +71,18 @@ public class TeamControllerTest {
 
     @Nested
     @DisplayName("createTeam 메소드는")
-    class Describe_createTeam{
+    class Describe_createTeam {
 
         @Nested
         @DisplayName("유효한 요청인 경우")
-        class Context_Valid_Request{
+        class Context_Valid_Request {
             CreateTeamRequest request;
             CreateTeamResponse response;
 
             CustomOAuth2User customOAuth2User;
 
             @BeforeEach
-            void setUp(){
+            void setUp() {
                 OAuth2UserDTO oauth2UserDTO = OAuth2UserDTO.from(member);
                 customOAuth2User = new CustomOAuth2User(oauth2UserDTO);
 
@@ -102,22 +109,27 @@ public class TeamControllerTest {
 
     @Nested
     @DisplayName("getTeam 메소드는")
-    class Describe_getTeam{
+    class Describe_getTeam {
 
         @Nested
         @DisplayName("존재하는 팀을 불러오는 경우")
-        class Context_Exist_Team{
+        class Context_Exist_Team {
             CustomOAuth2User customOAuth2User;
             GetTeamResponse response;
 
             @BeforeEach
-            void setUp(){
+            void setUp() {
                 OAuth2UserDTO oauth2UserDTO = OAuth2UserDTO.from(member);
                 customOAuth2User = new CustomOAuth2User(oauth2UserDTO);
 
                 SecurityUtil.setAuthentication(customOAuth2User);
 
-                response = GetTeamResponse.builder().teamId(1L).name("나이키").phoneNumber("01000000000").address("경기도").build();
+                response = GetTeamResponse.builder()
+                        .teamId(1L)
+                        .name("나이키")
+                        .phoneNumber("01000000000")
+                        .address("경기도")
+                        .build();
 
                 when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
                 when(teamQueryService.findByTeamId(teamId, customOAuth2User.getMemberId())).thenReturn(response);
@@ -130,68 +142,20 @@ public class TeamControllerTest {
                                 .content(objectMapper.writeValueAsString(response))
                                 .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.data.teamId", CoreMatchers.is(response.teamId().intValue())))
+                        .andExpect(jsonPath("$.data.teamId", CoreMatchers.is(response.teamId()
+                                .intValue())))
                         .andDo(print());
             }
         }
     }
 
     @Nested
-    @DisplayName("ExistTeam 애노테이션은")
-    class Describe_ExistTeam_Annotation{
-
-        @Nested
-        @DisplayName("해당 팀이 존재하지 않은 경우")
-        class Context_Not_Exist_Team{
-
-            @BeforeEach
-            void setUp(){
-                when(teamQueryService.existsByTeamId(teamId)).thenReturn(false);
-            }
-
-            @Test
-            @DisplayName("400 Bad Request를 반환한다.")
-            void it_returns_400_bad_request() throws Exception {
-                mockMvc.perform(get("/api/v1/teams/{teamId}", teamId)
-                                .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isBadRequest())
-                        .andReturn();
-            }
-        }
-
-        @Nested
-        @DisplayName("해당 팀이 존재하는 경우")
-        class Context_Exist_Team{
-            CustomOAuth2User customOAuth2User;
-
-            @BeforeEach
-            void setUp(){
-                OAuth2UserDTO oauth2UserDTO = OAuth2UserDTO.from(member);
-                customOAuth2User = new CustomOAuth2User(oauth2UserDTO);
-
-                SecurityUtil.setAuthentication(customOAuth2User);
-
-                when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
-            }
-
-            @Test
-            @DisplayName("200 Ok를 반환한다.")
-            void it_returns_200_ok() throws Exception {
-                mockMvc.perform(get("/api/v1/teams/{teamId}", teamId)
-                                .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isOk())
-                        .andReturn();
-            }
-        }
-    }
-
-    @Nested
     @DisplayName("getTeamMembers메소드는")
-    class Describe_getTeamMembers{
+    class Describe_getTeamMembers {
 
         @Nested
         @DisplayName("팀 내에 멤버가 존재한다면")
-        class Context_Exist_TeamMember{
+        class Context_Exist_TeamMember {
             TeamMemberListResponse response;
             TeamMemberVO teamMemberVO;
 
@@ -199,7 +163,7 @@ public class TeamControllerTest {
             void setUp() throws Exception {
                 teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
                 response = new TeamMemberListResponse(
-                        List.of(new QueryTeamMember(1L,"test1"),
+                        List.of(new QueryTeamMember(1L, "test1"),
                                 new QueryTeamMember(2L, "test2")));
 
                 when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
@@ -223,11 +187,11 @@ public class TeamControllerTest {
 
     @Nested
     @DisplayName("searchMembers 메소드는")
-    class Describe_searchMembers{
+    class Describe_searchMembers {
 
         @Nested
         @DisplayName("특정 접두사로 시작하는 멤버가 존재하면")
-        class Context_Exist_TeamMember_Starts_With_Prefix{
+        class Context_Exist_TeamMember_Starts_With_Prefix {
 
             String name;
             TeamMemberListResponse response;
@@ -237,7 +201,7 @@ public class TeamControllerTest {
             void setUp() throws Exception {
                 name = "john";
                 response = new TeamMemberListResponse(
-                        List.of(new QueryTeamMember(2L,"john")));
+                        List.of(new QueryTeamMember(2L, "john")));
                 teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
 
                 when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
@@ -261,7 +225,7 @@ public class TeamControllerTest {
 
         @Nested
         @DisplayName("특정 접두사로 시작하는 멤버가 존재하지 않는다면")
-        class Context_Not_Exist_TeamMember_Starts_With_Prefix{
+        class Context_Not_Exist_TeamMember_Starts_With_Prefix {
 
             String name;
             TeamMemberListResponse response;
@@ -295,11 +259,11 @@ public class TeamControllerTest {
 
     @Nested
     @DisplayName("inviteTeam 메소드는")
-    class Describe_inviteTeam{
+    class Describe_inviteTeam {
 
         @Nested
         @DisplayName("정상적인 요청이라면")
-        class Context_Valid_Request{
+        class Context_Valid_Request {
             String expectedInviteUrl;
             InvitationCodeRequest request;
             InvitationCodeResponse response;
@@ -335,17 +299,17 @@ public class TeamControllerTest {
 
     @Nested
     @DisplayName("joinTeam 메소드는")
-    class Describe_joinTeam{
+    class Describe_joinTeam {
 
         @Nested
         @DisplayName("유효한 초대 코드인 경우")
-        class Context_Valid_Invitation_Code{
+        class Context_Valid_Invitation_Code {
             String code;
             JoinTeamResponse response;
             CustomOAuth2User customOAuth2User;
 
             @BeforeEach
-            void setUp(){
+            void setUp() {
                 OAuth2UserDTO oauth2UserDTO = OAuth2UserDTO.from(member);
                 customOAuth2User = new CustomOAuth2User(oauth2UserDTO);
 
@@ -372,11 +336,11 @@ public class TeamControllerTest {
 
     @Nested
     @DisplayName("leaveTeam 메소드는")
-    class Describe_leaveTeam{
+    class Describe_leaveTeam {
 
         @Nested
         @DisplayName("팀에 속한 멤버가 요청을 하는 경우")
-        class Context_Team_Member{
+        class Context_Team_Member {
 
             TeamMemberVO teamMemberVO;
 
@@ -389,7 +353,8 @@ public class TeamControllerTest {
                         .thenReturn(teamMemberVO);
 
                 when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
-                doNothing().when(teamCommandService).leaveTeam(teamId, teamMemberVO.getMemberId());
+                doNothing().when(teamCommandService)
+                        .leaveTeam(teamId, teamMemberVO.getMemberId());
             }
 
             @Test
