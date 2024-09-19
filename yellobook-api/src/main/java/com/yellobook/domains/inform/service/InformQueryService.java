@@ -28,7 +28,7 @@ public class InformQueryService {
 
     public GetInformResponse getInformById(Long memberId, Long informId) {
         Inform inform = informRepository.findById(informId)
-                .get();
+                .orElseThrow(() -> new CustomException(InformErrorCode.INFORM_NOT_FOUND));
         Long writerId = inform.getMember()
                 .getId();
 
