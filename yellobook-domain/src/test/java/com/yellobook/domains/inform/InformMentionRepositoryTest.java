@@ -110,7 +110,7 @@ public class InformMentionRepositoryTest {
 
     @Nested
     @DisplayName("findByInformId 메소드는")
-    class Describe_FindByInformId {
+    class Describe_FindAllByInformId {
 
         @Nested
         @DisplayName("해당하는 inform 안에 mention 이 존재하는 경우")
@@ -145,7 +145,7 @@ public class InformMentionRepositoryTest {
             @Test
             @DisplayName("InformMention list를 반환한다.")
             void it_returns_inform_mention_list() {
-                mentions = informMentionRepository.findByInformId(informId);
+                mentions = informMentionRepository.findAllByInformId(informId);
 
                 assertThat(mentions).isNotEmpty();
             }
@@ -172,7 +172,7 @@ public class InformMentionRepositoryTest {
                 inform = createInform(team, member);
                 em.persist(inform);
                 informId = inform.getId();
-                mentions = informMentionRepository.findByInformId(informId);
+                mentions = informMentionRepository.findAllByInformId(informId);
             }
 
             @Test
@@ -191,7 +191,7 @@ public class InformMentionRepositoryTest {
 
             @BeforeEach
             void setUp() {
-                mentions = informMentionRepository.findByInformId(nonExistentInformId);
+                mentions = informMentionRepository.findAllByInformId(nonExistentInformId);
             }
 
             @Test
