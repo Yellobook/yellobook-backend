@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface InformMentionRepository extends JpaRepository<InformMention, Long> {
-    List<InformMention> findByInformId(Long informId);
+    List<InformMention> findAllByInformId(Long informId);
 }

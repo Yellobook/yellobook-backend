@@ -103,7 +103,7 @@ public class InformCommandService {
         Inform inform = informRepository.findById(informId)
                 .get();
 
-        List<InformMention> mentions = informMentionRepository.findByInformId(informId);
+        List<InformMention> mentions = informMentionRepository.findAllByInformId(informId);
 
         Long writerId = inform.getMember()
                 .getId();
