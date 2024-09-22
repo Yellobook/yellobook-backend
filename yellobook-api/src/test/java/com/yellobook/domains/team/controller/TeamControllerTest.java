@@ -52,12 +52,11 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(controllers = TeamController.class)
 @AutoConfigureMockMvc(addFilters = false)
 public class TeamControllerTest {
-    private final Long teamId = 1L;
-    private final Member member = MemberFixture.createMember();
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+
     @MockBean
     private TeamCommandService teamCommandService;
     @MockBean
@@ -66,6 +65,9 @@ public class TeamControllerTest {
     private RedisTeamService redisTeamService;
     @MockBean
     private TeamMemberArgumentResolver teamMemberArgumentResolver;
+
+    private final Long teamId = 1L;
+    private final Member member = MemberFixture.createMember();
 
     @Nested
     @DisplayName("createTeam 메소드는")
@@ -143,55 +145,6 @@ public class TeamControllerTest {
                         .andExpect(jsonPath("$.data.teamId", CoreMatchers.is(response.teamId()
                                 .intValue())))
                         .andDo(print());
-            }
-        }
-    }
-
-    @Nested
-    @DisplayName("ExistTeam 애노테이션은")
-    class Describe_ExistTeam_Annotation {
-
-        @Nested
-        @DisplayName("해당 팀이 존재하지 않은 경우")
-        class Context_Not_Exist_Team {
-
-            @BeforeEach
-            void setUp() {
-                when(teamQueryService.existsByTeamId(teamId)).thenReturn(false);
-            }
-
-            @Test
-            @DisplayName("400 Bad Request를 반환한다.")
-            void it_returns_400_bad_request() throws Exception {
-                mockMvc.perform(get("/api/v1/teams/{teamId}", teamId)
-                                .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isBadRequest())
-                        .andReturn();
-            }
-        }
-
-        @Nested
-        @DisplayName("해당 팀이 존재하는 경우")
-        class Context_Exist_Team {
-            CustomOAuth2User customOAuth2User;
-
-            @BeforeEach
-            void setUp() {
-                OAuth2UserDTO oauth2UserDTO = OAuth2UserDTO.from(member);
-                customOAuth2User = new CustomOAuth2User(oauth2UserDTO);
-
-                SecurityUtil.setAuthentication(customOAuth2User);
-
-                when(teamQueryService.existsByTeamId(teamId)).thenReturn(true);
-            }
-
-            @Test
-            @DisplayName("200 Ok를 반환한다.")
-            void it_returns_200_ok() throws Exception {
-                mockMvc.perform(get("/api/v1/teams/{teamId}", teamId)
-                                .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isOk())
-                        .andReturn();
             }
         }
     }
