@@ -128,7 +128,7 @@ public class InformQueryServiceTest {
                         new InformMention(inform, mentionedMember)
                 ));
 
-                when(informMapper.toGetInformResponseDTO(inform, inform.getComments(), List.of(mentionedMember),
+                when(informMapper.toGetInformResponseDTO(inform, inform.getComments(),
                         List.of(mentionedMember)))
                         .thenReturn(new GetInformResponse("test", "test", "test",
                                 List.of(new GetInformResponse.MentionItem(2L, "test")),
@@ -175,7 +175,7 @@ public class InformQueryServiceTest {
                         new InformMention(inform, author)
                 ));
 
-                when(informMapper.toGetInformResponseDTO(inform, inform.getComments(), List.of(author),
+                when(informMapper.toGetInformResponseDTO(inform, inform.getComments(),
                         List.of(author)))
                         .thenReturn(new GetInformResponse("test", "test", "test",
                                 List.of(new GetInformResponse.MentionItem(1L, "test")),
