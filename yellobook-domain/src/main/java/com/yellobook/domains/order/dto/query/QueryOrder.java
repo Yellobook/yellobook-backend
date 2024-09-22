@@ -1,8 +1,7 @@
 package com.yellobook.domains.order.dto.query;
 
-import lombok.Builder;
-
 import java.time.LocalDate;
+import lombok.Builder;
 
 @Builder
 public record QueryOrder(

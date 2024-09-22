@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public enum FileErrorCode implements ErrorCode{
+public enum FileErrorCode implements ErrorCode {
     FILE_NOT_EXIST(HttpStatus.NOT_FOUND, "FILE-001", "파일이 존재하지 않습니다."),
     FILE_NOT_EXCEL(HttpStatus.BAD_REQUEST, "FILE-002", "올바른 엑셀 확장자가 아닙니다. .xlsx의 엑셀 파일이어야 합니다."),
     CELL_IS_EMPTY(HttpStatus.BAD_REQUEST, "FILE-003", "빈 값을 가진 셀이 존재합니다."),

@@ -1,9 +1,8 @@
 package com.yellobook.domains.order.dto.query;
 
 import com.yellobook.common.enums.MemberTeamRole;
-import lombok.Builder;
-
 import java.time.LocalDateTime;
+import lombok.Builder;
 
 @Builder
 public record QueryOrderComment(

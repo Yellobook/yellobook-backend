@@ -7,10 +7,9 @@ import com.yellobook.domains.order.dto.query.QueryOrderComment;
 import com.yellobook.domains.order.entity.QOrder;
 import com.yellobook.domains.order.entity.QOrderComment;
 import com.yellobook.domains.team.entity.QParticipant;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -23,13 +22,14 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
         QParticipant participant = QParticipant.participant;
 
         return queryFactory.select(Projections.constructor(QueryOrderComment.class,
-                    orderComment.id.as("commentId"),
-                    participant.role,
-                    orderComment.content,
-                    orderComment.createdAt
+                        orderComment.id.as("commentId"),
+                        participant.role,
+                        orderComment.content,
+                        orderComment.createdAt
                 ))
                 .from(orderComment)
-                .join(participant).on(orderComment.member.id.eq(participant.member.id))
+                .join(participant)
+                .on(orderComment.member.id.eq(participant.member.id))
                 .where(orderComment.order.id.eq(orderId), orderComment.order.team.id.eq(participant.team.id))
                 .orderBy(orderComment.createdAt.asc())
                 .fetch();
@@ -40,12 +40,12 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
         QOrder order = QOrder.order;
 
         return queryFactory.select(Projections.constructor(QueryOrder.class,
-                    order.date,
-                    order.member.nickname.as("writer"),
-                    order.product.name.as("productName"),
-                    order.product.subProduct.as("subProductName"),
-                    order.orderAmount.as("amount"),
-                    order.memo
+                        order.date,
+                        order.member.nickname.as("writer"),
+                        order.product.name.as("productName"),
+                        order.product.subProduct.as("subProductName"),
+                        order.orderAmount.as("amount"),
+                        order.memo
                 ))
                 .from(order)
                 .where(order.id.eq(orderId))

@@ -52,7 +52,6 @@ public class TeamQueryServiceTest {
 
     @InjectMocks
     private TeamQueryService teamQueryService;
-
     private CustomOAuth2User customOAuth2User;
 
     private Member member;
@@ -70,13 +69,53 @@ public class TeamQueryServiceTest {
         customOAuth2User = new CustomOAuth2User(oauth2UserDTO);
     }
 
+    private Member createMember(Long memberId) {
+        return Member.builder()
+                .memberId(memberId)
+                .build();
+    }
+
+    private Team createTeam(Long teamId) {
+        Team team = Team.builder()
+                .name("test")
+                .phoneNumber("010")
+                .address("seoul")
+                .build();
+        try {
+            Field idField = Team.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(team, teamId);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("Failed to set team ID", e);
+        }
+
+        return team;
+    }
+
+    private Participant createParticipant(Long participantId, Team team, Member member, MemberTeamRole role) {
+        Participant participant = Participant.builder()
+                .team(team)
+                .member(member)
+                .role(role)
+                .build();
+        try {
+            Field idField = Participant.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(participant, participantId);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("Failed to set participant ID", e);
+        }
+
+        return participant;
+    }
+
     @Nested
     @DisplayName("makeInvitationCode 메소드는")
     class Describe_makeInvitationCode {
 
         @Nested
         @DisplayName("멤버가 팀에 속하지 않은 경우")
-        class Context_Member_Not_Belong_Team{
+        class Context_Member_Not_Belong_Team {
 
             InvitationCodeRequest request;
             CustomException exception;
@@ -85,23 +124,24 @@ public class TeamQueryServiceTest {
             void setUp() {
                 request = new InvitationCodeRequest(MemberTeamRole.ORDERER);
 
-                when(participantRepository.findByTeamIdAndMemberId(team.getId(), member.getId())).thenReturn(Optional.empty());
+                when(participantRepository.findByTeamIdAndMemberId(team.getId(), member.getId())).thenReturn(
+                        Optional.empty());
 
                 exception = assertThrows(
-                        CustomException.class, () -> teamQueryService.makeInvitationCode(team.getId(), request, customOAuth2User));
+                        CustomException.class, () -> teamQueryService.makeInvitationCode(team.getId(), request, 1L));
 
             }
 
             @Test
             @DisplayName("USER_NOT_IN_THAT_TEAM 에러를 반환한다.")
-            void it_returns_cannot_invite(){
+            void it_returns_cannot_invite() {
                 assertEquals(TeamErrorCode.USER_NOT_IN_THAT_TEAM, exception.getErrorCode());
             }
         }
 
         @Nested
         @DisplayName("ADMIN이 이미 있을 때, ADMIN을 초대하는 경우")
-        class Context_Admin_Already_Exists{
+        class Context_Admin_Already_Exists {
             Long teamId;
             Long memberId;
             Long memberId2;
@@ -126,12 +166,12 @@ public class TeamQueryServiceTest {
                         .thenReturn(Optional.of(adminPar));
 
                 exception = assertThrows(
-                        CustomException.class, () -> teamQueryService.makeInvitationCode(teamId, request, customOAuth2User));
+                        CustomException.class, () -> teamQueryService.makeInvitationCode(teamId, request, memberId));
             }
 
             @Test
             @DisplayName("ADMIN_EXISTS 에러를 반환한다.")
-            void it_returns_admin_exists(){
+            void it_returns_admin_exists() {
                 assertEquals(TeamErrorCode.ADMIN_EXISTS, exception.getErrorCode());
                 verify(participantRepository).findByTeamIdAndRole(teamId, MemberTeamRole.ADMIN);
             }
@@ -139,7 +179,7 @@ public class TeamQueryServiceTest {
 
         @Nested
         @DisplayName("문제가 없는 경우")
-        class Context_No_Problem{
+        class Context_No_Problem {
 
             InvitationCodeRequest request;
             InvitationCodeResponse response;
@@ -155,12 +195,12 @@ public class TeamQueryServiceTest {
                 when(teamMapper.toInvitationCodeResponse(anyString()))
                         .thenReturn(new InvitationCodeResponse("http://invitation-url")); // 응답 매핑
 
-                response = teamQueryService.makeInvitationCode(team.getId(), request, customOAuth2User);
+                response = teamQueryService.makeInvitationCode(team.getId(), request, member.getId());
             }
 
             @Test
             @DisplayName("초대 코드를 발급한다.")
-            void it_returns_invitation_code(){
+            void it_returns_invitation_code() {
                 assertNotNull(response);
                 assertEquals("http://invitation-url", response.inviteUrl());
                 verify(redisService).generateInvitationUrl(team.getId(), request.role());
@@ -173,7 +213,7 @@ public class TeamQueryServiceTest {
     class Describe_findTeamMembers {
         @Nested
         @DisplayName("팀원이 존재하는 경우")
-        class Context_TeamMember{
+        class Context_TeamMember {
 
             TeamMemberListResponse res;
 
@@ -194,14 +234,20 @@ public class TeamQueryServiceTest {
             @DisplayName("모든 팀원을 반환한다.")
             void it_returns_all_team_members() {
                 assertNotNull(res);
-                assertEquals(2, res.members().size());
-                assertEquals("test1", res.members().get(0).nickname());
-                assertEquals("test2", res.members().get(1).nickname());
+                assertEquals(2, res.members()
+                        .size());
+                assertEquals("test1", res.members()
+                        .get(0)
+                        .nickname());
+                assertEquals("test2", res.members()
+                        .get(1)
+                        .nickname());
             }
         }
+
         @Nested
         @DisplayName("팀원이 존재하지 않는 경우")
-        class Context_No_TeamMember_Exist{
+        class Context_No_TeamMember_Exist {
 
             TeamMemberListResponse res;
 
@@ -210,16 +256,18 @@ public class TeamQueryServiceTest {
                 List<QueryTeamMember> members = List.of();
 
                 when(teamRepository.findTeamMembers(team.getId())).thenReturn(members);
-                when(teamMapper.toTeamMemberListResponse(Collections.emptyList())).thenReturn(new TeamMemberListResponse(members));
+                when(teamMapper.toTeamMemberListResponse(Collections.emptyList())).thenReturn(
+                        new TeamMemberListResponse(members));
 
                 res = teamQueryService.findTeamMembers(team.getId());
             }
 
             @Test
             @DisplayName("빈 리스트를 반환한다")
-            void it_returns_empty_list(){
+            void it_returns_empty_list() {
                 assertNotNull(res);
-                assertEquals(0, res.members().size());
+                assertEquals(0, res.members()
+                        .size());
             }
         }
     }
@@ -243,23 +291,29 @@ public class TeamQueryServiceTest {
                         new QueryTeamMember(1L, "test1"),
                         new QueryTeamMember(2L, "test2")
                 );
-                teamMember = TeamMemberVO.of(member.getId(),team.getId(), MemberTeamRole.ORDERER);
+                teamMember = TeamMemberVO.of(member.getId(), team.getId(), MemberTeamRole.ORDERER);
 
                 when(participantRepository.findMentionsByNamePrefix(prefix, team.getId())).thenReturn(members);
                 when(teamMapper.toTeamMemberListResponse(members)).thenReturn(new TeamMemberListResponse(members));
 
-                res = teamQueryService.searchParticipants(teamMember, prefix);
+                res = teamQueryService.searchParticipants(teamMember.getTeamId(), prefix);
             }
 
             @Test
             @DisplayName("조건에 맞는 팀원들을 반환한다.")
-            void it_returns_team_members_match_the_condition(){
+            void it_returns_team_members_match_the_condition() {
                 assertNotNull(res);
-                assertEquals(2, res.members().size());
-                assertEquals("test1", res.members().get(0).nickname());
-                assertEquals("test2", res.members().get(1).nickname());
+                assertEquals(2, res.members()
+                        .size());
+                assertEquals("test1", res.members()
+                        .get(0)
+                        .nickname());
+                assertEquals("test2", res.members()
+                        .get(1)
+                        .nickname());
             }
         }
+
         @Nested
         @DisplayName("TeamMember이지만 검색어로 시작하는 팀원이 없는 경우")
         class Context_TeamMember_But_Not_Exist_Team_Members_Start_With_Prefix {
@@ -272,26 +326,28 @@ public class TeamQueryServiceTest {
             void setUp() {
                 prefix = "test";
                 List<QueryTeamMember> members = List.of();
-                teamMember = TeamMemberVO.of(member.getId(),team.getId(), MemberTeamRole.ORDERER);
+                teamMember = TeamMemberVO.of(member.getId(), team.getId(), MemberTeamRole.ORDERER);
                 when(participantRepository.findMentionsByNamePrefix(prefix, team.getId())).thenReturn(members);
                 when(teamMapper.toTeamMemberListResponse(members)).thenReturn(new TeamMemberListResponse(members));
 
-                res = teamQueryService.searchParticipants(teamMember, prefix);
+                res = teamQueryService.searchParticipants(teamMember.getTeamId(), prefix);
             }
 
             @Test
             @DisplayName("빈 리스트를 반환한다")
-            void it_returns_empty_list(){
+            void it_returns_empty_list() {
                 assertNotNull(res);
-                assertEquals(0, res.members().size());
+                assertEquals(0, res.members()
+                        .size());
             }
         }
 
         @Nested
         @DisplayName("팀에 속하지 않은 경우")
-        class Context_Not_TeamMember{
+        class Context_Not_TeamMember {
 
             CustomException exception;
+
             @BeforeEach
             void setUp() {
                 when(participantRepository.findByTeamIdAndMemberId(
@@ -300,12 +356,13 @@ public class TeamQueryServiceTest {
                         .thenReturn(Optional.empty());
 
                 exception = assertThrows(
-                        CustomException.class, () -> teamQueryService.findByTeamId(team.getId(), customOAuth2User));
+                        CustomException.class,
+                        () -> teamQueryService.findByTeamId(team.getId(), customOAuth2User.getMemberId()));
             }
 
             @Test
             @DisplayName("USER_NOT_IN_THAT_TEAM 에러를 반환한다.")
-            void it_returns_user_not_in_that_team(){
+            void it_returns_user_not_in_that_team() {
                 assertEquals(TeamErrorCode.USER_NOT_IN_THAT_TEAM, exception.getErrorCode());
             }
         }
@@ -317,7 +374,7 @@ public class TeamQueryServiceTest {
 
         @Nested
         @DisplayName("Team이 존재하는 경우")
-        class Context_Exist_Team{
+        class Context_Exist_Team {
 
             boolean result;
 
@@ -330,14 +387,14 @@ public class TeamQueryServiceTest {
 
             @Test
             @DisplayName("true를 반환한다.")
-            void it_returns_true(){
+            void it_returns_true() {
                 assertTrue(result);
             }
         }
 
         @Nested
         @DisplayName("Team이 존재하지 않는 경우")
-        class Context_Not_Exist_Team{
+        class Context_Not_Exist_Team {
             boolean result;
 
             @BeforeEach
@@ -349,40 +406,9 @@ public class TeamQueryServiceTest {
 
             @Test
             @DisplayName("false를 반환한다.")
-            void it_returns_false(){
+            void it_returns_false() {
                 assertFalse(result);
             }
         }
-    }
-
-
-    private Member createMember(Long memberId){
-        return Member.builder().memberId(memberId).build();
-    }
-
-    private Team createTeam(Long teamId){
-        Team team = Team.builder().name("test").phoneNumber("010").address("seoul").build();
-        try {
-            Field idField = Team.class.getDeclaredField("id");
-            idField.setAccessible(true);
-            idField.set(team, teamId);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException("Failed to set team ID", e);
-        }
-
-        return team;
-    }
-
-    private Participant createParticipant(Long participantId, Team team, Member member, MemberTeamRole role){
-        Participant participant = Participant.builder().team(team).member(member).role(role).build();
-        try {
-            Field idField = Participant.class.getDeclaredField("id");
-            idField.setAccessible(true);
-            idField.set(participant, participantId);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException("Failed to set participant ID", e);
-        }
-
-        return participant;
     }
 }

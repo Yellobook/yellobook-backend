@@ -1,11 +1,23 @@
 package com.yellobook.domains.member.entity;
 
-import com.yellobook.domains.common.entity.BaseEntity;
 import com.yellobook.common.enums.MemberRole;
-import jakarta.persistence.*;
-import lombok.*;
-
+import com.yellobook.domains.common.entity.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.PreRemove;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 
 @Entity
@@ -45,7 +57,8 @@ public class Member extends BaseEntity {
     private LocalDateTime deletedAt;
 
     @Builder
-    public Member(Long memberId, String nickname, String email, String profileImage, MemberRole role, Boolean allowance) {
+    public Member(Long memberId, String nickname, String email, String profileImage, MemberRole role,
+                  Boolean allowance) {
         this.id = memberId;
         this.nickname = nickname;
         this.email = email;

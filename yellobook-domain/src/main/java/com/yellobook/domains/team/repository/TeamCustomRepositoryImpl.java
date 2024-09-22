@@ -6,14 +6,13 @@ import com.yellobook.domains.member.entity.QMember;
 import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.entity.QParticipant;
 import com.yellobook.domains.team.entity.QTeam;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
 @RequiredArgsConstructor
-public class TeamCustomRepositoryImpl implements  TeamCustomRepository {
+public class TeamCustomRepositoryImpl implements TeamCustomRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override

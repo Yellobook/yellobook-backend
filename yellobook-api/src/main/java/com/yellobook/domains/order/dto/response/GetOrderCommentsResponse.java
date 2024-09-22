@@ -1,10 +1,9 @@
 package com.yellobook.domains.order.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Builder;
 
 @Builder
 public record GetOrderCommentsResponse(
@@ -22,6 +21,7 @@ public record GetOrderCommentsResponse(
             String content,
             @Schema(description = "댓글 생성 날짜", example = "2007-12-03T10:15:30")
             LocalDateTime createdAt
-    ){ }
+    ) {
+    }
 
 }

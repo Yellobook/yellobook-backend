@@ -17,10 +17,11 @@ public class ExistOrderValidator implements ConstraintValidator<ExistOrder, Long
     public boolean isValid(Long value, ConstraintValidatorContext context) {
         boolean isValid = orderQueryService.existsByOrderId(value);
 
-        if(!isValid){
+        if (!isValid) {
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(
-                    OrderErrorCode.ORDER_NOT_FOUND.toString()).addConstraintViolation();
+                            OrderErrorCode.ORDER_NOT_FOUND.toString())
+                    .addConstraintViolation();
         }
 
         return isValid;

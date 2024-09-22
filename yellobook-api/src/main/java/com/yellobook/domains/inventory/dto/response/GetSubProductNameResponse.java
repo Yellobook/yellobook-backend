@@ -1,9 +1,8 @@
 package com.yellobook.domains.inventory.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-
 import java.util.List;
+import lombok.Builder;
 
 @Builder
 public record GetSubProductNameResponse(
@@ -16,7 +15,7 @@ public record GetSubProductNameResponse(
             Long productId,
             @Schema(description = "하위 제품의 이름", defaultValue = "노란색")
             String subProductName
-    ){
+    ) {
     }
 
 }

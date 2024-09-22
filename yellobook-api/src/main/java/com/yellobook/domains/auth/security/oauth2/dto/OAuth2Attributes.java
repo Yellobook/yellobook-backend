@@ -1,11 +1,10 @@
 package com.yellobook.domains.auth.security.oauth2.dto;
 
 import com.yellobook.domains.auth.security.oauth2.enums.SocialType;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.Map;
 
 @Getter
 public class OAuth2Attributes {
@@ -24,8 +23,8 @@ public class OAuth2Attributes {
 
     public static OAuth2Attributes of(SocialType socialType, Map<String, Object> attributes) {
         return switch (socialType) {
-            case  KAKAO -> ofKakao(attributes);
-            case  NAVER -> ofNaver(attributes);
+            case KAKAO -> ofKakao(attributes);
+            case NAVER -> ofNaver(attributes);
         };
     }
 
@@ -41,7 +40,7 @@ public class OAuth2Attributes {
 
 
     private static OAuth2Attributes ofNaver(Map<String, Object> attributes) {
-        Map<String,String> response = (Map<String, String>) attributes.get("response");
+        Map<String, String> response = (Map<String, String>) attributes.get("response");
         return OAuth2Attributes.builder()
                 .email(response.get("email"))
                 .nickname(response.get("nickname"))

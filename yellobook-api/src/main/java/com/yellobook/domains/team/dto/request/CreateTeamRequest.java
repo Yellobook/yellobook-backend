@@ -18,4 +18,5 @@ public record CreateTeamRequest(
         @NotNull(message = "팀 개설자의 권한을 설정하십시오.")
         @Schema(description = "팀을 생성한 사람의 권한", example = "ADMIN")
         MemberTeamRole role
-){}
+) {
+}

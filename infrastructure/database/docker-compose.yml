@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:13
+    image: postgres:16
     container_name: yellobook-postgres
     environment:
       POSTGRES_DB: ${POSTGRES_DB_NAME}
