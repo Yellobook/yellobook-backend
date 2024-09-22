@@ -158,7 +158,7 @@ public class InformControllerTest {
             @BeforeEach
             void setUp() throws Exception {
                 informId = 1L;
-                response = new GetInformResponse("test", "test", List.of(), 10, List.of(), LocalDate.now());
+                response = new GetInformResponse("test", "test", "test", List.of(), 10, List.of(), LocalDate.now());
 
                 member = createMember();
                 OAuth2UserDTO oAuth2UserDTO = OAuth2UserDTO.from(member);
