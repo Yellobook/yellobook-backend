@@ -55,7 +55,7 @@ public class InformController {
     }
 
     @GetMapping("/{informId}")
-    @Operation(summary = "공지목록 조회", description = "등록된 공지를 조회하는 API 입니다.")
+    @Operation(summary = "공지 조회", description = "등록된 공지를 조회하는 API 입니다.")
     public ResponseEntity<SuccessResponse<GetInformResponse>> getInform(
             @ExistInform @PathVariable("informId") Long informId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
