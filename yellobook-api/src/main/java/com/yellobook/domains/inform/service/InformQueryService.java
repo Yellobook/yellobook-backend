@@ -28,13 +28,14 @@ public class InformQueryService {
 
     public GetInformResponse getInformById(Long memberId, Long informId) {
         Inform inform = informRepository.findById(informId)
-                .get();
+                .orElseThrow(() -> new CustomException(InformErrorCode.INFORM_NOT_FOUND));
         Long writerId = inform.getMember()
                 .getId();
 
-        // 공지및 일정의 언급들
-        List<InformMention> mentions = informMentionRepository.findByInformId(informId);
-        // 공지 및 일정에 달린 댓글들
+        // 공지의 언급들
+        List<InformMention> mentions = informMentionRepository.findAllByInformId(informId);
+
+        // 공지에 달린 댓글들
         List<InformComment> comments = inform.getComments();
 
         List<Member> mentionedMembers = new ArrayList<>();
@@ -46,7 +47,7 @@ public class InformQueryService {
                         .equals(memberId));
 
         if (memberId.equals(writerId) || isMentioned) {
-            return informMapper.toGetInformResponseDTO(inform, comments, mentionedMembers);
+            return informMapper.toGetInformResponseDTO(inform, comments, mentionedMembers, mentionedMembers);
         } else {
             throw new CustomException(InformErrorCode.NOT_MENTIONED);
         }

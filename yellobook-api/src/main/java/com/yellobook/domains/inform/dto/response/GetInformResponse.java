@@ -8,6 +8,8 @@ import lombok.Builder;
 
 @Builder
 public record GetInformResponse(
+        @Schema(description = "가지고 오는 글의 작성자")
+        String author,
         @Schema(description = "가지고 오는 글의 제목")
         String title,
         @Schema(description = "가지고 오는 글에 있는 메모")
