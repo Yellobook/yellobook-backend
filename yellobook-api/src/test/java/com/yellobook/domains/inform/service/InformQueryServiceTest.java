@@ -56,6 +56,8 @@ public class InformQueryServiceTest {
             Member mentionedMember;
             Member nonMentionedMember;
             CustomException exception;
+            Long nonMentionedMemberId;
+            Long informId;
 
             @BeforeEach
             void setUp() {
@@ -72,6 +74,9 @@ public class InformQueryServiceTest {
                 when(mentionedMember.getId()).thenReturn(2L);
                 when(nonMentionedMember.getId()).thenReturn(99L);
 
+                informId = inform.getId();
+                nonMentionedMemberId = nonMentionedMember.getId();
+
                 when(inform.getComments()).thenReturn(List.of(
                         InformComment.builder()
                                 .content("test")
@@ -79,12 +84,12 @@ public class InformQueryServiceTest {
                                 .member(mentionedMember)
                                 .build()
                 ));
-                when(informMentionRepository.findAllByInformId(inform.getId())).thenReturn(List.of(
+                when(informMentionRepository.findAllByInformId(informId)).thenReturn(List.of(
                         new InformMention(inform, mentionedMember)
                 ));
 
                 exception = assertThrows(CustomException.class, () -> {
-                    informQueryService.getInformById(nonMentionedMember.getId(), inform.getId());
+                    informQueryService.getInformById(nonMentionedMemberId, informId);
                 });
             }
 

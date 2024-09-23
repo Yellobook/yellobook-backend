@@ -83,19 +83,22 @@ public class InformCommandServiceTest {
         @Nested
         @DisplayName("Redis에서 조회한 participant가 존재하지 않는 경우")
         class Context_Not_Exist_Participant_Searching_From_Redis {
+
             Member member;
             CreateInformRequest request;
             CustomException exception;
+            Long memberId;
 
             @BeforeEach
             void setUp() {
                 member = createMember();
+                memberId = member.getId();
                 request = new CreateInformRequest("test", "test", List.of(), LocalDate.now());
-                when(redisService.getCurrentTeamMember(member.getId()))
+                when(redisService.getCurrentTeamMember(memberId))
                         .thenThrow(new CustomException(TeamErrorCode.USER_NOT_JOINED_ANY_TEAM));
 
                 exception = assertThrows(CustomException.class, () -> {
-                    informCommandService.createInform(member.getId(), request);
+                    informCommandService.createInform(memberId, request);
                 });
             }
 
@@ -167,10 +170,12 @@ public class InformCommandServiceTest {
             CustomException exception;
             Member writerMember;
             Member member;
+            Long memberId;
 
             @BeforeEach
             void setUp() {
                 member = mock(Member.class);
+                memberId = member.getId();
                 writerMember = mock(Member.class);
                 when(writerMember.getId()).thenReturn(999L);
 
@@ -179,7 +184,7 @@ public class InformCommandServiceTest {
                 when(informRepository.findById(anyLong())).thenReturn(Optional.of(inform));
 
                 exception = assertThrows(CustomException.class, () -> {
-                    informCommandService.deleteInform(1L, member.getId());  // 테스트할 메서드 호출
+                    informCommandService.deleteInform(1L, memberId);  // 테스트할 메서드 호출
                 });
             }
 
@@ -234,6 +239,8 @@ public class InformCommandServiceTest {
             Member notMentioned;
             Inform wrotenInform;
             Member member;
+            Long writenInformId;
+            Long notMentionedId;
 
             @BeforeEach
             void setUp() {
@@ -246,15 +253,18 @@ public class InformCommandServiceTest {
                 when(wrotenInform.getMember()).thenReturn(member);
                 when(wrotenInform.getId()).thenReturn(2L);
 
+                writenInformId = wrotenInform.getId();
+                notMentionedId = notMentioned.getId();
+
                 when(informRepository.findById(wrotenInform.getId())).thenReturn(Optional.of(wrotenInform));
-                when(informMentionRepository.findAllByInformId(wrotenInform.getId())).thenReturn(List.of(
+                when(informMentionRepository.findAllByInformId(writenInformId)).thenReturn(List.of(
                         InformMention.builder()
                                 .inform(wrotenInform)
                                 .member(mock(Member.class))
                                 .build()
                 ));
                 exception = assertThrows(CustomException.class, () -> {
-                    informCommandService.addComment(wrotenInform.getId(), notMentioned.getId(), request);
+                    informCommandService.addComment(writenInformId, notMentionedId, request);
                 });
             }
 
