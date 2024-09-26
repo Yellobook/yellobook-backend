@@ -31,8 +31,7 @@ public interface InformMapper {
     @Mapping(target = "view", source = "inform.view")
     @Mapping(target = "date", source = "inform.date")
     @Mapping(target = "author", source = "inform.member.nickname")
-    GetInformResponse toGetInformResponseDTO(Inform inform, List<InformComment> comments, List<Member> mentions,
-                                             List<Member> members);
+    GetInformResponse toGetInformResponseDTO(Inform inform, List<InformComment> comments, List<Member> mentions);
 
     default List<CommentItem> mapComments(List<InformComment> comments) {
         return comments.stream()

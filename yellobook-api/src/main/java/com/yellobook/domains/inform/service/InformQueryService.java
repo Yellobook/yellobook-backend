@@ -40,14 +40,16 @@ public class InformQueryService {
 
         List<Member> mentionedMembers = new ArrayList<>();
 
-        boolean isMentioned = mentions.stream()
+        mentions.stream()
                 .map(InformMention::getMember)
-                .peek(mentionedMembers::add)
+                .forEach(mentionedMembers::add);
+
+        boolean isMentioned = mentionedMembers.stream()
                 .anyMatch(mentionedMember -> mentionedMember.getId()
                         .equals(memberId));
 
         if (memberId.equals(writerId) || isMentioned) {
-            return informMapper.toGetInformResponseDTO(inform, comments, mentionedMembers, mentionedMembers);
+            return informMapper.toGetInformResponseDTO(inform, comments, mentionedMembers);
         } else {
             throw new CustomException(InformErrorCode.NOT_MENTIONED);
         }
