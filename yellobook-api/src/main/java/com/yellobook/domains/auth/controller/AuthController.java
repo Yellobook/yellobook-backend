@@ -14,13 +14,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -49,7 +51,7 @@ public class AuthController {
             @Valid @RequestBody AllowanceRequest request,
             HttpServletResponse response
     ) throws IOException {
-        var result = authService.updateAllowance(request.getToken());
+        var result = authService.updateAllowance(request.token());
         return ResponseFactory.success(result);
     }
 
@@ -58,7 +60,6 @@ public class AuthController {
     public ResponseEntity<Void> logout(
             HttpServletRequest request,
             @AuthenticationPrincipal CustomOAuth2User oAuth2User
-
     ) {
         String accessToken = jwtService.resolveAccessToken(request);
         authService.logout(oAuth2User.getMemberId(), accessToken);

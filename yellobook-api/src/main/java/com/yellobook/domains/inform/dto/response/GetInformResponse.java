@@ -1,14 +1,15 @@
 package com.yellobook.domains.inform.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Builder;
 
 @Builder
 public record GetInformResponse(
+        @Schema(description = "가지고 오는 글의 작성자")
+        String author,
         @Schema(description = "가지고 오는 글의 제목")
         String title,
         @Schema(description = "가지고 오는 글에 있는 메모")

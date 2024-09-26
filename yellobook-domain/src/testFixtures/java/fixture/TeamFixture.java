@@ -1,12 +1,11 @@
 package fixture;
 
-import com.yellobook.domains.team.entity.Team;
-import com.yellobook.domains.team.entity.Participant;
-import com.yellobook.domains.member.entity.Member;
 import com.yellobook.common.enums.MemberTeamRole;
-import support.ReflectionUtils;
-
+import com.yellobook.domains.member.entity.Member;
+import com.yellobook.domains.team.entity.Participant;
+import com.yellobook.domains.team.entity.Team;
 import java.time.LocalDateTime;
+import support.ReflectionUtils;
 
 public class TeamFixture {
     private static final String TEAM_NAME = "팀1";

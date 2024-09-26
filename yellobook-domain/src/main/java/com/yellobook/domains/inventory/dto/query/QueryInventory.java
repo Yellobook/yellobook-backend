@@ -1,8 +1,7 @@
 package com.yellobook.domains.inventory.dto.query;
 
-import lombok.Builder;
-
 import java.time.LocalDateTime;
+import lombok.Builder;
 
 @Builder
 public record QueryInventory(

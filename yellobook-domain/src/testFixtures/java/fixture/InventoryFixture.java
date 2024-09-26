@@ -28,14 +28,23 @@ public class InventoryFixture {
     }
 
     public static Product createProduct(Inventory inventory) {
-        return createProduct(PRODUCT_NAME, PRODUCT_SUBPRODUCT, PRODUCT_SKU, PRODUCT_PURCHASE_PRICE, PRODUCT_SALE_PRICE, PRODUCT_AMOUNT, inventory);
+        return createProduct(PRODUCT_NAME, PRODUCT_SUBPRODUCT, PRODUCT_SKU, PRODUCT_PURCHASE_PRICE, PRODUCT_SALE_PRICE,
+                PRODUCT_AMOUNT, inventory);
+    }
+
+    public static Product createProduct(Inventory inventory, Integer amount) {
+        return createProduct(PRODUCT_NAME, PRODUCT_SUBPRODUCT, PRODUCT_SKU, PRODUCT_PURCHASE_PRICE, PRODUCT_SALE_PRICE,
+                amount, inventory);
+
     }
 
     public static Product createProduct(String name, String subProduct, Inventory inventory) {
-        return createProduct(name, subProduct, PRODUCT_SKU, PRODUCT_PURCHASE_PRICE, PRODUCT_SALE_PRICE, PRODUCT_AMOUNT, inventory);
+        return createProduct(name, subProduct, PRODUCT_SKU, PRODUCT_PURCHASE_PRICE, PRODUCT_SALE_PRICE, PRODUCT_AMOUNT,
+                inventory);
     }
 
-    public static Product createProduct(String name, String subProduct, int sku, int purchasePrice, int salePrice, int amount, Inventory inventory) {
+    public static Product createProduct(String name, String subProduct, int sku, int purchasePrice, int salePrice,
+                                        int amount, Inventory inventory) {
         return Product.builder()
                 .name(name)
                 .subProduct(subProduct)

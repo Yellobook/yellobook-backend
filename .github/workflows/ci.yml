@@ -3,7 +3,7 @@ name: Jacoco CI Test
 on:
   # CI 는 PR 시에만 동작
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [ opened, synchronize, reopened ]
 
 jobs:
   build:
@@ -37,6 +37,7 @@ jobs:
           # 캐시가 존재하지 않을 경우 복원 시도
           restore-keys: ${{ runner.os }}-sonar
 
+
       - name: Gradle 캐시 설정
         uses: actions/cache@v3
         with:
@@ -44,17 +45,11 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
 
-      - name: Gradle 빌드 후 SonarCloud 정적분석
+      - name: Gradle 빌드
+        run: ./gradlew clean build
+
+      - name: SonarCloud 정적분석
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew clean build sonar --info
-
-      - name: CodeCoverage 업로드
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./build/reports/jacoco/test/jacocoTestReport.xml
-          fail_ci_if_error: true
-          verbose: true
-        continue-on-error: false
+        run: ./gradlew sonar --info

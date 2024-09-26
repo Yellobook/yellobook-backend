@@ -9,11 +9,10 @@ import com.yellobook.domains.member.repository.MemberRepository;
 import com.yellobook.domains.team.repository.ParticipantRepository;
 import com.yellobook.error.code.MemberErrorCode;
 import com.yellobook.error.exception.CustomException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -25,14 +24,18 @@ public class MemberQueryService {
     private final MemberMapper memberMapper;
 
     public ProfileResponse getMemberProfile(Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
-        List<ParticipantInfo> participantInfos = participantRepository.getMemberJoinTeam(memberId).stream()
-                .map(memberMapper::toParticipantInfo).toList();
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
+        List<ParticipantInfo> participantInfos = participantRepository.getMemberJoinTeam(memberId)
+                .stream()
+                .map(memberMapper::toParticipantInfo)
+                .toList();
         return memberMapper.toProfileResponseDTO(member, participantInfos);
     }
 
     public TermAllowanceResponse getAllowanceById(Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
         boolean allowed = member.getAllowance() != null ? member.getAllowance() : false;
         return memberMapper.toAllowanceResponseDTO(allowed);
     }

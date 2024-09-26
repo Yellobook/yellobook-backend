@@ -1,11 +1,10 @@
 package com.yellobook.domains.inform.dto.response;
 
+import java.time.LocalDateTime;
 import lombok.Builder;
 
-import java.time.LocalDateTime;
-
 @Builder
-public record CreateInformResponse (
+public record CreateInformResponse(
         Long informId,
         LocalDateTime createdAt
 ) {

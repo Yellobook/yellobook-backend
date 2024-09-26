@@ -22,7 +22,8 @@ public class TeamOrdererOnlyAspect {
 
     @Before("@annotation(com.yellobook.common.aop.annotation.TeamOrdererOnly)")
     public void checkIsTeamAdmin(JoinPoint joinPoint) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication = SecurityContextHolder.getContext()
+                .getAuthentication();
         var principal = (CustomOAuth2User) authentication.getPrincipal();
         Long memberId = principal.getMemberId();
         /**
@@ -30,7 +31,8 @@ public class TeamOrdererOnlyAspect {
          * AOP 에서 예외가 발생하면 컨트롤러 계층으로 전달되어 @RestControllerAdvice 에서 처리한다.
          */
         TeamMemberVO teamMember = redisTeamService.getCurrentTeamMember(memberId);
-        if(!teamMember.getRole().equals(MemberTeamRole.ORDERER)){
+        if (!teamMember.getRole()
+                .equals(MemberTeamRole.ORDERER)) {
             throw new CustomException(AuthErrorCode.ACCESS_DENIED);
         }
     }

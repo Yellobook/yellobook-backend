@@ -2,6 +2,7 @@ package com.yellobook.domains.schedule.controller;
 
 import com.yellobook.common.resolver.annotation.TeamMember;
 import com.yellobook.common.vo.TeamMemberVO;
+import com.yellobook.domains.schedule.ScheduleService;
 import com.yellobook.domains.schedule.dto.request.DailyParam;
 import com.yellobook.domains.schedule.dto.request.MonthlyParam;
 import com.yellobook.domains.schedule.dto.request.MonthlySearchParam;
@@ -9,7 +10,6 @@ import com.yellobook.domains.schedule.dto.response.CalendarResponse;
 import com.yellobook.domains.schedule.dto.response.DailyScheduleResponse;
 import com.yellobook.domains.schedule.dto.response.SearchMonthlyScheduleResponse;
 import com.yellobook.domains.schedule.dto.response.UpcomingScheduleResponse;
-import com.yellobook.domains.schedule.ScheduleService;
 import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,7 +18,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -32,7 +35,7 @@ public class ScheduleController {
     @GetMapping("/upcoming")
     public ResponseEntity<SuccessResponse<UpcomingScheduleResponse>> getUpcomingSchedules(
             @TeamMember TeamMemberVO teamMember
-            ) {
+    ) {
         var result = scheduleService.getUpcomingSchedules(teamMember);
         return ResponseFactory.success(result);
     }

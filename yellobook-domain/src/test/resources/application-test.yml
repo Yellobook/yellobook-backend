@@ -3,7 +3,7 @@ spring:
     url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
     username: sa
     password:
-    driver-class-name:  org.h2.Driver
+    driver-class-name: org.h2.Driver
   jpa:
     open-in-view: false
     hibernate:
@@ -13,6 +13,8 @@ spring:
       dialect: org.hibernate.dialect.H2Dialect
     show-sql: false
     database: h2
+  flyway:
+    enabled: false
 
 logging:
   level:

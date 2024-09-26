@@ -39,7 +39,7 @@ public class AuthService {
             throw new CustomException(AuthErrorCode.ACCESS_DENIED);
         }
         String newAccessToken = jwtService.createAccessToken(memberId);
-        return RefreshResponse.builder().accessToken(newAccessToken).build();
+        return authMapper.toRefreshResponse(newAccessToken);
     }
 
 
@@ -69,7 +69,7 @@ public class AuthService {
             // refreshToken 삭제
             redisService.deleteRefreshToken(memberId);
         } catch (Exception e) {
-            log.error("[AUTH_ERROR] 로그아웃 중 오류 발생: {}",e.getMessage());
+            log.error("[AUTH_ERROR] 로그아웃 중 오류 발생: {}", e.getMessage());
             throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
 

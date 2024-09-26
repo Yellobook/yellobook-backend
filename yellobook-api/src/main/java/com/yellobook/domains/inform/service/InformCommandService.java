@@ -6,11 +6,11 @@ import com.yellobook.domains.inform.dto.request.CreateInformCommentRequest;
 import com.yellobook.domains.inform.dto.request.CreateInformRequest;
 import com.yellobook.domains.inform.dto.response.CreateInformCommentResponse;
 import com.yellobook.domains.inform.dto.response.CreateInformResponse;
-import com.yellobook.domains.inform.mapper.CommentMapper;
-import com.yellobook.domains.inform.mapper.InformMapper;
 import com.yellobook.domains.inform.entity.Inform;
 import com.yellobook.domains.inform.entity.InformComment;
 import com.yellobook.domains.inform.entity.InformMention;
+import com.yellobook.domains.inform.mapper.CommentMapper;
+import com.yellobook.domains.inform.mapper.InformMapper;
 import com.yellobook.domains.inform.repository.InformCommentRepository;
 import com.yellobook.domains.inform.repository.InformMentionRepository;
 import com.yellobook.domains.inform.repository.InformRepository;
@@ -23,12 +23,11 @@ import com.yellobook.error.code.InformErrorCode;
 import com.yellobook.error.code.MemberErrorCode;
 import com.yellobook.error.code.TeamErrorCode;
 import com.yellobook.error.exception.CustomException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -48,11 +47,13 @@ public class InformCommandService {
             Long memberId,
             CreateInformRequest request
     ) {
-        Long teamId = redisService.getCurrentTeamMember(memberId).getTeamId();
+        Long teamId = redisService.getCurrentTeamMember(memberId)
+                .getTeamId();
 
         Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)
                 .orElseThrow(() -> {
-                    log.error("[INFORM_ERROR] Redis 에서 조회한 사용자가 속한 팀 정보에 해당하는 쿼리 결과가 존재하지 않음: 사용자 ID_{} 팀 ID_{}", memberId, teamId);
+                    log.error("[INFORM_ERROR] Redis 에서 조회한 사용자가 속한 팀 정보에 해당하는 쿼리 결과가 존재하지 않음: 사용자 ID_{} 팀 ID_{}",
+                            memberId, teamId);
                     return new CustomException(TeamErrorCode.TEAM_NOT_FOUND);
                 });
         Member member = participant.getMember();
@@ -64,11 +65,14 @@ public class InformCommandService {
 
         // 언급한 사용자들이 존재할 경우
         if (mentionIds != null && !mentionIds.isEmpty()) {
-            List<InformMention> mentions = request.mentionIds().stream().map(mentionDTO -> {
-                Member mentioned = memberRepository.findById(mentionDTO)
-                        .orElseThrow(() -> new CustomException(TeamErrorCode.MENTIONED_MEMBER_NOT_FOUND));
-                return informMapper.toInformMention(newInform, mentioned);
-            }).toList();
+            List<InformMention> mentions = request.mentionIds()
+                    .stream()
+                    .map(mentionDTO -> {
+                        Member mentioned = memberRepository.findById(mentionDTO)
+                                .orElseThrow(() -> new CustomException(TeamErrorCode.MENTIONED_MEMBER_NOT_FOUND));
+                        return informMapper.toInformMention(newInform, mentioned);
+                    })
+                    .toList();
             informMentionRepository.saveAll(mentions);
         }
         log.info("[INFORM_INFO] 사용자 ID_{} 가 공지및일정 ID_{} 생성", member.getId(), newInform.getId());
@@ -76,9 +80,12 @@ public class InformCommandService {
     }
 
     public void deleteInform(Long informId, Long memberId) {
-        Inform inform = informRepository.findById(informId).get();
+        Inform inform = informRepository.findById(informId)
+                .orElseThrow(() -> new CustomException(InformErrorCode.INFORM_NOT_FOUND));
         // 작성자가 아닐 경우
-        if (!inform.getMember().getId().equals(memberId)) {
+        if (!inform.getMember()
+                .getId()
+                .equals(memberId)) {
             log.warn("[INFORM_WARN] 본인이 작성하지 않은 공지 및 일정 ID_{} 에 대해 사용자 ID_{} 가 삭제 요청", informId, memberId);
             throw new CustomException(InformErrorCode.INFORM_MEMBER_NOT_MATCH);
         }
@@ -87,20 +94,23 @@ public class InformCommandService {
         informRepository.deleteById(informId);
     }
 
-    public void increaseViewCount(Long informId, TeamMemberVO teamMemberVO){
+    public void increaseViewCount(Long informId, TeamMemberVO teamMemberVO) {
         Inform inform = informRepository.findById(informId)
                 .orElseThrow(() -> new CustomException(InformErrorCode.INFORM_NOT_FOUND));
 
-        List<InformMention> mentions = informMentionRepository.findByInformId(informId);
+        List<InformMention> mentions = informMentionRepository.findAllByInformId(informId);
         boolean isMentioned = mentions
                 .stream()
-                .anyMatch(mention -> mention.getMember().getId().equals(teamMemberVO.getMemberId()));
+                .anyMatch(mention -> mention.getMember()
+                        .getId()
+                        .equals(teamMemberVO.getMemberId()));
 
         // 언급된 사용자이거나, 본인이 작성했을 경우
-        if(isMentioned || inform.getMember().getId().equals(teamMemberVO.getMemberId())){
+        if (isMentioned || inform.getMember()
+                .getId()
+                .equals(teamMemberVO.getMemberId())) {
             inform.updateView();
-        }
-        else{
+        } else {
             throw new CustomException(InformErrorCode.NOT_MENTIONED);
         }
     }
@@ -110,12 +120,17 @@ public class InformCommandService {
             Long informId,
             Long memberId,
             CreateInformCommentRequest request) {
-        Inform inform = informRepository.findById(informId).get();
+        Inform inform = informRepository.findById(informId)
+                .orElseThrow(() -> new CustomException(InformErrorCode.INFORM_NOT_FOUND));
 
-        List<InformMention> mentions = informMentionRepository.findByInformId(informId);
+        List<InformMention> mentions = informMentionRepository.findAllByInformId(informId);
 
-        Long writerId = inform.getMember().getId();
-        boolean isMentioned = mentions.stream().anyMatch(mention -> mention.getMember().getId().equals(memberId));
+        Long writerId = inform.getMember()
+                .getId();
+        boolean isMentioned = mentions.stream()
+                .anyMatch(mention -> mention.getMember()
+                        .getId()
+                        .equals(memberId));
 
         // 언급된 사용자이거나, 본인이 작성했을 경우
         if (memberId.equals(writerId) || isMentioned) {
