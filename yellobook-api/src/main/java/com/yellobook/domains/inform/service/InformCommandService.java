@@ -91,6 +91,7 @@ public class InformCommandService {
         }
 
         log.info("[INFORM_INFO] 공지및 일정 ID_{} 삭제", inform.getId());
+        informMentionRepository.deleteByInformId(informId);
         informRepository.deleteById(informId);
     }
 
