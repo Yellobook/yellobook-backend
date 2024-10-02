@@ -39,9 +39,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
-@RepositoryTest
-@DisplayName("ScheduleRepository 테스트")
-public class ScheduleRepositoryTest {
+@DisplayName("ScheduleRepository Unit Test")
+public class ScheduleRepositoryTest extends RepositoryTest {
 
     private final TeamMemberVO adminVo = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
     private final TeamMemberVO ordererVo = TeamMemberVO.of(2L, 1L, MemberTeamRole.ORDERER);

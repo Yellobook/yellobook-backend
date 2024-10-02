@@ -24,9 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-@RepositoryTest
 @DisplayName("InventoryRepository Unit Test")
-public class InventoryRepositoryTest {
+public class InventoryRepositoryTest extends RepositoryTest {
     @Autowired
     private InventoryRepository inventoryRepository;
 

@@ -9,7 +9,7 @@ import com.yellobook.domains.order.entity.OrderMention;
 import com.yellobook.domains.team.entity.Team;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import support.ReflectionUtils;
+import support.ReflectionUtil;
 
 public class OrderFixture {
     private static final int ORDER_VIEW = 1;
@@ -37,7 +37,7 @@ public class OrderFixture {
                 .member(member)
                 .product(product)
                 .build();
-        ReflectionUtils.setBaseTimeEntityFields(order, timestamp);
+        ReflectionUtil.setBaseTimeEntityFields(order, timestamp);
         return order;
     }
 

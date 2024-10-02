@@ -5,7 +5,7 @@ import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
 import java.time.LocalDateTime;
-import support.ReflectionUtils;
+import support.ReflectionUtil;
 
 public class TeamFixture {
     private static final String TEAM_NAME = "팀1";
@@ -23,7 +23,7 @@ public class TeamFixture {
                 .phoneNumber(phoneNumber)
                 .address(address)
                 .build();
-        ReflectionUtils.setBaseTimeEntityFields(team, timestamp);
+        ReflectionUtil.setBaseTimeEntityFields(team, timestamp);
         return team;
     }
 

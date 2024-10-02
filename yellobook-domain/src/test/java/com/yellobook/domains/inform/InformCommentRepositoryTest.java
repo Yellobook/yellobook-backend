@@ -20,8 +20,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@RepositoryTest
-public class InformCommentRepositoryTest {
+@DisplayName("InformCommentRepository Unit Test")
+public class InformCommentRepositoryTest extends RepositoryTest {
 
     @Autowired
     private InformCommentRepository informCommentRepository;

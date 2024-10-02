@@ -11,27 +11,18 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 
-@RepositoryTest
-@DisplayName("teamRepository 테스트")
-public class TeamRepositoryTest {
+@DisplayName("TeamRepositoryTest Unit Test")
+public class TeamRepositoryTest extends RepositoryTest {
     @Autowired
     private TeamRepository teamRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
-
-    @BeforeEach
-    public void setUp() {
-        teamRepository.deleteAll();
-        entityManager.createNativeQuery("ALTER TABLE teams ALTER COLUMN id RESTART WITH 1")
-                .executeUpdate();
-    }
 
     @Test
     @DisplayName("팀 생성")

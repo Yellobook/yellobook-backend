@@ -13,33 +13,19 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@RepositoryTest
-@DisplayName("Participant Repository 테스트")
-public class ParticipantRepositoryTest {
+@DisplayName("ParticipantRepository Unit Test")
+public class ParticipantRepositoryTest extends RepositoryTest {
 
     @Autowired
     private ParticipantRepository participantRepository;
 
     @PersistenceContext
     private EntityManager em;
-
-
-    @BeforeEach
-    void setUp() {
-        participantRepository.deleteAll();
-        em.createNativeQuery("ALTER TABLE participants ALTER COLUMN id RESTART WITH 1")
-                .executeUpdate();
-        em.createNativeQuery("ALTER TABLE teams ALTER COLUMN id RESTART WITH 1")
-                .executeUpdate();
-        em.createNativeQuery("ALTER TABLE members ALTER COLUMN id RESTART WITH 1")
-                .executeUpdate();
-    }
 
     @Test
     @DisplayName("참가자 생성")

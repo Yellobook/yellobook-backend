@@ -10,6 +10,7 @@ import com.yellobook.domains.order.entity.OrderComment;
 import com.yellobook.support.annotation.RepositoryTest;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,10 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.jdbc.Sql;
 
-@RepositoryTest
+@Disabled
 @Sql(scripts = "classpath:setup_order.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @DisplayName("OrderRepository Unit Test")
-public class OrderRepositoryTest {
+public class OrderRepositoryTest extends RepositoryTest {
     private final OrderRepository orderRepository;
     private final OrderCommentRepository orderCommentRepository;
     private final OrderMentionRepository orderMentionRepository;

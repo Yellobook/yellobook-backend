@@ -1,4 +1,4 @@
-package com.yellobook.support.utils;
+package support;
 
 import io.jsonwebtoken.Jwts;
 import java.util.Date;
@@ -14,3 +14,4 @@ public class JwtTestUtil {
                 .compact();
     }
 }
+

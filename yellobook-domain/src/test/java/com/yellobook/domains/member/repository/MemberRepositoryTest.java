@@ -13,9 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
-@RepositoryTest
 @DisplayName("MemberRepository Unit Test")
-public class MemberRepositoryTest {
+public class MemberRepositoryTest extends RepositoryTest {
     private final MemberRepository memberRepository;
     private final TestEntityManager entityManager;
     private Member member;
