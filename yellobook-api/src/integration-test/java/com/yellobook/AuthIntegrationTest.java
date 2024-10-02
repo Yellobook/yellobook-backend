@@ -10,7 +10,6 @@ import com.yellobook.domains.auth.service.JwtService;
 import com.yellobook.domains.member.repository.MemberRepository;
 import com.yellobook.support.IntegrationTest;
 import com.yellobook.support.annotation.CustomAutowired;
-import com.yellobook.support.utils.JwtTestUtil;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.restassured.RestAssured;
@@ -22,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
+import support.JwtTestUtil;
 
 @DisplayName("AuthController Integration Test")
 public class AuthIntegrationTest extends IntegrationTest {
@@ -111,7 +111,7 @@ public class AuthIntegrationTest extends IntegrationTest {
             }
 
             @Test
-            @DisplayName("에러 메시지를 포함해야 한다.")
+            @DisplayName("refresh 토큰이 없다는 에러 메시지를 포함해야 한다.")
             void it_contains_message() {
                 response.then()
                         .body("message", equalTo("쿠키에 리프레시 토큰이 없습니다."));
@@ -163,7 +163,7 @@ public class AuthIntegrationTest extends IntegrationTest {
             }
 
             @Test
-            @DisplayName("에러 메시지를 포함해야 한다.")
+            @DisplayName("refresh 토큰이 만료되었다는 에러 메시지를 포함해야 한다.")
             void it_contains_message() {
                 response.then()
                         .body("message", equalTo("리프레시 토큰의 유효기간이 만료되었습니다."));
@@ -256,7 +256,7 @@ public class AuthIntegrationTest extends IntegrationTest {
             }
 
             @Test
-            @DisplayName("에러 메시지를 포함해야 한다.")
+            @DisplayName("가입한 사용자가 존재하지 않는다는 에러 메시지를 포함해야 한다.")
             void it_contains_message() {
                 response.then()
                         .body("message", equalTo("가입한 사용자가 존재하지 않습니다."));
