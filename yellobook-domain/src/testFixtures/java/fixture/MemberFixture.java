@@ -4,7 +4,7 @@ import com.yellobook.common.enums.MemberRole;
 import com.yellobook.domains.member.entity.Member;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import support.ReflectionUtils;
+import support.ReflectionUtil;
 
 public class MemberFixture {
     private static final String MEMBER_NICKNAME = "사용자";
@@ -35,7 +35,7 @@ public class MemberFixture {
                 .role(role)
                 .allowance(allowance)
                 .build();
-        ReflectionUtils.setBaseTimeEntityFields(member, timestamp);
+        ReflectionUtil.setBaseTimeEntityFields(member, timestamp);
         return member;
     }
 

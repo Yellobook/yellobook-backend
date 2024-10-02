@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Assertions;
 
-public class ReflectionUtils {
+public class ReflectionUtil {
     /**
      * 엔티티의 createdAt과 updatedAt 필드를 설정
      *
