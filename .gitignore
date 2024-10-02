@@ -40,7 +40,7 @@ out/
 /*/**/resources/*.yml
 
 ### volumns
-infrastructure/database/*_data
+infrastructure/database/data
 infrastructure/monitoring/data
 ### .env
 .env

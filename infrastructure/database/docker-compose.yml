@@ -1,34 +1,27 @@
 services:
-  db:
-    image: postgres:16
-    container_name: yellobook-postgres
+  mysql:
+    image: mysql:8.0.34
+    container_name: yellobook-mysql
     environment:
-      POSTGRES_DB: ${POSTGRES_DB_NAME}
-      POSTGRES_USER: ${POSTGRES_DB_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_DB_PASSWORD}
-      TZ: Asia/Seoul
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - ./data/mysql_data:/var/lib/mysql
+      - ./mysql-conf/my.cnf:/etc/mysql/conf.d/my.cnf
     ports:
-      - "5433:5432"
-    command: ["postgres", "-c", "client_encoding=UTF8"]
+      - "3306:3306"
     networks:
       - yellobook-network
 
   redis:
-    image: redis:7
+    image: redis:7.0.12
     container_name: yellobook-redis
     ports:
       - "6378:6379"
     volumes:
-      - ./redis_data:/data
+      - ./data/redis_data:/data
     networks:
       - yellobook-network
-
-
-volumes:
-  postgres_data:
-  redis_data:
 
 networks:
   yellobook-network:

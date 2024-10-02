@@ -1,43 +1,29 @@
--- 공지 및 업무 멘션 데이터 삭제
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- 테이블의 데이터를 삭제
 DELETE FROM inform_mentions;
-ALTER TABLE inform_mentions ALTER COLUMN id RESTART WITH 1;
-
--- 주문 댓글 데이터 삭제
-DELETE FROM order_comments;
-ALTER TABLE order_comments ALTER COLUMN  id RESTART WITH 1;
-
--- 공지 및 업무 댓글 데이터 삭제
 DELETE FROM inform_comments;
-ALTER TABLE inform_comments ALTER COLUMN  id RESTART WITH 1;
-
--- 주문 멘션 데이터 삭제
-DELETE FROM order_mentions;
-ALTER TABLE order_mentions ALTER COLUMN id RESTART WITH 1;
-
--- 공지 및 업무 데이터 삭제
 DELETE FROM informs;
-ALTER TABLE informs ALTER COLUMN id RESTART WITH 1;
-
--- 주문 데이터 삭제
+DELETE FROM order_comments;
+DELETE FROM order_mentions;
 DELETE FROM orders;
-ALTER TABLE orders ALTER COLUMN id RESTART WITH 1;
-
--- 제품 데이터 삭제
 DELETE FROM products;
-ALTER TABLE products ALTER COLUMN id RESTART WITH 1;
-
--- 팀 멤버 연관 데이터 삭제
-DELETE FROM participants;
-ALTER TABLE participants ALTER COLUMN id RESTART WITH 1;
-
--- 회원 데이터 삭제
-DELETE FROM members;
-ALTER TABLE members ALTER COLUMN id RESTART WITH 1;
-
--- 재고현황 데이터 삭제
 DELETE FROM inventories;
-ALTER TABLE inventories ALTER COLUMN id RESTART WITH 1;
-
--- 팀 데이터 삭제
+DELETE FROM participants;
 DELETE FROM teams;
-ALTER TABLE teams ALTER COLUMN id RESTART WITH 1;
+DELETE FROM members;
+
+-- AUTO_INCREMENT 값 초기화
+ALTER TABLE inform_mentions AUTO_INCREMENT = 1;
+ALTER TABLE inform_comments AUTO_INCREMENT = 1;
+ALTER TABLE informs AUTO_INCREMENT = 1;
+ALTER TABLE order_comments AUTO_INCREMENT = 1;
+ALTER TABLE order_mentions AUTO_INCREMENT = 1;
+ALTER TABLE orders AUTO_INCREMENT = 1;
+ALTER TABLE products AUTO_INCREMENT = 1;
+ALTER TABLE inventories AUTO_INCREMENT = 1;
+ALTER TABLE participants AUTO_INCREMENT = 1;
+ALTER TABLE teams AUTO_INCREMENT = 1;
+ALTER TABLE members AUTO_INCREMENT = 1;
+
+SET FOREIGN_KEY_CHECKS = 1;
