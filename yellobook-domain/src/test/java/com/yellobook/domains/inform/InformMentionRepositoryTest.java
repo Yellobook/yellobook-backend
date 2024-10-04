@@ -201,4 +201,74 @@ public class InformMentionRepositoryTest {
             }
         }
     }
+
+    @Nested
+    @DisplayName("deleteByInformId 메소드는")
+    class Describe_DeleteByInformId {
+
+        @Nested
+        @DisplayName("informId에 해당하는 mention이 존재하는 경우")
+        class Context_exist_informmention {
+
+            Member member;
+            Team team;
+            Inform inform;
+            Long informId;
+
+            @BeforeEach
+            void setUp() {
+                member = createMember();
+                team = createTeam();
+
+                em.persist(team);
+                em.persist(member);
+
+                inform = createInform(team, member);
+                em.persist(inform);
+                informId = inform.getId();
+
+                InformMention informMention = InformMention.builder()
+                        .inform(inform)
+                        .member(member)
+                        .build();
+
+                em.persist(informMention);
+            }
+
+            @Test
+            @DisplayName("해당 inform에 있는 모든 mention을 지운다.")
+            void it_returns_delete_inform_mention() {
+                informMentionRepository.deleteByInformId(informId);
+
+                List<InformMention> mentions = informMentionRepository.findAllByInformId(informId);
+                assertThat(mentions).isEmpty();
+            }
+        }
+
+        @Nested
+        @DisplayName("informId에 해당하는 mention이 존재하지 않은 경우")
+        class Context_not_exist_informmention {
+
+            Long nonExistentInformId;
+
+            @BeforeEach
+            void setUp() {
+                nonExistentInformId = 999L;
+            }
+
+            @Test
+            @DisplayName("아무 것도 삭제하지 않는다.")
+            void it_does_nothing() {
+
+                //deleteByInformId 호출
+                informMentionRepository.deleteByInformId(nonExistentInformId);
+                em.flush();
+                em.clear();
+
+                //에러 없이 정상적으로 메서드가 수행되어야 함
+                List<InformMention> mentions = informMentionRepository.findAllByInformId(nonExistentInformId);
+                assertThat(mentions).isEmpty();  // 빈 리스트가 반환되어야 함
+            }
+        }
+    }
 }

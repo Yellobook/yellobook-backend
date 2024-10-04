@@ -7,13 +7,16 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.resolver.TeamMemberArgumentResolver;
+import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.auth.security.oauth2.dto.OAuth2UserDTO;
 import com.yellobook.domains.inform.dto.request.CreateInformCommentRequest;
@@ -226,6 +229,41 @@ public class InformControllerTest {
                                 .content(objectMapper.writeValueAsString(request)))
                         .andExpect(status().isCreated())
                         .andDo(print());
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("increaseInformView 메소드는")
+    class Describe_increaseInformView {
+
+        @Nested
+        @DisplayName("유효한 요청이 들어왔을 경우")
+        class Context_Valid_Request {
+
+            TeamMemberVO teamMemberVO;
+            Long informId;
+
+            @BeforeEach
+            void setUp() throws Exception {
+                teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
+                informId = 1L;
+
+                when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
+                when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                        .thenReturn(teamMemberVO);
+
+                when(informRepository.existsById(informId)).thenReturn(true);
+                doNothing().when(informCommandService)
+                        .increaseViewCount(informId, teamMemberVO);
+            }
+
+            @Test
+            @DisplayName("204 noContent를 반환한다.")
+            void it_returns_204_no_content() throws Exception {
+                mockMvc.perform(patch("/api/v1/informs/{informId}/views", informId).
+                                contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isNoContent());
             }
         }
     }

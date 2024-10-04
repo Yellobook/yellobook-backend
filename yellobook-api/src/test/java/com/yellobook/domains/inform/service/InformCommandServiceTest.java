@@ -320,4 +320,134 @@ public class InformCommandServiceTest {
             }
         }
     }
+
+    @Nested
+    @DisplayName("increaseViewCount 메소드는")
+    class Describe_IncreaseViewCount {
+
+        @Nested
+        @DisplayName("inform이 존재하지 않은 경우")
+        class Context_Not_Exist_inform {
+
+            Long notExistInformId;
+            CustomException exception;
+            TeamMemberVO teamMember;
+
+            @BeforeEach
+            void setUp() {
+                notExistInformId = 99L;
+                teamMember = mock(TeamMemberVO.class);
+
+                when(informRepository.findById(notExistInformId)).thenReturn(Optional.empty());
+                exception = assertThrows(CustomException.class, () -> {
+                    informCommandService.increaseViewCount(notExistInformId, teamMember);
+                });
+            }
+
+            @Test
+            @DisplayName("INFORM_NOT_FOUND 에러를 반환한다.")
+            void it_returns_inform_not_found() {
+                assertEquals(InformErrorCode.INFORM_NOT_FOUND, exception.getErrorCode());
+            }
+        }
+
+        @Nested
+        @DisplayName("본인이 작성하지 않고 멘션되지 않은 경우")
+        class Context_Not_Author_And_Not_Mentioned {
+
+            Inform inform;
+            Long informId;
+            Team team;
+            Member Author;
+            Member nonMentionedMember;
+            TeamMemberVO teamMember;
+            CustomException exception;
+
+            @BeforeEach
+            void setUp() {
+                team = mock(Team.class);
+                Author = mock(Member.class);
+                nonMentionedMember = Member.builder()
+                        .memberId(99L)
+                        .build();
+                inform = mock(Inform.class);
+                when(informRepository.findById(informId)).thenReturn(Optional.of(inform));
+                when(inform.getMember()).thenReturn(Author);
+
+                teamMember = TeamMemberVO.of(nonMentionedMember.getId(), team.getId(), MemberTeamRole.ADMIN);
+
+                exception = assertThrows(CustomException.class, () -> {
+                    informCommandService.increaseViewCount(informId, teamMember);
+                });
+            }
+
+            @Test
+            @DisplayName("NOT_MENTIONED 에러를 반환한다.")
+            void it_returns_not_mentioned() {
+                assertEquals(InformErrorCode.NOT_MENTIONED, exception.getErrorCode());
+            }
+        }
+
+        @Nested
+        @DisplayName("작성자의 요청일 경우")
+        class Context_Author {
+
+            Inform inform;
+            Member author;
+            TeamMemberVO teamMember;
+
+            @BeforeEach
+            void setUp() {
+                inform = mock(Inform.class);
+                author = mock(Member.class);
+
+                when(inform.getId()).thenReturn(1L);
+                when(informRepository.findById(inform.getId())).thenReturn(Optional.of(inform));
+                when(inform.getMember()).thenReturn(author);
+                teamMember = TeamMemberVO.of(author.getId(), 1L, MemberTeamRole.ADMIN);
+                doNothing().when(inform)
+                        .updateView();
+            }
+
+            @Test
+            @DisplayName("조회수를 증가시킨다.")
+            void it_returns_update_view() {
+                informCommandService.increaseViewCount(inform.getId(), teamMember);
+                verify(inform).updateView();
+            }
+        }
+
+        @Nested
+        @DisplayName("언급된 사용자의 요청일 경우")
+        class Context_Mentioned {
+
+            Inform inform;
+            Member mentionedMember;
+            Member author;
+            TeamMemberVO teamMember;
+
+            @BeforeEach
+            void setUp() {
+                inform = mock(Inform.class);
+                mentionedMember = mock(Member.class);
+                author = mock(Member.class);
+
+                when(inform.getMember()).thenReturn(author);
+                when(inform.getId()).thenReturn(1L);
+                when(informRepository.findById(inform.getId())).thenReturn(Optional.of(inform));
+
+                teamMember = TeamMemberVO.of(mentionedMember.getId(), 1L, MemberTeamRole.ADMIN);
+
+                doNothing().when(inform)
+                        .updateView();
+            }
+
+            @Test
+            @DisplayName("조회수를 증가시킨다.")
+            void it_returns_update_view() {
+                informCommandService.increaseViewCount(inform.getId(), teamMember);
+                verify(inform).updateView();
+            }
+        }
+    }
 }
