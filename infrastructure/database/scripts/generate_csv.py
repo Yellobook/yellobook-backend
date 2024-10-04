@@ -16,6 +16,7 @@ csv_files = [
     'inform_mentions.csv', 'order_comments.csv', 'inform_comments.csv'
 ]
 
+# CSV
 [
     members_file,
     teams_file,
@@ -30,6 +31,7 @@ csv_files = [
     inform_comments_file
 ] = csv_files
 
+# 데이터 개수
 NUM_USERS = 100000
 NUM_TEAMS = 100
 USERS_PER_TEAM = 10000
@@ -40,6 +42,10 @@ NUM_PRODUCTS_PER_INVENTORY = 100
 NUM_COMMENT_PER_COMMENTER = 2
 NUM_ORDERS = 1000000
 
+# enums
+ORDER_STATUS = ['PENDING_CONFIRM', 'PENDING_MODIFY', 'CONFIRMED']
+
+# 재사용 목적
 members = []
 teams = []
 participants = []
@@ -53,9 +59,13 @@ start_date = datetime(2024, 1, 1)
 end_date = datetime(2024, 9, 30)
 
 
+def get_csv_writer(file):
+    return csv.writer(file, lineterminator='\n')
+
+
 def create_members():
     with open(members_file, 'w', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
+        writer = get_csv_writer(file)
         writer.writerow(
             ['id', 'nickname', 'email', 'role', 'allowance', 'profile_image', 'created_at', 'updated_at', 'deleted_at'])
 
@@ -76,7 +86,7 @@ def create_members():
 
 def create_teams():
     with open(teams_file, 'w', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
+        writer = get_csv_writer(file)
         writer.writerow(['id', 'name', 'phone_number', 'address', 'created_at', 'updated_at'])
 
         for i in range(1, NUM_TEAMS + 1):
@@ -93,7 +103,7 @@ def create_teams():
 
 def create_participants():
     with open(participants_file, 'w', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
+        writer = get_csv_writer(file)
         writer.writerow(['id', 'member_id', 'team_id', 'role', 'created_at', 'updated_at'])
 
         participant_id = 1
@@ -125,6 +135,7 @@ def create_participants():
                 team_id = team['id']
 
                 writer.writerow([participant_id, member_id, team['id'], role, created_at, updated_at])
+
                 participants.append({'team_id': team['id'], 'member_id': member_id, 'role': role})
                 team_participants_map[team_id].append({'member_id': member_id, 'role': role})
                 participant_id += 1
@@ -133,10 +144,10 @@ def create_participants():
 def create_inventories_and_products():
     with open(inventories_file, 'w', newline='', encoding='utf-8') as inv_file, open(products_file, 'w', newline='',
                                                                                      encoding='utf-8') as pd_file:
-        inv_writer = csv.writer(inv_file)
+        inv_writer = get_csv_writer(inv_file)
         inv_writer.writerow(['id', 'team_id', 'title', 'view', 'created_at', 'updated_at'])
 
-        prod_writer = csv.writer(pd_file)
+        prod_writer = get_csv_writer(pd_file)
         prod_writer.writerow(
             ['id', 'inventory_id', 'name', 'sub_product', 'sku', 'amount', 'purchase_price', 'sale_price', 'created_at',
              'updated_at'])
@@ -177,9 +188,9 @@ def create_inform_with_mentions_and_comments():
     with open(informs_file, 'w', newline='', encoding='utf-8') as inform_file, \
             open(inform_mentions_file, 'w', newline='', encoding='utf-8') as mention_file, \
             open(inform_comments_file, 'w', newline='', encoding='utf-8') as comment_file:
-        inform_writer = csv.writer(inform_file)
-        mention_writer = csv.writer(mention_file)
-        comment_writer = csv.writer(comment_file)
+        inform_writer = get_csv_writer(inform_file)
+        mention_writer = get_csv_writer(mention_file)
+        comment_writer = get_csv_writer(comment_file)
 
         inform_writer.writerow(
             ['id', 'member_id', 'team_id', 'title', 'content', 'date', 'view', 'created_at', 'updated_at'])
@@ -228,15 +239,15 @@ def create_order_with_mentions_and_comments():
             open(order_mentions_file, 'w', newline='', encoding='utf-8') as mention_file, \
             open(order_comments_file, 'w', newline='', encoding='utf-8') as comment_file:
 
-        order_writer = csv.writer(order_file)
-        mention_writer = csv.writer(mention_file)
-        comment_writer = csv.writer(comment_file)
+        order_writer = get_csv_writer(order_file)
+        mention_writer = get_csv_writer(mention_file)
+        comment_writer = get_csv_writer(comment_file)
 
         order_writer.writerow(
             ['id', 'member_id', 'product_id', 'team_id', 'date', 'order_amount', 'view', 'memo',
              'order_status', 'created_at', 'updated_at'])
-        mention_writer.writerow(['id', 'order_id', 'member_id', 'created_at', 'updated_at'])
-        comment_writer.writerow(['id', 'order_id', 'member_id', 'content', 'created_at', 'updated_at'])
+        mention_writer.writerow(['id', 'member_id', 'order_id', 'created_at', 'updated_at'])
+        comment_writer.writerow(['id', 'member_id', 'order_id', 'content', 'created_at', 'updated_at'])
 
         mention_id = 1
         comment_id = 1
@@ -268,7 +279,7 @@ def create_order_with_mentions_and_comments():
             order_amount = random.randint(1, product['amount'])
             view = random.randint(0, 100)
             memo = fake.catch_phrase()
-            order_status = random.choice(['PENDING_CONFIRM', 'PENDING_MODIFY', 'CONFIRMED'])
+            order_status = random.choice(ORDER_STATUS)
             created_at = fake.date_time_between(start_date=date, end_date=end_date).strftime(
                 '%Y-%m-%d %H:%M:%S').strip()
             updated_at = created_at
@@ -281,17 +292,20 @@ def create_order_with_mentions_and_comments():
 
             admin = next(p for p in team_participants_map[team_id] if p['role'] == 'ADMIN')
             admin_id = admin['member_id']
+
+            # 각 팀의 관리자 언급
             mention_writer.writerow(
-                [mention_id, order_id, admin_id, created_at, updated_at]
+                [mention_id, admin_id, order_id, created_at, updated_at]
             )
             mention_id += 1
 
+            # 관리자
             comment_writer.writerow(
-                [comment_id, order_id, member_id, fake.catch_phrase(), created_at, updated_at])
+                [comment_id, member_id, order_id, fake.catch_phrase(), created_at, updated_at])
             comment_id += 1
 
             comment_writer.writerow(
-                [comment_id, order_id, admin_id, fake.catch_phrase(), created_at, updated_at])
+                [comment_id, admin_id, order_id, fake.catch_phrase(), created_at, updated_at])
             comment_id += 1
 
 
@@ -323,9 +337,9 @@ def start(funcs):
 
 start([
     create_members,
-    create_teams,
-    create_participants,
-    create_inventories_and_products,
-    create_order_with_mentions_and_comments,
-    create_inform_with_mentions_and_comments
+    # create_teams,
+    # create_participants,
+    # create_inventories_and_products,
+    # create_order_with_mentions_and_comments,
+    # create_inform_with_mentions_and_comments
 ])
