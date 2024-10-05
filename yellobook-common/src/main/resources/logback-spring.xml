@@ -3,7 +3,8 @@
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
     <!-- 로그 포맷 -->
-    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5level [%15.15t] [%X{request_id}] %-40.40logger{39} : %m%n%wEx"/>
+    <property name="LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5level [%15.15t] [%X{request_id}] %-40.40logger{39} : %m%n%wEx"/>
 
 
     <!-- 슬랙 에러 메시지 알림

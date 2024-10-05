@@ -1,11 +1,18 @@
 package com.yellobook.domains.schedule.repository;
 
+import static com.querydsl.core.types.dsl.Expressions.stringTemplate;
+import static com.yellobook.domains.inform.entity.QInform.inform;
+import static com.yellobook.domains.inform.entity.QInformMention.informMention;
+import static com.yellobook.domains.order.entity.QOrder.order;
+
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.DatePath;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringTemplate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.ScheduleType;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.schedule.dto.DailyCond;
 import com.yellobook.domains.schedule.dto.EarliestCond;
@@ -14,20 +21,10 @@ import com.yellobook.domains.schedule.dto.SearchMonthlyCond;
 import com.yellobook.domains.schedule.dto.query.QueryMonthlySchedule;
 import com.yellobook.domains.schedule.dto.query.QuerySchedule;
 import com.yellobook.domains.schedule.dto.query.QueryUpcomingSchedule;
-import com.yellobook.common.enums.MemberTeamRole;
-import com.yellobook.common.enums.ScheduleType;
-import org.springframework.stereotype.Repository;
-
 import java.time.LocalDate;
-import java.util.Optional;
-
-import static com.querydsl.core.types.dsl.Expressions.stringTemplate;
-import static com.yellobook.domains.inform.entity.QInform.*;
-import static com.yellobook.domains.inform.entity.QInformMention.*;
-import static com.yellobook.domains.order.entity.QOrder.*;
-
-
 import java.util.List;
+import java.util.Optional;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class ScheduleRepository {
@@ -40,10 +37,7 @@ public class ScheduleRepository {
     }
 
     /**
-     * 다가오는 주문
-     * 제목, 날짜, 일정형식 (주문, 공지 및 일정)
-     * - 관리자면 모든 주문
-     * - 주문자면 자신이 주문한 주문
+     * 다가오는 주문 제목, 날짜, 일정형식 (주문, 공지 및 일정) - 관리자면 모든 주문 - 주문자면 자신이 주문한 주문
      */
     public Optional<QueryUpcomingSchedule> findEarliestOrder(EarliestCond earliestCond) {
         TeamMemberVO teamMember = earliestCond.teamMember();
@@ -73,9 +67,7 @@ public class ScheduleRepository {
     }
 
     /**
-     * 다가오는 공지/일정
-     * 제목, 날짜 일정형식 (주문 공지 및 일정
-     * - 관리자, 주문자 구별 없이 본인이 작성했거나, 태그된 일정
+     * 다가오는 공지/일정 제목, 날짜 일정형식 (주문 공지 및 일정 - 관리자, 주문자 구별 없이 본인이 작성했거나, 태그된 일정
      */
     public Optional<QueryUpcomingSchedule> findEarliestInform(EarliestCond cond) {
         TeamMemberVO teamMember = cond.teamMember();
@@ -97,7 +89,8 @@ public class ScheduleRepository {
                 .where(
                         inform.date.after(today),
                         inform.team.id.eq(teamId),
-                        inform.member.id.eq(memberId).or(informMention.member.id.eq(memberId))
+                        inform.member.id.eq(memberId)
+                                .or(informMention.member.id.eq(memberId))
                 )
                 .orderBy(inform.date.asc(), inform.createdAt.asc())
                 .fetchFirst();
@@ -159,7 +152,8 @@ public class ScheduleRepository {
                 .where(
                         eqYearMonth(inform.date, cond.year(), cond.month()),
                         inform.team.id.eq(teamId),
-                        inform.member.id.eq(memberId).or(informMention.member.id.eq(memberId)),
+                        inform.member.id.eq(memberId)
+                                .or(informMention.member.id.eq(memberId)),
                         inform.title.like("%" + cond.keyword() + "%")
                 )
                 .orderBy(inform.date.asc(), inform.createdAt.asc())
@@ -221,7 +215,8 @@ public class ScheduleRepository {
                 .where(
                         eqYearMonth(inform.date, cond.year(), cond.month()),
                         inform.team.id.eq(teamId),
-                        inform.member.id.eq(memberId).or(informMention.member.id.eq(memberId))
+                        inform.member.id.eq(memberId)
+                                .or(informMention.member.id.eq(memberId))
                 )
                 .orderBy(inform.date.asc(), inform.createdAt.asc())
                 .fetch();
@@ -284,7 +279,8 @@ public class ScheduleRepository {
                 .on(inform.id.eq(informMention.inform.id))
                 .where(
                         eqYearMonthDay(inform.date, cond.year(), cond.month(), cond.day()),
-                        inform.member.id.eq(memberId).or(informMention.member.id.eq(memberId))
+                        inform.member.id.eq(memberId)
+                                .or(informMention.member.id.eq(memberId))
                 )
                 .orderBy(inform.date.asc(), inform.createdAt.asc())
                 .fetch();
@@ -300,14 +296,19 @@ public class ScheduleRepository {
     }
 
     private BooleanExpression eqYearMonth(DatePath<LocalDate> datePath, int year, int month) {
-        return datePath.year().eq(year)
-                .and(datePath.month().eq(month));
+        return datePath.year()
+                .eq(year)
+                .and(datePath.month()
+                        .eq(month));
     }
 
     private BooleanExpression eqYearMonthDay(DatePath<LocalDate> datePath, int year, int month, int day) {
-        return datePath.year().eq(year)
-                .and(datePath.month().eq(month))
-                .and(datePath.dayOfMonth().eq(day));
+        return datePath.year()
+                .eq(year)
+                .and(datePath.month()
+                        .eq(month))
+                .and(datePath.dayOfMonth()
+                        .eq(day));
     }
 
     /**

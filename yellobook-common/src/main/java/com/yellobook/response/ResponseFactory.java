@@ -1,10 +1,9 @@
 package com.yellobook.response;
 
 import com.yellobook.error.code.ErrorCode;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.util.List;
 
 public class ResponseFactory {
 
@@ -27,7 +26,8 @@ public class ResponseFactory {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    private static <T> ResponseEntity<SuccessResponse<T>> buildSuccessResponse(String message, HttpStatus statusCode, T data) {
+    private static <T> ResponseEntity<SuccessResponse<T>> buildSuccessResponse(String message, HttpStatus statusCode,
+                                                                               T data) {
         SuccessResponse<T> successResponse = SuccessResponse.<T>builder()
                 .isSuccess(true)
                 .message(message)

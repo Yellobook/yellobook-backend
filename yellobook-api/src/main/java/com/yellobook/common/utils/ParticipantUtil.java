@@ -10,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -19,19 +17,10 @@ public class ParticipantUtil {
     private final ParticipantRepository participantRepository;
 
     /**
-     * 권한 가져오기 + 팀에 해당하지 않는 멤버는 에러 반환
-     */
-    public MemberTeamRole getMemberTeamRole(Long teamId, Long memberId){
-        Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId).orElseThrow(()
-        -> new CustomException(TeamErrorCode.USER_NOT_IN_THAT_TEAM));
-        return participant.getRole();
-    }
-
-    /**
      * 관리자는 접근 불가능
      */
-    public static void forbidAdmin(MemberTeamRole role){
-        if(role == MemberTeamRole.ADMIN){
+    public static void forbidAdmin(MemberTeamRole role) {
+        if (role == MemberTeamRole.ADMIN) {
             throw new CustomException(AuthErrorCode.ADMIN_NOT_ALLOWED);
         }
     }
@@ -39,8 +28,8 @@ public class ParticipantUtil {
     /**
      * 주문자는 접근 불가능
      */
-    public static void forbidOrderer(MemberTeamRole role){
-        if(role == MemberTeamRole.ORDERER){
+    public static void forbidOrderer(MemberTeamRole role) {
+        if (role == MemberTeamRole.ORDERER) {
             throw new CustomException(AuthErrorCode.ORDERER_NOT_ALLOWED);
         }
     }
@@ -48,10 +37,20 @@ public class ParticipantUtil {
     /**
      * 뷰어는 접근 불가능
      */
-    public static void forbidViewer(MemberTeamRole role){
-        if(role == MemberTeamRole.VIEWER){
+    public static void forbidViewer(MemberTeamRole role) {
+        if (role == MemberTeamRole.VIEWER) {
             throw new CustomException(AuthErrorCode.VIEWER_NOT_ALLOWED);
         }
+    }
+
+    /**
+     * 권한 가져오기 + 팀에 해당하지 않는 멤버는 에러 반환
+     */
+    public MemberTeamRole getMemberTeamRole(Long teamId, Long memberId) {
+        Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)
+                .orElseThrow(()
+                        -> new CustomException(TeamErrorCode.USER_NOT_IN_THAT_TEAM));
+        return participant.getRole();
     }
 
     /**

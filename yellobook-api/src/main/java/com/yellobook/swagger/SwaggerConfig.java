@@ -11,26 +11,25 @@ import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
-import io.swagger.v3.oas.models.security.*;
+import java.util.List;
+import java.util.Map;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import java.util.List;
-import java.util.Map;
-
 @Profile({"local", "dev"})
 @Configuration
 public class SwaggerConfig {
 
+    private final String SOCIAL_TAG_NAME = "\uD83D\uDE80 소셜 로그인";
     @Value("${backend.base-url}")
     private String backendBaseURL;
-
-    private final String SOCIAL_TAG_NAME = "\uD83D\uDE80 소셜 로그인";
 
     @Bean
     public OpenAPI OpenApiConfig(OpenApiCustomizer openApiCustomizer) {
@@ -50,17 +49,15 @@ public class SwaggerConfig {
                 .info(getInfo())
                 // 서버 정보 추가
                 .servers(List.of(server))
-                .tags(List.of(new Tag().name(SOCIAL_TAG_NAME).description("Oauth2 Endpoint")))
+                .tags(List.of(new Tag().name(SOCIAL_TAG_NAME)
+                        .description("Oauth2 Endpoint")))
                 .path("/oauth2/authorization/kakao", oauth2PathItem(SocialType.KAKAO))
                 .path("/oauth2/authorization/naver", oauth2PathItem(SocialType.NAVER));
-
 
         openApiCustomizer.customise(openApi);
 
         return openApi;
     }
-
-
 
 
     private PathItem oauth2PathItem(SocialType socialLoginType) {
@@ -71,17 +68,17 @@ public class SwaggerConfig {
                 .summary(socialTitle)
                 // 인증 비활성화
                 .security(List.of())
-                .description(String.format("[%s](%s/oauth2/authorization/%s)", socialTitle, backendBaseURL,socialId))
+                .description(String.format("[%s](%s/oauth2/authorization/%s)", socialTitle, backendBaseURL, socialId))
                 .responses(new ApiResponses()
                         .addApiResponse("302", new ApiResponse()
                                 .content(new Content().addMediaType("application/json",
                                         new MediaType().schema(new Schema<Map<String, String>>()
                                                 .type("object")
                                                 .example(Map.of(
-                                                        "Set-Cookie", "accessToken=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c; Max-Age=3600; Path=/; Domain=yellobook.site; HttpOnly=false; Secure=false, refreshToken=dGhpcy1pcy1hLXRlc3QtcmVmcmVzaC10b2tlbg; Max-Age=3600; Path=/; Domain=yellobook.site; HttpOnly=false; Secure=false"
+                                                        "Set-Cookie",
+                                                        "accessToken=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c; Max-Age=3600; Path=/; Domain=yellobook.site; HttpOnly=false; Secure=false, refreshToken=dGhpcy1pcy1hLXRlc3QtcmVmcmVzaC10b2tlbg; Max-Age=3600; Path=/; Domain=yellobook.site; HttpOnly=false; Secure=false"
                                                 ))))))));
     }
-
 
 
     private Info getInfo() {

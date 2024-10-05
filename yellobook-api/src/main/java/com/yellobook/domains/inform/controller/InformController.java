@@ -17,7 +17,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Validated
@@ -49,13 +56,23 @@ public class InformController {
     }
 
     @GetMapping("/{informId}")
-    @Operation(summary = "공지목록 조회", description = "등록된 공지를 조회하는 API 입니다.")
+    @Operation(summary = "공지 조회", description = "등록된 공지를 조회하는 API 입니다.")
     public ResponseEntity<SuccessResponse<GetInformResponse>> getInform(
             @ExistInform @PathVariable("informId") Long informId,
             @TeamMember TeamMemberVO teamMemberVO
     ){
         var result = informQueryService.getInformById(teamMemberVO.getMemberId(), informId);
         return ResponseFactory.success(result);
+    }
+
+    @PatchMapping("/{informId}/views")
+    @Operation(summary = "조회수 증가", description = "조회하는 공지의 조회수 증가 API입니다.")
+    public ResponseEntity<Void> increaseInformView(
+            @ExistInform @PathVariable("informId") Long informId,
+            @TeamMember TeamMemberVO teamMemberVO
+    ) {
+        informCommandService.increaseViewCount(informId, teamMemberVO);
+        return ResponseFactory.noContent();
     }
 
 

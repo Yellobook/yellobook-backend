@@ -5,6 +5,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.core.Ordered;
@@ -14,9 +16,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-import java.io.IOException;
-import java.util.UUID;
-
 @Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Component
@@ -25,9 +24,10 @@ public class ReqResLoggingFilter extends OncePerRequestFilter {
     private static final String REQUEST_ID = "request_id";
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
-         String requestURI = request.getRequestURI();
+        String requestURI = request.getRequestURI();
         /**
          * HTTP 요청과 응답의 본문은 InputStream 과 OutputStream 을 통해 처리되기 때문에 한 번만 읽거나 쓸 수 있다.
          * 스트림을 한번 읽으면 스트림의 포인터가 데이터 끝으로 이동하며 다시 데이터를 읽을 수 없게 된다.
@@ -48,7 +48,9 @@ public class ReqResLoggingFilter extends OncePerRequestFilter {
         ContentCachingResponseWrapper cachingResponseWrapper = new ContentCachingResponseWrapper(response);
 
         // request id 식별자 추가
-        String requestId = UUID.randomUUID().toString().substring(0, 8);
+        String requestId = UUID.randomUUID()
+                .toString()
+                .substring(0, 8);
 
         MDC.put(REQUEST_ID, requestId);
 
@@ -59,7 +61,8 @@ public class ReqResLoggingFilter extends OncePerRequestFilter {
         double elapsedTime = (endTime - startTime) / 1000.0;
 
         try {
-            HttpLogMessage logMessage = HttpLogMessage.createInstance(cachingRequestWrapper, cachingResponseWrapper, elapsedTime);
+            HttpLogMessage logMessage = HttpLogMessage.createInstance(cachingRequestWrapper, cachingResponseWrapper,
+                    elapsedTime);
             log.info(logMessage.toPrettierLog());
 
             cachingResponseWrapper.copyBodyToResponse();
@@ -72,9 +75,9 @@ public class ReqResLoggingFilter extends OncePerRequestFilter {
 
     /**
      * Swagger 에 대한 HTTP 로깅을 비활성하기 위한 설정
-     *
-     * doFilterInternal 메서드가 호출되기 전에 souldNotFilter 메서드를 호출해 필터를 적용할지 결정한다.
-     * shouldNotFilter 메서드가 false 를 반환하면 doFilterInternal 는 호출되지 않고 해당 요청에 대해 필터가 적용되지 않는다.
+     * <p>
+     * doFilterInternal 메서드가 호출되기 전에 souldNotFilter 메서드를 호출해 필터를 적용할지 결정한다. shouldNotFilter 메서드가 false 를 반환하면
+     * doFilterInternal 는 호출되지 않고 해당 요청에 대해 필터가 적용되지 않는다.
      */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {

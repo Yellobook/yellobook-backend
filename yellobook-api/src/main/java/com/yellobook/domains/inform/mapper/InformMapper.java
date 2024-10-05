@@ -10,10 +10,9 @@ import com.yellobook.domains.inform.entity.InformComment;
 import com.yellobook.domains.inform.entity.InformMention;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.team.entity.Team;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
-import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface InformMapper {
@@ -31,13 +30,15 @@ public interface InformMapper {
     @Mapping(target = "memo", source = "inform.content")
     @Mapping(target = "view", source = "inform.view")
     @Mapping(target = "date", source = "inform.date")
-    GetInformResponse toGetInformResponseDTO(Inform inform, List<InformComment> comments, List<Member> members);
+    @Mapping(target = "author", source = "inform.member.nickname")
+    GetInformResponse toGetInformResponseDTO(Inform inform, List<InformComment> comments, List<Member> mentions);
 
     default List<CommentItem> mapComments(List<InformComment> comments) {
         return comments.stream()
                 .map(comment -> CommentItem.builder()
                         .id(comment.getId())
-                        .memberId(comment.getMember().getId())
+                        .memberId(comment.getMember()
+                                .getId())
                         .content(comment.getContent())
                         .createdAt(comment.getCreatedAt())
                         .build())

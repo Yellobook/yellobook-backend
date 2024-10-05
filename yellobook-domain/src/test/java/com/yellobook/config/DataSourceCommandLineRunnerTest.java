@@ -1,17 +1,17 @@
 package com.yellobook.config;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static support.ReflectionUtils.setField;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static support.ReflectionUtils.*;
 
 @ExtendWith(OutputCaptureExtension.class)
 @DisplayName("DataSourceCommandLineRunner 클래스")

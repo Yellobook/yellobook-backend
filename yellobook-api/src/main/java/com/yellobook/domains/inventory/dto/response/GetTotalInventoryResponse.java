@@ -1,9 +1,8 @@
 package com.yellobook.domains.inventory.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-
 import java.util.List;
+import lombok.Builder;
 
 @Schema(description = "전체 재고 현황 글 조회 - 응답 DTO")
 @Builder
@@ -28,7 +27,7 @@ public record GetTotalInventoryResponse(
             String updatedAt,
             @Schema(description = "조회수")
             Integer view
-    ){
+    ) {
     }
 
 }

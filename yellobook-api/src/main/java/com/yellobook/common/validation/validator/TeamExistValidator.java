@@ -17,8 +17,9 @@ public class TeamExistValidator implements ConstraintValidator<ExistTeam, Long> 
         if (!isValid) {
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(
-                    TeamErrorCode.TEAM_NOT_FOUND.toString()
-            ).addConstraintViolation();
+                            TeamErrorCode.TEAM_NOT_FOUND.toString()
+                    )
+                    .addConstraintViolation();
             return false;
         }
         return true;

@@ -1,7 +1,7 @@
 package com.yellobook.domains.auth.security.oauth2.dto;
 
-import com.yellobook.domains.member.entity.Member;
 import com.yellobook.common.enums.MemberRole;
+import com.yellobook.domains.member.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -16,7 +16,8 @@ public class OAuth2UserDTO {
 
 
     @Builder
-    private OAuth2UserDTO(Long memberId, String nickname, String email, String profileImage, Boolean allowance, MemberRole role) {
+    private OAuth2UserDTO(Long memberId, String nickname, String email, String profileImage, Boolean allowance,
+                          MemberRole role) {
         this.memberId = memberId;
         this.nickname = nickname;
         this.email = email;

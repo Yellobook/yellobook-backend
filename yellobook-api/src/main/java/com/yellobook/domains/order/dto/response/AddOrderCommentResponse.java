@@ -7,4 +7,5 @@ import lombok.Builder;
 public record AddOrderCommentResponse(
         @Schema(description = "생성한 댓글 Id", example = "1")
         Long commentId
-) { }
+) {
+}

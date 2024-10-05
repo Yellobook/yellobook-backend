@@ -23,8 +23,8 @@ public enum AuthErrorCode implements ErrorCode {
     INVALID_TOKEN_SIGNATURE(HttpStatus.BAD_REQUEST, "AUTH-008", "토큰의 서명이 일치하지 않습니다."),
     UNSUPPORTED_TOKEN(HttpStatus.BAD_REQUEST, "AUTH-009", "토큰의 특정 헤더나 클레임이 지원되지 않습니다."),
 
-    REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "AUTH-010", "쿠키에 refreshToken 이 없습니다."),
-    ACCESS_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "AUTH-011", "요청 헤더에 accessToken 이 없습니다."),
+    REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "AUTH-010", "쿠키에 리프레시 토큰이 없습니다."),
+    ACCESS_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "AUTH-011", "요청 헤더에 엑세스 토큰이 없습니다."),
     // 권한 애러
     ADMIN_NOT_ALLOWED(HttpStatus.UNAUTHORIZED, "AUTH-012", "관리자는 접근 권한이 없습니다."),
     ORDERER_NOT_ALLOWED(HttpStatus.UNAUTHORIZED, "AUTH-013", "주문자는 접근 권한이 없습니다."),
