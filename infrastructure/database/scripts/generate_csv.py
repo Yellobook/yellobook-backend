@@ -7,6 +7,7 @@ from collections import defaultdict
 from datetime import datetime
 
 from faker import Faker
+from tqdm import tqdm
 
 fake = Faker('ko_KR')
 
@@ -16,7 +17,7 @@ csv_files = [
     'inform_mentions.csv', 'order_comments.csv', 'inform_comments.csv'
 ]
 
-# CSV
+# csv
 [
     members_file,
     teams_file,
@@ -42,10 +43,10 @@ NUM_PRODUCTS_PER_INVENTORY = 100
 NUM_COMMENT_PER_COMMENTER = 2
 NUM_ORDERS = 1000000
 
-# enums
+# 주문자
 ORDER_STATUS = ['PENDING_CONFIRM', 'PENDING_MODIFY', 'CONFIRMED']
 
-# 재사용 목적
+# 테이블 별 데이터
 members = []
 teams = []
 participants = []
@@ -59,6 +60,7 @@ start_date = datetime(2024, 1, 1)
 end_date = datetime(2024, 9, 30)
 
 
+# csv.writer 기본값이 crlf 이므로 lf 방식으로 lineterminator 에 넣어줘야 한다.
 def get_csv_writer(file):
     return csv.writer(file, lineterminator='\n')
 
@@ -69,7 +71,7 @@ def create_members():
         writer.writerow(
             ['id', 'nickname', 'email', 'role', 'allowance', 'profile_image', 'created_at', 'updated_at', 'deleted_at'])
 
-        for member_id in range(1, NUM_USERS + 1):
+        for member_id in tqdm(range(1, NUM_USERS + 1), desc="사용자 생성 중"):
             nickname = fake.name()
             email = f"example{member_id}@gmail.com"
             role = 'USER'
@@ -89,7 +91,7 @@ def create_teams():
         writer = get_csv_writer(file)
         writer.writerow(['id', 'name', 'phone_number', 'address', 'created_at', 'updated_at'])
 
-        for i in range(1, NUM_TEAMS + 1):
+        for i in tqdm(range(1, NUM_TEAMS + 1), desc="팀 생성 중"):
             name = f'팀_{i}'
             phone_number = fake.phone_number()
             address = fake.address()
@@ -108,7 +110,7 @@ def create_participants():
 
         participant_id = 1
 
-        for team in teams:
+        for team in tqdm(teams, desc="팀별 사용자 추가 중"):
             admin_assigned = False
 
             selected_members = defaultdict(int)
@@ -155,7 +157,7 @@ def create_inventories_and_products():
         inventory_id = 1
         product_id = 1
 
-        for team in teams:
+        for team in tqdm(teams, desc="팀별 재고현황 생성 중"):
             team_id = team['id']
 
             for _ in range(NUM_INVENTORIES_PER_TEAM):
@@ -188,6 +190,7 @@ def create_inform_with_mentions_and_comments():
     with open(informs_file, 'w', newline='', encoding='utf-8') as inform_file, \
             open(inform_mentions_file, 'w', newline='', encoding='utf-8') as mention_file, \
             open(inform_comments_file, 'w', newline='', encoding='utf-8') as comment_file:
+
         inform_writer = get_csv_writer(inform_file)
         mention_writer = get_csv_writer(mention_file)
         comment_writer = get_csv_writer(comment_file)
@@ -200,8 +203,7 @@ def create_inform_with_mentions_and_comments():
         mention_id = 1
         comment_id = 1
 
-        for inform_id in range(1, NUM_INFORMS + 1):
-
+        for inform_id in tqdm(range(1, NUM_INFORMS + 1), desc="공지 생성 중"):
             team_id = random.choice(list(team_participants_map.keys()))
             team_participants = team_participants_map[team_id]
             participant = random.choice(team_participants)
@@ -262,8 +264,8 @@ def create_order_with_mentions_and_comments():
         for pi, p in enumerate(products):
             inventory_product_map[p['inventory_id']].append({'products_idx': pi, 'amount': p['amount'], 'id': p['id']})
 
-        for order_id in range(1, NUM_ORDERS + 1):
-
+        for order_id in tqdm(range(1, NUM_ORDERS + 1), desc="주문 생성 중"):
+            # 주문자 선택
             participant = random.choice(orderers)
             team_id = participant['team_id']
             member_id = participant['member_id']
@@ -284,6 +286,7 @@ def create_order_with_mentions_and_comments():
                 '%Y-%m-%d %H:%M:%S').strip()
             updated_at = created_at
 
+            # 재고 감소
             products[product['products_idx']]['amount'] -= order_amount
 
             order_writer.writerow(
@@ -299,11 +302,12 @@ def create_order_with_mentions_and_comments():
             )
             mention_id += 1
 
-            # 관리자
+            # 작성자 댓글
             comment_writer.writerow(
                 [comment_id, member_id, order_id, fake.catch_phrase(), created_at, updated_at])
             comment_id += 1
 
+            # 관리자 댓글
             comment_writer.writerow(
                 [comment_id, admin_id, order_id, fake.catch_phrase(), created_at, updated_at])
             comment_id += 1
@@ -337,9 +341,9 @@ def start(funcs):
 
 start([
     create_members,
-    # create_teams,
-    # create_participants,
-    # create_inventories_and_products,
-    # create_order_with_mentions_and_comments,
-    # create_inform_with_mentions_and_comments
+    create_teams,
+    create_participants,
+    create_inventories_and_products,
+    create_inform_with_mentions_and_comments,
+    create_order_with_mentions_and_comments
 ])
