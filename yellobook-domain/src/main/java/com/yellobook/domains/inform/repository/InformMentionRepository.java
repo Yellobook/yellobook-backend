@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface InformMentionRepository extends JpaRepository<InformMention, Long> {
     List<InformMention> findAllByInformId(Long informId);
+
+    void deleteByInformId(Long informId);
 }

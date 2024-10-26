@@ -1,5 +1,6 @@
 package com.yellobook.domains.inform.service;
 
+import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.auth.service.RedisTeamService;
 import com.yellobook.domains.inform.dto.request.CreateInformCommentRequest;
 import com.yellobook.domains.inform.dto.request.CreateInformRequest;
@@ -18,7 +19,6 @@ import com.yellobook.domains.member.repository.MemberRepository;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
 import com.yellobook.domains.team.repository.ParticipantRepository;
-import com.yellobook.domains.team.service.TeamQueryService;
 import com.yellobook.error.code.InformErrorCode;
 import com.yellobook.error.code.MemberErrorCode;
 import com.yellobook.error.code.TeamErrorCode;
@@ -38,7 +38,6 @@ public class InformCommandService {
     private final InformMapper informMapper;
     private final ParticipantRepository participantRepository;
     private final RedisTeamService redisService;
-    private final TeamQueryService teamQueryService;
     private final MemberRepository memberRepository;
     private final InformMentionRepository informMentionRepository;
     private final InformCommentRepository informCommentRepository;
@@ -82,7 +81,7 @@ public class InformCommandService {
 
     public void deleteInform(Long informId, Long memberId) {
         Inform inform = informRepository.findById(informId)
-                .get();
+                .orElseThrow(() -> new CustomException(InformErrorCode.INFORM_NOT_FOUND));
         // 작성자가 아닐 경우
         if (!inform.getMember()
                 .getId()
@@ -92,7 +91,29 @@ public class InformCommandService {
         }
 
         log.info("[INFORM_INFO] 공지및 일정 ID_{} 삭제", inform.getId());
+        informMentionRepository.deleteByInformId(informId);
         informRepository.deleteById(informId);
+    }
+
+    public void increaseViewCount(Long informId, TeamMemberVO teamMemberVO) {
+        Inform inform = informRepository.findById(informId)
+                .orElseThrow(() -> new CustomException(InformErrorCode.INFORM_NOT_FOUND));
+
+        List<InformMention> mentions = informMentionRepository.findAllByInformId(informId);
+        boolean isMentioned = mentions
+                .stream()
+                .anyMatch(mention -> mention.getMember()
+                        .getId()
+                        .equals(teamMemberVO.getMemberId()));
+
+        // 언급된 사용자이거나, 본인이 작성했을 경우
+        if (isMentioned || inform.getMember()
+                .getId()
+                .equals(teamMemberVO.getMemberId())) {
+            inform.updateView();
+        } else {
+            throw new CustomException(InformErrorCode.NOT_MENTIONED);
+        }
     }
 
 
@@ -101,7 +122,7 @@ public class InformCommandService {
             Long memberId,
             CreateInformCommentRequest request) {
         Inform inform = informRepository.findById(informId)
-                .get();
+                .orElseThrow(() -> new CustomException(InformErrorCode.INFORM_NOT_FOUND));
 
         List<InformMention> mentions = informMentionRepository.findAllByInformId(informId);
 
