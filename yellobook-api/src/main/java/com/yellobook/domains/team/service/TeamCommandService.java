@@ -1,6 +1,6 @@
 package com.yellobook.domains.team.service;
 
-import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.domains.auth.dto.InvitationResponse;
 import com.yellobook.domains.auth.service.RedisTeamService;
 import com.yellobook.domains.member.entity.Member;
@@ -76,7 +76,7 @@ public class TeamCommandService {
                             memberId,
                             tempParticipant.getTeam()
                                     .getId(),
-                            tempParticipant.getRole()
+                            tempParticipant.getTeamMemberRole()
                                     .name()
                     );
                 });
@@ -86,7 +86,7 @@ public class TeamCommandService {
 
         InvitationResponse invitationData = redisService.getInvitationInfo(code);
         Long teamId = invitationData.getTeamId();
-        MemberTeamRole role = invitationData.getRole();
+        TeamMemberRole role = invitationData.getRole();
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> {
@@ -104,8 +104,8 @@ public class TeamCommandService {
             throw new CustomException(TeamErrorCode.MEMBER_ALREADY_EXIST);
         }
         // ADMIN이 있는가?
-        if (role == MemberTeamRole.ADMIN) {
-            participantRepository.findByTeamIdAndRole(teamId, MemberTeamRole.ADMIN)
+        if (role == TeamMemberRole.ADMIN) {
+            participantRepository.findByTeamIdAndTeamMemberRole(teamId, TeamMemberRole.ADMIN)
                     .ifPresent(
                             admin -> {
                                 log.warn("Admin already exists in team {}", teamId);

@@ -1,6 +1,6 @@
 package com.yellobook.domains.team.repository;
 
-import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.domains.team.entity.Participant;
 import java.util.List;
 import java.util.Optional;
@@ -14,5 +14,5 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long>,
 
     Optional<Participant> findByTeamIdAndMemberId(Long teamId, Long memberId);
 
-    Optional<Participant> findByTeamIdAndRole(Long teamId, MemberTeamRole role);
+    Optional<Participant> findByTeamIdAndTeamMemberRole(Long teamId, TeamMemberRole teamMemberRole);
 }

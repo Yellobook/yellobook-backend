@@ -11,7 +11,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.inventory.dto.cond.ExcelProductCond;
 import com.yellobook.domains.inventory.dto.request.AddProductRequest;
@@ -55,9 +55,9 @@ import org.springframework.web.multipart.MultipartFile;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("InventoryCommandService Unit Test")
 class InventoryCommandServiceTest {
-    private final TeamMemberVO admin = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
-    private final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, MemberTeamRole.ORDERER);
-    private final TeamMemberVO viewer = TeamMemberVO.of(3L, 1L, MemberTeamRole.VIEWER);
+    private final TeamMemberVO admin = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
+    private final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, TeamMemberRole.ORDERER);
+    private final TeamMemberVO viewer = TeamMemberVO.of(3L, 1L, TeamMemberRole.VIEWER);
     @InjectMocks
     private InventoryCommandService inventoryCommandService;
     @Mock

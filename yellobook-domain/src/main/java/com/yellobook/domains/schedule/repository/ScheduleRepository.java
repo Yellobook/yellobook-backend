@@ -11,8 +11,8 @@ import com.querydsl.core.types.dsl.DatePath;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringTemplate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.enums.ScheduleType;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.schedule.dto.DailyCond;
 import com.yellobook.domains.schedule.dto.EarliestCond;
@@ -39,12 +39,12 @@ public class ScheduleRepository {
     /**
      * 다가오는 주문 제목, 날짜, 일정형식 (주문, 공지 및 일정) - 관리자면 모든 주문 - 주문자면 자신이 주문한 주문
      */
-    public Optional<QueryUpcomingSchedule> findEarliestOrder(EarliestCond earliestCond) {
-        TeamMemberVO teamMember = earliestCond.teamMember();
-        LocalDate today = earliestCond.today();
+    public Optional<QueryUpcomingSchedule> findEarliestOrder(EarliestCond cond) {
+        TeamMemberVO teamMember = cond.teamMember();
+        LocalDate today = cond.today();
         Long teamId = teamMember.getTeamId();
         Long memberId = teamMember.getMemberId();
-        MemberTeamRole role = teamMember.getRole();
+        TeamMemberRole role = teamMember.getRole();
 
         QueryUpcomingSchedule schedule = queryFactory
                 .select(
@@ -105,7 +105,7 @@ public class ScheduleRepository {
         TeamMemberVO teamMember = cond.teamMember();
         Long teamId = teamMember.getTeamId();
         Long memberId = teamMember.getMemberId();
-        MemberTeamRole role = teamMember.getRole();
+        TeamMemberRole role = teamMember.getRole();
 
         List<QuerySchedule> schedules = queryFactory
                 .select(
@@ -168,7 +168,7 @@ public class ScheduleRepository {
         TeamMemberVO teamMember = cond.teamMember();
         Long teamId = teamMember.getTeamId();
         Long memberId = teamMember.getMemberId();
-        MemberTeamRole role = teamMember.getRole();
+        TeamMemberRole role = teamMember.getRole();
 
         List<QueryMonthlySchedule> schedules = queryFactory
                 .select(
@@ -231,7 +231,7 @@ public class ScheduleRepository {
         TeamMemberVO teamMember = cond.teamMember();
         Long teamId = teamMember.getTeamId();
         Long memberId = teamMember.getMemberId();
-        MemberTeamRole role = teamMember.getRole();
+        TeamMemberRole role = teamMember.getRole();
 
         List<QuerySchedule> schedules = queryFactory
                 .select(
@@ -314,8 +314,8 @@ public class ScheduleRepository {
     /**
      * 주문자라면 자신이 작성한 주문이어야 한다.
      */
-    private BooleanExpression eqOrderer(MemberTeamRole role, Long memberId) {
-        if (role == MemberTeamRole.ORDERER) {
+    private BooleanExpression eqOrderer(TeamMemberRole role, Long memberId) {
+        if (role == TeamMemberRole.ORDERER) {
             return order.member.id.eq(memberId);
         }
         return null;

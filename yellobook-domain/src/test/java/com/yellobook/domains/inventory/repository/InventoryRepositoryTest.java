@@ -10,9 +10,7 @@ import com.yellobook.domains.inventory.dto.query.QueryProduct;
 import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.team.entity.Team;
-import com.yellobook.support.annotation.RepositoryTest;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import com.yellobook.support.RepositoryTest;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,15 +30,12 @@ public class InventoryRepositoryTest extends RepositoryTest {
     @Autowired
     private ProductRepository productRepository;
 
-    @PersistenceContext
-    private EntityManager em;
-
     private Team team;
 
     @BeforeEach
     void setUp() {
-        team = createTeam();
-        em.persist(team);
+        resetAutoIncrement();
+        team = em.persist(createTeam());
     }
 
     @Nested
@@ -69,8 +64,7 @@ public class InventoryRepositoryTest extends RepositoryTest {
             @BeforeEach
             void setUpContext() {
                 for (int i = 0; i < 6; i++) {
-                    Inventory inventory = createInventory(String.format("2024년 08월 0%d일 재고현황", i), team);
-                    em.persist(inventory);
+                    em.persist(createInventory(String.format("2024년 08월 0%d일 재고현황", i), team));
                 }
             }
 

@@ -10,9 +10,7 @@ import com.yellobook.domains.inform.entity.InformComment;
 import com.yellobook.domains.inform.repository.InformCommentRepository;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.team.entity.Team;
-import com.yellobook.support.annotation.RepositoryTest;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import com.yellobook.support.RepositoryTest;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,9 +23,6 @@ public class InformCommentRepositoryTest extends RepositoryTest {
 
     @Autowired
     private InformCommentRepository informCommentRepository;
-
-    @PersistenceContext
-    private EntityManager em;
 
     @Nested
     @DisplayName("save 메소드는")
@@ -45,13 +40,10 @@ public class InformCommentRepositoryTest extends RepositoryTest {
 
             @BeforeEach
             void setUp() {
-                member = createMember();
-                team = createTeam();
-                em.persist(team);
-                em.persist(member);
+                member = em.persist(createMember());
+                team = em.persist(createTeam());
+                inform = em.persist(createInform(team, member));
 
-                inform = createInform(team, member);
-                em.persist(inform);
                 comment = InformComment.builder()
                         .inform(inform)
                         .member(member)
@@ -77,23 +69,15 @@ public class InformCommentRepositoryTest extends RepositoryTest {
         @Nested
         @DisplayName("해당하는 inform 안에 comment 가 존재하는 경우")
         class Context_exist_informcomment {
-
-            Member member;
-            Team team;
-            Inform inform;
             Long informId;
-
             List<InformComment> list;
 
             @BeforeEach
             void setUp() {
-                member = createMember();
-                team = createTeam();
-                em.persist(team);
-                em.persist(member);
+                Member member = em.persist(createMember());
+                Team team = em.persist(createTeam());
+                Inform inform = em.persist(createInform(team, member));
 
-                inform = createInform(team, member);
-                em.persist(inform);
                 informId = inform.getId();
                 InformComment comment = InformComment.builder()
                         .inform(inform)
@@ -116,23 +100,17 @@ public class InformCommentRepositoryTest extends RepositoryTest {
         @DisplayName("해당하는 inform 안에 comment 가 존재하지 않는 경우")
         class Context_not_exist_informcomment {
 
-            Member member;
-            Team team;
-            Inform inform;
             Long informId;
 
             List<InformComment> list;
 
             @BeforeEach
             void setUp() {
-                member = createMember();
-                team = createTeam();
-                em.persist(team);
-                em.persist(member);
-                inform = createInform(team, member);
-                em.persist(inform);
-                informId = inform.getId();
+                Member member = em.persist(createMember());
+                Team team = em.persist(createTeam());
+                Inform inform = em.persist(createInform(team, member));
 
+                informId = inform.getId();
                 list = informCommentRepository.findByInformId(informId);
             }
 

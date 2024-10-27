@@ -49,7 +49,7 @@ public class HttpLogMessage {
     public String toPrettierLog() {
         return String.format(
                 """
-                                        
+                                                
                         |[REQUEST] %s %s %s (%.3f)
                         |>> CLIENT_IP: %s
                         |>> HEADERS: %s

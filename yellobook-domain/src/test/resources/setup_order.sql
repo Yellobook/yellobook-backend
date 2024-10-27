@@ -10,7 +10,7 @@ VALUES (1, '사용자1', 'user1@example.com', 'profile1.png', 'USER', true, '202
        (3, '사용자3', 'user3@example.com', 'profile3.png', 'USER', true, '2024-07-25 10:00:00', '2024-07-25 10:00:00');
 
 -- 팀별 권한 데이터 삽입
-INSERT INTO participants (id, team_id, member_id, role, created_at, updated_at)
+INSERT INTO participants (id, team_id, member_id, team_member_role, created_at, updated_at)
 VALUES (1, 1, 1, 'ADMIN', '2024-07-25 10:00:00', '2024-07-25 10:00:00'),
        (2, 1, 2, 'ORDERER', '2024-07-25 10:00:00', '2024-07-25 10:00:00'),
        (3, 1, 3, 'VIEWER', '2024-07-25 10:00:00', '2024-07-25 10:00:00'),

@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.common.resolver.TeamMemberArgumentResolver;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
@@ -88,7 +88,7 @@ public class TeamControllerTest {
 
                 SecurityUtil.setAuthentication(customOAuth2User);
 
-                request = new CreateTeamRequest("nike", "01000000000", "경기도", MemberTeamRole.ADMIN);
+                request = new CreateTeamRequest("nike", "01000000000", "경기도", TeamMemberRole.ADMIN);
                 response = new CreateTeamResponse(1L, LocalDateTime.now());
 
                 when(teamCommandService.createTeam(request, customOAuth2User.getMemberId()))
@@ -161,7 +161,7 @@ public class TeamControllerTest {
 
             @BeforeEach
             void setUp() throws Exception {
-                teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
+                teamMemberVO = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
                 response = new TeamMemberListResponse(
                         List.of(new QueryTeamMember(1L, "test1"),
                                 new QueryTeamMember(2L, "test2")));
@@ -202,7 +202,7 @@ public class TeamControllerTest {
                 name = "john";
                 response = new TeamMemberListResponse(
                         List.of(new QueryTeamMember(2L, "john")));
-                teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
+                teamMemberVO = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
 
                 when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
                 when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
@@ -235,7 +235,7 @@ public class TeamControllerTest {
             void setUp() throws Exception {
                 name = "john";
                 response = new TeamMemberListResponse(List.of());
-                teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
+                teamMemberVO = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
 
                 when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
                 when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
@@ -275,8 +275,8 @@ public class TeamControllerTest {
                 response = InvitationCodeResponse.builder()
                         .inviteUrl(expectedInviteUrl)
                         .build();
-                request = new InvitationCodeRequest(MemberTeamRole.ADMIN);
-                teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
+                request = new InvitationCodeRequest(TeamMemberRole.ADMIN);
+                teamMemberVO = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
 
                 when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
                 when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any())).thenReturn(teamMemberVO);
@@ -346,7 +346,7 @@ public class TeamControllerTest {
 
             @BeforeEach
             void setUp() throws Exception {
-                teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
+                teamMemberVO = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
 
                 when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
                 when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))

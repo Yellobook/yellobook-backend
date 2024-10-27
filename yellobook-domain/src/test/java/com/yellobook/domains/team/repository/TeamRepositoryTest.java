@@ -1,16 +1,17 @@
 package com.yellobook.domains.team.repository;
 
 import com.yellobook.common.enums.MemberRole;
-import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
-import com.yellobook.support.annotation.RepositoryTest;
+import com.yellobook.support.RepositoryTest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,12 @@ public class TeamRepositoryTest extends RepositoryTest {
     private TeamRepository teamRepository;
 
     @PersistenceContext
-    private EntityManager entityManager;
+    private EntityManager em;
+
+    @BeforeEach
+    void setUp() {
+        resetAutoIncrement();
+    }
 
     @Test
     @DisplayName("팀 생성")
@@ -94,7 +100,7 @@ public class TeamRepositoryTest extends RepositoryTest {
         Assertions.assertThatThrownBy(() -> teamRepository.save(team2))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessageContaining("could not execute statement");
-        entityManager.clear();
+        em.clear();
         Assertions.assertThat(teamRepository.findAll())
                 .hasSize(1);
     }
@@ -109,14 +115,14 @@ public class TeamRepositoryTest extends RepositoryTest {
                 .phoneNumber("123-456-7890")
                 .address("1234 Test St")
                 .build();
-        entityManager.persist(team);
+        em.persist(team);
 
         Participant participant1 = createParticipant(
                 "홍길동",
                 "hong@example.com",
                 MemberRole.USER,
                 team,
-                MemberTeamRole.ADMIN
+                TeamMemberRole.ADMIN
         );
 
         Participant participant2 = createParticipant(
@@ -124,7 +130,7 @@ public class TeamRepositoryTest extends RepositoryTest {
                 "bo@example.com",
                 MemberRole.USER,
                 team,
-                MemberTeamRole.ORDERER
+                TeamMemberRole.ORDERER
         );
 
         Participant participant3 = createParticipant(
@@ -132,7 +138,7 @@ public class TeamRepositoryTest extends RepositoryTest {
                 "kim@example.com",
                 MemberRole.USER,
                 team,
-                MemberTeamRole.ORDERER
+                TeamMemberRole.ORDERER
         );
 
         Participant participant4 = createParticipant(
@@ -140,7 +146,7 @@ public class TeamRepositoryTest extends RepositoryTest {
                 "kim1@example.com",
                 MemberRole.USER,
                 team,
-                MemberTeamRole.ORDERER
+                TeamMemberRole.ORDERER
         );
 
         //when
@@ -152,21 +158,21 @@ public class TeamRepositoryTest extends RepositoryTest {
     }
 
     private Participant createParticipant(String nickname, String email, MemberRole role, Team team,
-                                          MemberTeamRole teamRole) {
+                                          TeamMemberRole teamMemberRole) {
         Member member = Member.builder()
                 .nickname(nickname)
                 .email(email)
                 .role(role)
                 .build();
         member.updateAllowance();
-        entityManager.persist(member);
+        em.persist(member);
 
         Participant participant = Participant.builder()
                 .team(team)
                 .member(member)
-                .role(teamRole)
+                .teamMemberRole(teamMemberRole)
                 .build();
-        entityManager.persist(participant);
+        em.persist(participant);
 
         return participant;
     }

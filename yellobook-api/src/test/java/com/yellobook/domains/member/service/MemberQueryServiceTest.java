@@ -8,7 +8,7 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.domains.member.dto.response.ProfileResponse;
 import com.yellobook.domains.member.dto.response.TermAllowanceResponse;
 import com.yellobook.domains.member.entity.Member;
@@ -43,11 +43,11 @@ class MemberQueryServiceTest {
 
     private List<QueryMemberJoinTeam> createQueryMemberJoinTeam() {
         QueryMemberJoinTeam dto1 = QueryMemberJoinTeam.builder()
-                .role(MemberTeamRole.ADMIN)
+                .role(TeamMemberRole.ADMIN)
                 .teamName("AAA")
                 .build();
         QueryMemberJoinTeam dto2 = QueryMemberJoinTeam.builder()
-                .role(MemberTeamRole.ADMIN)
+                .role(TeamMemberRole.ADMIN)
                 .teamName("BBB")
                 .build();
         return List.of(dto1, dto2);

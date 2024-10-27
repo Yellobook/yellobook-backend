@@ -1,6 +1,6 @@
 package com.yellobook.domains.auth.dto;
 
-import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,5 +10,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class InvitationResponse {
     Long teamId;
-    MemberTeamRole role;
+    TeamMemberRole role;
 }

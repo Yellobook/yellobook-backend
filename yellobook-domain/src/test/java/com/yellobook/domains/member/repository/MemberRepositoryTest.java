@@ -3,7 +3,7 @@ package com.yellobook.domains.member.repository;
 import static fixture.MemberFixture.createMember;
 
 import com.yellobook.domains.member.entity.Member;
-import com.yellobook.support.annotation.RepositoryTest;
+import com.yellobook.support.RepositoryTest;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +27,7 @@ public class MemberRepositoryTest extends RepositoryTest {
 
     @BeforeEach
     void setMember() {
+        resetAutoIncrement();
         member = createMember();
     }
 

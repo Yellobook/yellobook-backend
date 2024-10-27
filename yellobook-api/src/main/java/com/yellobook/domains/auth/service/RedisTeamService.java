@@ -1,6 +1,6 @@
 package com.yellobook.domains.auth.service;
 
-import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.auth.dto.InvitationResponse;
 import com.yellobook.domains.team.entity.Participant;
@@ -52,17 +52,17 @@ public class RedisTeamService {
                     .orElseThrow(() -> new CustomException(TeamErrorCode.USER_NOT_JOINED_ANY_TEAM));
             Long teamId = participant.getTeam()
                     .getId();
-            MemberTeamRole memberTeamRole = participant.getRole();
+            TeamMemberRole teamMemberRole = participant.getTeamMemberRole();
             // redis 에 저장
-            setMemberCurrentTeam(memberId, teamId, memberTeamRole.name());
-            return TeamMemberVO.of(memberId, teamId, memberTeamRole);
+            setMemberCurrentTeam(memberId, teamId, teamMemberRole.name());
+            return TeamMemberVO.of(memberId, teamId, teamMemberRole);
         }
         ListOperations<String, String> valueOps = redisTemplate.opsForList();
         List<String> values = valueOps.range(key, 0, 1);
         if (values != null && values.size() == 2) {
             Long teamId = Long.valueOf(values.get(0));
-            MemberTeamRole memberTeamRole = MemberTeamRole.valueOf(values.get(1));
-            return TeamMemberVO.of(memberId, teamId, memberTeamRole);
+            TeamMemberRole teamMemberRole = TeamMemberRole.valueOf(values.get(1));
+            return TeamMemberVO.of(memberId, teamId, teamMemberRole);
         }
         log.error("[TEAM_ERROR] 사용자 ID {}가 위치한 팀을 조회할 때 예상치 못한 값이 REDIS 에 들어가 있음: {}", memberId, values);
         throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
@@ -73,7 +73,7 @@ public class RedisTeamService {
         return "member:team:" + memberId;
     }
 
-    public String generateInvitationUrl(Long teamId, MemberTeamRole role) {
+    public String generateInvitationUrl(Long teamId, TeamMemberRole role) {
         String code = UUID.randomUUID()
                 .toString();
         String key = generateInvitaionKey(code);
@@ -103,7 +103,7 @@ public class RedisTeamService {
         }
 
         Long teamId = Long.parseLong(parts[0]);
-        MemberTeamRole role = MemberTeamRole.valueOf(parts[1]);
+        TeamMemberRole role = TeamMemberRole.valueOf(parts[1]);
 
         return new InvitationResponse(teamId, role);
     }

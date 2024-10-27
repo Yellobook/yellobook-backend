@@ -11,8 +11,8 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.enums.OrderStatus;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.inventory.repository.ProductRepository;
@@ -50,9 +50,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("OrderCommandService Unit Test")
 class OrderCommandServiceTest {
-    private final TeamMemberVO admin = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
-    private final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, MemberTeamRole.ORDERER);
-    private final TeamMemberVO viewer = TeamMemberVO.of(3L, 1L, MemberTeamRole.VIEWER);
+    private final TeamMemberVO admin = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
+    private final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, TeamMemberRole.ORDERER);
+    private final TeamMemberVO viewer = TeamMemberVO.of(3L, 1L, TeamMemberRole.VIEWER);
     @InjectMocks
     private OrderCommandService orderCommandService;
     @Mock
@@ -566,7 +566,8 @@ class OrderCommandServiceTest {
                 team = createTeamWithId(orderer.getTeamId());
                 when(memberRepository.findById(orderer.getMemberId())).thenReturn(Optional.of(member));
                 when(teamRepository.findById(orderer.getTeamId())).thenReturn(Optional.of(team));
-                when(participantRepository.findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN)).thenReturn(
+                when(participantRepository.findByTeamIdAndTeamMemberRole(team.getId(),
+                        TeamMemberRole.ADMIN)).thenReturn(
                         Optional.empty());
             }
 
@@ -578,7 +579,7 @@ class OrderCommandServiceTest {
                 Assertions.assertEquals(OrderErrorCode.ORDER_CREATION_NOT_ALLOWED, exception.getErrorCode());
                 verify(memberRepository).findById(orderer.getMemberId());
                 verify(teamRepository).findById(orderer.getTeamId());
-                verify(participantRepository).findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN);
+                verify(participantRepository).findByTeamIdAndTeamMemberRole(team.getId(), TeamMemberRole.ADMIN);
             }
         }
 
@@ -593,10 +594,11 @@ class OrderCommandServiceTest {
                 request = createMakeOrderRequest(10);
                 Member member = createMemberWithId(orderer.getMemberId());
                 team = createTeamWithId(orderer.getTeamId());
-                Participant participant = createParticipant(team, member, MemberTeamRole.ADMIN);
+                Participant participant = createParticipant(team, member, TeamMemberRole.ADMIN);
                 when(memberRepository.findById(orderer.getMemberId())).thenReturn(Optional.of(member));
                 when(teamRepository.findById(orderer.getTeamId())).thenReturn(Optional.of(team));
-                when(participantRepository.findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN)).thenReturn(
+                when(participantRepository.findByTeamIdAndTeamMemberRole(team.getId(),
+                        TeamMemberRole.ADMIN)).thenReturn(
                         Optional.of(participant));
                 when(productRepository.findById(request.productId())).thenReturn(Optional.empty());
             }
@@ -609,7 +611,7 @@ class OrderCommandServiceTest {
                 Assertions.assertEquals(InventoryErrorCode.PRODUCT_NOT_FOUND, exception.getErrorCode());
                 verify(memberRepository).findById(orderer.getMemberId());
                 verify(teamRepository).findById(orderer.getTeamId());
-                verify(participantRepository).findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN);
+                verify(participantRepository).findByTeamIdAndTeamMemberRole(team.getId(), TeamMemberRole.ADMIN);
                 verify(productRepository).findById(request.productId());
             }
         }
@@ -625,11 +627,12 @@ class OrderCommandServiceTest {
                 request = createMakeOrderRequest(1111);
                 Member member = createMemberWithId(orderer.getMemberId());
                 team = createTeamWithId(orderer.getTeamId());
-                Participant participant = createParticipant(team, member, MemberTeamRole.ADMIN);
+                Participant participant = createParticipant(team, member, TeamMemberRole.ADMIN);
                 Product product = createProduct(null);
                 when(memberRepository.findById(orderer.getMemberId())).thenReturn(Optional.of(member));
                 when(teamRepository.findById(orderer.getTeamId())).thenReturn(Optional.of(team));
-                when(participantRepository.findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN)).thenReturn(
+                when(participantRepository.findByTeamIdAndTeamMemberRole(team.getId(),
+                        TeamMemberRole.ADMIN)).thenReturn(
                         Optional.of(participant));
                 when(productRepository.findById(request.productId())).thenReturn(Optional.of(product));
             }
@@ -642,7 +645,7 @@ class OrderCommandServiceTest {
                 Assertions.assertEquals(OrderErrorCode.ORDER_AMOUNT_EXCEED, exception.getErrorCode());
                 verify(memberRepository).findById(orderer.getMemberId());
                 verify(teamRepository).findById(orderer.getTeamId());
-                verify(participantRepository).findByTeamIdAndRole(team.getId(), MemberTeamRole.ADMIN);
+                verify(participantRepository).findByTeamIdAndTeamMemberRole(team.getId(), TeamMemberRole.ADMIN);
                 verify(productRepository).findById(request.productId());
             }
         }

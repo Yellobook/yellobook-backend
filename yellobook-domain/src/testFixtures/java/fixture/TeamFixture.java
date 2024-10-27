@@ -1,6 +1,6 @@
 package fixture;
 
-import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
@@ -27,11 +27,11 @@ public class TeamFixture {
         return team;
     }
 
-    public static Participant createParticipant(Team team, Member member, MemberTeamRole role) {
+    public static Participant createParticipant(Team team, Member member, TeamMemberRole teamMemberRole) {
         return Participant.builder()
                 .team(team)
                 .member(member)
-                .role(role)
+                .teamMemberRole(teamMemberRole)
                 .build();
     }
 }

@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.common.resolver.TeamMemberArgumentResolver;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
@@ -246,7 +246,7 @@ public class InformControllerTest {
 
             @BeforeEach
             void setUp() throws Exception {
-                teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
+                teamMemberVO = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
                 informId = 1L;
 
                 when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);

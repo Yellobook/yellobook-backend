@@ -9,9 +9,7 @@ import com.yellobook.domains.inform.entity.Inform;
 import com.yellobook.domains.inform.repository.InformRepository;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.team.entity.Team;
-import com.yellobook.support.annotation.RepositoryTest;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import com.yellobook.support.RepositoryTest;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,43 +19,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @DisplayName("InformRepository Unit Test")
 public class InformRepositoryTest extends RepositoryTest {
-
     @Autowired
     private InformRepository informRepository;
 
-    @PersistenceContext
-    private EntityManager em;
-
     @Nested
-    @DisplayName("InformRepository의 save 메소드는")
+    @DisplayName("save 메소드는")
     class Describe_Inform_Repository_Save {
 
         @Nested
-        @DisplayName("유효한 inform을 저장하고자 하는 경우")
+        @DisplayName("유효한 공지를 저장하고자 하는 경우")
         class Context_valid_inform {
-
-            Member member;
-            Team team;
             Inform inform;
             Inform savedInform;
 
             @BeforeEach
             void setUp() {
-                member = createMember();
-                team = createTeam();
+                Member member = em.persist(createMember());
+                Team team = em.persist(createTeam());
                 inform = createInform(team, member);
-
-                em.persist(member);
-                em.persist(team);
-                em.persist(inform);
-
-                savedInform = informRepository.save(inform);
+                savedInform = informRepository.save(createInform(team, member));
             }
 
             @Test
             @DisplayName("inform을 저장한다.")
             void it_returns_inform_saved() {
-                assertThat(savedInform.getId()).isEqualTo(inform.getId());
                 assertThat(savedInform.getTitle()).isEqualTo(inform.getTitle());
                 assertThat(savedInform.getContent()).isEqualTo(inform.getContent());
             }
@@ -71,23 +56,13 @@ public class InformRepositoryTest extends RepositoryTest {
         @Nested
         @DisplayName("inform이 존재하는 경우")
         class Context_exist_inform {
-
-            Member member;
-            Team team;
-            Inform inform;
             Long informId;
 
             @BeforeEach
             void setUp() {
-                member = createMember();
-                team = createTeam();
-                inform = createInform(team, member);
-
-                em.persist(member);
-                em.persist(team);
-                em.persist(inform);
-
-                informId = inform.getId();
+                Member member = em.persist(createMember());
+                Team team = em.persist(createTeam());
+                informId = em.persistAndGetId(createInform(team, member), Long.class);
             }
 
             @Test
@@ -115,13 +90,9 @@ public class InformRepositoryTest extends RepositoryTest {
 
             @BeforeEach
             void setUp() {
-                member = createMember();
-                team = createTeam();
-                inform = createInform(team, member);
-
-                em.persist(member);
-                em.persist(team);
-                em.persist(inform);
+                member = em.persist(createMember());
+                team = em.persist(createTeam());
+                inform = em.persist(createInform(team, member));
 
                 informId = inform.getId();
             }
