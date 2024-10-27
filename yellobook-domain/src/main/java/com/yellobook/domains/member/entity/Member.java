@@ -30,8 +30,6 @@ import lombok.NoArgsConstructor;
                 @UniqueConstraint(name = "uc_members_email", columnNames = "email")
         }
 )
-//@Builder
-//@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
     @Id
