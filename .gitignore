@@ -40,14 +40,14 @@ out/
 /*/**/resources/*.yml
 
 ### volumns
-infrastructure/database/data
-infrastructure/monitoring/data
+infra/database/data
+infra/monitoring/data
 ### .env
 .env
 /*/**/.env
 
 ### application logs
-infrastructure/monitoring/logs/*
+infra/monitoring/logs/*
 
 ### spy
 *.log

@@ -9,15 +9,17 @@
 
 ### Backend
 
-- Java 17
+- Java 17(LTS)
 - Gradle 8.8
 - Spring Boot 3.3.1
-- Postgres 16.x
+- Mysql 8.x
 - Redis 7.x
 - Spring Data JPA
 - QueryDSL
 - JUnit5
 - Mockito
+- RestAssured
+- Testcontainers
 
 ### Infra
 
@@ -28,7 +30,7 @@
 
 ## 2. 협업툴
 
-<img src="https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=slack&logoColor=white">   
+<img src="https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=slack&logoColor=white">
 <img src="https://img.shields.io/badge/Jira-0052CC?style=for-the-badge&logo=jira&logoColor=white">
 <img src="https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=notion&logoColor=white">
 <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white">
@@ -51,6 +53,8 @@
 - common
     - 애플리케이션에서 공통적으로 사용되는 설정을 모아둔 모듈
     - 공통 응답 포맷, 공통 에러코드, 공통 예외 처리 핸들러, 공통으로 사용되는 상수, 유틸리티 클래스, 로깅 설정을 포함한다.
+
+## 5. 데이터베이스
 
 ## 4. 개발 프로세스
 
