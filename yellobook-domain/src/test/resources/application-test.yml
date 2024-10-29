@@ -11,7 +11,19 @@ spring:
 logging:
   level:
     org:
+      springframework:
+        transaction: DEBUG
+        test:
+          context:
+            jdbc: DEBUG
+        jdbc:
+          datasource:
+            init: DEBUG
+        orm:
+          jpa:
+            JpaTransactionManager: DEBUG
       hibernate:
         SQL: DEBUG
         orm.jdbc.bind: TRACE
         type.descriptor.sql: TRACE
+
