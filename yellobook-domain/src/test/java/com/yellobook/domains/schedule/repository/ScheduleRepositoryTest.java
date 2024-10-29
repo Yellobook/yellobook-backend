@@ -59,13 +59,12 @@ public class ScheduleRepositoryTest extends RepositoryTest {
 
     @BeforeEach
     void setUp() {
-        resetAutoIncrement();
         initData();
     }
 
     @Nested
     @DisplayName("데이터베이스 초기화 테스트")
-    class initTest extends RepositoryTest {
+    class initTest {
         @Test
         @DisplayName("사용자는 총 3명이어야 한다.")
         void testMemberCount() {
@@ -117,7 +116,7 @@ public class ScheduleRepositoryTest extends RepositoryTest {
     }
 
     @Nested
-    @DisplayName("findEarliestOrder 메소드는")
+    @DisplayName("findEarliestOrder 메서드는")
     class Describe_findEarliestOrder {
 
         @Nested
@@ -171,7 +170,7 @@ public class ScheduleRepositoryTest extends RepositoryTest {
     }
 
     @Nested
-    @DisplayName("findEarliestInform 메소드는")
+    @DisplayName("findEarliestInform 메서드는")
     class Describe_findEarliestInform {
 
         @Nested
@@ -200,7 +199,7 @@ public class ScheduleRepositoryTest extends RepositoryTest {
     }
 
     @Nested
-    @DisplayName("searchMonthlyOrders 메소드는")
+    @DisplayName("searchMonthlyOrders 메서드는")
     class Describe_searchMonthlyOrders {
 
         @Nested
@@ -320,7 +319,7 @@ public class ScheduleRepositoryTest extends RepositoryTest {
     }
 
     @Nested
-    @DisplayName("searchMonthlyInforms 메소드는")
+    @DisplayName("searchMonthlyInforms 메서드는")
     class Describe_searchMonthlyInforms {
 
         @Nested
@@ -398,7 +397,7 @@ public class ScheduleRepositoryTest extends RepositoryTest {
     }
 
     @Nested
-    @DisplayName("findMonthlyOrders 메소드는")
+    @DisplayName("findMonthlyOrders 메서드는")
     class Describe_findMonthlyOrders {
 
         @Nested
@@ -451,7 +450,7 @@ public class ScheduleRepositoryTest extends RepositoryTest {
     }
 
     @Nested
-    @DisplayName("findMonthlyInforms 메소드는")
+    @DisplayName("findMonthlyInforms 메서드는")
     class Describe_findMonthlyInforms {
 
         abstract class ContextTeamMember {
@@ -524,7 +523,7 @@ public class ScheduleRepositoryTest extends RepositoryTest {
     }
 
     @Nested
-    @DisplayName("findDailyInforms 메소드는")
+    @DisplayName("findDailyInforms 메서드는")
     class Describe_findDailyInforms {
 
         abstract class ContextTeamMember {
@@ -599,19 +598,16 @@ public class ScheduleRepositoryTest extends RepositoryTest {
     }
 
     @Nested
-    @DisplayName("findDailyOrders 메소드는")
+    @DisplayName("findDailyOrders 메서드는")
     class Describe_findDailyOrders {
 
         @Nested
         @DisplayName("특정 날짜가 주어진 경우")
         class Context_with_specific_date {
-            final int year = today.getYear();
-            final int month = today.getMonthValue();
-            final int day = today.getDayOfMonth();
             final DailyCond cond = DailyCond.builder()
-                    .year(year)
-                    .month(month)
-                    .day(day)
+                    .year(today.getYear())
+                    .month(today.getMonthValue())
+                    .day(today.getDayOfMonth())
                     .teamMember(ordererVo)
                     .build();
             private List<QuerySchedule> schedules;
@@ -664,14 +660,14 @@ public class ScheduleRepositoryTest extends RepositoryTest {
     }
 
     private Long getEntityCount(Class<?> entityType) {
-        return getEm().getEntityManager()
+        return em.getEntityManager()
                 .createQuery("SELECT COUNT(e) FROM " + entityType.getSimpleName() + " e",
                         Long.class)
                 .getSingleResult();
     }
 
     private Long getMonthlyInformMentionCountByTeamMemberRole(TeamMemberRole teamMemberRole, LocalDate date) {
-        return getEm().getEntityManager()
+        return em.getEntityManager()
                 .createQuery(
                         "SELECT COUNT(im) FROM Inform i "
                                 + "JOIN InformMention im ON i.id = im.inform.id "
@@ -685,7 +681,7 @@ public class ScheduleRepositoryTest extends RepositoryTest {
     }
 
     private Long getMonthlyOrderMentionCountByTeamMemberRole(TeamMemberRole teamMemberRole, LocalDate date) {
-        return getEm().getEntityManager()
+        return em.getEntityManager()
                 .createQuery(
                         "SELECT COUNT(om) FROM Order o "
                                 + "JOIN OrderMention om ON o.id = om.order.id "

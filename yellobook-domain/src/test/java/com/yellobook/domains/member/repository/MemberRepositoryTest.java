@@ -27,7 +27,6 @@ public class MemberRepositoryTest extends RepositoryTest {
 
     @BeforeEach
     void setMember() {
-        resetAutoIncrement();
         member = createMember();
     }
 
@@ -69,7 +68,6 @@ public class MemberRepositoryTest extends RepositoryTest {
                 Assertions.assertThat(optionalMember)
                         .isEmpty();
             }
-
         }
 
     }

@@ -13,7 +13,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,11 +26,6 @@ public class ParticipantRepositoryTest extends RepositoryTest {
 
     @PersistenceContext
     private EntityManager em;
-
-    @BeforeEach
-    void setUp() {
-        resetAutoIncrement();
-    }
 
     @Test
     @DisplayName("참가자 생성")

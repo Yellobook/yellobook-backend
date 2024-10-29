@@ -10,13 +10,17 @@ import com.yellobook.domains.order.entity.OrderComment;
 import com.yellobook.support.RepositoryTest;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 
-@Sql(scripts = "classpath:sql/setup_order.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(
+        scripts = "classpath:sql/setup_order.sql",
+        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
+)
 @DisplayName("OrderRepository Unit Test")
 public class OrderRepositoryTest extends RepositoryTest {
     @Autowired
@@ -29,6 +33,11 @@ public class OrderRepositoryTest extends RepositoryTest {
     private OrderMentionRepository orderMentionRepository;
 
     private final Long nonExistOrderId = 9999L;
+
+    @AfterEach
+    public void down() {
+        resetAutoIncrement();
+    }
 
     @Nested
     @DisplayName("getOrder 메소드는")
@@ -158,7 +167,7 @@ public class OrderRepositoryTest extends RepositoryTest {
             @DisplayName("언급된 사람도 삭제되어야 한다.")
             void it_deletes_mentioned_member() {
                 orderMentionRepository.deleteAllByOrderId(orderId);
-                getEm().flush();
+                em.flush();
 
                 boolean existsAfterDeletion = orderMentionRepository.existsByMemberIdAndOrderId(1L, orderId);
                 assertThat(existsAfterDeletion).isFalse();

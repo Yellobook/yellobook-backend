@@ -3,13 +3,17 @@ package com.yellobook.support;
 import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE;
 
 import jakarta.persistence.EntityManager;
-import lombok.Getter;
+import jakarta.persistence.Table;
+import jakarta.persistence.metamodel.EntityType;
+import java.util.Set;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -21,10 +25,13 @@ import org.testcontainers.containers.MySQLContainer;
 @AutoConfigureTestDatabase(replace = NONE)
 @Import(RepositoryTestConfig.class)
 @ActiveProfiles("test")
-@Getter
 public abstract class RepositoryTest {
+
     @Autowired
     protected TestEntityManager em;
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
 
     private static final String MYSQL_CONTAINER_IMAGE_TAG = "mysql:8.0.32"; // MySQL 8.0 이미지
 
@@ -48,30 +55,21 @@ public abstract class RepositoryTest {
         registry.add("spring.datasource.password", mysql::getPassword);
     }
 
+    @AfterEach
     protected void resetAutoIncrement() {
+        jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 0");
         EntityManager em = this.em.getEntityManager();
-        em.createNativeQuery("ALTER TABLE inform_mentions AUTO_INCREMENT = 1")
-                .executeUpdate();
-        em.createNativeQuery("ALTER TABLE inform_comments AUTO_INCREMENT = 1")
-                .executeUpdate();
-        em.createNativeQuery("ALTER TABLE informs AUTO_INCREMENT = 1")
-                .executeUpdate();
-        em.createNativeQuery("ALTER TABLE order_comments AUTO_INCREMENT = 1")
-                .executeUpdate();
-        em.createNativeQuery("ALTER TABLE order_mentions AUTO_INCREMENT = 1")
-                .executeUpdate();
-        em.createNativeQuery("ALTER TABLE orders AUTO_INCREMENT = 1")
-                .executeUpdate();
-        em.createNativeQuery("ALTER TABLE products AUTO_INCREMENT = 1")
-                .executeUpdate();
-        em.createNativeQuery("ALTER TABLE inventories AUTO_INCREMENT = 1")
-                .executeUpdate();
-        em.createNativeQuery("ALTER TABLE participants AUTO_INCREMENT = 1")
-                .executeUpdate();
-        em.createNativeQuery("ALTER TABLE teams AUTO_INCREMENT = 1")
-                .executeUpdate();
-        em.createNativeQuery("ALTER TABLE members AUTO_INCREMENT = 1")
-                .executeUpdate();
+        Set<EntityType<?>> entities = em.getMetamodel()
+                .getEntities();
+        for (var entity : entities) {
+            String tableName = entity.getJavaType()
+                    .getAnnotation(Table.class)
+                    .name();
+            jdbcTemplate.execute("TRUNCATE TABLE " + tableName);
+            jdbcTemplate.execute("ALTER TABLE " + tableName + " AUTO_INCREMENT = 1");
+        }
+        jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
     }
+
 }
 

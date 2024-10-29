@@ -11,7 +11,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +23,6 @@ public class TeamRepositoryTest extends RepositoryTest {
 
     @PersistenceContext
     private EntityManager em;
-
-    @BeforeEach
-    void setUp() {
-        resetAutoIncrement();
-    }
 
     @Test
     @DisplayName("팀 생성")

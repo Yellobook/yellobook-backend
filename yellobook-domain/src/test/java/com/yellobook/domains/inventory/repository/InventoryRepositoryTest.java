@@ -34,7 +34,6 @@ public class InventoryRepositoryTest extends RepositoryTest {
 
     @BeforeEach
     void setUp() {
-        resetAutoIncrement();
         team = em.persist(createTeam());
     }
 
