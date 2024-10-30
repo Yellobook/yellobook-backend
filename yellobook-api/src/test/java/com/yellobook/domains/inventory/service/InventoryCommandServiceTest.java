@@ -414,7 +414,7 @@ class InventoryCommandServiceTest {
             void it_increases_view() {
                 inventoryCommandService.increaseInventoryView(inventoryId, admin);
 
-                assertThat(inventory.getView()).isEqualTo(1L);
+                assertThat(inventory.getView()).isEqualTo(1);
             }
         }
     }
