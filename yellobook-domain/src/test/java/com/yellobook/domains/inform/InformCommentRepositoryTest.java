@@ -24,6 +24,11 @@ public class InformCommentRepositoryTest extends RepositoryTest {
     @Autowired
     private InformCommentRepository informCommentRepository;
 
+    @BeforeEach
+    public void setUp() {
+        resetAutoIncrement();
+    }
+
     @Nested
     @DisplayName("save 메소드는")
     class Describe_Save {

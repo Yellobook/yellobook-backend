@@ -9,10 +9,9 @@ import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
 import com.yellobook.support.RepositoryTest;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,8 +23,10 @@ public class ParticipantRepositoryTest extends RepositoryTest {
     @Autowired
     private ParticipantRepository participantRepository;
 
-    @PersistenceContext
-    private EntityManager em;
+    @BeforeEach
+    public void setUp() {
+        resetAutoIncrement();
+    }
 
     @Test
     @DisplayName("참가자 생성")

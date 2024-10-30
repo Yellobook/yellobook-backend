@@ -19,8 +19,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @DisplayName("InformRepository Unit Test")
 public class InformRepositoryTest extends RepositoryTest {
+
     @Autowired
     private InformRepository informRepository;
+
+    @BeforeEach
+    public void setUp() {
+        resetAutoIncrement();
+    }
 
     @Nested
     @DisplayName("save 메소드는")

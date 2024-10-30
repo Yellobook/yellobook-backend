@@ -11,23 +11,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 @DisplayName("MemberRepository Unit Test")
 public class MemberRepositoryTest extends RepositoryTest {
-    private final MemberRepository memberRepository;
-    private final TestEntityManager entityManager;
-    private Member member;
 
     @Autowired
-    public MemberRepositoryTest(MemberRepository memberRepository, TestEntityManager entityManager) {
-        this.memberRepository = memberRepository;
-        this.entityManager = entityManager;
-    }
+    private MemberRepository memberRepository;
 
     @BeforeEach
     void setMember() {
-        member = createMember();
+        resetAutoIncrement();
     }
 
     @Nested
@@ -36,9 +29,11 @@ public class MemberRepositoryTest extends RepositoryTest {
         @Nested
         @DisplayName("해당 이메일이 존재하면")
         class Context_email_exist {
+            Member member;
+
             @BeforeEach
             void setUpContext() {
-                entityManager.persist(member);
+                member = em.persist(createMember());
             }
 
             @Test
@@ -60,10 +55,18 @@ public class MemberRepositoryTest extends RepositoryTest {
         @Nested
         @DisplayName("해당 이메일이 존재하지 않으면")
         class Context_email_not_exist {
+            Member member;
+
+            @BeforeEach
+            void setUpContext() {
+                member = em.persist(createMember());
+            }
+
             @Test
-            @DisplayName("어떤 사용자도 반환하면 안된다.")
+            @DisplayName("어떤 사용자도 반환하지 않는다.")
             void it_returns_empty() {
-                Optional<Member> optionalMember = memberRepository.findByEmail(member.getEmail());
+                String nonExistEmail = "nonExistEmail@gmail.com";
+                Optional<Member> optionalMember = memberRepository.findByEmail(nonExistEmail);
 
                 Assertions.assertThat(optionalMember)
                         .isEmpty();

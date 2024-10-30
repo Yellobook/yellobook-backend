@@ -10,7 +10,6 @@ import com.yellobook.domains.order.entity.OrderComment;
 import com.yellobook.support.RepositoryTest;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,6 +22,7 @@ import org.springframework.test.context.jdbc.Sql;
 )
 @DisplayName("OrderRepository Unit Test")
 public class OrderRepositoryTest extends RepositoryTest {
+
     @Autowired
     private OrderRepository orderRepository;
 
@@ -32,12 +32,7 @@ public class OrderRepositoryTest extends RepositoryTest {
     @Autowired
     private OrderMentionRepository orderMentionRepository;
 
-    private final Long nonExistOrderId = 9999L;
-
-    @AfterEach
-    public void down() {
-        resetAutoIncrement();
-    }
+    private final Long NON_EXIST_ORDER_ID = 9999L;
 
     @Nested
     @DisplayName("getOrder 메소드는")
@@ -55,13 +50,12 @@ public class OrderRepositoryTest extends RepositoryTest {
                 assertThat(orderDTO).isNotNull();
                 assertThat(orderDTO.memo()).isEqualTo("메모1");
             }
-
         }
 
         @Nested
         @DisplayName("존재하지 않는 주문을 조회하면")
         class Context_order_not_exist {
-            Long orderId = nonExistOrderId;
+            Long orderId = NON_EXIST_ORDER_ID;
 
             @Test
             @DisplayName("null을 반환한다.")
@@ -84,7 +78,7 @@ public class OrderRepositoryTest extends RepositoryTest {
         @Nested
         @DisplayName("주문이 존재하지 않으면")
         class Context_order_not_exist {
-            Long orderId = nonExistOrderId;
+            Long orderId = NON_EXIST_ORDER_ID;
 
             @Test
             @DisplayName("빈 리스트를 반환한다.")

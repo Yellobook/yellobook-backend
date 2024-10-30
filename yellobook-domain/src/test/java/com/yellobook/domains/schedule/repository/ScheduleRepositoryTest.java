@@ -40,7 +40,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @DisplayName("ScheduleRepository Unit Test")
 public class ScheduleRepositoryTest extends RepositoryTest {
-
     @Autowired
     protected ScheduleRepository scheduleRepository;
 
@@ -59,7 +58,16 @@ public class ScheduleRepositoryTest extends RepositoryTest {
 
     @BeforeEach
     void setUp() {
+        resetAutoIncrement();
         initData();
+    }
+
+    @BeforeEach
+    public void before() {
+        Long res = jdbcTemplate.queryForObject("SELECT count(*) FROM orders", Long.class);
+        System.out.println("res = " + res);
+        Long firstId = jdbcTemplate.queryForObject("SELECT MIN(id) FROM orders", Long.class);
+        System.out.println("firstId = " + firstId);
     }
 
     @Nested

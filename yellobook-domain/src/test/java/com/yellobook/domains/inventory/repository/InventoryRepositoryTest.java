@@ -24,17 +24,17 @@ import org.springframework.data.domain.Pageable;
 
 @DisplayName("InventoryRepository Unit Test")
 public class InventoryRepositoryTest extends RepositoryTest {
+
     @Autowired
     private InventoryRepository inventoryRepository;
 
     @Autowired
     private ProductRepository productRepository;
 
-    private Team team;
 
     @BeforeEach
     void setUp() {
-        team = em.persist(createTeam());
+        resetAutoIncrement();
     }
 
     @Nested
@@ -45,6 +45,12 @@ public class InventoryRepositoryTest extends RepositoryTest {
         @Nested
         @DisplayName("재고가 존재하지 않으면")
         class Context_inventory_exist {
+            Team team;
+
+            @BeforeEach
+            void setUpContext() {
+                team = em.persist(createTeam());
+            }
 
             @Test
             @DisplayName("빈 리스트를 반환한다.")
@@ -59,9 +65,11 @@ public class InventoryRepositoryTest extends RepositoryTest {
         @Nested
         @DisplayName("재고가 존재하면")
         class Context_inventory_not_exist {
+            Team team;
 
             @BeforeEach
             void setUpContext() {
+                team = em.persist(createTeam());
                 for (int i = 0; i < 6; i++) {
                     em.persist(createInventory(String.format("2024년 08월 0%d일 재고현황", i), team));
                 }
@@ -95,10 +103,12 @@ public class InventoryRepositoryTest extends RepositoryTest {
     @Nested
     @DisplayName("getProducts 메소드는")
     class Describe_GetProducts {
-        private Inventory inventory;
+        Inventory inventory;
+        Team team;
 
         @BeforeEach
         void setUpContext() {
+            team = em.persist(createTeam());
             inventory = createInventory("2024년 08월 06일 재고현황", team);
             em.persist(inventory);
 
@@ -148,9 +158,11 @@ public class InventoryRepositoryTest extends RepositoryTest {
     @Nested
     @DisplayName("deleteById 메소드는")
     class Describe_DeleteById {
+        Team team;
 
         @BeforeEach
         void setUpContext() {
+            team = em.persist(createTeam());
             Inventory inventory = createInventory(team);
             em.persist(inventory);
 
@@ -179,24 +191,26 @@ public class InventoryRepositoryTest extends RepositoryTest {
     @Nested
     @DisplayName("existsByInventoryIdAndSku 메소드는")
     class Describe_ExistsByInventoryIdAndSku {
-        private Inventory inventory;
-
-        @BeforeEach
-        void setUpContext() {
-            inventory = createInventory(team);
-            em.persist(inventory);
-
-            for (int i = 0; i < 5; i++) {
-                Product product = createProduct(String.format("product%d", i), String.format("sub%d", i), i, i * 1000,
-                        i * 2000, i * 100, inventory);
-                em.persist(product);
-            }
-        }
-
         @Nested
         @DisplayName("재고 id와 sku가 제공되면")
         class Context_inventory_id_and_sku_given {
             Integer sku = 1;
+            Inventory inventory;
+            Team team;
+
+            @BeforeEach
+            void setUpContext() {
+                team = em.persist(createTeam());
+                inventory = createInventory(team);
+                em.persist(inventory);
+
+                for (int i = 0; i < 5; i++) {
+                    Product product = createProduct(String.format("product%d", i), String.format("sub%d", i), i,
+                            i * 1000,
+                            i * 2000, i * 100, inventory);
+                    em.persist(product);
+                }
+            }
 
             @Test
             @DisplayName("해당 재고에 포함되고, 해당 sku와 동일한 sku를 갖는 제품이 존재하는지 확인한다.")
@@ -206,7 +220,6 @@ public class InventoryRepositoryTest extends RepositoryTest {
                 assertThat(exist1).isTrue();
             }
         }
-
     }
 
 }

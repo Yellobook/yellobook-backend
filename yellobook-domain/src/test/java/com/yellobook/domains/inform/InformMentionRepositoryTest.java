@@ -25,6 +25,11 @@ public class InformMentionRepositoryTest extends RepositoryTest {
     @Autowired
     private InformMentionRepository informMentionRepository;
 
+    @BeforeEach
+    public void setUp() {
+        resetAutoIncrement();
+    }
+
     @Nested
     @DisplayName("saveAll 메소드는")
     class Describe_SaveAll {

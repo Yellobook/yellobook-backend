@@ -7,10 +7,9 @@ import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
 import com.yellobook.support.RepositoryTest;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +17,14 @@ import org.springframework.dao.DataIntegrityViolationException;
 
 @DisplayName("TeamRepositoryTest Unit Test")
 public class TeamRepositoryTest extends RepositoryTest {
+
     @Autowired
     private TeamRepository teamRepository;
 
-    @PersistenceContext
-    private EntityManager em;
+    @BeforeEach
+    public void setUp() {
+        resetAutoIncrement();
+    }
 
     @Test
     @DisplayName("팀 생성")
