@@ -1,40 +1,38 @@
 package com.yellobook.domains.order.repository;
 
-import static com.yellobook.common.enums.MemberTeamRole.ADMIN;
-import static com.yellobook.common.enums.MemberTeamRole.ORDERER;
+import static com.yellobook.common.enums.TeamMemberRole.ADMIN;
+import static com.yellobook.common.enums.TeamMemberRole.ORDERER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.yellobook.domains.order.dto.query.QueryOrder;
 import com.yellobook.domains.order.dto.query.QueryOrderComment;
 import com.yellobook.domains.order.entity.OrderComment;
-import com.yellobook.support.annotation.RepositoryTest;
+import com.yellobook.support.RepositoryTest;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.jdbc.Sql;
 
-@RepositoryTest
-@Sql(scripts = "classpath:setup_order.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(
+        scripts = "classpath:sql/setup_order.sql",
+        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
+)
 @DisplayName("OrderRepository Unit Test")
-public class OrderRepositoryTest {
-    private final OrderRepository orderRepository;
-    private final OrderCommentRepository orderCommentRepository;
-    private final OrderMentionRepository orderMentionRepository;
-    private final TestEntityManager entityManager;
-    private final Long nonExistOrderId = 9999L;
+public class OrderRepositoryTest extends RepositoryTest {
 
     @Autowired
-    public OrderRepositoryTest(OrderRepository orderRepository, OrderCommentRepository orderCommentRepository,
-                               TestEntityManager entityManager, OrderMentionRepository orderMentionRepository) {
-        this.orderRepository = orderRepository;
-        this.orderCommentRepository = orderCommentRepository;
-        this.orderMentionRepository = orderMentionRepository;
-        this.entityManager = entityManager;
-    }
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private OrderCommentRepository orderCommentRepository;
+
+    @Autowired
+    private OrderMentionRepository orderMentionRepository;
+
+    private final Long NON_EXIST_ORDER_ID = 9999L;
 
     @Nested
     @DisplayName("getOrder 메소드는")
@@ -52,13 +50,12 @@ public class OrderRepositoryTest {
                 assertThat(orderDTO).isNotNull();
                 assertThat(orderDTO.memo()).isEqualTo("메모1");
             }
-
         }
 
         @Nested
         @DisplayName("존재하지 않는 주문을 조회하면")
         class Context_order_not_exist {
-            Long orderId = nonExistOrderId;
+            Long orderId = NON_EXIST_ORDER_ID;
 
             @Test
             @DisplayName("null을 반환한다.")
@@ -81,7 +78,7 @@ public class OrderRepositoryTest {
         @Nested
         @DisplayName("주문이 존재하지 않으면")
         class Context_order_not_exist {
-            Long orderId = nonExistOrderId;
+            Long orderId = NON_EXIST_ORDER_ID;
 
             @Test
             @DisplayName("빈 리스트를 반환한다.")
@@ -164,7 +161,7 @@ public class OrderRepositoryTest {
             @DisplayName("언급된 사람도 삭제되어야 한다.")
             void it_deletes_mentioned_member() {
                 orderMentionRepository.deleteAllByOrderId(orderId);
-                entityManager.flush();
+                em.flush();
 
                 boolean existsAfterDeletion = orderMentionRepository.existsByMemberIdAndOrderId(1L, orderId);
                 assertThat(existsAfterDeletion).isFalse();

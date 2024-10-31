@@ -1,0 +1,30 @@
+services:
+  mysql:
+    image: mysql:8.0.34
+    container_name: yellobook-mysql
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./data/mysql_data:/var/lib/mysql
+      - ./mysql-conf/my.cnf:/etc/mysql/conf.d/my.cnf
+    ports:
+      - "3306:3306"
+    networks:
+      - yellobook-network
+
+  redis:
+    image: redis:7.0.12
+    container_name: yellobook-redis
+    ports:
+      - "6378:6379"
+    volumes:
+      - ./data/redis_data:/data
+    networks:
+      - yellobook-network
+
+networks:
+  yellobook-network:
+    driver: bridge
+    # 식별을 위해 폴더 이름이 붙는 것을 방지
+    name: yellobook-network

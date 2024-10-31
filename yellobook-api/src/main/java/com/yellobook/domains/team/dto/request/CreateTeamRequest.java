@@ -1,6 +1,6 @@
 package com.yellobook.domains.team.dto.request;
 
-import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -17,6 +17,6 @@ public record CreateTeamRequest(
         String address,
         @NotNull(message = "팀 개설자의 권한을 설정하십시오.")
         @Schema(description = "팀을 생성한 사람의 권한", example = "ADMIN")
-        MemberTeamRole role
+        TeamMemberRole role
 ) {
 }

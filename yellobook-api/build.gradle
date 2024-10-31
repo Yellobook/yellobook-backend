@@ -57,7 +57,7 @@ dependencies {
     // testcontainers
     integrationTestImplementation 'org.testcontainers:testcontainers:1.20.1'
     integrationTestImplementation 'org.testcontainers:junit-jupiter:1.20.1'
-    integrationTestImplementation "org.testcontainers:postgresql:1.20.1"
+    integrationTestImplementation "org.testcontainers:mysql:1.20.1"
     integrationTestImplementation "com.redis:testcontainers-redis:2.2.2"
 }
 

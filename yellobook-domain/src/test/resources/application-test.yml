@@ -1,25 +1,31 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-    open-in-view: false
     hibernate:
-      ddl-auto: create-drop
-    properties:
-      hibernate.format_sql: true
-      dialect: org.hibernate.dialect.H2Dialect
-    show-sql: false
-    database: h2
+      ddl-auto: create
+    show-sql: true
   flyway:
     enabled: false
 
 logging:
   level:
     org:
+      springframework:
+        transaction: DEBUG
+        test:
+          context:
+            jdbc: DEBUG
+        jdbc:
+          datasource:
+            init: DEBUG
+          core:
+            JdbcTemplate: DEBUG
+        orm:
+          jpa:
+            JpaTransactionManager: DEBUG
       hibernate:
         SQL: DEBUG
         orm.jdbc.bind: TRACE
         type.descriptor.sql: TRACE
+

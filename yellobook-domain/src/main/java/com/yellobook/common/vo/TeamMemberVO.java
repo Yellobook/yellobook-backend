@@ -1,6 +1,6 @@
 package com.yellobook.common.vo;
 
-import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import java.util.Objects;
 import lombok.Getter;
 
@@ -8,9 +8,9 @@ import lombok.Getter;
 public class TeamMemberVO {
     private final Long memberId;
     private final Long teamId;
-    private final MemberTeamRole role;
+    private final TeamMemberRole role;
 
-    private TeamMemberVO(Long memberId, Long teamId, MemberTeamRole role) {
+    private TeamMemberVO(Long memberId, Long teamId, TeamMemberRole role) {
         if (memberId == null || teamId == null || role == null) {
             throw new IllegalArgumentException("VO 에 null 값이 존재할 수 없습니다.");
         }
@@ -19,7 +19,7 @@ public class TeamMemberVO {
         this.role = role;
     }
 
-    public static TeamMemberVO of(Long memberId, Long teamId, MemberTeamRole role) {
+    public static TeamMemberVO of(Long memberId, Long teamId, TeamMemberRole role) {
         return new TeamMemberVO(memberId, teamId, role);
     }
 

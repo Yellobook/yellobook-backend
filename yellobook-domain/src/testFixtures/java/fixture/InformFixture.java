@@ -6,7 +6,7 @@ import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.team.entity.Team;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import support.ReflectionUtils;
+import support.ReflectionUtil;
 
 public class InformFixture {
     private static final String INFORM_TITLE = "공지";
@@ -31,7 +31,7 @@ public class InformFixture {
                 .team(team)
                 .member(member)
                 .build();
-        ReflectionUtils.setBaseTimeEntityFields(inform, timestamp);
+        ReflectionUtil.setBaseTimeEntityFields(inform, timestamp);
         return inform;
     }
 

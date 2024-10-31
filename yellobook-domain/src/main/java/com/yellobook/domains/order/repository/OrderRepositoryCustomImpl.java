@@ -23,7 +23,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 
         return queryFactory.select(Projections.constructor(QueryOrderComment.class,
                         orderComment.id.as("commentId"),
-                        participant.role,
+                        participant.teamMemberRole,
                         orderComment.content,
                         orderComment.createdAt
                 ))

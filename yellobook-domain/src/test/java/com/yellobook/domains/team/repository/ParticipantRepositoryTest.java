@@ -3,14 +3,12 @@ package com.yellobook.domains.team.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.yellobook.common.enums.MemberRole;
-import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
-import com.yellobook.support.annotation.RepositoryTest;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import com.yellobook.support.RepositoryTest;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,26 +17,15 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@RepositoryTest
-@DisplayName("Participant Repository 테스트")
-public class ParticipantRepositoryTest {
+@DisplayName("ParticipantRepository Unit Test")
+public class ParticipantRepositoryTest extends RepositoryTest {
 
     @Autowired
     private ParticipantRepository participantRepository;
 
-    @PersistenceContext
-    private EntityManager em;
-
-
     @BeforeEach
-    void setUp() {
-        participantRepository.deleteAll();
-        em.createNativeQuery("ALTER TABLE participants ALTER COLUMN id RESTART WITH 1")
-                .executeUpdate();
-        em.createNativeQuery("ALTER TABLE teams ALTER COLUMN id RESTART WITH 1")
-                .executeUpdate();
-        em.createNativeQuery("ALTER TABLE members ALTER COLUMN id RESTART WITH 1")
-                .executeUpdate();
+    public void setUp() {
+        resetAutoIncrement();
     }
 
     @Test
@@ -55,7 +42,7 @@ public class ParticipantRepositoryTest {
         Member member = new Member(null, "설", "johndoe@gmail.com", "", MemberRole.USER, true);
         em.persist(member);
 
-        Participant participant = new Participant(team, member, MemberTeamRole.ADMIN);
+        Participant participant = new Participant(team, member, TeamMemberRole.ADMIN);
         //when
         participantRepository.save(participant);
 
@@ -78,7 +65,7 @@ public class ParticipantRepositoryTest {
         Member member = new Member(null, "설", "johndoe@gmail.com", "", MemberRole.USER, true);
         em.persist(member);
 
-        Participant participant = new Participant(team, member, MemberTeamRole.ADMIN);
+        Participant participant = new Participant(team, member, TeamMemberRole.ADMIN);
 
         participantRepository.save(participant);
 
@@ -90,7 +77,7 @@ public class ParticipantRepositoryTest {
     }
 
     private Participant createParticipant(String nickname, String email, MemberRole role, Team team,
-                                          MemberTeamRole teamRole) {
+                                          TeamMemberRole teamRole) {
         Member member = Member.builder()
                 .nickname(nickname)
                 .email(email)
@@ -102,7 +89,7 @@ public class ParticipantRepositoryTest {
         Participant participant = Participant.builder()
                 .team(team)
                 .member(member)
-                .role(teamRole)
+                .teamMemberRole(teamRole)
                 .build();
         em.persist(participant);
 
@@ -133,7 +120,7 @@ public class ParticipantRepositoryTest {
                     "hong@example.com",
                     MemberRole.USER,
                     team,
-                    MemberTeamRole.ADMIN
+                    TeamMemberRole.ADMIN
             );
 
             Participant participant2 = createParticipant(
@@ -141,7 +128,7 @@ public class ParticipantRepositoryTest {
                     "bo@example.com",
                     MemberRole.USER,
                     team,
-                    MemberTeamRole.ORDERER
+                    TeamMemberRole.ORDERER
             );
 
             Participant participant3 = createParticipant(
@@ -149,7 +136,7 @@ public class ParticipantRepositoryTest {
                     "kim@example.com",
                     MemberRole.USER,
                     team,
-                    MemberTeamRole.ORDERER
+                    TeamMemberRole.ORDERER
             );
 
             Participant participant4 = createParticipant(
@@ -157,7 +144,7 @@ public class ParticipantRepositoryTest {
                     "kim1@example.com",
                     MemberRole.USER,
                     team,
-                    MemberTeamRole.ORDERER
+                    TeamMemberRole.ORDERER
             );
 
             // When
@@ -190,7 +177,7 @@ public class ParticipantRepositoryTest {
                     "hong@example.com",
                     MemberRole.USER,
                     team,
-                    MemberTeamRole.ADMIN
+                    TeamMemberRole.ADMIN
             );
 
             Participant participant2 = createParticipant(
@@ -198,7 +185,7 @@ public class ParticipantRepositoryTest {
                     "kim@example.com",
                     MemberRole.USER,
                     team,
-                    MemberTeamRole.ORDERER
+                    TeamMemberRole.ORDERER
             );
             em.flush();
 
@@ -230,7 +217,7 @@ public class ParticipantRepositoryTest {
                     "hong@example.com",
                     MemberRole.USER,
                     team,
-                    MemberTeamRole.ORDERER
+                    TeamMemberRole.ORDERER
             );
 
             Participant participant2 = createParticipant(
@@ -238,7 +225,7 @@ public class ParticipantRepositoryTest {
                     "kim@example.com",
                     MemberRole.USER,
                     team,
-                    MemberTeamRole.ORDERER
+                    TeamMemberRole.ORDERER
             );
             em.flush();
 
@@ -279,7 +266,7 @@ public class ParticipantRepositoryTest {
                     "hong@example.com",
                     MemberRole.USER,
                     team,
-                    MemberTeamRole.ADMIN
+                    TeamMemberRole.ADMIN
             );
 
             Participant participant2 = createParticipant(
@@ -287,7 +274,7 @@ public class ParticipantRepositoryTest {
                     "bo@example.com",
                     MemberRole.USER,
                     team,
-                    MemberTeamRole.ORDERER
+                    TeamMemberRole.ORDERER
             );
 
             Participant participant3 = createParticipant(
@@ -295,7 +282,7 @@ public class ParticipantRepositoryTest {
                     "kim@example.com",
                     MemberRole.USER,
                     team2,
-                    MemberTeamRole.VIEWER
+                    TeamMemberRole.VIEWER
             );
 
             Participant participant4 = createParticipant(
@@ -303,20 +290,20 @@ public class ParticipantRepositoryTest {
                     "kim1@example.com",
                     MemberRole.USER,
                     team2,
-                    MemberTeamRole.ORDERER
+                    TeamMemberRole.ORDERER
             );
             //when
             //team에는 admin이 있고
-            Optional<Participant> result1 = participantRepository.findByTeamIdAndRole(team.getId(),
-                    MemberTeamRole.ADMIN);
-            Optional<Participant> result2 = participantRepository.findByTeamIdAndRole(team.getId(),
-                    MemberTeamRole.VIEWER);
+            Optional<Participant> result1 = participantRepository.findByTeamIdAndTeamMemberRole(team.getId(),
+                    TeamMemberRole.ADMIN);
+            Optional<Participant> result2 = participantRepository.findByTeamIdAndTeamMemberRole(team.getId(),
+                    TeamMemberRole.VIEWER);
 
             //team2에는 admin이 없다
-            Optional<Participant> result3 = participantRepository.findByTeamIdAndRole(team2.getId(),
-                    MemberTeamRole.ADMIN);
-            Optional<Participant> result4 = participantRepository.findByTeamIdAndRole(team2.getId(),
-                    MemberTeamRole.ORDERER);
+            Optional<Participant> result3 = participantRepository.findByTeamIdAndTeamMemberRole(team2.getId(),
+                    TeamMemberRole.ADMIN);
+            Optional<Participant> result4 = participantRepository.findByTeamIdAndTeamMemberRole(team2.getId(),
+                    TeamMemberRole.ORDERER);
 
             //then
             assertThat(result1).isPresent();

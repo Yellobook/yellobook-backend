@@ -9,15 +9,17 @@
 
 ### Backend
 
-- Java 17
+- Java 17(LTS)
 - Gradle 8.8
 - Spring Boot 3.3.1
-- Postgres 16.x
+- Mysql 8.x
 - Redis 7.x
 - Spring Data JPA
 - QueryDSL
 - JUnit5
 - Mockito
+- RestAssured
+- Testcontainers
 
 ### Infra
 
@@ -28,7 +30,7 @@
 
 ## 2. 협업툴
 
-<img src="https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=slack&logoColor=white">   
+<img src="https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=slack&logoColor=white">
 <img src="https://img.shields.io/badge/Jira-0052CC?style=for-the-badge&logo=jira&logoColor=white">
 <img src="https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=notion&logoColor=white">
 <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white">
@@ -52,7 +54,11 @@
     - 애플리케이션에서 공통적으로 사용되는 설정을 모아둔 모듈
     - 공통 응답 포맷, 공통 에러코드, 공통 예외 처리 핸들러, 공통으로 사용되는 상수, 유틸리티 클래스, 로깅 설정을 포함한다.
 
-## 4. 개발 프로세스
+## 4. 데이터베이스 ERD
+
+![](docs/images/erd.png)
+
+## 5. 개발 프로세스
 
 Jira 의 Scrum 기반 개발 프로세스를 이용한다.
 
@@ -67,7 +73,7 @@ Jira 의 Scrum 기반 개발 프로세스를 이용한다.
 2. 개발 완료시 PR
 3. develop merge : 코드 리뷰 / approve 1명 이상 완료시
 
-## 5. 버전 관리 규칙
+## 6. 버전 관리 규칙
 
 ### Commit/PR 접두사 규칙
 
@@ -130,3 +136,4 @@ merge commit 메시지는 PR 이력을 파악하기 쉽도록 PR 제목과 동�
 Merge Conflict 가 발생할 경우, PR을 올린 사람이 충돌을 해결한다.
 
  
+

@@ -1,14 +1,12 @@
 package com.yellobook.domains.team.repository;
 
 import com.yellobook.common.enums.MemberRole;
-import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
-import com.yellobook.support.annotation.RepositoryTest;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import com.yellobook.support.RepositoryTest;
 import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,20 +15,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 
-@RepositoryTest
-@DisplayName("teamRepository 테스트")
-public class TeamRepositoryTest {
+@DisplayName("TeamRepositoryTest Unit Test")
+public class TeamRepositoryTest extends RepositoryTest {
+
     @Autowired
     private TeamRepository teamRepository;
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     @BeforeEach
     public void setUp() {
-        teamRepository.deleteAll();
-        entityManager.createNativeQuery("ALTER TABLE teams ALTER COLUMN id RESTART WITH 1")
-                .executeUpdate();
+        resetAutoIncrement();
     }
 
     @Test
@@ -103,7 +96,7 @@ public class TeamRepositoryTest {
         Assertions.assertThatThrownBy(() -> teamRepository.save(team2))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessageContaining("could not execute statement");
-        entityManager.clear();
+        em.clear();
         Assertions.assertThat(teamRepository.findAll())
                 .hasSize(1);
     }
@@ -118,14 +111,14 @@ public class TeamRepositoryTest {
                 .phoneNumber("123-456-7890")
                 .address("1234 Test St")
                 .build();
-        entityManager.persist(team);
+        em.persist(team);
 
         Participant participant1 = createParticipant(
                 "홍길동",
                 "hong@example.com",
                 MemberRole.USER,
                 team,
-                MemberTeamRole.ADMIN
+                TeamMemberRole.ADMIN
         );
 
         Participant participant2 = createParticipant(
@@ -133,7 +126,7 @@ public class TeamRepositoryTest {
                 "bo@example.com",
                 MemberRole.USER,
                 team,
-                MemberTeamRole.ORDERER
+                TeamMemberRole.ORDERER
         );
 
         Participant participant3 = createParticipant(
@@ -141,7 +134,7 @@ public class TeamRepositoryTest {
                 "kim@example.com",
                 MemberRole.USER,
                 team,
-                MemberTeamRole.ORDERER
+                TeamMemberRole.ORDERER
         );
 
         Participant participant4 = createParticipant(
@@ -149,7 +142,7 @@ public class TeamRepositoryTest {
                 "kim1@example.com",
                 MemberRole.USER,
                 team,
-                MemberTeamRole.ORDERER
+                TeamMemberRole.ORDERER
         );
 
         //when
@@ -161,21 +154,21 @@ public class TeamRepositoryTest {
     }
 
     private Participant createParticipant(String nickname, String email, MemberRole role, Team team,
-                                          MemberTeamRole teamRole) {
+                                          TeamMemberRole teamMemberRole) {
         Member member = Member.builder()
                 .nickname(nickname)
                 .email(email)
                 .role(role)
                 .build();
         member.updateAllowance();
-        entityManager.persist(member);
+        em.persist(member);
 
         Participant participant = Participant.builder()
                 .team(team)
                 .member(member)
-                .role(teamRole)
+                .teamMemberRole(teamMemberRole)
                 .build();
-        entityManager.persist(participant);
+        em.persist(participant);
 
         return participant;
     }
