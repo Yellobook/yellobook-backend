@@ -527,7 +527,7 @@ class InventoryCommandServiceTest {
                 file = mock(MultipartFile.class);
 
                 Long teamId = 1L;
-                Team team = createTeam();
+                Team team = createTeam("팀1");
                 List<ExcelProductCond> productConds = createProductList();
                 when(excelReadUtil.read(file)).thenReturn(productConds);
                 when(teamRepository.findById(teamId)).thenReturn(Optional.of(team));
