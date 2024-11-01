@@ -43,7 +43,7 @@ public class InformMentionRepositoryTest extends RepositoryTest {
             @BeforeEach
             void setUp() {
                 Member member = em.persist(createMember());
-                Team team = em.persist(createTeam());
+                Team team = em.persist(createTeam("팀1"));
                 Inform inform = em.persist(createInform(team, member));
 
                 Member member2 = Member.builder()
@@ -113,7 +113,7 @@ public class InformMentionRepositoryTest extends RepositoryTest {
             @BeforeEach
             void setUp() {
                 Member member = em.persist(createMember());
-                Team team = em.persist(createTeam());
+                Team team = em.persist(createTeam("팀1"));
                 Inform inform = em.persist(createInform(team, member));
 
                 informId = inform.getId();
@@ -145,7 +145,7 @@ public class InformMentionRepositoryTest extends RepositoryTest {
             @BeforeEach
             void setUp() {
                 Member member = em.persist(createMember());
-                Team team = em.persist(createTeam());
+                Team team = em.persist(createTeam("팀1"));
                 Inform inform = em.persist(createInform(team, member));
                 Long informId = inform.getId();
 
@@ -192,7 +192,7 @@ public class InformMentionRepositoryTest extends RepositoryTest {
             @BeforeEach
             void setUp() {
                 Member member = em.persist(createMember());
-                Team team = em.persist(createTeam());
+                Team team = em.persist(createTeam("팀1"));
                 Inform inform = em.persist(createInform(team, member));
 
                 informId = inform.getId();
