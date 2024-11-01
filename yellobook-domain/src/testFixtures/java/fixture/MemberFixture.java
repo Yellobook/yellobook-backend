@@ -15,13 +15,16 @@ public class MemberFixture {
 
 
     public static Member createMember() {
-        LocalDateTime now = LocalDateTime.now();
         return createMember(MEMBER_NICKNAME, generateUniqueEmail(), MEMBER_PROFILE_IMAGE, MEMBER_ROLE, MEMBER_ALLOWANCE,
                 MEMBER_TIMESTAMP);
     }
 
+    public static Member createMember(String nickname) {
+        return createMember(nickname, generateUniqueEmail(), MEMBER_PROFILE_IMAGE, MEMBER_ROLE, MEMBER_ALLOWANCE,
+                MEMBER_TIMESTAMP);
+    }
+
     public static Member createMember(Boolean allowance) {
-        LocalDateTime now = LocalDateTime.now();
         return createMember(MEMBER_NICKNAME, generateUniqueEmail(), MEMBER_PROFILE_IMAGE, MEMBER_ROLE, allowance,
                 MEMBER_TIMESTAMP);
     }
