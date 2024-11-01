@@ -20,6 +20,7 @@ public class ParticipantCustomRepositoryImpl implements ParticipantCustomReposit
         QParticipant participant = QParticipant.participant;
         return queryFactory.select(Projections.constructor(QueryMemberJoinTeam.class,
                         participant.teamMemberRole,
+                        participant.team.id.as("teamId"),
                         participant.team.name.as("teamName")
                 ))
                 .from(participant)

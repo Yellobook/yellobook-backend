@@ -22,6 +22,7 @@ public interface MemberMapper {
     default ParticipantInfo toParticipantInfo(QueryMemberJoinTeam queryMemberJoinTeam) {
         return ParticipantInfo.builder()
                 .teamName(queryMemberJoinTeam.teamName())
+                .teamId(queryMemberJoinTeam.teamId())
                 .role(queryMemberJoinTeam.role()
                         .getDescription())
                 .build();

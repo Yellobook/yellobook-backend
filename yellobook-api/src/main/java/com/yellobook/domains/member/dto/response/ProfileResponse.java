@@ -26,6 +26,8 @@ public record ProfileResponse(
     public record ParticipantInfo(
             @Schema(description = "팀 이름", example = "team1")
             String teamName,
+            @Schema(description = "팀 ID", example = "1")
+            Long teamId,
             @Schema(description = "팀에서 역할", example = "관리자")
             String role
     ) {
