@@ -62,14 +62,6 @@ public class ScheduleRepositoryTest extends RepositoryTest {
         initData();
     }
 
-    @BeforeEach
-    public void before() {
-        Long res = jdbcTemplate.queryForObject("SELECT count(*) FROM orders", Long.class);
-        System.out.println("res = " + res);
-        Long firstId = jdbcTemplate.queryForObject("SELECT MIN(id) FROM orders", Long.class);
-        System.out.println("firstId = " + firstId);
-    }
-
     @Nested
     @DisplayName("데이터베이스 초기화 테스트")
     class initTest {
@@ -634,7 +626,7 @@ public class ScheduleRepositoryTest extends RepositoryTest {
     }
 
     private void initData() {
-        Team team = em.persistAndFlush(createTeam());
+        Team team = em.persistAndFlush(createTeam("팀1"));
 
         Member admin = em.persistAndFlush(createMember());
         Member orderer = em.persistAndFlush(createMember());

@@ -86,7 +86,7 @@ class OrderCommandServiceTest {
     }
 
     private Team createTeamWithId(Long teamId) {
-        Team team = createTeam();
+        Team team = createTeam("팀1");
         try {
             Field idField = Team.class.getDeclaredField("id");
             idField.setAccessible(true);

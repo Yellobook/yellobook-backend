@@ -58,3 +58,6 @@ infra/monitoring/logs/*
 ### .DS_Store
 .DS_Store
 **/.DS_Store
+
+### csv
+infra/**/*.csv

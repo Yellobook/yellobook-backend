@@ -123,7 +123,7 @@ public class InformCommandServiceTest {
             @BeforeEach
             void setUp() {
                 member = mock(Member.class);
-                team = createTeam();
+                team = createTeam("팀1");
                 participant = createParticipant(team, member, TeamMemberRole.ADMIN);
                 inform = createInform(team, member);
 

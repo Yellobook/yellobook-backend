@@ -41,7 +41,7 @@ public class InformRepositoryTest extends RepositoryTest {
             @BeforeEach
             void setUp() {
                 Member member = em.persist(createMember());
-                Team team = em.persist(createTeam());
+                Team team = em.persist(createTeam("팀1"));
                 inform = createInform(team, member);
                 savedInform = informRepository.save(createInform(team, member));
             }
@@ -67,7 +67,7 @@ public class InformRepositoryTest extends RepositoryTest {
             @BeforeEach
             void setUp() {
                 Member member = em.persist(createMember());
-                Team team = em.persist(createTeam());
+                Team team = em.persist(createTeam("팀1"));
                 informId = em.persistAndGetId(createInform(team, member), Long.class);
             }
 
@@ -97,7 +97,7 @@ public class InformRepositoryTest extends RepositoryTest {
             @BeforeEach
             void setUp() {
                 member = em.persist(createMember());
-                team = em.persist(createTeam());
+                team = em.persist(createTeam("팀1"));
                 inform = em.persist(createInform(team, member));
 
                 informId = inform.getId();

@@ -49,7 +49,7 @@ public class InventoryRepositoryTest extends RepositoryTest {
 
             @BeforeEach
             void setUpContext() {
-                team = em.persist(createTeam());
+                team = em.persist(createTeam("팀1"));
             }
 
             @Test
@@ -69,7 +69,7 @@ public class InventoryRepositoryTest extends RepositoryTest {
 
             @BeforeEach
             void setUpContext() {
-                team = em.persist(createTeam());
+                team = em.persist(createTeam("팀1"));
                 for (int i = 0; i < 6; i++) {
                     em.persist(createInventory(String.format("2024년 08월 0%d일 재고현황", i), team));
                 }
@@ -108,7 +108,7 @@ public class InventoryRepositoryTest extends RepositoryTest {
 
         @BeforeEach
         void setUpContext() {
-            team = em.persist(createTeam());
+            team = em.persist(createTeam("팀1"));
             inventory = createInventory("2024년 08월 06일 재고현황", team);
             em.persist(inventory);
 
@@ -162,7 +162,7 @@ public class InventoryRepositoryTest extends RepositoryTest {
 
         @BeforeEach
         void setUpContext() {
-            team = em.persist(createTeam());
+            team = em.persist(createTeam("팀1"));
             Inventory inventory = createInventory(team);
             em.persist(inventory);
 
@@ -200,7 +200,7 @@ public class InventoryRepositoryTest extends RepositoryTest {
 
             @BeforeEach
             void setUpContext() {
-                team = em.persist(createTeam());
+                team = em.persist(createTeam("팀1"));
                 inventory = createInventory(team);
                 em.persist(inventory);
 
