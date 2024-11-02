@@ -8,25 +8,17 @@ import com.yellobook.domains.team.dto.query.QueryMemberJoinTeam;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.stereotype.Component;
 
-@Component
 @Mapper(componentModel = "spring")
 public interface MemberMapper {
     @Mapping(source = "member.id", target = "memberId")
-    @Mapping(source = "participantInfos", target = "teams")
-    ProfileResponse toProfileResponseDTO(Member member, List<ParticipantInfo> participantInfos);
+    @Mapping(source = "memberJoinTeams", target = "teams")
+    ProfileResponse toProfileResponse(Member member, List<QueryMemberJoinTeam> memberJoinTeams);
 
-    TermAllowanceResponse toAllowanceResponseDTO(Boolean allowance);
+    @Mapping(source = "role.description", target = "role")
+    ParticipantInfo toParticipantInfo(QueryMemberJoinTeam memberJoinTeam);
 
-    default ParticipantInfo toParticipantInfo(QueryMemberJoinTeam queryMemberJoinTeam) {
-        return ParticipantInfo.builder()
-                .teamName(queryMemberJoinTeam.teamName())
-                .teamId(queryMemberJoinTeam.teamId())
-                .role(queryMemberJoinTeam.role()
-                        .getDescription())
-                .build();
-    }
+    List<ParticipantInfo> toParticipantInfoList(List<QueryMemberJoinTeam> memberJoinTeams);
 
-
+    TermAllowanceResponse toAllowanceResponse(Boolean allowance);
 }

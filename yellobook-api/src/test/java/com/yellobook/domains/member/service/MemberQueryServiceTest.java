@@ -94,7 +94,7 @@ class MemberQueryServiceTest {
 
                 when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
                 when(participantRepository.getMemberJoinTeam(memberId)).thenReturn(queryMemberJoinTeams);
-                when(memberMapper.toProfileResponseDTO(eq(member), anyList())).thenReturn(expectResponse);
+                when(memberMapper.toProfileResponse(eq(member), anyList())).thenReturn(expectResponse);
             }
 
             @Test
@@ -145,7 +145,7 @@ class MemberQueryServiceTest {
                 member = createMember();
                 expectResponse = createAllowanceResponse(member.getAllowance());
                 when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
-                when(memberMapper.toAllowanceResponseDTO(member.getAllowance())).thenReturn(expectResponse);
+                when(memberMapper.toAllowanceResponse(member.getAllowance())).thenReturn(expectResponse);
             }
 
             @Test
@@ -155,7 +155,7 @@ class MemberQueryServiceTest {
 
                 assertThat(response.allowance()).isEqualTo(expectResponse.allowance());
                 verify(memberRepository).findById(memberId);
-                verify(memberMapper).toAllowanceResponseDTO(member.getAllowance());
+                verify(memberMapper).toAllowanceResponse(member.getAllowance());
             }
         }
 
