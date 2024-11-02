@@ -9,7 +9,6 @@ import com.yellobook.domains.inform.dto.response.CreateInformResponse;
 import com.yellobook.domains.inform.entity.Inform;
 import com.yellobook.domains.inform.entity.InformComment;
 import com.yellobook.domains.inform.entity.InformMention;
-import com.yellobook.domains.inform.mapper.CommentMapper;
 import com.yellobook.domains.inform.mapper.InformMapper;
 import com.yellobook.domains.inform.repository.InformCommentRepository;
 import com.yellobook.domains.inform.repository.InformMentionRepository;
@@ -41,7 +40,7 @@ public class InformCommandService {
     private final MemberRepository memberRepository;
     private final InformMentionRepository informMentionRepository;
     private final InformCommentRepository informCommentRepository;
-    private final CommentMapper commentMapper;
+    private final InformMapper mapper;
 
     public CreateInformResponse createInform(
             Long memberId,
@@ -146,7 +145,7 @@ public class InformCommandService {
 
             informCommentRepository.save(newComment);
 
-            return commentMapper.toCreateInformCommentResponse(newComment);
+            return mapper.toCreateInformCommentResponse(newComment);
         } else {
             throw new CustomException(InformErrorCode.NOT_MENTIONED);
         }

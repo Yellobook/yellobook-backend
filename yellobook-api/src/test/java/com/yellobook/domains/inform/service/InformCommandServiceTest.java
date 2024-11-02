@@ -24,7 +24,6 @@ import com.yellobook.domains.inform.dto.response.CreateInformCommentResponse;
 import com.yellobook.domains.inform.entity.Inform;
 import com.yellobook.domains.inform.entity.InformComment;
 import com.yellobook.domains.inform.entity.InformMention;
-import com.yellobook.domains.inform.mapper.CommentMapper;
 import com.yellobook.domains.inform.mapper.InformMapper;
 import com.yellobook.domains.inform.repository.InformCommentRepository;
 import com.yellobook.domains.inform.repository.InformMentionRepository;
@@ -67,9 +66,8 @@ public class InformCommandServiceTest {
     private MemberRepository memberRepository;
 
     @Mock
-    private InformMapper informMapper;
-    @Mock
-    private CommentMapper commentMapper;
+    private InformMapper mapper;
+
     @Mock
     private RedisTeamService redisService;
 
@@ -139,7 +137,8 @@ public class InformCommandServiceTest {
                 when(memberRepository.findById(2L)).thenReturn(Optional.of(member2));
                 when(participantRepository.findByTeamIdAndMemberId(team.getId(), member.getId())).thenReturn(
                         Optional.of(participant));
-                when(informMapper.toInform(request, member, team)).thenReturn(inform);
+                when(mapper
+                        .toInform(request, member, team)).thenReturn(inform);
 
                 informCommandService.createInform(member.getId(), request);
             }
@@ -153,7 +152,8 @@ public class InformCommandServiceTest {
             @Test
             @DisplayName("멘션된 팀원이 있으면 InformMention에 저장한다.")
             void it_returns_saved_mentioned_to_inform_mention() {
-                verify(informMapper).toInformMention(inform, member2);
+                verify(mapper
+                ).toInformMention(inform, member2);
                 verify(informMentionRepository).saveAll(anyList());
             }
         }
@@ -301,7 +301,8 @@ public class InformCommandServiceTest {
                         .build();
                 when(informRepository.findById(inform.getId())).thenReturn(Optional.of(inform));
                 when(informCommentRepository.save(any(InformComment.class))).thenReturn(comment);
-                when(commentMapper.toCreateInformCommentResponse(any(InformComment.class)))
+                when(mapper
+                        .toCreateInformCommentResponse(any(InformComment.class)))
                         .thenReturn(new CreateInformCommentResponse(1L, comment.getCreatedAt()));
 
                 when(informMentionRepository.findAllByInformId(inform.getId())).thenReturn(List.of(
