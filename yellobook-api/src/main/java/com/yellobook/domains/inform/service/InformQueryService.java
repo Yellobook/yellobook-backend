@@ -49,7 +49,7 @@ public class InformQueryService {
                         .equals(memberId));
 
         if (memberId.equals(writerId) || isMentioned) {
-            return informMapper.toGetInformResponseDTO(inform, comments, mentionedMembers);
+            return informMapper.toGetInformResponse(inform, comments, mentionedMembers);
         } else {
             throw new CustomException(InformErrorCode.NOT_MENTIONED);
         }

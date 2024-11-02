@@ -1,6 +1,7 @@
 package com.yellobook.domains.inform.mapper;
 
 import com.yellobook.domains.inform.dto.request.CreateInformRequest;
+import com.yellobook.domains.inform.dto.response.CreateInformCommentResponse;
 import com.yellobook.domains.inform.dto.response.CreateInformResponse;
 import com.yellobook.domains.inform.dto.response.GetInformResponse;
 import com.yellobook.domains.inform.dto.response.GetInformResponse.CommentItem;
@@ -19,38 +20,29 @@ public interface InformMapper {
     @Mapping(source = "request.memo", target = "content")
     Inform toInform(CreateInformRequest request, Member member, Team team);
 
-    @Mapping(source = "inform.id", target = "informId")
+    @Mapping(source = "id", target = "informId")
     CreateInformResponse toCreateInformResponse(Inform inform);
 
-    @Mapping(target = "inform", source = "inform")
-    @Mapping(target = "member", source = "member")
+    @Mapping(source = "inform", target = "inform")
+    @Mapping(source = "member", target = "member")
     InformMention toInformMention(Inform inform, Member member);
 
-    @Mapping(target = "title", source = "inform.title")
-    @Mapping(target = "memo", source = "inform.content")
-    @Mapping(target = "view", source = "inform.view")
-    @Mapping(target = "date", source = "inform.date")
-    @Mapping(target = "author", source = "inform.member.nickname")
-    GetInformResponse toGetInformResponseDTO(Inform inform, List<InformComment> comments, List<Member> mentions);
+    @Mapping(source = "inform.content", target = "memo")
+    @Mapping(source = "inform.member.nickname", target = "author")
+    @Mapping(source = "informComments", target = "comments")
+    @Mapping(source = "members", target = "mentions")
+    GetInformResponse toGetInformResponse(Inform inform, List<InformComment> informComments, List<Member> members);
 
-    default List<CommentItem> mapComments(List<InformComment> comments) {
-        return comments.stream()
-                .map(comment -> CommentItem.builder()
-                        .id(comment.getId())
-                        .memberId(comment.getMember()
-                                .getId())
-                        .content(comment.getContent())
-                        .createdAt(comment.getCreatedAt())
-                        .build())
-                .toList();
-    }
+    @Mapping(source = "id", target = "memberId")
+    CommentItem toCommentItem(InformComment informComment);
 
-    default List<MentionItem> mapMentions(List<Member> members) {
-        return members.stream()
-                .map(member -> MentionItem.builder()
-                        .memberId(member.getId())
-                        .memberNickname(member.getNickname()) // Assuming "nickname" is correct
-                        .build())
-                .toList();
-    }
+    List<CommentItem> toCommentItemList(List<InformComment> comments);
+
+    @Mapping(source = "id", target = "memberId")
+    @Mapping(source = "nickname", target = "memberNickname")
+    MentionItem toMentionItem(Member member);
+
+    List<MentionItem> toMentionItemList(List<Member> members);
+
+    CreateInformCommentResponse toCreateInformCommentResponse(InformComment comment);
 }
