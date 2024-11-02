@@ -1,6 +1,7 @@
 package fixture;
 
 import com.yellobook.domains.inform.entity.Inform;
+import com.yellobook.domains.inform.entity.InformComment;
 import com.yellobook.domains.inform.entity.InformMention;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.team.entity.Team;
@@ -11,6 +12,7 @@ import support.ReflectionUtil;
 public class InformFixture {
     private static final String INFORM_TITLE = "공지";
     private static final String INFORM_CONTENT = "내용";
+    private static final String INFORM_COMMENT_CONTENT = "공지 댓글 내용";
     private static final LocalDate INFORM_DATE = LocalDate.now();
     private static final LocalDateTime INFORM_TIMESTAMP = LocalDateTime.now();
 
@@ -37,6 +39,14 @@ public class InformFixture {
 
     public static InformMention createInformMention(Inform inform, Member member) {
         return InformMention.builder()
+                .inform(inform)
+                .member(member)
+                .build();
+    }
+
+    public static InformComment createInformComment(Inform inform, Member member) {
+        return InformComment.builder()
+                .content(INFORM_COMMENT_CONTENT)
                 .inform(inform)
                 .member(member)
                 .build();
