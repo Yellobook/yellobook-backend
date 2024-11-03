@@ -10,4 +10,13 @@ public record CalendarResponse(
         @Schema(description = "날짜별 일정 목록")
         List<CalendarItem> calendar
 ) {
+    @Builder
+    public record CalendarItem(
+            @Schema(description = "일자")
+            Integer day,
+
+            @Schema(description = "일정 제목 목록")
+            List<String> titles
+    ) {
+    }
 }
