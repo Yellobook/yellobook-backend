@@ -5,31 +5,24 @@ import com.yellobook.domains.schedule.dto.DailyCond;
 import com.yellobook.domains.schedule.dto.EarliestCond;
 import com.yellobook.domains.schedule.dto.MonthlyCond;
 import com.yellobook.domains.schedule.dto.SearchMonthlyCond;
+import com.yellobook.domains.schedule.dto.query.QuerySchedule;
 import com.yellobook.domains.schedule.dto.query.QueryUpcomingSchedule;
 import com.yellobook.domains.schedule.dto.request.DailyParam;
 import com.yellobook.domains.schedule.dto.request.MonthlyParam;
 import com.yellobook.domains.schedule.dto.request.MonthlySearchParam;
-import com.yellobook.domains.schedule.dto.response.CalendarItem;
 import com.yellobook.domains.schedule.dto.response.CalendarResponse;
+import com.yellobook.domains.schedule.dto.response.CalendarResponse.CalendarItem;
+import com.yellobook.domains.schedule.dto.response.DailyScheduleResponse;
+import com.yellobook.domains.schedule.dto.response.SearchMonthlyScheduleResponse;
 import com.yellobook.domains.schedule.dto.response.UpcomingScheduleResponse;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface ScheduleMapper {
-    ScheduleMapper INSTANCE = Mappers.getMapper(ScheduleMapper.class);
-
-    @Mapping(source = "title", target = "scheduleTitle")
-    UpcomingScheduleResponse toUpcomingScheduleResponse(QueryUpcomingSchedule queryUpcomingSchedule);
-
-    @Mapping(target = "calendar", source = "calendarMap", qualifiedByName = "mapToCalendarItems")
-    CalendarResponse toCalendarResponse(Map<Integer, List<String>> calendarMap);
-
     EarliestCond toEarliestCond(LocalDate today, TeamMemberVO teamMember);
 
     MonthlyCond toMonthlyCond(MonthlyParam monthlyParam, TeamMemberVO teamMember);
@@ -38,16 +31,27 @@ public interface ScheduleMapper {
 
     DailyCond toDailyCond(DailyParam dailyParam, TeamMemberVO teamMember);
 
+    @Mapping(source = "title", target = "scheduleTitle")
+    UpcomingScheduleResponse toUpcomingScheduleResponse(QueryUpcomingSchedule queryUpcomingSchedule);
 
-    @Named("mapToCalendarItems")
-    default List<CalendarItem> mapToCalendarItems(Map<Integer, List<String>> calendarMap) {
+    @Mapping(source = "title", target = "scheduleTitle")
+    UpcomingScheduleResponse toUpcomingScheduleResponse(String title);
+
+    default SearchMonthlyScheduleResponse toSearchMonthlyScheduleResponse(List<QuerySchedule> schedules) {
+        return new SearchMonthlyScheduleResponse(schedules);
+    }
+
+    @Mapping(source = "calendarMap", target = "calendar")
+    CalendarResponse toCalendarResponse(Map<Integer, List<String>> calendarMap);
+
+    default List<CalendarItem> toCalendarItems(Map<Integer, List<String>> calendarMap) {
         return calendarMap.entrySet()
                 .stream()
-                .map(entry -> CalendarItem.builder()
-                        .day(entry.getKey())
-                        .titles(entry.getValue())
-                        .build()
-                )
+                .map(entry -> new CalendarItem(entry.getKey(), entry.getValue()))
                 .toList();
+    }
+
+    default DailyScheduleResponse toDailyScheduleResponse(List<QuerySchedule> schedules) {
+        return new DailyScheduleResponse(schedules);
     }
 }
