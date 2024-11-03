@@ -27,41 +27,41 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ViewerScheduleStrategy implements ScheduleStrategy {
     private final ScheduleRepository scheduleRepository;
-    private final ScheduleMapper scheduleMapper;
+    private final ScheduleMapper mapper;
 
     @Override
     public UpcomingScheduleResponse getUpcomingSchedules(TeamMemberVO teamMember) {
         LocalDate today = LocalDate.now();
-        EarliestCond cond = scheduleMapper.toEarliestCond(today, teamMember);
+        EarliestCond cond = mapper.toEarliestCond(today, teamMember);
         return scheduleRepository.findEarliestInform(cond)
-                .map(scheduleMapper::toUpcomingScheduleResponse)
-                .orElseGet(() -> new UpcomingScheduleResponse("일정이 없습니다."));
+                .map(mapper::toUpcomingScheduleResponse)
+                .orElseGet(() -> mapper.toUpcomingScheduleResponse("일정이 없습니다."));
     }
 
 
     @Override
     public SearchMonthlyScheduleResponse searchMonthlySchedules(MonthlySearchParam monthlySearchParam,
                                                                 TeamMemberVO teamMember) {
-        SearchMonthlyCond cond = scheduleMapper.toSearchMonthlyCond(monthlySearchParam, teamMember);
+        SearchMonthlyCond cond = mapper.toSearchMonthlyCond(monthlySearchParam, teamMember);
         List<QuerySchedule> informs = scheduleRepository.searchMonthlyInforms(cond);
-        return new SearchMonthlyScheduleResponse(informs);
+        return mapper.toSearchMonthlyScheduleResponse(informs);
     }
 
 
     @Override
     public CalendarResponse getCalendarSchedules(MonthlyParam monthlyParam, TeamMemberVO teamMember) {
-        MonthlyCond cond = scheduleMapper.toMonthlyCond(monthlyParam, teamMember);
+        MonthlyCond cond = mapper.toMonthlyCond(monthlyParam, teamMember);
         List<QueryMonthlySchedule> informs = scheduleRepository.findMonthlyInforms(cond);
         Map<Integer, List<String>> calendarMap = new HashMap<>();
         this.addScheduleToCalendarMap(calendarMap, informs);
-        return scheduleMapper.toCalendarResponse(calendarMap);
+        return mapper.toCalendarResponse(calendarMap);
     }
 
 
     @Override
     public DailyScheduleResponse getDailySchedules(DailyParam dailyParam, TeamMemberVO teamMember) {
-        DailyCond cond = scheduleMapper.toDailyCond(dailyParam, teamMember);
+        DailyCond cond = mapper.toDailyCond(dailyParam, teamMember);
         List<QuerySchedule> informs = scheduleRepository.findDailyInforms(cond);
-        return new DailyScheduleResponse(informs);
+        return mapper.toDailyScheduleResponse(informs);
     }
 }

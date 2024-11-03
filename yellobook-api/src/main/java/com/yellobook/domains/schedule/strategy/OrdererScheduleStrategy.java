@@ -29,28 +29,28 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class OrdererScheduleStrategy implements ScheduleStrategy {
     private final ScheduleRepository scheduleRepository;
-    private final ScheduleMapper scheduleMapper;
+    private final ScheduleMapper mapper;
 
     @Override
     public UpcomingScheduleResponse getUpcomingSchedules(TeamMemberVO teamMember) {
         LocalDate today = LocalDate.now();
-        EarliestCond cond = scheduleMapper.toEarliestCond(today, teamMember);
+        EarliestCond cond = mapper.toEarliestCond(today, teamMember);
         QueryUpcomingSchedule order = scheduleRepository.findEarliestOrder(cond)
                 .orElse(null);
         QueryUpcomingSchedule inform = scheduleRepository.findEarliestInform(cond)
                 .orElse(null);
         QueryUpcomingSchedule schedule = this.selectSchedule(order, inform);
         if (schedule != null) {
-            return scheduleMapper.toUpcomingScheduleResponse(schedule);
+            return mapper.toUpcomingScheduleResponse(schedule);
         }
-        return new UpcomingScheduleResponse("일정이 없습니다.");
+        return mapper.toUpcomingScheduleResponse("일정이 없습니다.");
     }
 
 
     @Override
     public SearchMonthlyScheduleResponse searchMonthlySchedules(MonthlySearchParam monthlySearchParam,
                                                                 TeamMemberVO teamMember) {
-        SearchMonthlyCond cond = scheduleMapper.toSearchMonthlyCond(monthlySearchParam, teamMember);
+        SearchMonthlyCond cond = mapper.toSearchMonthlyCond(monthlySearchParam, teamMember);
         List<QuerySchedule> orders = scheduleRepository.searchMonthlyOrders(cond);
         List<QuerySchedule> informs = scheduleRepository.searchMonthlyInforms(cond);
         List<QuerySchedule> schedules = new ArrayList<>();
@@ -59,26 +59,26 @@ public class OrdererScheduleStrategy implements ScheduleStrategy {
         List<QuerySchedule> sortedSchedules = schedules.stream()
                 .sorted(this::compareQuerySchedule)
                 .toList();
-        return new SearchMonthlyScheduleResponse(sortedSchedules);
+        return mapper.toSearchMonthlyScheduleResponse(sortedSchedules);
     }
 
 
     @Override
     public CalendarResponse getCalendarSchedules(MonthlyParam monthlyParam, TeamMemberVO teamMember) {
-        MonthlyCond cond = scheduleMapper.toMonthlyCond(monthlyParam, teamMember);
+        MonthlyCond cond = mapper.toMonthlyCond(monthlyParam, teamMember);
         List<QueryMonthlySchedule> orders = scheduleRepository.findMonthlyOrders(cond);
         List<QueryMonthlySchedule> informs = scheduleRepository.findMonthlyInforms(cond);
 
         Map<Integer, List<String>> calendarMap = new HashMap<>();
-        this.addScheduleToCalendarMap(calendarMap, orders);
-        this.addScheduleToCalendarMap(calendarMap, informs);
-        return scheduleMapper.toCalendarResponse(calendarMap);
+        addScheduleToCalendarMap(calendarMap, orders);
+        addScheduleToCalendarMap(calendarMap, informs);
+        return mapper.toCalendarResponse(calendarMap);
     }
 
 
     @Override
     public DailyScheduleResponse getDailySchedules(DailyParam dailyParam, TeamMemberVO teamMember) {
-        DailyCond cond = scheduleMapper.toDailyCond(dailyParam, teamMember);
+        DailyCond cond = mapper.toDailyCond(dailyParam, teamMember);
         List<QuerySchedule> orders = scheduleRepository.findDailyOrders(cond);
         List<QuerySchedule> informs = scheduleRepository.findDailyInforms(cond);
         List<QuerySchedule> schedules = new ArrayList<>();
@@ -87,6 +87,6 @@ public class OrdererScheduleStrategy implements ScheduleStrategy {
         List<QuerySchedule> sortedSchedules = schedules.stream()
                 .sorted(this::compareQuerySchedule)
                 .toList();
-        return new DailyScheduleResponse(sortedSchedules);
+        return mapper.toDailyScheduleResponse(sortedSchedules);
     }
 }
