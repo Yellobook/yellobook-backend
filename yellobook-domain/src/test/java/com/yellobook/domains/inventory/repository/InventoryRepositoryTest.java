@@ -287,6 +287,7 @@ public class InventoryRepositoryTest extends RepositoryTest {
             @Test
             @DisplayName("updatedAt는 변경 없이 이전과 동일하다.")
             void it_remains_same_updatedAt() {
+                LocalDateTime oldUpdatedAt = inventory.getUpdatedAt();
                 inventoryRepository.increaseView(inventory.getId());
                 em.flush();
                 em.clear();
@@ -295,7 +296,8 @@ public class InventoryRepositoryTest extends RepositoryTest {
                         .orElse(null);
 
                 assertThat(updatedInventory).isNotNull();
-                assertThat(updatedInventory.getUpdatedAt()).isEqualTo(inventory.getUpdatedAt());
+                // JPQL auditing 우회 명시
+                assertThat(updatedInventory.getUpdatedAt()).isEqualTo(oldUpdatedAt);
             }
         }
     }
