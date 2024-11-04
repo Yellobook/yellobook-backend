@@ -48,6 +48,13 @@ jobs:
       - name: Gradle 빌드
         run: ./gradlew clean build
 
+      - name: Test Report 제작
+        uses: actions/upload-artifact@v3
+        if: failure()  # 이전 단계가 실패한 경우에만 실행
+        with:
+          name: test-report
+          path: ./yellobook-domain/build/reports/tests/test/
+
       - name: SonarCloud 정적분석
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
