@@ -14,6 +14,7 @@ import com.yellobook.domains.inventory.mapper.InventoryMapper;
 import com.yellobook.domains.inventory.mapper.ProductMapper;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -76,7 +77,7 @@ public class InventoryQueryService {
                 teamMember.getTeamId());
         if (optionalInventory.isEmpty()) {
             // team에서 재고가 존재하지 않으면 빈 리스트 반환
-            return productMapper.toEmptyGetProductNameResponse();
+            return productMapper.toGetProductsNameResponse(Collections.emptyList());
         } else {
             // 재고가 존재하면 해당 재고에 있는 제품 중 검색 조건에 맞는 것들 반환
             List<QueryProductName> productsName = productRepository.getProductsName(optionalInventory.get()
@@ -94,7 +95,7 @@ public class InventoryQueryService {
                 teamMember.getTeamId());
         if (optionalInventory.isEmpty()) {
             // team에서 재고가 존재하지 않으면 빈 리스트 반환
-            return productMapper.toEmptyGetSubProductNameResponse();
+            return productMapper.toGetSubProductNameResponse(Collections.emptyList());
         } else {
             // 재고가 존재하면 해당 재고에 있는 제품 중 검색 조건에 맞는 것들 반환
             List<QuerySubProduct> subProducts = productRepository.getSubProducts(optionalInventory.get()
