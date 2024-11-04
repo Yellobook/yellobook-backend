@@ -15,6 +15,6 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long>, Inv
 
     @Modifying
     @Query("update Inventory i set i.updatedAt = :now where i.id = :id")
-    LocalDateTime updateUpdatedAt(@Param("id") Long id, @Param("now") LocalDateTime now);
+    void updateUpdatedAt(@Param("id") Long id, @Param("now") LocalDateTime now);
 
 }

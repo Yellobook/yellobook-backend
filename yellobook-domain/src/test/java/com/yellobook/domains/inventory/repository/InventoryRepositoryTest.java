@@ -11,6 +11,7 @@ import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.team.entity.Team;
 import com.yellobook.support.RepositoryTest;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -221,5 +222,39 @@ public class InventoryRepositoryTest extends RepositoryTest {
             }
         }
     }
+
+    @Nested
+    @DisplayName("updateUpdatedAt 메소드는")
+    class Describe_UpdateUpdatedAt {
+        @Nested
+        @DisplayName("재고 id와 updatedAt 날짜가 주어지면")
+        class Context_inventory_id_and_updatedAt_given {
+            Inventory inventory;
+            LocalDateTime updatedAt = LocalDateTime.of(2024, 11, 4, 12, 0);
+
+            @BeforeEach
+            void setUpContext() {
+                Team team = em.persist(createTeam("팀1"));
+                inventory = createInventory(team);
+                em.persist(inventory);
+            }
+
+            @Test
+            @DisplayName("주어진 updatedAt 날짜로 변경한다.")
+            void it_updates_updatedAt() {
+                inventoryRepository.updateUpdatedAt(inventory.getId(), updatedAt);
+                em.flush();
+                em.clear();
+
+                Inventory updatedInventory = inventoryRepository.findById(inventory.getId())
+                        .orElse(null);
+
+                assertThat(updatedInventory).isNotNull();
+                assertThat(updatedInventory.getUpdatedAt()).isEqualTo(updatedAt);
+            }
+
+        }
+    }
+
 
 }
