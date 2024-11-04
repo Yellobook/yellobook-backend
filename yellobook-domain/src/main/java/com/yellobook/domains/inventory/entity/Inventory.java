@@ -51,7 +51,7 @@ public class Inventory extends BaseEntity {
         this.view = 0;
     }
 
-    public void increaseView() {
-        this.view += 1;
-    }
+//    public void increaseView() {
+//        this.view += 1;
+//    }
 }
