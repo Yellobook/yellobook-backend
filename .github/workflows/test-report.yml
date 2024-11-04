@@ -42,4 +42,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: test-report
-          path: ./yellobook-domain/build/reports/tests/test/index.html
+          path: ./yellobook-domain/build/reports/tests/test/
