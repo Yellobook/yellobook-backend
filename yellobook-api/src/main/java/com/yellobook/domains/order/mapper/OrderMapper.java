@@ -1,7 +1,10 @@
 package com.yellobook.domains.order.mapper;
 
-import com.yellobook.common.enums.TeamMemberRole;
+import static com.yellobook.domains.order.dto.response.GetOrderCommentsResponse.CommentInfo;
+
+
 import com.yellobook.common.enums.OrderStatus;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.order.dto.query.QueryOrder;
@@ -10,7 +13,6 @@ import com.yellobook.domains.order.dto.request.AddOrderCommentRequest;
 import com.yellobook.domains.order.dto.request.MakeOrderRequest;
 import com.yellobook.domains.order.dto.response.AddOrderCommentResponse;
 import com.yellobook.domains.order.dto.response.GetOrderCommentsResponse;
-import com.yellobook.domains.order.dto.response.GetOrderCommentsResponse.CommentInfo;
 import com.yellobook.domains.order.dto.response.GetOrderResponse;
 import com.yellobook.domains.order.dto.response.MakeOrderResponse;
 import com.yellobook.domains.order.entity.Order;
@@ -20,11 +22,10 @@ import com.yellobook.domains.team.entity.Team;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
 
 @Component
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", imports = {OrderStatus.class})
 public interface OrderMapper {
     @Mapping(source = "requestDTO.content", target = "content")
     @Mapping(source = "member", target = "member")
@@ -33,21 +34,12 @@ public interface OrderMapper {
 
     AddOrderCommentResponse toAddOrderCommentResponse(Long commentId);
 
-    @Mapping(source = "role", target = "role", qualifiedByName = "getRoleDescription")
-    CommentInfo toCommentInfo(QueryOrderComment orderCommentDTOs);
-
-    default Order toOrder(MakeOrderRequest requestDTO, Member member, Team team, Product product) {
-        return Order.builder()
-                .view(0)
-                .memo(requestDTO.memo())
-                .date(requestDTO.date())
-                .orderStatus(OrderStatus.PENDING_CONFIRM)
-                .orderAmount(requestDTO.orderAmount())
-                .product(product)
-                .member(member)
-                .team(team)
-                .build();
-    }
+    @Mapping(target = "view", constant = "0")
+    @Mapping(source = "member", target = "member")
+    @Mapping(source = "team", target = "team")
+    @Mapping(source = "product", target = "product")
+    @Mapping(target = "orderStatus", expression = "java(OrderStatus.PENDING_CONFIRM)")
+    Order toOrder(MakeOrderRequest request, Member member, Team team, Product product);
 
     @Mapping(source = "order", target = "order")
     @Mapping(source = "member", target = "member")
@@ -57,16 +49,9 @@ public interface OrderMapper {
 
     GetOrderResponse toGetOrderResponse(QueryOrder queryOrder);
 
-    @Named("getRoleDescription")
-    default String getRoleDescription(TeamMemberRole teamMemberRole) {
-        return teamMemberRole.getDescription();
-    }
+    @Mapping(source = "orderComments", target = "comments")
+    GetOrderCommentsResponse toGetOrderCommentsResponse(Long orderId, List<QueryOrderComment> orderComments);
 
-    default GetOrderCommentsResponse toGetOrderCommentsResponse(List<QueryOrderComment> orderComments) {
-        return GetOrderCommentsResponse.builder()
-                .comments(orderComments.stream()
-                        .map(this::toCommentInfo)
-                        .toList())
-                .build();
-    }
+    @Mapping(target = "role", expression = "java(comment.role().getDescription())")
+    CommentInfo toQueryOrderComment(QueryOrderComment comment);
 }

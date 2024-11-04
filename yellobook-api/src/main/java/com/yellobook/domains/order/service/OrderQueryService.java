@@ -37,7 +37,7 @@ public class OrderQueryService {
                 orderId)) {
             // 댓글 조회
             List<QueryOrderComment> orderComments = orderRepository.getOrderComments(orderId);
-            return orderMapper.toGetOrderCommentsResponse(orderComments);
+            return orderMapper.toGetOrderCommentsResponse(orderId, orderComments);
         } else {
             throw new CustomException(OrderErrorCode.ORDER_ACCESS_DENIED);
         }

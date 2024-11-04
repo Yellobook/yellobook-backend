@@ -119,12 +119,13 @@ class OrderQueryServiceTest {
                 Member member = createMemberWithId(2L);
                 Order order = createOrder(null, member, null, PENDING_CONFIRM);  // orderMember : 2L, member : 2L
                 GetOrderCommentsResponse expectResponse = GetOrderCommentsResponse.builder()
+                        .orderId(orderId)
                         .comments(Collections.emptyList())
                         .build();
 
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
                 when(orderRepository.getOrderComments(orderId)).thenReturn(Collections.emptyList());
-                when(orderMapper.toGetOrderCommentsResponse(any())).thenReturn(expectResponse);
+                when(orderMapper.toGetOrderCommentsResponse(orderId, any())).thenReturn(expectResponse);
             }
 
             @Test
@@ -154,13 +155,14 @@ class OrderQueryServiceTest {
                         .role("주문자")
                         .build();
                 GetOrderCommentsResponse expectResponse = GetOrderCommentsResponse.builder()
+                        .orderId(orderId)
                         .comments(Collections.singletonList(commentInfo))
                         .build();
 
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
                 when(orderRepository.getOrderComments(orderId)).thenReturn(List.of(QueryOrderComment.builder()
                         .build()));
-                when(orderMapper.toGetOrderCommentsResponse(any())).thenReturn(expectResponse);
+                when(orderMapper.toGetOrderCommentsResponse(orderId, any())).thenReturn(expectResponse);
             }
 
             @Test
