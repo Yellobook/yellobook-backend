@@ -399,12 +399,17 @@ class InventoryQueryServiceTest {
         @DisplayName("재고가 존재하지 않으면")
         class Context_Inventory_Not_Exist {
             String name;
+            GetProductsNameResponse expectResponse;
 
             @BeforeEach
             void setUpContext() {
                 name = "product";
+                expectResponse = GetProductsNameResponse.builder()
+                        .names(Collections.emptyList())
+                        .build();
                 when(inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId())).thenReturn(
                         Optional.empty());
+                when(productMapper.toGetProductsNameResponse(Collections.emptyList())).thenReturn(expectResponse);
             }
 
             @Test
@@ -412,7 +417,9 @@ class InventoryQueryServiceTest {
             void it_returns_empty_list() {
                 GetProductsNameResponse response = inventoryQueryService.getProductsName(name, admin);
 
-                assertThat(response.names()).isEqualTo(Collections.emptyList());
+                assertThat(response).isNotNull();
+                assertThat(response).isEqualTo(expectResponse);
+                verify(productMapper).toGetProductsNameResponse(Collections.emptyList());
                 verify(inventoryRepository).findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId());
             }
         }
@@ -499,12 +506,17 @@ class InventoryQueryServiceTest {
         @DisplayName("재고가 존재하지 않으면")
         class Context_Inventory_Not_Exist {
             String name;
+            GetSubProductNameResponse expectedResponse;
 
             @BeforeEach
             void setUpContext() {
                 name = "product";
+                expectedResponse = GetSubProductNameResponse.builder()
+                        .subProducts(Collections.emptyList())
+                        .build();
                 when(inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId())).thenReturn(
                         Optional.empty());
+                when(productMapper.toGetSubProductNameResponse(Collections.emptyList())).thenReturn(expectedResponse);
             }
 
             @Test
@@ -512,8 +524,11 @@ class InventoryQueryServiceTest {
             void it_returns_empty_list() {
                 GetSubProductNameResponse response = inventoryQueryService.getSubProductName(name, admin);
 
-                assertThat(response.subProducts()).isEqualTo(Collections.emptyList());
+                assertThat(response).isNotNull();
+                assertThat(response).isEqualTo(expectedResponse);
                 verify(inventoryRepository).findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId());
+                verify(productMapper).toGetSubProductNameResponse(Collections.emptyList());
+
             }
         }
 
