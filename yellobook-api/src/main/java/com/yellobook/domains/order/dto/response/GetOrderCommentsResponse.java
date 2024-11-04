@@ -7,6 +7,8 @@ import lombok.Builder;
 
 @Builder
 public record GetOrderCommentsResponse(
+        @Schema(description = "주문 Id")
+        Long orderId,
         @Schema(description = "댓글 전체")
         List<CommentInfo> comments
 ) {
