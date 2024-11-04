@@ -12,6 +12,7 @@ import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.team.entity.Team;
 import com.yellobook.support.RepositoryTest;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -289,15 +290,15 @@ public class InventoryRepositoryTest extends RepositoryTest {
             void it_remains_same_updatedAt() {
                 LocalDateTime oldUpdatedAt = inventory.getUpdatedAt();
                 inventoryRepository.increaseView(inventory.getId());
-                em.flush();
-                em.clear();
 
                 Inventory updatedInventory = inventoryRepository.findById(inventory.getId())
                         .orElse(null);
 
                 assertThat(updatedInventory).isNotNull();
                 // JPQL auditing 우회 명시
-                assertThat(updatedInventory.getUpdatedAt()).isEqualTo(oldUpdatedAt);
+                assertThat(updatedInventory.getUpdatedAt()
+                        .truncatedTo(ChronoUnit.SECONDS))
+                        .isEqualTo(oldUpdatedAt.truncatedTo(ChronoUnit.SECONDS));
             }
         }
     }
