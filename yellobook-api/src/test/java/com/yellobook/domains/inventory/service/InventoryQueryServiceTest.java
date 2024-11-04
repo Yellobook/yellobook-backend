@@ -403,13 +403,8 @@ class InventoryQueryServiceTest {
             @BeforeEach
             void setUpContext() {
                 name = "product";
-                GetProductsNameResponse expectResult = GetProductsNameResponse.builder()
-                        .names(Collections.emptyList())
-                        .build();
                 when(inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId())).thenReturn(
                         Optional.empty());
-                when(productMapper.toEmptyGetProductNameResponse()).thenReturn(expectResult);
-
             }
 
             @Test
@@ -419,7 +414,6 @@ class InventoryQueryServiceTest {
 
                 assertThat(response.names()).isEqualTo(Collections.emptyList());
                 verify(inventoryRepository).findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId());
-                verify(productMapper).toEmptyGetProductNameResponse();
             }
         }
 
@@ -509,12 +503,8 @@ class InventoryQueryServiceTest {
             @BeforeEach
             void setUpContext() {
                 name = "product";
-                GetSubProductNameResponse expectResult = GetSubProductNameResponse.builder()
-                        .subProducts(Collections.emptyList())
-                        .build();
                 when(inventoryRepository.findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId())).thenReturn(
                         Optional.empty());
-                when(productMapper.toEmptyGetSubProductNameResponse()).thenReturn(expectResult);
             }
 
             @Test
@@ -524,7 +514,6 @@ class InventoryQueryServiceTest {
 
                 assertThat(response.subProducts()).isEqualTo(Collections.emptyList());
                 verify(inventoryRepository).findFirstByTeamIdOrderByCreatedAtDesc(admin.getTeamId());
-                verify(productMapper).toEmptyGetSubProductNameResponse();
             }
         }
 

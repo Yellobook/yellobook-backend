@@ -26,8 +26,6 @@ public interface ProductMapper {
 
     AddProductResponse toAddProductResponse(Long productId);
 
-    List<SubProductInfo> toSubProductInfo(List<QuerySubProduct> subProducts);
-
     List<ProductInfo> toProductInfo(List<QueryProduct> queryProductList);
 
     default GetProductsResponse toGetProductsResponse(List<QueryProduct> products) {
@@ -36,9 +34,9 @@ public interface ProductMapper {
                 .build();
     }
 
-    default GetProductsNameResponse toGetProductsNameResponse(List<QueryProductName> queryProducts) {
+    default GetProductsNameResponse toGetProductsNameResponse(List<QueryProductName> productNames) {
         return GetProductsNameResponse.builder()
-                .names(queryProducts.stream()
+                .names(productNames.stream()
                         .map(QueryProductName::name)
                         .toList())
                 .build();
@@ -49,4 +47,6 @@ public interface ProductMapper {
                 .subProducts(toSubProductInfo(subProducts))
                 .build();
     }
+
+    List<SubProductInfo> toSubProductInfo(List<QuerySubProduct> subProducts);
 }
