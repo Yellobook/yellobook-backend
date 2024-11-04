@@ -71,8 +71,6 @@ public class Order extends BaseEntity {
     @Builder
     private Order(Integer view, String memo, LocalDate date, OrderStatus orderStatus, Integer orderAmount,
                   Product product, Member member, Team team) {
-        // 필수 필드 검증 추가할 것
-        // 양방향 연관관계 필요하면 private 으로 빼서만들고 생성자에 추가할것
         this.view = view;
         this.memo = memo;
         this.date = date;
