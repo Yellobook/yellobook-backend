@@ -61,6 +61,8 @@ public class InventoryCommandService {
         Product newProduct = productMapper.toProduct(requestDTO, inventory);
         Long productId = productRepository.save(newProduct)
                 .getId();
+        inventory.updateUpdatedAt();
+
         return productMapper.toAddProductResponse(productId);
     }
 
@@ -75,8 +77,11 @@ public class InventoryCommandService {
         if (productOptional.isEmpty()) {
             throw new CustomException(InventoryErrorCode.PRODUCT_NOT_FOUND);  // 여기 이미 validation 했는데, 또 해야 하나...?
         }
-        productOptional.get()
-                .modifyAmount(requestDTO.amount());
+        Product product = productOptional.get();
+        product.modifyAmount(requestDTO.amount());
+
+        product.getInventory()
+                .updateUpdatedAt();
     }
 
     /**
@@ -86,7 +91,11 @@ public class InventoryCommandService {
         ParticipantUtil.forbidViewer(teamMember.getRole());
         ParticipantUtil.forbidOrderer(teamMember.getRole());
 
-        productRepository.deleteById(productId);
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new CustomException(InventoryErrorCode.PRODUCT_NOT_FOUND));
+        productRepository.deleteById(product.getId());
+        product.getInventory()
+                .updateUpdatedAt();
     }
 
     /**
@@ -97,7 +106,7 @@ public class InventoryCommandService {
 
         Inventory inventory = inventoryRepository.findById(inventoryId)
                 .orElseThrow(() -> new CustomException(InventoryErrorCode.INVENTORY_NOT_FOUND));
-        inventory.increaseView();
+        inventoryRepository.increaseView(inventory.getId());
     }
 
     /*

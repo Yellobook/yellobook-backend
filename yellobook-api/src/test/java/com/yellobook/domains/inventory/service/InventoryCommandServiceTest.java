@@ -10,6 +10,7 @@ import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static support.ReflectionUtil.setField;
 
 import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.common.vo.TeamMemberVO;
@@ -179,13 +180,15 @@ class InventoryCommandServiceTest {
             Long inventoryId;
             AddProductRequest request;
             AddProductResponse expectResponse;
+            Product product;
 
             @BeforeEach
             void setUpContext() {
                 inventoryId = 1L;
                 request = createAddProductRequest();
                 Inventory inventory = createInventory(null);
-                Product product = createProduct(inventory);
+                setField(inventory, "id", inventoryId);
+                product = createProduct(inventory);
                 expectResponse = AddProductResponse.builder()
                         .productId(1L)
                         .build();
@@ -209,6 +212,7 @@ class InventoryCommandServiceTest {
                 assertThat(response).isNotNull();
                 assertThat(response.productId()).isEqualTo(expectResponse.productId());
             }
+
         }
 
     }
@@ -297,12 +301,14 @@ class InventoryCommandServiceTest {
             void setUpContext() {
                 productId = 1L;
                 request = createModifyProductAmountRequest();
-                product = createProduct(null);
+                Inventory inventory = createInventory(null);
+                setField(inventory, "id", 1L);
+                product = createProduct(inventory);
                 when(productRepository.findById(productId)).thenReturn(Optional.of(product));
             }
 
             @Test
-            @DisplayName("제품 수량 수정이 잘 되었는지 확인")
+            @DisplayName("제품 수량 수정이 잘 되었는지 확인한다.")
             void it_modify_product_amount() {
                 inventoryCommandService.modifyProductAmount(productId, request, admin);
 
@@ -356,19 +362,27 @@ class InventoryCommandServiceTest {
         @DisplayName("제품 삭제가 가능하면")
         class Context_Can_Delete_Product {
             Long productId;
+            Product product;
 
             @BeforeEach
             void setUpContext() {
                 productId = 1L;
+                Inventory inventory = createInventory(null);
+                setField(inventory, "id", 1L);
+                product = createProduct(inventory);
+                setField(product, "id", 1L);
+
+                when(productRepository.findById(productId)).thenReturn(Optional.of(product));
             }
 
             @Test
-            @DisplayName("제품이 잘 삭제되었는지 확인")
-            void deleteProduct() {
+            @DisplayName("제품이 잘 삭제되었는지 확인한다.")
+            void it_delete_Product() {
                 inventoryCommandService.deleteProduct(productId, admin);
 
                 verify(productRepository).deleteById(productId);
             }
+
         }
     }
 
@@ -406,6 +420,7 @@ class InventoryCommandServiceTest {
             void setUpContext() {
                 inventoryId = 1L;
                 inventory = createInventory(null);
+                setField(inventory, "id", inventoryId);
                 when(inventoryRepository.findById(inventoryId)).thenReturn(Optional.of(inventory));
             }
 
@@ -414,7 +429,7 @@ class InventoryCommandServiceTest {
             void it_increases_view() {
                 inventoryCommandService.increaseInventoryView(inventoryId, admin);
 
-                assertThat(inventory.getView()).isEqualTo(1);
+                verify(inventoryRepository).increaseView(inventory.getId());
             }
         }
     }

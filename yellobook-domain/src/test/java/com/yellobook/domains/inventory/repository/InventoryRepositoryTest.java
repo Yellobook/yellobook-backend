@@ -11,6 +11,8 @@ import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.team.entity.Team;
 import com.yellobook.support.RepositoryTest;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -221,5 +223,86 @@ public class InventoryRepositoryTest extends RepositoryTest {
             }
         }
     }
+
+    @Nested
+    @DisplayName("updateUpdatedAt 메소드는")
+    class Describe_UpdateUpdatedAt {
+        @Nested
+        @DisplayName("재고 id와 updatedAt 날짜가 주어지면")
+        class Context_inventory_id_and_updatedAt_given {
+            Inventory inventory;
+            LocalDateTime updatedAt = LocalDateTime.of(2024, 11, 4, 12, 0);
+
+            @BeforeEach
+            void setUpContext() {
+                Team team = em.persist(createTeam("팀1"));
+                inventory = createInventory(team);
+                em.persist(inventory);
+            }
+
+            @Test
+            @DisplayName("주어진 updatedAt 날짜로 변경한다.")
+            void it_updates_updatedAt() {
+                inventoryRepository.updateUpdatedAt(inventory.getId(), updatedAt);
+                em.flush();
+                em.clear();
+
+                Inventory updatedInventory = inventoryRepository.findById(inventory.getId())
+                        .orElse(null);
+
+                assertThat(updatedInventory).isNotNull();
+                assertThat(updatedInventory.getUpdatedAt()).isEqualTo(updatedAt);
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("increaseView 메소드는")
+    class Describe_IncreaseView {
+        @Nested
+        @DisplayName("재고 id가 주어지면")
+        class Context_inventory_id_given {
+            Inventory inventory;
+
+            @BeforeEach
+            void setUpContext() {
+                Team team = em.persist(createTeam("팀1"));
+                inventory = createInventory(team);
+                em.persist(inventory);
+            }
+
+            @Test
+            @DisplayName("view를 1 증가한다.")
+            void it_increases_view() {
+                inventoryRepository.increaseView(inventory.getId());
+                em.flush();
+                em.clear();
+
+                Inventory updatedInventory = inventoryRepository.findById(inventory.getId())
+                        .orElse(null);
+
+                assertThat(updatedInventory).isNotNull();
+                assertThat(updatedInventory.getView()).isEqualTo(inventory.getView() + 1);
+            }
+
+            @Test
+            @DisplayName("updatedAt는 변경 없이 이전과 동일하다.")
+            void it_remains_same_updatedAt() {
+                LocalDateTime oldUpdatedAt = inventory.getUpdatedAt();
+                inventoryRepository.increaseView(inventory.getId());
+                em.flush();
+                em.clear();
+
+                Inventory updatedInventory = inventoryRepository.findById(inventory.getId())
+                        .orElse(null);
+
+                assertThat(updatedInventory).isNotNull();
+                assertThat(updatedInventory.getUpdatedAt()
+                        .truncatedTo(ChronoUnit.SECONDS))
+                        .isEqualTo(oldUpdatedAt.truncatedTo(ChronoUnit.SECONDS));
+            }
+        }
+    }
+
 
 }
