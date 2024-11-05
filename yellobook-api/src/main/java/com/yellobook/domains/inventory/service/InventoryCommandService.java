@@ -61,7 +61,7 @@ public class InventoryCommandService {
         Product newProduct = productMapper.toProduct(requestDTO, inventory);
         Long productId = productRepository.save(newProduct)
                 .getId();
-        inventoryRepository.updateUpdatedAt(inventory.getId(), LocalDateTime.now());
+        inventory.updateUpdatedAt();
 
         return productMapper.toAddProductResponse(productId);
     }
@@ -80,8 +80,8 @@ public class InventoryCommandService {
         Product product = productOptional.get();
         product.modifyAmount(requestDTO.amount());
 
-        inventoryRepository.updateUpdatedAt(product.getInventory()
-                .getId(), LocalDateTime.now());
+        product.getInventory()
+                .updateUpdatedAt();
     }
 
     /**
@@ -94,8 +94,8 @@ public class InventoryCommandService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new CustomException(InventoryErrorCode.PRODUCT_NOT_FOUND));
         productRepository.deleteById(product.getId());
-        inventoryRepository.updateUpdatedAt(product.getInventory()
-                .getId(), LocalDateTime.now());
+        product.getInventory()
+                .updateUpdatedAt();
     }
 
     /**

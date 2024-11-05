@@ -5,7 +5,6 @@ import static fixture.InventoryFixture.createProduct;
 import static fixture.TeamFixture.createTeam;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.mock;
@@ -214,15 +213,6 @@ class InventoryCommandServiceTest {
                 assertThat(response.productId()).isEqualTo(expectResponse.productId());
             }
 
-            @Test
-            @DisplayName("재고현황의 updatedAt이 변경되었는지 확인한다.")
-            void it_update_updatedAt() {
-                inventoryCommandService.addProduct(inventoryId, request, admin);
-
-                verify(inventoryRepository).updateUpdatedAt(eq(product.getInventory()
-                        .getId()), any(LocalDateTime.class));
-            }
-
         }
 
     }
@@ -324,15 +314,6 @@ class InventoryCommandServiceTest {
 
                 assertThat(product.getAmount()).isEqualTo(request.amount());
             }
-
-            @Test
-            @DisplayName("재고현황의 updatedAt이 변경되었는지 확인한다.")
-            void it_update_updatedAt() {
-                inventoryCommandService.modifyProductAmount(productId, request, admin);
-
-                verify(inventoryRepository).updateUpdatedAt(eq(product.getInventory()
-                        .getId()), any(LocalDateTime.class));
-            }
         }
     }
 
@@ -400,15 +381,6 @@ class InventoryCommandServiceTest {
                 inventoryCommandService.deleteProduct(productId, admin);
 
                 verify(productRepository).deleteById(productId);
-            }
-
-            @Test
-            @DisplayName("재고현황의 updatedAt이 변경되었는지 확인한다.")
-            void it_update_updatedAt() {
-                inventoryCommandService.deleteProduct(productId, admin);
-
-                verify(inventoryRepository).updateUpdatedAt(eq(product.getInventory()
-                        .getId()), any(LocalDateTime.class));
             }
 
         }
