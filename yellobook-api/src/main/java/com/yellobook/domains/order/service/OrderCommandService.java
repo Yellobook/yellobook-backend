@@ -1,7 +1,7 @@
 package com.yellobook.domains.order.service;
 
-import com.yellobook.common.enums.MemberTeamRole;
 import com.yellobook.common.enums.OrderStatus;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.common.utils.ParticipantUtil;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.inventory.entity.Product;
@@ -145,13 +145,13 @@ public class OrderCommandService {
                 .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
         Team team = teamRepository.findById(teamMemberVO.getTeamId())
                 .orElseThrow(() -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
-        MemberTeamRole role = teamMemberVO.getRole();
+        TeamMemberRole role = teamMemberVO.getRole();
         // 관리자, 뷰어 주문 불가능
         ParticipantUtil.forbidAdmin(role);
         ParticipantUtil.forbidViewer(role);
         // 관리자 없으면 주문자 주문 불가능
-        Optional<Participant> optionalParticipant = participantRepository.findByTeamIdAndRole(team.getId(),
-                MemberTeamRole.ADMIN);
+        Optional<Participant> optionalParticipant = participantRepository.findByTeamIdAndTeamMemberRole(team.getId(),
+                TeamMemberRole.ADMIN);
         if (optionalParticipant.isEmpty()) {
             throw new CustomException(OrderErrorCode.ORDER_CREATION_NOT_ALLOWED);
         }

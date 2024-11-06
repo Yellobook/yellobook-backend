@@ -15,7 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.auth.service.RedisTeamService;
 import com.yellobook.domains.inform.dto.request.CreateInformCommentRequest;
@@ -123,8 +123,8 @@ public class InformCommandServiceTest {
             @BeforeEach
             void setUp() {
                 member = mock(Member.class);
-                team = createTeam();
-                participant = createParticipant(team, member, MemberTeamRole.ADMIN);
+                team = createTeam("팀1");
+                participant = createParticipant(team, member, TeamMemberRole.ADMIN);
                 inform = createInform(team, member);
 
                 request = new CreateInformRequest("test", "test", List.of(2L), LocalDate.now());
@@ -374,7 +374,7 @@ public class InformCommandServiceTest {
                 when(informRepository.findById(informId)).thenReturn(Optional.of(inform));
                 when(inform.getMember()).thenReturn(Author);
 
-                teamMember = TeamMemberVO.of(nonMentionedMember.getId(), team.getId(), MemberTeamRole.ADMIN);
+                teamMember = TeamMemberVO.of(nonMentionedMember.getId(), team.getId(), TeamMemberRole.ADMIN);
 
                 exception = assertThrows(CustomException.class, () -> {
                     informCommandService.increaseViewCount(informId, teamMember);
@@ -404,7 +404,7 @@ public class InformCommandServiceTest {
                 when(inform.getId()).thenReturn(1L);
                 when(informRepository.findById(inform.getId())).thenReturn(Optional.of(inform));
                 when(inform.getMember()).thenReturn(author);
-                teamMember = TeamMemberVO.of(author.getId(), 1L, MemberTeamRole.ADMIN);
+                teamMember = TeamMemberVO.of(author.getId(), 1L, TeamMemberRole.ADMIN);
                 doNothing().when(inform)
                         .updateView();
             }
@@ -436,7 +436,7 @@ public class InformCommandServiceTest {
                 when(inform.getId()).thenReturn(1L);
                 when(informRepository.findById(inform.getId())).thenReturn(Optional.of(inform));
 
-                teamMember = TeamMemberVO.of(mentionedMember.getId(), 1L, MemberTeamRole.ADMIN);
+                teamMember = TeamMemberVO.of(mentionedMember.getId(), 1L, TeamMemberRole.ADMIN);
 
                 doNothing().when(inform)
                         .updateView();

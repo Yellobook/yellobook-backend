@@ -1,6 +1,6 @@
 package com.yellobook.domains.team.entity;
 
-import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.domains.common.entity.BaseEntity;
 import com.yellobook.domains.member.entity.Member;
 import jakarta.persistence.Column;
@@ -43,17 +43,17 @@ public class Participant extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private MemberTeamRole role;
+    private TeamMemberRole teamMemberRole;
 
     @Builder
-    public Participant(Team team, Member member, MemberTeamRole role) {
-        isValid(team, member, role);
+    public Participant(Team team, Member member, TeamMemberRole teamMemberRole) {
+        isValid(team, member, teamMemberRole);
         this.team = team;
         this.member = member;
-        this.role = role;
+        this.teamMemberRole = teamMemberRole;
     }
 
-    private void isValid(Team team, Member member, MemberTeamRole role) {
+    private void isValid(Team team, Member member, TeamMemberRole role) {
         if (team == null || member == null || role == null) {
             throw new IllegalArgumentException("null값이 존재합니다.");
         }

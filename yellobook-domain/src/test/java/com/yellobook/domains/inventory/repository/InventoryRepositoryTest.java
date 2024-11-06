@@ -10,9 +10,9 @@ import com.yellobook.domains.inventory.dto.query.QueryProduct;
 import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.team.entity.Team;
-import com.yellobook.support.annotation.RepositoryTest;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import com.yellobook.support.RepositoryTest;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,24 +24,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-@RepositoryTest
 @DisplayName("InventoryRepository Unit Test")
-public class InventoryRepositoryTest {
+public class InventoryRepositoryTest extends RepositoryTest {
+
     @Autowired
     private InventoryRepository inventoryRepository;
 
     @Autowired
     private ProductRepository productRepository;
 
-    @PersistenceContext
-    private EntityManager em;
-
-    private Team team;
 
     @BeforeEach
     void setUp() {
-        team = createTeam();
-        em.persist(team);
+        resetAutoIncrement();
     }
 
     @Nested
@@ -52,6 +47,12 @@ public class InventoryRepositoryTest {
         @Nested
         @DisplayName("재고가 존재하지 않으면")
         class Context_inventory_exist {
+            Team team;
+
+            @BeforeEach
+            void setUpContext() {
+                team = em.persist(createTeam("팀1"));
+            }
 
             @Test
             @DisplayName("빈 리스트를 반환한다.")
@@ -66,12 +67,13 @@ public class InventoryRepositoryTest {
         @Nested
         @DisplayName("재고가 존재하면")
         class Context_inventory_not_exist {
+            Team team;
 
             @BeforeEach
             void setUpContext() {
+                team = em.persist(createTeam("팀1"));
                 for (int i = 0; i < 6; i++) {
-                    Inventory inventory = createInventory(String.format("2024년 08월 0%d일 재고현황", i), team);
-                    em.persist(inventory);
+                    em.persist(createInventory(String.format("2024년 08월 0%d일 재고현황", i), team));
                 }
             }
 
@@ -103,10 +105,12 @@ public class InventoryRepositoryTest {
     @Nested
     @DisplayName("getProducts 메소드는")
     class Describe_GetProducts {
-        private Inventory inventory;
+        Inventory inventory;
+        Team team;
 
         @BeforeEach
         void setUpContext() {
+            team = em.persist(createTeam("팀1"));
             inventory = createInventory("2024년 08월 06일 재고현황", team);
             em.persist(inventory);
 
@@ -156,9 +160,11 @@ public class InventoryRepositoryTest {
     @Nested
     @DisplayName("deleteById 메소드는")
     class Describe_DeleteById {
+        Team team;
 
         @BeforeEach
         void setUpContext() {
+            team = em.persist(createTeam("팀1"));
             Inventory inventory = createInventory(team);
             em.persist(inventory);
 
@@ -187,24 +193,26 @@ public class InventoryRepositoryTest {
     @Nested
     @DisplayName("existsByInventoryIdAndSku 메소드는")
     class Describe_ExistsByInventoryIdAndSku {
-        private Inventory inventory;
-
-        @BeforeEach
-        void setUpContext() {
-            inventory = createInventory(team);
-            em.persist(inventory);
-
-            for (int i = 0; i < 5; i++) {
-                Product product = createProduct(String.format("product%d", i), String.format("sub%d", i), i, i * 1000,
-                        i * 2000, i * 100, inventory);
-                em.persist(product);
-            }
-        }
-
         @Nested
         @DisplayName("재고 id와 sku가 제공되면")
         class Context_inventory_id_and_sku_given {
             Integer sku = 1;
+            Inventory inventory;
+            Team team;
+
+            @BeforeEach
+            void setUpContext() {
+                team = em.persist(createTeam("팀1"));
+                inventory = createInventory(team);
+                em.persist(inventory);
+
+                for (int i = 0; i < 5; i++) {
+                    Product product = createProduct(String.format("product%d", i), String.format("sub%d", i), i,
+                            i * 1000,
+                            i * 2000, i * 100, inventory);
+                    em.persist(product);
+                }
+            }
 
             @Test
             @DisplayName("해당 재고에 포함되고, 해당 sku와 동일한 sku를 갖는 제품이 존재하는지 확인한다.")
@@ -214,7 +222,87 @@ public class InventoryRepositoryTest {
                 assertThat(exist1).isTrue();
             }
         }
-
     }
+
+    @Nested
+    @DisplayName("updateUpdatedAt 메소드는")
+    class Describe_UpdateUpdatedAt {
+        @Nested
+        @DisplayName("재고 id와 updatedAt 날짜가 주어지면")
+        class Context_inventory_id_and_updatedAt_given {
+            Inventory inventory;
+            LocalDateTime updatedAt = LocalDateTime.of(2024, 11, 4, 12, 0);
+
+            @BeforeEach
+            void setUpContext() {
+                Team team = em.persist(createTeam("팀1"));
+                inventory = createInventory(team);
+                em.persist(inventory);
+            }
+
+            @Test
+            @DisplayName("주어진 updatedAt 날짜로 변경한다.")
+            void it_updates_updatedAt() {
+                inventoryRepository.updateUpdatedAt(inventory.getId(), updatedAt);
+                em.flush();
+                em.clear();
+
+                Inventory updatedInventory = inventoryRepository.findById(inventory.getId())
+                        .orElse(null);
+
+                assertThat(updatedInventory).isNotNull();
+                assertThat(updatedInventory.getUpdatedAt()).isEqualTo(updatedAt);
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("increaseView 메소드는")
+    class Describe_IncreaseView {
+        @Nested
+        @DisplayName("재고 id가 주어지면")
+        class Context_inventory_id_given {
+            Inventory inventory;
+
+            @BeforeEach
+            void setUpContext() {
+                Team team = em.persist(createTeam("팀1"));
+                inventory = createInventory(team);
+                em.persist(inventory);
+            }
+
+            @Test
+            @DisplayName("view를 1 증가한다.")
+            void it_increases_view() {
+                inventoryRepository.increaseView(inventory.getId());
+                em.flush();
+                em.clear();
+
+                Inventory updatedInventory = inventoryRepository.findById(inventory.getId())
+                        .orElse(null);
+
+                assertThat(updatedInventory).isNotNull();
+                assertThat(updatedInventory.getView()).isEqualTo(inventory.getView() + 1);
+            }
+
+            @Test
+            @DisplayName("updatedAt는 변경 없이 이전과 동일하다.")
+            void it_remains_same_updatedAt() {
+                LocalDateTime oldUpdatedAt = inventory.getUpdatedAt();
+                inventoryRepository.increaseView(inventory.getId());
+                em.flush();
+                em.clear();
+
+                Inventory updatedInventory = inventoryRepository.findById(inventory.getId())
+                        .orElse(null);
+
+                assertThat(updatedInventory).isNotNull();
+                assertThat(updatedInventory.getUpdatedAt()
+                        .truncatedTo(ChronoUnit.SECONDS))
+                        .isEqualTo(oldUpdatedAt.truncatedTo(ChronoUnit.SECONDS));
+            }
+        }
+    }
+
 
 }

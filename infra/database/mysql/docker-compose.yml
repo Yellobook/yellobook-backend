@@ -1,0 +1,18 @@
+services:
+  mysql:
+    image: mysql:8.0.34
+    container_name: yellobook-mysql
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./data:/var/lib/mysql
+      - ./mysql-conf/my.cnf:/etc/mysql/conf.d/my.cnf
+    ports:
+      - "3306:3306"
+    networks:
+      - yellobook-network
+
+networks:
+  yellobook-network:
+    external: true

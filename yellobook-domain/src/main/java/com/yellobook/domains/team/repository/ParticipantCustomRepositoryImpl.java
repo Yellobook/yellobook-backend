@@ -19,7 +19,8 @@ public class ParticipantCustomRepositoryImpl implements ParticipantCustomReposit
     public List<QueryMemberJoinTeam> getMemberJoinTeam(Long memberId) {
         QParticipant participant = QParticipant.participant;
         return queryFactory.select(Projections.constructor(QueryMemberJoinTeam.class,
-                        participant.role,
+                        participant.teamMemberRole,
+                        participant.team.id.as("teamId"),
                         participant.team.name.as("teamName")
                 ))
                 .from(participant)

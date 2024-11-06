@@ -1,9 +1,11 @@
 package com.yellobook.domains.member.controller;
 
 
+import com.yellobook.common.resolver.annotation.TeamMember;
+import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
+import com.yellobook.domains.member.dto.response.CurrentTeamResponse;
 import com.yellobook.domains.member.dto.response.ProfileResponse;
-import com.yellobook.domains.member.service.MemberCommandService;
 import com.yellobook.domains.member.service.MemberQueryService;
 import com.yellobook.response.ResponseFactory;
 import com.yellobook.response.SuccessResponse;
@@ -23,15 +25,23 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
 
     private final MemberQueryService memberQueryService;
-    private final MemberCommandService memberCommandService;
 
     @GetMapping("/profile")
-    @Operation(summary = "마이프로필 조회", description = "로그인한 멤버의 마이프로필 조회 API")
+    @Operation(summary = "마이프로필 조회", description = "로그인한 사용자의 마이프로필 조회 API")
     public ResponseEntity<SuccessResponse<ProfileResponse>> getMemberProfile(
             @AuthenticationPrincipal CustomOAuth2User user
     ) {
-        ProfileResponse response = memberQueryService.getMemberProfile(user.getMemberId());
-        return ResponseFactory.success(response);
+        var result = memberQueryService.getMemberProfile(user.getMemberId());
+        return ResponseFactory.success(result);
+    }
+
+    @GetMapping("/teams/current")
+    @Operation(summary = "사용자가 현재 위치한 팀 조회", description = "로그인한 사용자가 현재 위치한 팀 정보를 반환하는 API")
+    public ResponseEntity<SuccessResponse<CurrentTeamResponse>> getMemberCurrentTeam(
+            @TeamMember TeamMemberVO teamMember
+    ) {
+        var result = memberQueryService.getMemberCurrentTeam(teamMember.getTeamId());
+        return ResponseFactory.success(result);
     }
 
 //    @PatchMapping("/deactivate")

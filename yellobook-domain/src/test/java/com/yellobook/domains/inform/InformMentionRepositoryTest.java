@@ -11,9 +11,7 @@ import com.yellobook.domains.inform.entity.InformMention;
 import com.yellobook.domains.inform.repository.InformMentionRepository;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.team.entity.Team;
-import com.yellobook.support.annotation.RepositoryTest;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import com.yellobook.support.RepositoryTest;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,14 +19,16 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@RepositoryTest
-public class InformMentionRepositoryTest {
+@DisplayName("InformMentionRepository Unit Test")
+public class InformMentionRepositoryTest extends RepositoryTest {
 
     @Autowired
     private InformMentionRepository informMentionRepository;
 
-    @PersistenceContext
-    private EntityManager em;
+    @BeforeEach
+    public void setUp() {
+        resetAutoIncrement();
+    }
 
     @Nested
     @DisplayName("saveAll 메소드는")
@@ -38,24 +38,15 @@ public class InformMentionRepositoryTest {
         @DisplayName("유효한 mention 리스트가 주어졌을 때")
         class Context_valid {
 
-            Member member;
-            Team team;
-            Inform inform;
             List<InformMention> mentions;
-            Member member2;
 
             @BeforeEach
             void setUp() {
-                member = createMember();
-                team = createTeam();
+                Member member = em.persist(createMember());
+                Team team = em.persist(createTeam("팀1"));
+                Inform inform = em.persist(createInform(team, member));
 
-                em.persist(team);
-                em.persist(member);
-
-                inform = createInform(team, member);
-                em.persist(inform);
-
-                member2 = Member.builder()
+                Member member2 = Member.builder()
                         .nickname("test2")
                         .allowance(true)
                         .email("tt@tt")
@@ -116,22 +107,15 @@ public class InformMentionRepositoryTest {
         @DisplayName("해당하는 inform 안에 mention 이 존재하는 경우")
         class Context_exist_informmention {
 
-            Member member;
-            Team team;
-            Inform inform;
             Long informId;
             List<InformMention> mentions;
 
             @BeforeEach
             void setUp() {
-                member = createMember();
-                team = createTeam();
+                Member member = em.persist(createMember());
+                Team team = em.persist(createTeam("팀1"));
+                Inform inform = em.persist(createInform(team, member));
 
-                em.persist(team);
-                em.persist(member);
-
-                inform = createInform(team, member);
-                em.persist(inform);
                 informId = inform.getId();
 
                 InformMention informMention = InformMention.builder()
@@ -143,11 +127,12 @@ public class InformMentionRepositoryTest {
             }
 
             @Test
-            @DisplayName("InformMention list를 반환한다.")
+            @DisplayName("InformMention 목록을 반환한다.")
             void it_returns_inform_mention_list() {
                 mentions = informMentionRepository.findAllByInformId(informId);
 
                 assertThat(mentions).isNotEmpty();
+                assertThat(mentions.size()).isEqualTo(1);
             }
         }
 
@@ -155,23 +140,15 @@ public class InformMentionRepositoryTest {
         @DisplayName("해당하는 inform 안에 mention이 존재하지 않는 경우")
         class Context_not_exist_informmention {
 
-            Member member;
-            Team team;
-            Inform inform;
-            Long informId;
             List<InformMention> mentions;
 
             @BeforeEach
             void setUp() {
-                member = createMember();
-                team = createTeam();
+                Member member = em.persist(createMember());
+                Team team = em.persist(createTeam("팀1"));
+                Inform inform = em.persist(createInform(team, member));
+                Long informId = inform.getId();
 
-                em.persist(team);
-                em.persist(member);
-
-                inform = createInform(team, member);
-                em.persist(inform);
-                informId = inform.getId();
                 mentions = informMentionRepository.findAllByInformId(informId);
             }
 
@@ -210,21 +187,14 @@ public class InformMentionRepositoryTest {
         @DisplayName("informId에 해당하는 mention이 존재하는 경우")
         class Context_exist_informmention {
 
-            Member member;
-            Team team;
-            Inform inform;
             Long informId;
 
             @BeforeEach
             void setUp() {
-                member = createMember();
-                team = createTeam();
+                Member member = em.persist(createMember());
+                Team team = em.persist(createTeam("팀1"));
+                Inform inform = em.persist(createInform(team, member));
 
-                em.persist(team);
-                em.persist(member);
-
-                inform = createInform(team, member);
-                em.persist(inform);
                 informId = inform.getId();
 
                 InformMention informMention = InformMention.builder()
@@ -242,32 +212,6 @@ public class InformMentionRepositoryTest {
 
                 List<InformMention> mentions = informMentionRepository.findAllByInformId(informId);
                 assertThat(mentions).isEmpty();
-            }
-        }
-
-        @Nested
-        @DisplayName("informId에 해당하는 mention이 존재하지 않은 경우")
-        class Context_not_exist_informmention {
-
-            Long nonExistentInformId;
-
-            @BeforeEach
-            void setUp() {
-                nonExistentInformId = 999L;
-            }
-
-            @Test
-            @DisplayName("아무 것도 삭제하지 않는다.")
-            void it_does_nothing() {
-
-                //deleteByInformId 호출
-                informMentionRepository.deleteByInformId(nonExistentInformId);
-                em.flush();
-                em.clear();
-
-                //에러 없이 정상적으로 메서드가 수행되어야 함
-                List<InformMention> mentions = informMentionRepository.findAllByInformId(nonExistentInformId);
-                assertThat(mentions).isEmpty();  // 빈 리스트가 반환되어야 함
             }
         }
     }

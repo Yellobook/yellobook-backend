@@ -4,15 +4,18 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.yellobook.common.enums.MemberRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.common.resolver.TeamMemberArgumentResolver;
+import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.auth.security.oauth2.dto.OAuth2UserDTO;
+import com.yellobook.domains.member.dto.response.CurrentTeamResponse;
 import com.yellobook.domains.member.dto.response.ProfileResponse;
 import com.yellobook.domains.member.entity.Member;
-import com.yellobook.domains.member.service.MemberCommandService;
 import com.yellobook.domains.member.service.MemberQueryService;
 import java.util.Collections;
 import org.hamcrest.CoreMatchers;
@@ -31,7 +34,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @WebMvcTest(MemberController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -46,30 +48,9 @@ class MemberControllerTest {
     private MemberQueryService memberQueryService;
 
     @MockBean
-    private MemberCommandService memberCommandService;
-
-    @MockBean
     private TeamMemberArgumentResolver teamMemberArgumentResolver;
 
     private Authentication authentication;
-
-    @BeforeEach
-    void setUp() {
-        Member member = Member.builder()
-                .memberId(1L)
-                .nickname("yellow")
-                .email("email")
-                .profileImage("image")
-                .allowance(true)
-                .role(MemberRole.USER)
-                .build();
-
-        OAuth2UserDTO oauth2UserDTO = OAuth2UserDTO.from(member);
-        CustomOAuth2User user = new CustomOAuth2User(oauth2UserDTO);
-        authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-        SecurityContextHolder.getContext()
-                .setAuthentication(authentication);
-    }
 
     @Nested
     @DisplayName("getMemberProfile 메소드는")
@@ -81,6 +62,21 @@ class MemberControllerTest {
 
             @BeforeEach
             void setUpContext() {
+                Member member = Member.builder()
+                        .memberId(1L)
+                        .nickname("yellow")
+                        .email("email")
+                        .profileImage("image")
+                        .allowance(true)
+                        .role(MemberRole.USER)
+                        .build();
+
+                OAuth2UserDTO oauth2UserDTO = OAuth2UserDTO.from(member);
+                CustomOAuth2User user = new CustomOAuth2User(oauth2UserDTO);
+                authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                SecurityContextHolder.getContext()
+                        .setAuthentication(authentication);
+
                 response = new ProfileResponse(1L, "사용자", "profile.png", "example@gmail.com", Collections.emptyList());
                 when(memberQueryService.getMemberProfile(any(Long.class))).thenReturn(response);
             }
@@ -95,7 +91,47 @@ class MemberControllerTest {
                         .andDo(print())
                         .andExpect(status().isOk())
                         .andExpect(
-                                MockMvcResultMatchers.jsonPath("$.data.nickname", CoreMatchers.is(response.nickname())))
+                                jsonPath("$.data.nickname", CoreMatchers.is(response.nickname())))
+                        .andReturn();
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("getMemberCurrentTeam 메서드는")
+    class Describe_getMemberCurrentTeam {
+        @Nested
+        @DisplayName("팀에 가입한 사용자라면")
+        class Context_with_team_member {
+            CurrentTeamResponse response;
+
+            @BeforeEach
+            void setUpContext() throws Exception {
+                response = CurrentTeamResponse.builder()
+                        .teamId(1L)
+                        .teamName("옐로북 팀")
+                        .build();
+                TeamMemberVO teamMember = TeamMemberVO.of(1L, 100L, TeamMemberRole.ADMIN);
+                when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
+                when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                        .thenReturn(teamMember);
+                when(memberQueryService.getMemberCurrentTeam(any(Long.class))).thenReturn(response);
+            }
+
+            @Test
+            @DisplayName("현재 사용자가 위치한 팀 Id, 팀 이름을 반환해야 한다.")
+            void it_returns_current_team() throws Exception {
+                mockMvc.perform(get("/api/v1/members/teams/current")
+                                .contentType(MediaType.APPLICATION_JSON)
+                        )
+                        .andDo(print())
+                        .andExpect(status().isOk())
+                        .andExpect(
+                                jsonPath("$.data.teamId").value(response.teamId())
+                        )
+                        .andExpect(
+                                jsonPath("$.data.teamName").value(response.teamName())
+                        )
                         .andReturn();
             }
         }

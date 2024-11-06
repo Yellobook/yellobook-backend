@@ -1,11 +1,12 @@
 package com.yellobook.domains.team.dto.query;
 
-import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import lombok.Builder;
 
 @Builder
 public record QueryMemberJoinTeam(
-        MemberTeamRole role,
+        TeamMemberRole role,
+        Long teamId,
         String teamName
 ) {
 }

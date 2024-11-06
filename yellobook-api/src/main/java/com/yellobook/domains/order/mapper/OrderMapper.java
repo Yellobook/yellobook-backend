@@ -1,6 +1,6 @@
 package com.yellobook.domains.order.mapper;
 
-import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.common.enums.OrderStatus;
 import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.member.entity.Member;
@@ -58,8 +58,8 @@ public interface OrderMapper {
     GetOrderResponse toGetOrderResponse(QueryOrder queryOrder);
 
     @Named("getRoleDescription")
-    default String getRoleDescription(MemberTeamRole memberTeamRole) {
-        return memberTeamRole.getDescription();
+    default String getRoleDescription(TeamMemberRole teamMemberRole) {
+        return teamMemberRole.getDescription();
     }
 
     default GetOrderCommentsResponse toGetOrderCommentsResponse(List<QueryOrderComment> orderComments) {

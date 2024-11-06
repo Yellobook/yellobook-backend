@@ -1,6 +1,15 @@
 package com.yellobook.domains.team.service;
 
-import com.yellobook.common.enums.MemberTeamRole;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.auth.security.oauth2.dto.OAuth2UserDTO;
@@ -17,6 +26,10 @@ import com.yellobook.domains.team.repository.ParticipantRepository;
 import com.yellobook.domains.team.repository.TeamRepository;
 import com.yellobook.error.code.TeamErrorCode;
 import com.yellobook.error.exception.CustomException;
+import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,16 +38,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class TeamQueryServiceTest {
@@ -63,7 +66,7 @@ public class TeamQueryServiceTest {
     void setUp() {
         member = createMember(1L);
         team = createTeam(1L);
-        participant = createParticipant(1L, team, member, MemberTeamRole.ORDERER);
+        participant = createParticipant(1L, team, member, TeamMemberRole.ORDERER);
 
         OAuth2UserDTO oauth2UserDTO = OAuth2UserDTO.from(member);
         customOAuth2User = new CustomOAuth2User(oauth2UserDTO);
@@ -92,11 +95,11 @@ public class TeamQueryServiceTest {
         return team;
     }
 
-    private Participant createParticipant(Long participantId, Team team, Member member, MemberTeamRole role) {
+    private Participant createParticipant(Long participantId, Team team, Member member, TeamMemberRole role) {
         Participant participant = Participant.builder()
                 .team(team)
                 .member(member)
-                .role(role)
+                .teamMemberRole(role)
                 .build();
         try {
             Field idField = Participant.class.getDeclaredField("id");
@@ -122,7 +125,7 @@ public class TeamQueryServiceTest {
 
             @BeforeEach
             void setUp() {
-                request = new InvitationCodeRequest(MemberTeamRole.ORDERER);
+                request = new InvitationCodeRequest(TeamMemberRole.ORDERER);
 
                 when(participantRepository.findByTeamIdAndMemberId(team.getId(), member.getId())).thenReturn(
                         Optional.empty());
@@ -157,12 +160,12 @@ public class TeamQueryServiceTest {
                 memberId = member.getId();
                 memberId2 = 2L;
                 member2 = createMember(memberId2);
-                adminPar = createParticipant(2L, team, member2, MemberTeamRole.ADMIN);
-                request = new InvitationCodeRequest(MemberTeamRole.ADMIN);
+                adminPar = createParticipant(2L, team, member2, TeamMemberRole.ADMIN);
+                request = new InvitationCodeRequest(TeamMemberRole.ADMIN);
 
                 when(participantRepository.findByTeamIdAndMemberId(teamId, memberId))
                         .thenReturn(Optional.of(participant));
-                when(participantRepository.findByTeamIdAndRole(teamId, MemberTeamRole.ADMIN))
+                when(participantRepository.findByTeamIdAndTeamMemberRole(teamId, TeamMemberRole.ADMIN))
                         .thenReturn(Optional.of(adminPar));
 
                 exception = assertThrows(
@@ -173,7 +176,7 @@ public class TeamQueryServiceTest {
             @DisplayName("ADMIN_EXISTS 에러를 반환한다.")
             void it_returns_admin_exists() {
                 assertEquals(TeamErrorCode.ADMIN_EXISTS, exception.getErrorCode());
-                verify(participantRepository).findByTeamIdAndRole(teamId, MemberTeamRole.ADMIN);
+                verify(participantRepository).findByTeamIdAndTeamMemberRole(teamId, TeamMemberRole.ADMIN);
             }
         }
 
@@ -186,7 +189,7 @@ public class TeamQueryServiceTest {
 
             @BeforeEach
             void setUp() {
-                request = new InvitationCodeRequest(MemberTeamRole.ORDERER);
+                request = new InvitationCodeRequest(TeamMemberRole.ORDERER);
 
                 when(participantRepository.findByTeamIdAndMemberId(team.getId(), customOAuth2User.getMemberId()))
                         .thenReturn(Optional.of(participant)); // 참가자 정보
@@ -291,7 +294,7 @@ public class TeamQueryServiceTest {
                         new QueryTeamMember(1L, "test1"),
                         new QueryTeamMember(2L, "test2")
                 );
-                teamMember = TeamMemberVO.of(member.getId(), team.getId(), MemberTeamRole.ORDERER);
+                teamMember = TeamMemberVO.of(member.getId(), team.getId(), TeamMemberRole.ORDERER);
 
                 when(participantRepository.findMentionsByNamePrefix(prefix, team.getId())).thenReturn(members);
                 when(teamMapper.toTeamMemberListResponse(members)).thenReturn(new TeamMemberListResponse(members));
@@ -326,7 +329,7 @@ public class TeamQueryServiceTest {
             void setUp() {
                 prefix = "test";
                 List<QueryTeamMember> members = List.of();
-                teamMember = TeamMemberVO.of(member.getId(), team.getId(), MemberTeamRole.ORDERER);
+                teamMember = TeamMemberVO.of(member.getId(), team.getId(), TeamMemberRole.ORDERER);
                 when(participantRepository.findMentionsByNamePrefix(prefix, team.getId())).thenReturn(members);
                 when(teamMapper.toTeamMemberListResponse(members)).thenReturn(new TeamMemberListResponse(members));
 

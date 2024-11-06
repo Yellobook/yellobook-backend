@@ -60,12 +60,6 @@ subprojects {
     apply plugin: 'io.spring.dependency-management'
     apply plugin: 'jacoco'
 
-    configurations {
-        compileOnly {
-            extendsFrom annotationProcessor
-        }
-    }
-
     java {
         toolchain {
             languageVersion = JavaLanguageVersion.of(17)
@@ -76,6 +70,8 @@ subprojects {
         // Lombok
         compileOnly 'org.projectlombok:lombok'
         annotationProcessor 'org.projectlombok:lombok'
+        testCompileOnly 'org.projectlombok:lombok'
+        testAnnotationProcessor 'org.projectlombok:lombok'
 
         // MapStruct (Lombok 보다 뒤에 있어야 함)
         implementation 'org.mapstruct:mapstruct:1.5.5.Final'

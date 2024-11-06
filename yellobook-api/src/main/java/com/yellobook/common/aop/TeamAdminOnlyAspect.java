@@ -1,6 +1,6 @@
 package com.yellobook.common.aop;
 
-import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.auth.service.RedisTeamService;
@@ -32,7 +32,7 @@ public class TeamAdminOnlyAspect {
          */
         TeamMemberVO teamMember = redisTeamService.getCurrentTeamMember(memberId);
         if (!teamMember.getRole()
-                .equals(MemberTeamRole.ADMIN)) {
+                .equals(TeamMemberRole.ADMIN)) {
             throw new CustomException(AuthErrorCode.ACCESS_DENIED);
         }
     }

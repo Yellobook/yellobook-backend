@@ -30,8 +30,6 @@ import lombok.NoArgsConstructor;
                 @UniqueConstraint(name = "uc_members_email", columnNames = "email")
         }
 )
-//@Builder
-//@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
     @Id
@@ -41,7 +39,7 @@ public class Member extends BaseEntity {
     @Column(nullable = false, length = 20)
     private String nickname;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String email;
 
     private String profileImage;

@@ -9,7 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.common.resolver.TeamMemberArgumentResolver;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.schedule.ScheduleService;
@@ -37,7 +37,7 @@ import org.springframework.util.MultiValueMap;
 @WebMvcTest(ScheduleController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class ScheduleControllerTest {
-    private final TeamMemberVO teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
+    private final TeamMemberVO teamMemberVO = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
     @Autowired
     private MockMvc mockMvc;
     @Autowired

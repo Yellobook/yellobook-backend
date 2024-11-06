@@ -1,6 +1,6 @@
 package com.yellobook.domains.team.service;
 
-import com.yellobook.common.enums.MemberTeamRole;
+import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.domains.auth.service.RedisTeamService;
 import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.dto.request.InvitationCodeRequest;
@@ -38,7 +38,7 @@ public class TeamQueryService {
             InvitationCodeRequest request,
             Long memberId
     ) {
-        MemberTeamRole role = request.role();
+        TeamMemberRole role = request.role();
 
         Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)
                 .orElseThrow(() -> {
@@ -52,17 +52,17 @@ public class TeamQueryService {
         return teamMapper.toInvitationCodeResponse(invitationUrl);
     }
 
-    private void validateInvitationPermission(Participant participant, MemberTeamRole requestedRole, Long teamId) {
-        MemberTeamRole currentRole = participant.getRole();
+    private void validateInvitationPermission(Participant participant, TeamMemberRole requestedRole, Long teamId) {
+        TeamMemberRole currentRole = participant.getTeamMemberRole();
 
-        if (currentRole == MemberTeamRole.VIEWER) {
+        if (currentRole == TeamMemberRole.VIEWER) {
             log.warn("VIEWER cannot invite: Participant ID = {}, Team ID = {}", participant.getId(), teamId);
             throw new CustomException(TeamErrorCode.VIEWER_CANNOT_INVITE);
         }
 
-        if (requestedRole == MemberTeamRole.ADMIN) {
-            if (currentRole != MemberTeamRole.ADMIN) {
-                participantRepository.findByTeamIdAndRole(teamId, MemberTeamRole.ADMIN)
+        if (requestedRole == TeamMemberRole.ADMIN) {
+            if (currentRole != TeamMemberRole.ADMIN) {
+                participantRepository.findByTeamIdAndTeamMemberRole(teamId, TeamMemberRole.ADMIN)
                         .ifPresent(admin -> {
                             log.warn("ADMIN already exists: Team ID = {}", teamId);
                             throw new CustomException(TeamErrorCode.ADMIN_EXISTS);
@@ -82,7 +82,7 @@ public class TeamQueryService {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
 
-        redisService.setMemberCurrentTeam(memberId, teamId, participant.getRole()
+        redisService.setMemberCurrentTeam(memberId, teamId, participant.getTeamMemberRole()
                 .name());
 
         return teamMapper.toGetTeamResponse(team);

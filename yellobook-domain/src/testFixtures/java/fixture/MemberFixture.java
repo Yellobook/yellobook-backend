@@ -4,7 +4,7 @@ import com.yellobook.common.enums.MemberRole;
 import com.yellobook.domains.member.entity.Member;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import support.ReflectionUtils;
+import support.ReflectionUtil;
 
 public class MemberFixture {
     private static final String MEMBER_NICKNAME = "사용자";
@@ -15,13 +15,16 @@ public class MemberFixture {
 
 
     public static Member createMember() {
-        LocalDateTime now = LocalDateTime.now();
         return createMember(MEMBER_NICKNAME, generateUniqueEmail(), MEMBER_PROFILE_IMAGE, MEMBER_ROLE, MEMBER_ALLOWANCE,
                 MEMBER_TIMESTAMP);
     }
 
+    public static Member createMember(String nickname) {
+        return createMember(nickname, generateUniqueEmail(), MEMBER_PROFILE_IMAGE, MEMBER_ROLE, MEMBER_ALLOWANCE,
+                MEMBER_TIMESTAMP);
+    }
+
     public static Member createMember(Boolean allowance) {
-        LocalDateTime now = LocalDateTime.now();
         return createMember(MEMBER_NICKNAME, generateUniqueEmail(), MEMBER_PROFILE_IMAGE, MEMBER_ROLE, allowance,
                 MEMBER_TIMESTAMP);
     }
@@ -35,7 +38,7 @@ public class MemberFixture {
                 .role(role)
                 .allowance(allowance)
                 .build();
-        ReflectionUtils.setBaseTimeEntityFields(member, timestamp);
+        ReflectionUtil.setBaseTimeEntityFields(member, timestamp);
         return member;
     }
 
