@@ -4,8 +4,8 @@ import static com.yellobook.common.enums.OrderStatus.PENDING_CONFIRM;
 import static fixture.MemberFixture.createMember;
 import static fixture.OrderFixture.createOrder;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static support.ReflectionUtil.setField;
 
 import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.common.vo.TeamMemberVO;
@@ -21,7 +21,7 @@ import com.yellobook.domains.order.repository.OrderMentionRepository;
 import com.yellobook.domains.order.repository.OrderRepository;
 import com.yellobook.error.code.OrderErrorCode;
 import com.yellobook.error.exception.CustomException;
-import java.lang.reflect.Field;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -50,14 +50,7 @@ class OrderQueryServiceTest {
 
     private Member createMemberWithId(Long memberId) {
         Member member = createMember();
-        try {
-            Field idField = Member.class.getDeclaredField("id");
-            idField.setAccessible(true);
-            idField.set(member, memberId);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to set member ID", e);
-        }
+        setField(member, "id", memberId);
         return member;
     }
 
@@ -110,7 +103,7 @@ class OrderQueryServiceTest {
 
         @Nested
         @DisplayName("댓글이 없으면")
-        class Context_empty_ordercomment {
+        class Context_empty_orderComment {
             Long orderId;
 
             @BeforeEach
@@ -118,14 +111,15 @@ class OrderQueryServiceTest {
                 orderId = 1L;
                 Member member = createMemberWithId(2L);
                 Order order = createOrder(null, member, null, PENDING_CONFIRM);  // orderMember : 2L, member : 2L
+                List<QueryOrderComment> queryOrderComments = Collections.emptyList();
                 GetOrderCommentsResponse expectResponse = GetOrderCommentsResponse.builder()
                         .orderId(orderId)
                         .comments(Collections.emptyList())
                         .build();
 
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-                when(orderRepository.getOrderComments(orderId)).thenReturn(Collections.emptyList());
-                when(orderMapper.toGetOrderCommentsResponse(orderId, any())).thenReturn(expectResponse);
+                when(orderRepository.getOrderComments(orderId)).thenReturn(queryOrderComments);
+                when(orderMapper.toGetOrderCommentsResponse(orderId, queryOrderComments)).thenReturn(expectResponse);
             }
 
             @Test
@@ -142,7 +136,7 @@ class OrderQueryServiceTest {
 
         @Nested
         @DisplayName("댓글이 존재하면")
-        class Context_ordercomment_exist {
+        class Context_orderComment_exist {
             Long orderId;
 
             @BeforeEach
@@ -154,15 +148,20 @@ class OrderQueryServiceTest {
                         .content("content")
                         .role("주문자")
                         .build();
+                List<QueryOrderComment> queryOrderComments = List.of(QueryOrderComment.builder()
+                        .commentId(1L)
+                        .role(TeamMemberRole.ORDERER)
+                        .content("content")
+                        .createdAt(LocalDateTime.now())
+                        .build());
                 GetOrderCommentsResponse expectResponse = GetOrderCommentsResponse.builder()
                         .orderId(orderId)
                         .comments(Collections.singletonList(commentInfo))
                         .build();
 
                 when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-                when(orderRepository.getOrderComments(orderId)).thenReturn(List.of(QueryOrderComment.builder()
-                        .build()));
-                when(orderMapper.toGetOrderCommentsResponse(orderId, any())).thenReturn(expectResponse);
+                when(orderRepository.getOrderComments(orderId)).thenReturn(queryOrderComments);
+                when(orderMapper.toGetOrderCommentsResponse(orderId, queryOrderComments)).thenReturn(expectResponse);
             }
 
             @Test

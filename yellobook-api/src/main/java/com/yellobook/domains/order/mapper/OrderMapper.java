@@ -2,9 +2,7 @@ package com.yellobook.domains.order.mapper;
 
 import static com.yellobook.domains.order.dto.response.GetOrderCommentsResponse.CommentInfo;
 
-
 import com.yellobook.common.enums.OrderStatus;
-import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.domains.inventory.entity.Product;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.order.dto.query.QueryOrder;
@@ -22,12 +20,10 @@ import com.yellobook.domains.team.entity.Team;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.stereotype.Component;
 
-@Component
 @Mapper(componentModel = "spring", imports = {OrderStatus.class})
 public interface OrderMapper {
-    @Mapping(source = "requestDTO.content", target = "content")
+
     @Mapping(source = "member", target = "member")
     @Mapping(source = "order", target = "order")
     OrderComment toOrderComment(AddOrderCommentRequest requestDTO, Member member, Order order);
