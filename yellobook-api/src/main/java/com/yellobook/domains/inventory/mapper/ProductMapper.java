@@ -15,9 +15,7 @@ import com.yellobook.domains.inventory.entity.Inventory;
 import com.yellobook.domains.inventory.entity.Product;
 import java.util.List;
 import org.mapstruct.Mapper;
-import org.springframework.stereotype.Component;
 
-@Component
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
     Product toProduct(AddProductRequest addProductRequest, Inventory inventory);
