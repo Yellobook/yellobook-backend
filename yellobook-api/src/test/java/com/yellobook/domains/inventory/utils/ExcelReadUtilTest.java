@@ -32,13 +32,13 @@ import org.springframework.web.multipart.MultipartFile;
 @DisplayName("ExcelReadUtil Unit Test")
 class ExcelReadUtilTest {
     @InjectMocks
-    private ExcelReadUtil excelReadUtil;
+    ExcelReadUtil excelReadUtil;
 
     @Nested
     @DisplayName("read 메소드는")
     class Describe_Read {
 
-        private MultipartFile createMockMultipartFile(List<List<Object>> content) throws IOException {
+        MultipartFile createMockMultipartFile(List<List<Object>> content) throws IOException {
             try {
                 Workbook workbook = new XSSFWorkbook(); // 엑셀 워크북 생성
                 Sheet sheet = workbook.createSheet("sheet1"); // 시트 생성

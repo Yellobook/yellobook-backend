@@ -55,28 +55,28 @@ import org.springframework.web.multipart.MultipartFile;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("InventoryCommandService Unit Test")
 class InventoryCommandServiceTest {
-    private final TeamMemberVO admin = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
-    private final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, TeamMemberRole.ORDERER);
-    private final TeamMemberVO viewer = TeamMemberVO.of(3L, 1L, TeamMemberRole.VIEWER);
+    final TeamMemberVO admin = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
+    final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, TeamMemberRole.ORDERER);
+    final TeamMemberVO viewer = TeamMemberVO.of(3L, 1L, TeamMemberRole.VIEWER);
     @InjectMocks
-    private InventoryCommandService inventoryCommandService;
+    InventoryCommandService inventoryCommandService;
     @Mock
-    private InventoryRepository inventoryRepository;
+    InventoryRepository inventoryRepository;
     @Mock
-    private ProductRepository productRepository;
+    ProductRepository productRepository;
     @Mock
-    private TeamRepository teamRepository;
+    TeamRepository teamRepository;
     @Mock
-    private ProductMapper productMapper;
+    ProductMapper productMapper;
     @Mock
-    private InventoryMapper inventoryMapper;
+    InventoryMapper inventoryMapper;
     @Mock
-    private ExcelReadUtil excelReadUtil;
+    ExcelReadUtil excelReadUtil;
 
     @Nested
     @DisplayName("addProduct 메소드는")
     class Describe_AddProduct {
-        private AddProductRequest createAddProductRequest() {
+        AddProductRequest createAddProductRequest() {
             return AddProductRequest.builder()
                     .name("name")
                     .subProduct("sub")
@@ -216,7 +216,7 @@ class InventoryCommandServiceTest {
     @Nested
     @DisplayName("modifyProductAmount 메소드는")
     class Describe_ModifyProductAmount {
-        private ModifyProductAmountRequest createModifyProductAmountRequest() {
+        ModifyProductAmountRequest createModifyProductAmountRequest() {
             return ModifyProductAmountRequest.builder()
                     .amount(1000)
                     .build();
@@ -422,7 +422,7 @@ class InventoryCommandServiceTest {
     @Nested
     @DisplayName("addInventory 메소드는")
     class Describe_AddInventory {
-        private List<ExcelProductCond> createProductList() {
+        List<ExcelProductCond> createProductList() {
             return List.of(
                     ExcelProductCond.builder()
                             .name("상품 A")

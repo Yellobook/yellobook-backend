@@ -50,29 +50,29 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("OrderCommandService Unit Test")
 class OrderCommandServiceTest {
-    private final TeamMemberVO admin = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
-    private final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, TeamMemberRole.ORDERER);
-    private final TeamMemberVO viewer = TeamMemberVO.of(3L, 1L, TeamMemberRole.VIEWER);
+    final TeamMemberVO admin = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
+    final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, TeamMemberRole.ORDERER);
+    final TeamMemberVO viewer = TeamMemberVO.of(3L, 1L, TeamMemberRole.VIEWER);
     @InjectMocks
-    private OrderCommandService orderCommandService;
+    OrderCommandService orderCommandService;
     @Mock
-    private OrderRepository orderRepository;
+    OrderRepository orderRepository;
     @Mock
-    private OrderMentionRepository orderMentionRepository;
+    OrderMentionRepository orderMentionRepository;
     @Mock
-    private OrderCommentRepository orderCommentRepository;
+    OrderCommentRepository orderCommentRepository;
     @Mock
-    private MemberRepository memberRepository;
+    MemberRepository memberRepository;
     @Mock
-    private TeamRepository teamRepository;
+    TeamRepository teamRepository;
     @Mock
-    private ParticipantRepository participantRepository;
+    ParticipantRepository participantRepository;
     @Mock
-    private ProductRepository productRepository;
+    ProductRepository productRepository;
     @Mock
-    private OrderMapper orderMapper;
+    OrderMapper orderMapper;
 
-    private Member createMemberWithId(Long memberId) {
+    Member createMemberWithId(Long memberId) {
         Member member = createMember();
         try {
             Field idField = Member.class.getDeclaredField("id");
@@ -85,7 +85,7 @@ class OrderCommandServiceTest {
         return member;
     }
 
-    private Team createTeamWithId(Long teamId) {
+    Team createTeamWithId(Long teamId) {
         Team team = createTeam("팀1");
         try {
             Field idField = Team.class.getDeclaredField("id");
@@ -98,7 +98,7 @@ class OrderCommandServiceTest {
         return team;
     }
 
-    private OrderComment createOrderCommentWithId(Long commentId) {
+    OrderComment createOrderCommentWithId(Long commentId) {
         OrderComment comment = createOrderComment(null, null);
         try {
             Field idField = OrderComment.class.getDeclaredField("id");
@@ -385,7 +385,7 @@ class OrderCommandServiceTest {
     @Nested
     @DisplayName("addOrderComment 메소드는")
     class Describe_AddOrderComment {
-        private AddOrderCommentRequest createAddOrderCommentRequest() {
+        AddOrderCommentRequest createAddOrderCommentRequest() {
             return AddOrderCommentRequest.builder()
                     .content("댓글 내용")
                     .build();
@@ -496,7 +496,7 @@ class OrderCommandServiceTest {
     @Nested
     @DisplayName("makeOrder 메소드는")
     class Describe_MakeOrder {
-        private MakeOrderRequest createMakeOrderRequest(Integer orderAmount) {
+        MakeOrderRequest createMakeOrderRequest(Integer orderAmount) {
             return MakeOrderRequest.builder()
                     .productId(1L)
                     .orderAmount(orderAmount)

@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class MemberRepositoryTest extends RepositoryTest {
 
     @Autowired
-    private MemberRepository memberRepository;
+    MemberRepository memberRepository;
 
     @BeforeEach
     void setMember() {

@@ -24,15 +24,15 @@ import org.springframework.test.context.jdbc.Sql;
 public class OrderRepositoryTest extends RepositoryTest {
 
     @Autowired
-    private OrderRepository orderRepository;
+    OrderRepository orderRepository;
 
     @Autowired
-    private OrderCommentRepository orderCommentRepository;
+    OrderCommentRepository orderCommentRepository;
 
     @Autowired
-    private OrderMentionRepository orderMentionRepository;
+    OrderMentionRepository orderMentionRepository;
 
-    private final Long NON_EXIST_ORDER_ID = 9999L;
+    final Long NON_EXIST_ORDER_ID = 9999L;
 
     @Nested
     @DisplayName("getOrder 메소드는")
@@ -70,7 +70,7 @@ public class OrderRepositoryTest extends RepositoryTest {
     @Nested
     @DisplayName("getOrderComments 메소드는")
     class Describe_GetOrderComments {
-        private OrderComment getOrderCommentById(Long commentId) {
+        OrderComment getOrderCommentById(Long commentId) {
             return orderCommentRepository.findById(commentId)
                     .orElseThrow(() -> new RuntimeException("OrderComment Not Found"));
         }

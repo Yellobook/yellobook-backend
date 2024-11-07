@@ -33,15 +33,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @DisplayName("MemberQueryService Unit Test")
 class MemberQueryServiceTest {
     @InjectMocks
-    private MemberQueryService memberQueryService;
+    MemberQueryService memberQueryService;
     @Mock
-    private MemberRepository memberRepository;
+    MemberRepository memberRepository;
     @Mock
-    private ParticipantRepository participantRepository;
+    ParticipantRepository participantRepository;
     @Mock
-    private MemberMapper memberMapper;
+    MemberMapper memberMapper;
 
-    private List<QueryMemberJoinTeam> createQueryMemberJoinTeam() {
+    List<QueryMemberJoinTeam> createQueryMemberJoinTeam() {
         QueryMemberJoinTeam dto1 = QueryMemberJoinTeam.builder()
                 .role(TeamMemberRole.ADMIN)
                 .teamName("AAA")
@@ -53,7 +53,7 @@ class MemberQueryServiceTest {
         return List.of(dto1, dto2);
     }
 
-    private ProfileResponse createProfileResponse(List<ParticipantInfo> participantInfos) {
+    ProfileResponse createProfileResponse(List<ParticipantInfo> participantInfos) {
         return ProfileResponse.builder()
                 .memberId(1L)
                 .nickname("nickname")
@@ -63,7 +63,7 @@ class MemberQueryServiceTest {
                 .build();
     }
 
-    private TermAllowanceResponse createAllowanceResponse(boolean allowance) {
+    TermAllowanceResponse createAllowanceResponse(boolean allowance) {
         return TermAllowanceResponse.builder()
                 .allowance(allowance)
                 .build();

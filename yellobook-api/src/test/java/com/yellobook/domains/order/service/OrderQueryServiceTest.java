@@ -38,17 +38,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("OrderQueryService Unit Test")
 class OrderQueryServiceTest {
-    private final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, TeamMemberRole.ORDERER);
+    final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, TeamMemberRole.ORDERER);
     @InjectMocks
-    private OrderQueryService orderQueryService;
+    OrderQueryService orderQueryService;
     @Mock
-    private OrderRepository orderRepository;
+    OrderRepository orderRepository;
     @Mock
-    private OrderMentionRepository orderMentionRepository;
+    OrderMentionRepository orderMentionRepository;
     @Mock
-    private OrderMapper orderMapper;
+    OrderMapper orderMapper;
 
-    private Member createMemberWithId(Long memberId) {
+    Member createMemberWithId(Long memberId) {
         Member member = createMember();
         setField(member, "id", memberId);
         return member;

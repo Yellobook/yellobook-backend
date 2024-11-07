@@ -8,5 +8,5 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class MemberCommandServiceTest {
 
     @InjectMocks
-    private MemberCommandService memberCommandService;
+    MemberCommandService memberCommandService;
 }

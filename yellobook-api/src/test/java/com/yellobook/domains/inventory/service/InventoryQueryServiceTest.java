@@ -45,21 +45,21 @@ import org.springframework.data.domain.Pageable;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("InventoryQueryService Unit Test")
 class InventoryQueryServiceTest {
-    private final TeamMemberVO admin = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
-    private final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, TeamMemberRole.ORDERER);
-    private final TeamMemberVO viewer = TeamMemberVO.of(3L, 1L, TeamMemberRole.VIEWER);
+    final TeamMemberVO admin = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
+    final TeamMemberVO orderer = TeamMemberVO.of(2L, 1L, TeamMemberRole.ORDERER);
+    final TeamMemberVO viewer = TeamMemberVO.of(3L, 1L, TeamMemberRole.VIEWER);
     @InjectMocks
-    private InventoryQueryService inventoryQueryService;
+    InventoryQueryService inventoryQueryService;
     @Mock
-    private InventoryRepository inventoryRepository;
+    InventoryRepository inventoryRepository;
     @Mock
-    private ProductRepository productRepository;
+    ProductRepository productRepository;
     @Mock
-    private InventoryMapper inventoryMapper;
+    InventoryMapper inventoryMapper;
     @Mock
-    private ProductMapper productMapper;
+    ProductMapper productMapper;
 
-    private List<QueryProduct> createProductDTOs() {
+    List<QueryProduct> createProductDTOs() {
         List<QueryProduct> result = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             result.add(QueryProduct.builder()
@@ -69,7 +69,7 @@ class InventoryQueryServiceTest {
         return result;
     }
 
-    private GetProductsResponse createGetProductsResponse() {
+    GetProductsResponse createGetProductsResponse() {
         List<ProductInfo> result = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             result.add(ProductInfo.builder()
@@ -81,7 +81,7 @@ class InventoryQueryServiceTest {
                 .build();
     }
 
-    private Inventory createInventoryWithId() {
+    Inventory createInventoryWithId() {
         Inventory inventory = createInventory(null);
         try {
             Field idField = Inventory.class.getDeclaredField("id");
@@ -97,7 +97,7 @@ class InventoryQueryServiceTest {
     @Nested
     @DisplayName("getTotalInventory 메소드는")
     class Describe_GetTotalInventory {
-        private List<QueryInventory> createInventoryDTOs() {
+        List<QueryInventory> createInventoryDTOs() {
             List<QueryInventory> result = new ArrayList<>();
             for (int i = 0; i < 4; i++) {
                 result.add(QueryInventory.builder()
@@ -106,7 +106,7 @@ class InventoryQueryServiceTest {
             return result;
         }
 
-        private List<InventoryInfo> createInventoryInfo() {
+        List<InventoryInfo> createInventoryInfo() {
             List<InventoryInfo> result = new ArrayList<>();
             for (int i = 0; i < 4; i++) {
                 result.add(InventoryInfo.builder()
@@ -159,9 +159,8 @@ class InventoryQueryServiceTest {
                         .inventories(inventoryInfos)
                         .build();
                 when(inventoryRepository.getTotalInventory(admin.getTeamId(), pageable)).thenReturn(queryInventories);
-                when(inventoryMapper.toInventoryInfoList(queryInventories)).thenReturn(inventoryInfos);
-                when(inventoryMapper.toGetTotalInventoryResponse(page, inventoryInfos.size(),
-                        inventoryInfos)).thenReturn(expectResponse);
+                when(inventoryMapper.toGetTotalInventoryResponse(page, queryInventories)).thenReturn(
+                        expectResponse);
             }
 
             @Test
@@ -170,7 +169,6 @@ class InventoryQueryServiceTest {
                 GetTotalInventoryResponse response = inventoryQueryService.getTotalInventory(page, size, admin);
 
                 verify(inventoryRepository).getTotalInventory(admin.getTeamId(), pageable);
-                verify(inventoryMapper).toInventoryInfoList(queryInventories);
                 assertThat(response.page()).isEqualTo(expectResponse.page());
                 assertThat(response.size()).isEqualTo(expectResponse.size());
                 assertThat(response.inventories()).isSameAs(inventoryInfos);
@@ -200,8 +198,7 @@ class InventoryQueryServiceTest {
                         .inventories(Collections.emptyList())
                         .build();
                 when(inventoryRepository.getTotalInventory(admin.getTeamId(), pageable)).thenReturn(queryInventories);
-                when(inventoryMapper.toInventoryInfoList(queryInventories)).thenReturn(inventoryInfos);
-                when(inventoryMapper.toGetTotalInventoryResponse(page, 0, inventoryInfos)).thenReturn(expectResponse);
+                when(inventoryMapper.toGetTotalInventoryResponse(page, queryInventories)).thenReturn(expectResponse);
             }
 
             @Test
@@ -210,7 +207,6 @@ class InventoryQueryServiceTest {
                 GetTotalInventoryResponse response = inventoryQueryService.getTotalInventory(page, size, admin);
 
                 verify(inventoryRepository).getTotalInventory(admin.getTeamId(), pageable);
-                verify(inventoryMapper).toInventoryInfoList(queryInventories);
                 assertThat(response.page()).isEqualTo(expectResponse.page());
                 assertThat(response.size()).isEqualTo(expectResponse.size());
                 assertThat(response.inventories()).isSameAs(Collections.emptyList());
@@ -464,7 +460,7 @@ class InventoryQueryServiceTest {
     @Nested
     @DisplayName("getSubProductName 메소드는")
     class Describe_GetSubProductName {
-        private List<QuerySubProduct> createQuerySubProducts() {
+        List<QuerySubProduct> createQuerySubProducts() {
             return List.of(
                     QuerySubProduct.builder()
                             .productId(1L)
@@ -481,7 +477,7 @@ class InventoryQueryServiceTest {
             );
         }
 
-        private GetSubProductNameResponse createGetSubProductNameResponse() {
+        GetSubProductNameResponse createGetSubProductNameResponse() {
             List<GetSubProductNameResponse.SubProductInfo> subProductInfos = List.of(
                     GetSubProductNameResponse.SubProductInfo.builder()
                             .productId(1L)

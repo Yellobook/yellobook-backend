@@ -26,10 +26,10 @@ import org.springframework.data.domain.Pageable;
 public class InventoryRepositoryTest extends RepositoryTest {
 
     @Autowired
-    private InventoryRepository inventoryRepository;
+    InventoryRepository inventoryRepository;
 
     @Autowired
-    private ProductRepository productRepository;
+    ProductRepository productRepository;
 
 
     @BeforeEach

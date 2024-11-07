@@ -44,17 +44,17 @@ import org.springframework.test.web.servlet.MockMvc;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("OrderController Unit Test")
 class OrderControllerTest {
-    private final TeamMemberVO teamMemberVO = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
+    final TeamMemberVO teamMemberVO = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
     @Autowired
-    private MockMvc mockMvc;
+    MockMvc mockMvc;
     @Autowired
-    private ObjectMapper objectMapper;
+    ObjectMapper objectMapper;
     @MockBean
-    private OrderQueryService orderQueryService;
+    OrderQueryService orderQueryService;
     @MockBean
-    private OrderCommandService orderCommandService;
+    OrderCommandService orderCommandService;
     @MockBean
-    private TeamMemberArgumentResolver teamMemberArgumentResolver;
+    TeamMemberArgumentResolver teamMemberArgumentResolver;
 
     @BeforeEach
     void setTeamMemberVO() throws Exception {

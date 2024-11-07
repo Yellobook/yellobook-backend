@@ -40,18 +40,18 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 class MemberControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
+    MockMvc mockMvc;
 
     @MockBean
-    private MemberQueryService memberQueryService;
+    MemberQueryService memberQueryService;
 
     @MockBean
-    private MemberCommandService memberCommandService;
+    MemberCommandService memberCommandService;
 
     @MockBean
-    private TeamMemberArgumentResolver teamMemberArgumentResolver;
+    TeamMemberArgumentResolver teamMemberArgumentResolver;
 
-    private Authentication authentication;
+    Authentication authentication;
 
     @BeforeEach
     void setUp() {

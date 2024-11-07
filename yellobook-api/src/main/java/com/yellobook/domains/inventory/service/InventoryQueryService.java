@@ -40,8 +40,7 @@ public class InventoryQueryService {
 
         Pageable pageable = PageRequest.of(page - 1, size);
         List<QueryInventory> content = inventoryRepository.getTotalInventory(teamMember.getTeamId(), pageable);
-        return inventoryMapper.toGetTotalInventoryResponse(page, content.size(),
-                inventoryMapper.toInventoryInfoList(content));
+        return inventoryMapper.toGetTotalInventoryResponse(page, content);
     }
 
     /**
