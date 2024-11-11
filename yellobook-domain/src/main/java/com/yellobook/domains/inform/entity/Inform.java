@@ -65,6 +65,9 @@ public class Inform extends BaseEntity {
     @OneToMany(mappedBy = "inform", cascade = CascadeType.REMOVE)
     private List<InformComment> comments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "inform", cascade = CascadeType.REMOVE)
+    private List<InformMention> mentions = new ArrayList<>();
+
     @Builder
     private Inform(String title, String content, LocalDate date, Member member, Team team) {
         this.title = title;
