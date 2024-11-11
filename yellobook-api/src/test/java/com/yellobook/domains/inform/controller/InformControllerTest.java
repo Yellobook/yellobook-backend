@@ -78,7 +78,7 @@ public class InformControllerTest {
                 request = new CreateInformRequest("test1", "01012345678", List.of(), LocalDate.now());
                 response = new CreateInformResponse(informId, LocalDateTime.now());
 
-                teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
+                teamMemberVO = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
 
                 when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
                 when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
@@ -113,7 +113,7 @@ public class InformControllerTest {
             void setUp() throws Exception {
                 informId = 1L;
 
-                teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
+                teamMemberVO = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
 
                 when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
                 when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
@@ -152,7 +152,7 @@ public class InformControllerTest {
                 informId = 1L;
                 response = new GetInformResponse("test", "test", "test", List.of(), 10, List.of(), LocalDate.now());
 
-                teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
+                teamMemberVO = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
 
                 when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
                 when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
@@ -194,7 +194,7 @@ public class InformControllerTest {
                 request = new CreateInformCommentRequest("test");
                 response = new CreateInformCommentResponse(informId, LocalDateTime.now());
 
-                teamMemberVO = TeamMemberVO.of(1L, 1L, MemberTeamRole.ADMIN);
+                teamMemberVO = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
 
                 when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
                 when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
