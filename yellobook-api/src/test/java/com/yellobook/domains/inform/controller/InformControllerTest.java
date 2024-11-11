@@ -64,7 +64,7 @@ public class InformControllerTest {
     class Describe_createInform {
 
         @Nested
-        @DisplayName("유효한 요청의 경우")
+        @DisplayName("inform을 생성할 경우")
         class Context_Valid_Request {
 
             Long informId;
@@ -87,7 +87,7 @@ public class InformControllerTest {
             }
 
             @Test
-            @DisplayName("201 Created를 반환한다.")
+            @DisplayName("inform을 생성하고 201 Created를 반환한다.")
             void it_returns_201_created() throws Exception {
                 mockMvc.perform(post("/api/v1/informs")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -103,7 +103,7 @@ public class InformControllerTest {
     class Describe_deleteInform {
 
         @Nested
-        @DisplayName("inform이 존재하는 경우")
+        @DisplayName("존재하는 inform에 대한 요청일 경우")
         class Context_Exist_Inform {
 
             Long informId;
@@ -125,7 +125,7 @@ public class InformControllerTest {
             }
 
             @Test
-            @DisplayName("204 NoContent를 반환한다.")
+            @DisplayName("inform을 삭제, 204 NoContent를 반환한다.")
             void it_returns_204_no_content() throws Exception {
                 mockMvc.perform(delete("/api/v1/informs/{informId}", informId)
                                 .contentType(MediaType.APPLICATION_JSON))
@@ -179,7 +179,7 @@ public class InformControllerTest {
     class Describe_addComment {
 
         @Nested
-        @DisplayName("유효한 요청이 들어왔을 경우")
+        @DisplayName("comment를 작성할 경우")
         class Context_Valid_Request {
 
             CreateInformCommentRequest request;
@@ -222,7 +222,7 @@ public class InformControllerTest {
     class Describe_increaseInformView {
 
         @Nested
-        @DisplayName("유효한 요청이 들어왔을 경우")
+        @DisplayName("존재하는 inform의 경우")
         class Context_Valid_Request {
 
             TeamMemberVO teamMemberVO;
