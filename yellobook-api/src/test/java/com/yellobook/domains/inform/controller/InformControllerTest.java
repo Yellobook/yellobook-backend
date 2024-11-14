@@ -1,6 +1,5 @@
 package com.yellobook.domains.inform.controller;
 
-import static fixture.MemberFixture.createMember;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -17,8 +16,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yellobook.common.enums.TeamMemberRole;
 import com.yellobook.common.resolver.TeamMemberArgumentResolver;
 import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
-import com.yellobook.domains.auth.security.oauth2.dto.OAuth2UserDTO;
 import com.yellobook.domains.inform.dto.request.CreateInformCommentRequest;
 import com.yellobook.domains.inform.dto.request.CreateInformRequest;
 import com.yellobook.domains.inform.dto.response.CreateInformCommentResponse;
@@ -27,7 +24,6 @@ import com.yellobook.domains.inform.dto.response.GetInformResponse;
 import com.yellobook.domains.inform.repository.InformRepository;
 import com.yellobook.domains.inform.service.InformCommandService;
 import com.yellobook.domains.inform.service.InformQueryService;
-import com.yellobook.domains.member.entity.Member;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -68,14 +64,13 @@ public class InformControllerTest {
     class Describe_createInform {
 
         @Nested
-        @DisplayName("유효한 요청의 경우")
+        @DisplayName("inform을 생성할 경우")
         class Context_Valid_Request {
 
             Long informId;
             CreateInformRequest request;
             CreateInformResponse response;
-            Member member;
-            CustomOAuth2User customOAuth2User;
+            TeamMemberVO teamMemberVO;
 
             @BeforeEach
             void setUp() throws Exception {
@@ -83,19 +78,16 @@ public class InformControllerTest {
                 request = new CreateInformRequest("test1", "01012345678", List.of(), LocalDate.now());
                 response = new CreateInformResponse(informId, LocalDateTime.now());
 
-                member = createMember();
-                OAuth2UserDTO oAuth2UserDTO = OAuth2UserDTO.from(member);
-                customOAuth2User = new CustomOAuth2User(oAuth2UserDTO);
+                teamMemberVO = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
 
                 when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
                 when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
-                        .thenReturn(customOAuth2User);
-
-                when(informCommandService.createInform(member.getId(), request)).thenReturn(response);
+                        .thenReturn(teamMemberVO);
+                when(informCommandService.createInform(teamMemberVO.getMemberId(), request)).thenReturn(response);
             }
 
             @Test
-            @DisplayName("201 Created를 반환한다.")
+            @DisplayName("inform을 생성하고 201 Created를 반환한다.")
             void it_returns_201_created() throws Exception {
                 mockMvc.perform(post("/api/v1/informs")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -111,32 +103,29 @@ public class InformControllerTest {
     class Describe_deleteInform {
 
         @Nested
-        @DisplayName("inform이 존재하는 경우")
+        @DisplayName("존재하는 inform에 대한 요청일 경우")
         class Context_Exist_Inform {
 
             Long informId;
-            Member member;
-            CustomOAuth2User customOAuth2User;
+            TeamMemberVO teamMemberVO;
 
             @BeforeEach
             void setUp() throws Exception {
                 informId = 1L;
 
-                member = createMember();
-                OAuth2UserDTO oAuth2UserDTO = OAuth2UserDTO.from(member);
-                customOAuth2User = new CustomOAuth2User(oAuth2UserDTO);
+                teamMemberVO = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
 
                 when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
                 when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
-                        .thenReturn(customOAuth2User);
+                        .thenReturn(teamMemberVO);
 
                 when(informRepository.existsById(informId)).thenReturn(true);
                 doNothing().when(informCommandService)
-                        .deleteInform(informId, member.getId());
+                        .deleteInform(informId, teamMemberVO.getMemberId());
             }
 
             @Test
-            @DisplayName("204 NoContent를 반환한다.")
+            @DisplayName("inform을 삭제, 204 NoContent를 반환한다.")
             void it_returns_204_no_content() throws Exception {
                 mockMvc.perform(delete("/api/v1/informs/{informId}", informId)
                                 .contentType(MediaType.APPLICATION_JSON))
@@ -155,24 +144,22 @@ public class InformControllerTest {
 
             GetInformResponse response;
             Long informId;
-            Member member;
-            CustomOAuth2User customOAuth2User;
+            TeamMemberVO teamMemberVO;
+
 
             @BeforeEach
             void setUp() throws Exception {
                 informId = 1L;
                 response = new GetInformResponse("test", "test", "test", List.of(), 10, List.of(), LocalDate.now());
 
-                member = createMember();
-                OAuth2UserDTO oAuth2UserDTO = OAuth2UserDTO.from(member);
-                customOAuth2User = new CustomOAuth2User(oAuth2UserDTO);
+                teamMemberVO = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
 
                 when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
                 when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
-                        .thenReturn(customOAuth2User);
+                        .thenReturn(teamMemberVO);
 
                 when(informRepository.existsById(informId)).thenReturn(true);
-                when(informQueryService.getInformById(customOAuth2User.getMemberId(), informId)).thenReturn(response);
+                when(informQueryService.getInformById(teamMemberVO.getMemberId(), informId)).thenReturn(response);
             }
 
             @Test
@@ -192,14 +179,13 @@ public class InformControllerTest {
     class Describe_addComment {
 
         @Nested
-        @DisplayName("유효한 요청이 들어왔을 경우")
+        @DisplayName("comment를 작성할 경우")
         class Context_Valid_Request {
 
             CreateInformCommentRequest request;
             CreateInformCommentResponse response;
             Long informId;
-            Member member;
-            CustomOAuth2User customOAuth2User;
+            TeamMemberVO teamMemberVO;
 
             @BeforeEach
             void setUp() throws Exception {
@@ -208,16 +194,14 @@ public class InformControllerTest {
                 request = new CreateInformCommentRequest("test");
                 response = new CreateInformCommentResponse(informId, LocalDateTime.now());
 
-                member = createMember();
-                OAuth2UserDTO oAuth2UserDTO = OAuth2UserDTO.from(member);
-                customOAuth2User = new CustomOAuth2User(oAuth2UserDTO);
+                teamMemberVO = TeamMemberVO.of(1L, 1L, TeamMemberRole.ADMIN);
 
                 when(teamMemberArgumentResolver.supportsParameter(any())).thenReturn(true);
                 when(teamMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
-                        .thenReturn(customOAuth2User);
+                        .thenReturn(teamMemberVO);
 
                 when(informRepository.existsById(informId)).thenReturn(true);
-                when(informCommandService.addComment(informId, customOAuth2User.getMemberId(), request)).thenReturn(
+                when(informCommandService.addComment(informId, teamMemberVO.getMemberId(), request)).thenReturn(
                         response);
             }
 
@@ -238,7 +222,7 @@ public class InformControllerTest {
     class Describe_increaseInformView {
 
         @Nested
-        @DisplayName("유효한 요청이 들어왔을 경우")
+        @DisplayName("존재하는 inform의 경우")
         class Context_Valid_Request {
 
             TeamMemberVO teamMemberVO;
