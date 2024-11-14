@@ -26,6 +26,7 @@ import com.yellobook.domains.inventory.mapper.ProductMapper;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
 import com.yellobook.domains.inventory.utils.ExcelReadUtil;
+import com.yellobook.domains.order.repository.OrderRepository;
 import com.yellobook.domains.team.entity.Team;
 import com.yellobook.domains.team.repository.TeamRepository;
 import com.yellobook.error.code.AuthErrorCode;
@@ -67,6 +68,8 @@ class InventoryCommandServiceTest {
     private ProductRepository productRepository;
     @Mock
     private TeamRepository teamRepository;
+    @Mock
+    OrderRepository orderRepository;
     @Mock
     private ProductMapper productMapper;
     @Mock
@@ -359,6 +362,29 @@ class InventoryCommandServiceTest {
         }
 
         @Nested
+        @DisplayName("주문과 연관되어 있다면")
+        class Context_Order_Related {
+            Long productId;
+            Product product;
+
+            @BeforeEach
+            void setUpContext() {
+                productId = 1L;
+                product = createProduct(null);
+                when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+                when(orderRepository.existsByProduct(product)).thenReturn(true);
+            }
+
+            @Test
+            @DisplayName("제품 삭제가 불가능하므로 예외를 반환한다.")
+            void it_throws_exception() {
+                CustomException exception = Assertions.assertThrows(CustomException.class, () ->
+                        inventoryCommandService.deleteProduct(productId, admin));
+                Assertions.assertEquals(InventoryErrorCode.ORDER_RELATED, exception.getErrorCode());
+            }
+        }
+
+        @Nested
         @DisplayName("제품 삭제가 가능하면")
         class Context_Can_Delete_Product {
             Long productId;
@@ -368,10 +394,10 @@ class InventoryCommandServiceTest {
             void setUpContext() {
                 productId = 1L;
                 Inventory inventory = createInventory(null);
-                setField(inventory, "id", 1L);
                 product = createProduct(inventory);
                 setField(product, "id", 1L);
 
+                when(orderRepository.existsByProduct(product)).thenReturn(false);
                 when(productRepository.findById(productId)).thenReturn(Optional.of(product));
             }
 

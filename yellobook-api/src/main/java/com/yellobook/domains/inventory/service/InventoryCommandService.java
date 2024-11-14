@@ -14,6 +14,7 @@ import com.yellobook.domains.inventory.mapper.ProductMapper;
 import com.yellobook.domains.inventory.repository.InventoryRepository;
 import com.yellobook.domains.inventory.repository.ProductRepository;
 import com.yellobook.domains.inventory.utils.ExcelReadUtil;
+import com.yellobook.domains.order.repository.OrderRepository;
 import com.yellobook.domains.team.entity.Team;
 import com.yellobook.domains.team.repository.TeamRepository;
 import com.yellobook.error.code.FileErrorCode;
@@ -39,6 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class InventoryCommandService {
     private final InventoryRepository inventoryRepository;
     private final ProductRepository productRepository;
+    private final OrderRepository orderRepository;
     private final TeamRepository teamRepository;
     private final ProductMapper productMapper;
     private final InventoryMapper inventoryMapper;
@@ -93,6 +95,10 @@ public class InventoryCommandService {
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new CustomException(InventoryErrorCode.PRODUCT_NOT_FOUND));
+        // 주문에 연관되어 있는 제품이면 삭제 불가능
+        if (orderRepository.existsByProduct(product)) {
+            throw new CustomException(InventoryErrorCode.ORDER_RELATED);
+        }
         productRepository.deleteById(product.getId());
         product.getInventory()
                 .updateUpdatedAt();
