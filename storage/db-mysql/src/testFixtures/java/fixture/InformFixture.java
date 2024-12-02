@@ -1,9 +1,9 @@
 package fixture;
 
-import com.yellobook.core.domains.inform.entity.Inform;
-import com.yellobook.core.domains.inform.entity.InformMention;
-import com.yellobook.core.domains.member.entity.Member;
-import com.yellobook.core.domains.team.entity.Team;
+import com.yellobook.domains.inform.entity.Inform;
+import com.yellobook.domains.inform.entity.InformMention;
+import com.yellobook.domains.member.entity.Member;
+import com.yellobook.domains.team.entity.Team;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import support.ReflectionUtil;

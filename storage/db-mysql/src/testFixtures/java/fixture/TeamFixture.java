@@ -1,9 +1,9 @@
 package fixture;
 
-import com.yellobook.core.core.enums.TeamMemberRole;
-import com.yellobook.core.domains.member.entity.Member;
-import com.yellobook.core.domains.team.entity.Participant;
-import com.yellobook.core.domains.team.entity.Team;
+import com.yellobook.domains.member.entity.Member;
+import com.yellobook.domains.team.entity.Participant;
+import com.yellobook.domains.team.entity.Team;
+import com.yellobook.TeamMemberRole;
 import java.time.LocalDateTime;
 import support.ReflectionUtil;
 

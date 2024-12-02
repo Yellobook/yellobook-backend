@@ -73,7 +73,7 @@ dependencies {
 
 // application*.yml 설정파일 복사
 tasks.register('copyConfig', Copy) {
-    from '../Config/yellobook-api/'
+    from '../../Config/yellobook-api/'
     include "application*.yml"
     into 'src/main/resources'
 }

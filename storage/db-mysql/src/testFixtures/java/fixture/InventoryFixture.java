@@ -1,8 +1,8 @@
 package fixture;
 
-import com.yellobook.core.domains.inventory.entity.Inventory;
-import com.yellobook.core.domains.inventory.entity.Product;
-import com.yellobook.core.domains.team.entity.Team;
+import com.yellobook.domains.inventory.entity.Inventory;
+import com.yellobook.domains.inventory.entity.Product;
+import com.yellobook.domains.team.entity.Team;
 
 public class InventoryFixture {
     // 재고

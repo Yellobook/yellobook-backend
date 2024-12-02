@@ -1,12 +1,12 @@
 package fixture;
 
-import com.yellobook.core.core.enums.OrderStatus;
-import com.yellobook.core.domains.inventory.entity.Product;
-import com.yellobook.core.domains.member.entity.Member;
-import com.yellobook.core.domains.order.entity.Order;
-import com.yellobook.core.domains.order.entity.OrderComment;
-import com.yellobook.core.domains.order.entity.OrderMention;
-import com.yellobook.core.domains.team.entity.Team;
+import com.yellobook.domains.inventory.entity.Product;
+import com.yellobook.domains.member.entity.Member;
+import com.yellobook.domains.order.entity.Order;
+import com.yellobook.domains.order.entity.OrderComment;
+import com.yellobook.domains.order.entity.OrderMention;
+import com.yellobook.domains.team.entity.Team;
+import com.yellobook.OrderStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import support.ReflectionUtil;

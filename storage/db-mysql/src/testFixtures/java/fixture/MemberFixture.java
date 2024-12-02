@@ -1,7 +1,7 @@
 package fixture;
 
-import com.yellobook.core.core.enums.MemberRole;
-import com.yellobook.core.domains.member.entity.Member;
+import com.yellobook.domains.member.entity.Member;
+import com.yellobook.MemberRole;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import support.ReflectionUtil;
