@@ -26,9 +26,9 @@ import org.testcontainers.containers.MySQLContainer;
 @ActiveProfiles("integration-test")
 public abstract class IntegrationTest {
 
-    private static final String MYSQL_CONTAINER_IMAGE_TAG = "mysql:8.0.32"; // MySQL 8.0 이미지
-    private static final String REDIS_DOCKER_IMAGE_TAG = "redis:7.0.12";
-    private static final int REDIS_PORT = 6379;
+    static final String MYSQL_CONTAINER_IMAGE_TAG = "mysql:8.0.32"; // MySQL 8.0 이미지
+    static final String REDIS_DOCKER_IMAGE_TAG = "redis:7.0.12";
+    static final int REDIS_PORT = 6379;
 
     static final MySQLContainer mysql;
     static final GenericContainer redis;

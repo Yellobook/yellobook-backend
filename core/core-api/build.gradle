@@ -1,3 +1,8 @@
+plugins {
+    id 'idea'
+    id 'java'
+}
+
 sourceSets {
     integrationTest {
         java.srcDir "$projectDir/src/integration-test/java"
@@ -7,8 +12,14 @@ sourceSets {
     }
 }
 
+idea {
+    module {
+        testSources.from(sourceSets.integrationTest.java.srcDirs)
+        testResources.from(sourceSets.integrationTest.resources.srcDirs)
+    }
+}
+
 configurations {
-    integrationTestImplementation.extendsFrom implementation
     integrationTestImplementation.extendsFrom testImplementation
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
@@ -38,9 +49,6 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 
-    // spring boot test
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
     // lombok (test)
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
@@ -52,6 +60,17 @@ dependencies {
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    // validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // logback slack
+    implementation 'com.github.maricn:logback-slack-appender:1.6.1'
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // spring boot test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
     // rest assured
     integrationTestImplementation 'io.rest-assured:rest-assured:5.3.1'
     integrationTestImplementation 'io.rest-assured:json-path:5.3.1'
@@ -61,17 +80,8 @@ dependencies {
     integrationTestImplementation 'org.testcontainers:junit-jupiter:1.20.1'
     integrationTestImplementation "org.testcontainers:mysql:1.20.1"
     integrationTestImplementation "com.redis:testcontainers-redis:2.2.2"
-
-    // validation
-    api 'org.springframework.boot:spring-boot-starter-validation'
-
-    // logback slack
-    implementation 'com.github.maricn:logback-slack-appender:1.6.1'
-
-    implementation 'org.springframework.boot:spring-boot-starter-web'
 }
 
-// application*.yml 설정파일 복사
 tasks.register('copyConfig', Copy) {
     from '../../Config/yellobook-api/'
     include "application*.yml"
