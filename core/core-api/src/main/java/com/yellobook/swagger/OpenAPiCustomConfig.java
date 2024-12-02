@@ -1,4 +1,4 @@
-package com.yellobook.config;
+package com.yellobook.swagger;
 
 import io.swagger.v3.oas.models.tags.Tag;
 import java.util.ArrayList;

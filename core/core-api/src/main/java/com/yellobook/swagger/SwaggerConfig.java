@@ -1,4 +1,4 @@
-package com.yellobook.config;
+package com.yellobook.swagger;
 
 import com.yellobook.SocialType;
 import io.swagger.v3.oas.models.Components;
