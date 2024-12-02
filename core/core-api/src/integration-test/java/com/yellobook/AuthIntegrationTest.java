@@ -9,7 +9,6 @@ import com.yellobook.domains.auth.dto.request.AllowanceRequest;
 import com.yellobook.domains.auth.service.JwtService;
 import com.yellobook.domains.member.repository.MemberRepository;
 import com.yellobook.support.IntegrationTest;
-import com.yellobook.support.annotation.CustomAutowired;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.restassured.RestAssured;
@@ -18,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,10 +25,10 @@ import support.JwtTestUtil;
 
 @DisplayName("AuthController Integration Test")
 public class AuthIntegrationTest extends IntegrationTest {
-    @CustomAutowired
+    @Autowired
     private JwtService jwtService;
 
-    @CustomAutowired
+    @Autowired
     private MemberRepository memberRepository;
 
     @Nested
