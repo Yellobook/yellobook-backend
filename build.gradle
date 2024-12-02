@@ -9,11 +9,6 @@ plugins {
 group = 'com.yellobook'
 version = '1.0.0'
 
-// 루트 build.gradle 에 플러그인 설정을 추가하면 모든 서브프로젝트에 동일한 설정이 적용
-jacoco {
-    toolVersion = '0.8.9'
-}
-
 ext {
     defineExcludes = {
         // 제외할 경로들 선언
@@ -89,6 +84,10 @@ subprojects {
     }
 }
 
+jacoco {
+    toolVersion = '0.8.9'
+}
+
 jacocoTestReport {
     // 서브프로젝트들의 태스크가 완료된 후 실행되도록 설정
     dependsOn subprojects.collect {
@@ -126,9 +125,6 @@ sonar {
         property "sonar.coverage.jacoco.xmlReportPaths", layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml").get().asFile.absolutePath
     }
 }
-
-check.dependsOn jacocoTestReport
-
 //if (project == rootProject) {
 //    bootJar {
 //        enabled = false
