@@ -1,2 +1,6 @@
 rootProject.name = 'yellobook'
-include 'yellobook-api', 'yellobook-common', 'yellobook-domain'
+
+include 'core:core-api'
+include 'core:core-enum'
+include 'storage:db-mysql'
+include 'tests:api-docs'

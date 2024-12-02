@@ -1,0 +1,14 @@
+dependencies {
+    implementation project(":core:core-enum")
+
+    // swagger
+    api 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}

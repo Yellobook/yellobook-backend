@@ -1,0 +1,36 @@
+package com.yellobook.core.domains.team.repository;
+
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.yellobook.core.domains.member.entity.QMember;
+import com.yellobook.core.domains.team.dto.query.QueryTeamMember;
+import com.yellobook.core.domains.team.entity.QParticipant;
+import com.yellobook.core.domains.team.entity.QTeam;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+
+@Repository
+@RequiredArgsConstructor
+public class TeamCustomRepositoryImpl implements TeamCustomRepository {
+    private final JPAQueryFactory queryFactory;
+
+    @Override
+    public List<QueryTeamMember> findTeamMembers(Long teamId) {
+        QMember member = QMember.member;
+        QParticipant participant = QParticipant.participant;
+        QTeam team = QTeam.team;
+        return queryFactory
+                .select(
+                        Projections.constructor(QueryTeamMember.class,
+                                member.id.as("memberId"),
+                                member.nickname.as("nickname")
+                        )
+                )
+                .from(participant)
+                .join(participant.team, team)
+                .join(participant.member, member)
+                .where(team.id.eq(teamId))
+                .fetch();
+    }
+}
