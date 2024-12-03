@@ -1,14 +1,16 @@
 plugins {
     id 'idea'
-    id 'java'
 }
+
+bootJar.enabled = true
+jar.enabled = false
 
 sourceSets {
     integrationTest {
         java.srcDir "$projectDir/src/integration-test/java"
         resources.srcDir "$projectDir/src/integration-test/resources"
-        compileClasspath += main.output + test.output
-        runtimeClasspath += main.output + test.output
+        compileClasspath += main.output
+        runtimeClasspath += main.output
     }
 }
 
@@ -89,17 +91,14 @@ tasks.register('copyConfig', Copy) {
 }
 
 tasks.register('integrationTest', Test) {
+    group 'verification'
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
     useJUnitPlatform()
-
-    // test 태스크가 없다면 실행되지 않는다.
-    mustRunAfter test
 }
 
 processResources.dependsOn('copyConfig')
 
-check.dependsOn integrationTest, test
-
-bootJar.enabled = true
-jar.enabled = false
+check {
+    dependsOn integrationTest
+}
