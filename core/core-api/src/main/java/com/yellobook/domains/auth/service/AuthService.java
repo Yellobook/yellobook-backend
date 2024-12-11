@@ -6,6 +6,7 @@ import com.yellobook.domains.auth.mapper.AuthMapper;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.member.repository.MemberRepository;
+import com.yellobook.service.RedisAuthService;
 import com.yellobook.support.error.code.AuthErrorCode;
 import com.yellobook.support.error.code.CommonErrorCode;
 import com.yellobook.support.error.exception.CustomException;

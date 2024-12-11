@@ -1,4 +1,4 @@
-package com.yellobook.domains.auth.service;
+package com.yellobook.service;
 
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;

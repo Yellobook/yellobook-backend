@@ -1,19 +1,19 @@
 package com.yellobook.domains.team.service;
 
-import com.yellobook.domains.auth.service.RedisTeamService;
+import com.yellobook.TeamMemberRole;
+import com.yellobook.domains.auth.service.TeamService;
+import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.dto.request.InvitationCodeRequest;
 import com.yellobook.domains.team.dto.response.GetTeamResponse;
 import com.yellobook.domains.team.dto.response.InvitationCodeResponse;
 import com.yellobook.domains.team.dto.response.TeamMemberListResponse;
-import com.yellobook.domains.team.mapper.TeamMapper;
-import com.yellobook.support.error.code.TeamErrorCode;
-import com.yellobook.support.error.exception.CustomException;
-import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
+import com.yellobook.domains.team.mapper.TeamMapper;
 import com.yellobook.domains.team.repository.ParticipantRepository;
 import com.yellobook.domains.team.repository.TeamRepository;
-import com.yellobook.TeamMemberRole;
+import com.yellobook.support.error.code.TeamErrorCode;
+import com.yellobook.support.error.exception.CustomException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -31,7 +31,7 @@ public class TeamQueryService {
     private final TeamRepository teamRepository;
     private final ParticipantRepository participantRepository;
     private final TeamMapper teamMapper;
-    private final RedisTeamService redisService;
+    private final TeamService teamService;
 
     public InvitationCodeResponse makeInvitationCode(
             Long teamId,
@@ -47,7 +47,7 @@ public class TeamQueryService {
                 });
 
         validateInvitationPermission(participant, role, teamId);
-        String invitationUrl = redisService.generateInvitationUrl(teamId, role);
+        String invitationUrl = teamService.generateInvitationUrl(teamId, role);
 
         return teamMapper.toInvitationCodeResponse(invitationUrl);
     }
@@ -82,7 +82,7 @@ public class TeamQueryService {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
 
-        redisService.setMemberCurrentTeam(memberId, teamId, participant.getTeamMemberRole()
+        teamService.setMemberCurrentTeam(memberId, teamId, participant.getTeamMemberRole()
                 .name());
 
         return teamMapper.toGetTeamResponse(team);

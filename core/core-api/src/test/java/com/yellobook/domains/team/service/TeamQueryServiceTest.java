@@ -9,23 +9,23 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.yellobook.TeamMemberRole;
+import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.auth.security.oauth2.dto.OAuth2UserDTO;
-import com.yellobook.domains.auth.service.RedisTeamService;
+import com.yellobook.domains.auth.service.TeamService;
+import com.yellobook.domains.member.entity.Member;
+import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.dto.request.InvitationCodeRequest;
 import com.yellobook.domains.team.dto.response.InvitationCodeResponse;
 import com.yellobook.domains.team.dto.response.TeamMemberListResponse;
-import com.yellobook.domains.team.mapper.TeamMapper;
-import com.yellobook.support.error.code.TeamErrorCode;
-import com.yellobook.support.error.exception.CustomException;
-import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domains.member.entity.Member;
-import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
+import com.yellobook.domains.team.mapper.TeamMapper;
 import com.yellobook.domains.team.repository.ParticipantRepository;
 import com.yellobook.domains.team.repository.TeamRepository;
-import com.yellobook.TeamMemberRole;
+import com.yellobook.support.error.code.TeamErrorCode;
+import com.yellobook.support.error.exception.CustomException;
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
@@ -49,7 +49,7 @@ public class TeamQueryServiceTest {
     private ParticipantRepository participantRepository;
 
     @Mock
-    private RedisTeamService redisService;
+    private TeamService redisService;
 
     @Mock
     private TeamMapper teamMapper;

@@ -3,6 +3,7 @@ package com.yellobook.domains.auth.service;
 import com.yellobook.domains.auth.enums.TokenType;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.member.repository.MemberRepository;
+import com.yellobook.service.RedisAuthService;
 import com.yellobook.support.error.code.AuthErrorCode;
 import com.yellobook.support.error.code.CommonErrorCode;
 import com.yellobook.support.error.exception.CustomException;

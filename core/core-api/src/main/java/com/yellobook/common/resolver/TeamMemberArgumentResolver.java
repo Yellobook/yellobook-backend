@@ -1,11 +1,11 @@
 package com.yellobook.common.resolver;
 
 import com.yellobook.common.resolver.annotation.TeamMember;
+import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
-import com.yellobook.domains.auth.service.RedisTeamService;
+import com.yellobook.domains.auth.service.TeamService;
 import com.yellobook.support.error.code.AuthErrorCode;
 import com.yellobook.support.error.exception.CustomException;
-import com.yellobook.common.vo.TeamMemberVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
@@ -19,7 +19,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @Component
 @RequiredArgsConstructor
 public class TeamMemberArgumentResolver implements HandlerMethodArgumentResolver {
-    private final RedisTeamService redisTeamService;
+    private final TeamService teamService;
 
     // 메소드 파라미터가 resolver 에 의해 지원될지 여부를 판단
     @Override
@@ -40,7 +40,7 @@ public class TeamMemberArgumentResolver implements HandlerMethodArgumentResolver
         if (authentication != null && authentication.isAuthenticated()) {
             CustomOAuth2User customOauth2User = (CustomOAuth2User) authentication.getPrincipal();
             Long memberId = customOauth2User.getMemberId();
-            TeamMemberVO teamMember = redisTeamService.getCurrentTeamMember(memberId);
+            TeamMemberVO teamMember = teamService.getCurrentTeamMember(memberId);
             return teamMember;
         }
         // 인증되지 않은 경로에 컨트롤러에서 사용한다면 접근 거부

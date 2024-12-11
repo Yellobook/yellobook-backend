@@ -11,24 +11,24 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.yellobook.TeamMemberRole;
 import com.yellobook.domains.auth.dto.InvitationResponse;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.auth.security.oauth2.dto.OAuth2UserDTO;
-import com.yellobook.domains.auth.service.RedisTeamService;
+import com.yellobook.domains.auth.service.TeamService;
+import com.yellobook.domains.member.entity.Member;
+import com.yellobook.domains.member.repository.MemberRepository;
 import com.yellobook.domains.team.dto.request.CreateTeamRequest;
 import com.yellobook.domains.team.dto.response.CreateTeamResponse;
 import com.yellobook.domains.team.dto.response.JoinTeamResponse;
-import com.yellobook.domains.team.mapper.ParticipantMapper;
-import com.yellobook.domains.team.mapper.TeamMapper;
-import com.yellobook.support.error.code.TeamErrorCode;
-import com.yellobook.support.error.exception.CustomException;
-import com.yellobook.domains.member.entity.Member;
-import com.yellobook.domains.member.repository.MemberRepository;
 import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
+import com.yellobook.domains.team.mapper.ParticipantMapper;
+import com.yellobook.domains.team.mapper.TeamMapper;
 import com.yellobook.domains.team.repository.ParticipantRepository;
 import com.yellobook.domains.team.repository.TeamRepository;
-import com.yellobook.TeamMemberRole;
+import com.yellobook.support.error.code.TeamErrorCode;
+import com.yellobook.support.error.exception.CustomException;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -63,7 +63,7 @@ public class TeamCommandServiceTest {
     private CustomOAuth2User customOAuth2User;
 
     @Mock
-    private RedisTeamService redisService;
+    private TeamService teamService;
 
     @InjectMocks
     private TeamCommandService teamCommandService;
@@ -188,7 +188,7 @@ public class TeamCommandServiceTest {
                 verify(teamRepository).findByName(validRequest.name());
                 verify(teamRepository).save(team);
                 verify(participantRepository).save(participant);
-                verify(redisService).setMemberCurrentTeam(member.getId(), team.getId(), validRequest.role()
+                verify(teamService).setMemberCurrentTeam(member.getId(), team.getId(), validRequest.role()
                         .name());
 
                 assertNotNull(response);
@@ -213,7 +213,7 @@ public class TeamCommandServiceTest {
             void setUp() {
                 code = "invitationCode";
                 invitationResponse = new InvitationResponse(team.getId(), TeamMemberRole.ORDERER);
-                when(redisService.getInvitationInfo(code)).thenReturn(invitationResponse);
+                when(teamService.getInvitationInfo(code)).thenReturn(invitationResponse);
                 when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
 
                 exception = assertThrows(CustomException.class, () -> {
@@ -243,7 +243,7 @@ public class TeamCommandServiceTest {
                 adminInvitationCode = "adminInvitationCode";
                 invitationResponse = new InvitationResponse(team.getId(), TeamMemberRole.ADMIN);
 
-                when(redisService.getInvitationInfo(adminInvitationCode)).thenReturn(invitationResponse);
+                when(teamService.getInvitationInfo(adminInvitationCode)).thenReturn(invitationResponse);
                 when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
                 when(teamRepository.findById(anyLong())).thenReturn(Optional.of(team));
                 when(participantRepository.findByTeamIdAndTeamMemberRole(team.getId(),
@@ -276,7 +276,7 @@ public class TeamCommandServiceTest {
                 notExistTeamCode = "invitationCode";
                 invitationResponse = new InvitationResponse(team.getId(), TeamMemberRole.ORDERER);
 
-                when(redisService.getInvitationInfo(notExistTeamCode)).thenReturn(invitationResponse);
+                when(teamService.getInvitationInfo(notExistTeamCode)).thenReturn(invitationResponse);
                 when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
                 when(teamRepository.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -308,7 +308,7 @@ public class TeamCommandServiceTest {
                 belongTeamCode = "invitationCode";
                 invitationResponse = new InvitationResponse(belongTeamId, TeamMemberRole.ADMIN);
 
-                when(redisService.getInvitationInfo(belongTeamCode)).thenReturn(invitationResponse);
+                when(teamService.getInvitationInfo(belongTeamCode)).thenReturn(invitationResponse);
                 when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
                 when(teamRepository.findById(anyLong())).thenReturn(Optional.of(team));
                 when(participantRepository.findByTeamIdAndMemberId(belongTeamId, 1L)).thenReturn(
@@ -339,7 +339,7 @@ public class TeamCommandServiceTest {
             void setUp() {
                 code = "validInvitationCode";
                 invitationResponse = new InvitationResponse(team.getId(), TeamMemberRole.ADMIN);
-                when(redisService.getInvitationInfo(code)).thenReturn(invitationResponse);
+                when(teamService.getInvitationInfo(code)).thenReturn(invitationResponse);
                 when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
                 when(teamRepository.findById(team.getId())).thenReturn(Optional.of(team));
                 when(participantRepository.findByTeamIdAndMemberId(team.getId(), member.getId())).thenReturn(
@@ -354,7 +354,7 @@ public class TeamCommandServiceTest {
             @DisplayName("팀에 가입시키고 현재 팀을 가입한 팀으로 변경한다.")
             void it_returns_member_to_join_team() {
                 verify(participantRepository).save(participant);
-                verify(redisService).setMemberCurrentTeam(member.getId(), team.getId(), TeamMemberRole.ADMIN.name());
+                verify(teamService).setMemberCurrentTeam(member.getId(), team.getId(), TeamMemberRole.ADMIN.name());
 
                 assertNotNull(response);
                 assertNotNull(response.teamId());
@@ -423,7 +423,7 @@ public class TeamCommandServiceTest {
             @DisplayName("정상적으로 팀에서 나가고 현재 팀을 가장 최근 팀으로 변경한다.")
             void it_returns_member_to_leave_team() {
                 verify(participantRepository).delete(participant); // 참가자 삭제 확인
-                verify(redisService, times(1)).setMemberCurrentTeam(anyLong(), anyLong(), anyString());
+                verify(teamService, times(1)).setMemberCurrentTeam(anyLong(), anyLong(), anyString());
             }
         }
     }

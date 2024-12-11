@@ -1,6 +1,7 @@
 package com.yellobook.domains.inform.service;
 
-import com.yellobook.domains.auth.service.RedisTeamService;
+import com.yellobook.common.vo.TeamMemberVO;
+import com.yellobook.domains.auth.service.TeamService;
 import com.yellobook.domains.inform.dto.request.CreateInformCommentRequest;
 import com.yellobook.domains.inform.dto.request.CreateInformRequest;
 import com.yellobook.domains.inform.dto.response.CreateInformCommentResponse;
@@ -22,7 +23,6 @@ import com.yellobook.support.error.code.InformErrorCode;
 import com.yellobook.support.error.code.MemberErrorCode;
 import com.yellobook.support.error.code.TeamErrorCode;
 import com.yellobook.support.error.exception.CustomException;
-import com.yellobook.common.vo.TeamMemberVO;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ public class InformCommandService {
     private final InformRepository informRepository;
     private final InformMapper informMapper;
     private final ParticipantRepository participantRepository;
-    private final RedisTeamService redisService;
+    private final TeamService teamService;
     private final MemberRepository memberRepository;
     private final InformMentionRepository informMentionRepository;
     private final InformCommentRepository informCommentRepository;
@@ -47,7 +47,7 @@ public class InformCommandService {
             Long memberId,
             CreateInformRequest request
     ) {
-        Long teamId = redisService.getCurrentTeamMember(memberId)
+        Long teamId = teamService.getCurrentTeamMember(memberId)
                 .getTeamId();
 
         Participant participant = participantRepository.findByTeamIdAndMemberId(teamId, memberId)

@@ -6,7 +6,7 @@ import com.yellobook.domains.auth.security.handler.CustomAuthenticationEntryPoin
 import com.yellobook.domains.auth.security.oauth2.handler.CustomSuccessHandler;
 import com.yellobook.domains.auth.security.oauth2.service.CustomOAuth2UserService;
 import com.yellobook.domains.auth.service.JwtService;
-import com.yellobook.domains.auth.service.RedisAuthService;
+import com.yellobook.service.RedisAuthService;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

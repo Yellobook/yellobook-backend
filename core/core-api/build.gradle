@@ -2,9 +2,6 @@ plugins {
     id 'idea'
 }
 
-bootJar.enabled = true
-jar.enabled = false
-
 sourceSets {
     integrationTest {
         java.srcDir "$projectDir/src/integration-test/java"
@@ -28,6 +25,7 @@ configurations {
 
 dependencies {
     implementation project(":storage:storage-mysql")
+    implementation project(":storage:storage-redis")
     implementation project(':core:core-enum')
 
     // testFixtures
@@ -57,9 +55,6 @@ dependencies {
     // mapStruct
     implementation 'org.mapstruct:mapstruct:1.5.3.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
-
-    // redis
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     // validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'

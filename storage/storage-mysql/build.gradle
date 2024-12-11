@@ -54,15 +54,7 @@ configurations {
 processResources.dependsOn('copyConfig')
 
 tasks.register('copyConfig', Copy) {
-    from '../Config/yellobook-domain/'
+    from '../../Config/yellobook-domain/'
     include "application*.yml"
     into 'src/main/resources'
-}
-
-bootJar {
-    enabled = false
-}
-
-jar {
-    enabled = true
 }

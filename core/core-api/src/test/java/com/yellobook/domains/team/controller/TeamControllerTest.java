@@ -13,10 +13,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yellobook.TeamMemberRole;
 import com.yellobook.common.resolver.TeamMemberArgumentResolver;
+import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.auth.security.oauth2.dto.OAuth2UserDTO;
-import com.yellobook.domains.auth.service.RedisTeamService;
+import com.yellobook.domains.member.entity.Member;
+import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import com.yellobook.domains.team.dto.request.CreateTeamRequest;
 import com.yellobook.domains.team.dto.request.InvitationCodeRequest;
 import com.yellobook.domains.team.dto.response.CreateTeamResponse;
@@ -27,10 +30,7 @@ import com.yellobook.domains.team.dto.response.TeamMemberListResponse;
 import com.yellobook.domains.team.service.TeamCommandService;
 import com.yellobook.domains.team.service.TeamQueryService;
 import com.yellobook.domains.team.util.SecurityUtil;
-import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domains.member.entity.Member;
-import com.yellobook.domains.team.dto.query.QueryTeamMember;
-import com.yellobook.TeamMemberRole;
+import com.yellobook.service.RedisTeamService;
 import fixture.MemberFixture;
 import java.time.LocalDateTime;
 import java.util.List;

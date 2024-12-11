@@ -15,19 +15,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.yellobook.domains.auth.service.RedisTeamService;
+import com.yellobook.TeamMemberRole;
+import com.yellobook.common.vo.TeamMemberVO;
+import com.yellobook.domains.auth.service.TeamService;
 import com.yellobook.domains.inform.dto.request.CreateInformCommentRequest;
 import com.yellobook.domains.inform.dto.request.CreateInformRequest;
 import com.yellobook.domains.inform.dto.response.CreateInformCommentResponse;
-import com.yellobook.domains.inform.mapper.CommentMapper;
-import com.yellobook.domains.inform.mapper.InformMapper;
-import com.yellobook.support.error.code.InformErrorCode;
-import com.yellobook.support.error.code.TeamErrorCode;
-import com.yellobook.support.error.exception.CustomException;
-import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.domains.inform.entity.Inform;
 import com.yellobook.domains.inform.entity.InformComment;
 import com.yellobook.domains.inform.entity.InformMention;
+import com.yellobook.domains.inform.mapper.CommentMapper;
+import com.yellobook.domains.inform.mapper.InformMapper;
 import com.yellobook.domains.inform.repository.InformCommentRepository;
 import com.yellobook.domains.inform.repository.InformMentionRepository;
 import com.yellobook.domains.inform.repository.InformRepository;
@@ -37,7 +35,9 @@ import com.yellobook.domains.team.entity.Participant;
 import com.yellobook.domains.team.entity.Team;
 import com.yellobook.domains.team.repository.ParticipantRepository;
 import com.yellobook.domains.team.repository.TeamRepository;
-import com.yellobook.TeamMemberRole;
+import com.yellobook.support.error.code.InformErrorCode;
+import com.yellobook.support.error.code.TeamErrorCode;
+import com.yellobook.support.error.exception.CustomException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -71,7 +71,7 @@ public class InformCommandServiceTest {
     @Mock
     private CommentMapper commentMapper;
     @Mock
-    private RedisTeamService redisService;
+    private TeamService teamService;
 
     @InjectMocks
     private InformCommandService informCommandService;
@@ -94,7 +94,7 @@ public class InformCommandServiceTest {
                 member = createMember();
                 memberId = member.getId();
                 request = new CreateInformRequest("test", "test", List.of(), LocalDate.now());
-                when(redisService.getCurrentTeamMember(memberId))
+                when(teamService.getCurrentTeamMember(memberId))
                         .thenThrow(new CustomException(TeamErrorCode.USER_NOT_JOINED_ANY_TEAM));
 
                 exception = assertThrows(CustomException.class, () -> {
@@ -130,7 +130,7 @@ public class InformCommandServiceTest {
                 request = new CreateInformRequest("test", "test", List.of(2L), LocalDate.now());
 
                 TeamMemberVO teamMemberVO = mock(TeamMemberVO.class);
-                when(redisService.getCurrentTeamMember(member.getId())).thenReturn(teamMemberVO);
+                when(teamService.getCurrentTeamMember(member.getId())).thenReturn(teamMemberVO);
                 when(teamMemberVO.getTeamId()).thenReturn(team.getId());
 
                 member2 = Member.builder()

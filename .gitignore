@@ -42,9 +42,11 @@ out/
 ### volumns
 infra/database/data
 infra/monitoring/data
+infra/database/mysql/data
+
 ### .env
 .env
-/*/**/.env
+/infra/database/mysql/.env
 
 ### application logs
 infra/monitoring/logs/*
