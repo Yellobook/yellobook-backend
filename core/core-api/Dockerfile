@@ -4,7 +4,7 @@ WORKDIR /app
 
 EXPOSE 8080
 
-ARG JAR_FILE="yellobook-api/build/libs/*.jar"
+ARG JAR_FILE="core/core-api/build/libs/*.jar"
 ARG PROFILE=dev
 
 COPY ${JAR_FILE} yellobook-server.jar
