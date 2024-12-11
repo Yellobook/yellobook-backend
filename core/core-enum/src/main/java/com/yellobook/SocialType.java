@@ -1,5 +1,6 @@
 package com.yellobook;
 
+import java.util.NoSuchElementException;
 import lombok.Getter;
 
 @Getter
@@ -22,8 +23,6 @@ public enum SocialType {
                 return socialType;
             }
         }
-        // TODO : 의존성 수정
-        return null;
-        //throw new OAuth2AuthenticationException("OAuth2 제공자가 올바르지 않습니다. registrationId: %s".formatted(registrationId));
+        throw new NoSuchElementException("OAuth2 제공자가 올바르지 않습니다. registrationId: %s".formatted(registrationId));
     }
 }

@@ -2,5 +2,4 @@ rootProject.name = 'yellobook'
 
 include 'core:core-api'
 include 'core:core-enum'
-include 'storage:db-mysql'
-include 'tests:api-docs'
+include 'storage:storage-mysql'

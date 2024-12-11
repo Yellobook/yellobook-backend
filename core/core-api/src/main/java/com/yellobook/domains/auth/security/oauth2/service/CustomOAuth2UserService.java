@@ -1,13 +1,14 @@
 package com.yellobook.domains.auth.security.oauth2.service;
 
+import com.yellobook.MemberRole;
 import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.domains.auth.security.oauth2.dto.OAuth2Attributes;
 import com.yellobook.domains.auth.security.oauth2.dto.OAuth2UserDTO;
 import com.yellobook.domains.auth.security.oauth2.enums.SocialType;
 import com.yellobook.domains.member.entity.Member;
 import com.yellobook.domains.member.repository.MemberRepository;
-import com.yellobook.MemberRole;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -32,8 +33,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .getRegistrationId();
         // 인증된 사용자 정보
         Map<String, Object> attributes = oAuth2User.getAttributes();
+
         // 소셜 로그인 종류
-        SocialType socialType = SocialType.from(registrationId);
+        SocialType socialType;
+        try {
+            socialType = SocialType.from(registrationId);
+        } catch (NoSuchElementException e) {
+            throw new OAuth2AuthenticationException(e.getMessage());
+        }
+
         // 소셜 로그인 attributes
         OAuth2Attributes oAuth2Attributes = OAuth2Attributes.of(socialType, attributes);
 
