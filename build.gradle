@@ -1,13 +1,10 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.3.1' apply(false)
-    id 'io.spring.dependency-management' version '1.1.5'
+    id 'org.springframework.boot' apply false
+    id 'io.spring.dependency-management'
     id 'jacoco'
-    id 'org.sonarqube' version '4.4.1.3373'
+    id 'org.sonarqube'
 }
-
-group = 'com.yellobook'
-version = '1.0.0'
 
 ext {
     defineExcludes = {
@@ -34,8 +31,11 @@ ext {
 }
 
 allprojects {
-    sourceCompatibility = '17'
-    targetCompatibility = '17'
+    group = projectGroup
+    version = applicationVersion
+
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
 
     repositories {
         mavenCentral()
@@ -44,9 +44,6 @@ allprojects {
 
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
-    javaLauncher = javaToolchains.launcherFor {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
 }
 
 subprojects {
@@ -57,7 +54,7 @@ subprojects {
 
     java {
         toolchain {
-            languageVersion = JavaLanguageVersion.of(17)
+            languageVersion = JavaLanguageVersion.of(javaVersion)
         }
     }
 
@@ -68,7 +65,7 @@ subprojects {
         testCompileOnly 'org.projectlombok:lombok'
         testAnnotationProcessor 'org.projectlombok:lombok'
 
-        // MapStruct (Lombok 보다 뒤에 있어야 함)
+        // MapStruct
         implementation 'org.mapstruct:mapstruct:1.5.5.Final'
         annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
@@ -130,9 +127,3 @@ sonar {
         property "sonar.coverage.jacoco.xmlReportPaths", layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml").get().asFile.absolutePath
     }
 }
-
-//if (project == rootProject) {
-//    bootJar {
-//        enabled = false
-//    }
-//}

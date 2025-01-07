@@ -1,6 +1,21 @@
+pluginManagement {
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == "org.springframework.boot") {
+                useVersion(springBootVersion)
+            } else if (requested.id.id == "io.spring.dependency-management") {
+                useVersion(springDependencyManagementVersion)
+            } else if (requested.id.id == "org.sonarqube") {
+                useVersion(sonarqubeVersion)
+            }
+        }
+    }
+}
+
 rootProject.name = 'yellobook'
 
-include 'core:core-api'
-include 'core:core-enum'
-include 'storage:storage-mysql'
-include 'storage:storage-redis'
+include 'api-server'
+include 'core'
+include 'infrastructure:db-core'
+include 'infrastructure:storage-redis'
+
