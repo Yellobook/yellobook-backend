@@ -1,11 +1,5 @@
-package com.yellobook.support.common.resolver;
+package com.yellobook.api.support;
 
-import com.yellobook.common.vo.TeamMemberVO;
-import com.yellobook.domains.auth.security.oauth2.dto.CustomOAuth2User;
-import com.yellobook.domains.auth.service.TeamService;
-import com.yellobook.support.common.resolver.annotation.TeamMember;
-import com.yellobook.support.error.code.AuthErrorCode;
-import com.yellobook.support.error.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;

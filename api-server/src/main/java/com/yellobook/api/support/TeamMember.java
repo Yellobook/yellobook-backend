@@ -1,4 +1,4 @@
-package com.yellobook.support.common.resolver.annotation;
+package com.yellobook.api.support;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import java.lang.annotation.ElementType;
