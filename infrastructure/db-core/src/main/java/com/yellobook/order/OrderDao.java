@@ -3,21 +3,78 @@ package com.yellobook.order;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.yellobook.core.domain.common.TeamMemberRole;
+import com.yellobook.core.domain.order.Order;
 import com.yellobook.core.domain.order.OrderRepository;
+import com.yellobook.core.domain.order.OrderStatus;
+import com.yellobook.core.domain.order.dto.CreateOrderCommend;
 import com.yellobook.core.domain.team.TeamMemberVO;
+import com.yellobook.inventory.ProductEntity;
+import com.yellobook.inventory.ProductJpaRepository;
+import com.yellobook.member.MemberEntity;
+import com.yellobook.member.MemberJpaRepository;
+import com.yellobook.team.TeamEntity;
 import java.time.LocalDate;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-@RequiredArgsConstructor
 public class OrderDao implements OrderRepository {
+
     private final OrderJpaRepository orderJpaRepository;
-    private final OrderMentionJpaRepository orderMentionJpaRepository;
+    private final ProductJpaRepository productJpaRepository;
+    private final MemberJpaRepository memberJpaRepository;
+    private final TeamJpaRepository teamJpaRepository; // TeamJpaRepository
     private final JPAQueryFactory queryFactory;
 
+    @Autowired
+    public OrderDao(OrderJpaRepository orderJpaRepository,
+                    ProductJpaRepository productJpaRepository, MemberJpaRepository memberJpaRepository,
+                    TeamJpaRepository teamRepository, JPAQueryFactory queryFactory) {
+        this.orderJpaRepository = orderJpaRepository;
+        this.productJpaRepository = productJpaRepository;
+        this.memberJpaRepository = memberJpaRepository;
+        this.teamRepository = teamRepository;
+        this.queryFactory = queryFactory;
+    }
+
     @Override
+    public Long save(CreateOrderCommend order) {
+        ProductEntity product = productJpaRepository.getReferenceById(order.productId());
+        MemberEntity member = memberJpaRepository.getReferenceById(order.ordererId());
+        TeamEntity team = teamJpaRepository.getReferenceById(order.teamId());
+        OrderEntity orderEntity = OrderEntity.builder()
+                .view(order.view())
+                .memo(order.memo())
+                .date(order.date())
+                .orderStatus(order.status())
+                .orderAmount(order.orderAmount())
+                .product(product)
+                .member(member)
+                .team(team)
+                .build();
+        return orderJpaRepository.save(orderEntity)
+                .getId();
+    }
+
+    @Override
+    public void updateOrderStatus(OrderStatus status, Long orderId) {
+        orderJpaRepository.updateOrderStatus(status, orderId);
+    }
+
+    @Override
+    public void delete(Long orderId) {
+        orderJpaRepository.deleteById(orderId);
+    }
+
+    @Override
+    public Optional<Order> findById(Long orderId) {
+        Optional<OrderEntity> orderEntity = orderJpaRepository.findById(orderId);
+        return orderEntity.map(OrderEntity::toOrder);
+    }
+
+
     public QueryOrder getOrder(Long orderId) {
         QOrder order = QOrder.order;
 
@@ -64,4 +121,6 @@ public class OrderDao implements OrderRepository {
                 .fetchFirst();
         return Optional.ofNullable(schedule);
     }
+
+
 }

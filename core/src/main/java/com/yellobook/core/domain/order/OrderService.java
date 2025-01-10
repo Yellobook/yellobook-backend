@@ -1,220 +1,144 @@
 package com.yellobook.core.domain.order;
 
-import com.yellobook.OrderStatus;
-import com.yellobook.TeamMemberRole;
-import com.yellobook.common.utils.ParticipantUtil;
-import com.yellobook.core.domain.order.mapper.OrderMapper;
-import com.yellobook.core.domain.team.TeamMemberVO;
-import com.yellobook.inventory.entity.Product;
-import com.yellobook.inventory.repository.ProductRepository;
-import com.yellobook.member.entity.Member;
-import com.yellobook.member.repository.MemberRepository;
-import com.yellobook.order.dto.request.AddOrderCommentRequest;
-import com.yellobook.order.dto.request.MakeOrderRequest;
-import com.yellobook.order.dto.response.AddOrderCommentResponse;
-import com.yellobook.order.dto.response.MakeOrderResponse;
-import com.yellobook.order.entity.Order;
-import com.yellobook.order.entity.OrderComment;
-import com.yellobook.order.entity.OrderMention;
-import com.yellobook.order.repository.OrderMentionRepository;
-import com.yellobook.support.error.code.InventoryErrorCode;
-import com.yellobook.support.error.code.MemberErrorCode;
-import com.yellobook.support.error.code.OrderErrorCode;
-import com.yellobook.support.error.code.TeamErrorCode;
-import com.yellobook.support.error.exception.CustomException;
-import com.yellobook.team.Participant;
-import com.yellobook.team.entity.Team;
-import com.yellobook.team.repository.ParticipantRepository;
-import com.yellobook.team.repository.TeamRepository;
+import com.yellobook.core.domain.common.TeamMemberRole;
+import com.yellobook.core.domain.order.dto.CreateOrderCommentCommend;
+import com.yellobook.core.domain.order.dto.CreateOrderPayload;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 public class OrderService {
-    private final OrderRepository orderRepository;
-    private final OrderCommentRepository orderCommentRepository;
-    private final OrderMentionRepository orderMentionRepository;
-    private final MemberRepository memberRepository;
-    private final TeamRepository teamRepository;
-    private final ProductRepository productRepository;
-    private final ParticipantRepository participantRepository;
-    private final OrderMapper orderMapper;
+    private final OrderReader orderReader;
+    private final OrderWriter orderWriter;
+    private final OrderManager orderManager;
+    private final OrderPermission orderPermission;
+    private final OrderCommentReader orderCommentReader;
+    private final OrderCommentWriter orderCommentWriter;
 
-    /**
-     * 주문 정정 요청 (관리자)
-     */
-    public void modifyRequestOrder(Long orderId, TeamMemberVO teamMemberVO) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new CustomException(OrderErrorCode.ORDER_NOT_FOUND));
-        // 함께하는 사람에 내가 없으면 (관리자가 아니라는 뜻, 접근권한 에러)
-        if (!orderMentionRepository.existsByMemberIdAndOrderId(teamMemberVO.getMemberId(), order.getId())) {
-            throw new CustomException(OrderErrorCode.ORDER_ACCESS_DENIED);
-        }
-        // 주문 확인 상태이면 변경 불가능
-        if (order.getOrderStatus()
-                .equals(OrderStatus.CONFIRMED)) {
-            throw new CustomException(OrderErrorCode.ORDER_CONFIRMED_CANT_MODIFY);
-        }
-        // 수정 & dirty checking
-        order.requestModifyOrder();
+
+    @Autowired
+    OrderService(OrderReader orderReader, OrderWriter orderWriter,
+                 OrderManager orderManager,
+                 OrderPermission orderPermission, OrderCommentReader orderCommentReader,
+                 OrderCommentWriter orderCommentWriter) {
+        this.orderReader = orderReader;
+        this.orderWriter = orderWriter;
+        this.orderManager = orderManager;
+        this.orderPermission = orderPermission;
+        this.orderCommentReader = orderCommentReader;
+        this.orderCommentWriter = orderCommentWriter;
     }
 
     /**
-     * 주문 확정 (관리자)
+     * 주문 정정 요청 (관리자)
+     *
+     * @param orderId  주문 ID
+     * @param memberId 사용자 ID
+     * @param teamId   팀 ID
+     * @param role     팀에서 역할
      */
-    public void confirmOrder(Long orderId, TeamMemberVO teamMemberVO) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new CustomException(OrderErrorCode.ORDER_NOT_FOUND));
-        // 함께하는 사람에 내가 없으면 (관리자가 아니라는 뜻, 접근권한 에러)
-        if (!orderMentionRepository.existsByMemberIdAndOrderId(teamMemberVO.getMemberId(), order.getId())) {
-            throw new CustomException(OrderErrorCode.ORDER_ACCESS_DENIED);
-        }
-        // 주문 정정 요청이 되어 있으면 주문 확정 불가능
-        if (order.getOrderStatus()
-                .equals(OrderStatus.PENDING_MODIFY)) {
-            throw new CustomException(OrderErrorCode.ORDER_PENDING_MODIFY_CANT_CONFIRM);
-        }
-        // 제품 수량 마이너스
-        if (order.getOrderAmount() > order.getProduct()
-                .getAmount()) {
-            throw new CustomException(OrderErrorCode.ORDER_AMOUNT_EXCEED);
-        } else {
-            order.getProduct()
-                    .reduceAmount(order.getOrderAmount());
-        }
-        order.confirmOrder();
+    public void adminRequestOrderModification(Long orderId, Long memberId, Long teamId, TeamMemberRole role) {
+        Order order = orderReader.read(orderId);
+        orderPermission.onlyAdminCanAccess(role);
+        orderManager.requestModify(order);
+        orderWriter.updateOrderStatus(order, OrderStatus.PENDING_MODIFY);
+    }
+
+    /**
+     * 주문 정정 요청, CONFIRMED 으로 변경 (관리자)
+     *
+     * @param orderId  주문 ID
+     * @param memberId 사용자 ID
+     * @param teamId   팀 ID
+     * @param role     팀에서 역할
+     */
+    public void adminConfirmOrder(Long orderId, Long memberId, Long teamId, TeamMemberRole role) {
+        Order order = orderReader.read(orderId);
+        orderPermission.onlyAdminCanAccess(role);
+        orderManager.canConfirmOrder(order);
+        orderWriter.updateOrderStatus(order, OrderStatus.CONFIRMED);
+        orderManager.restoreProductAmount(order);
     }
 
     /**
      * 주문 취소 (주문자)
+     *
+     * @param orderId  주문 ID
+     * @param memberId 사용자 ID
      */
-    public void cancelOrder(Long orderId, TeamMemberVO teamMemberVO) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new CustomException(OrderErrorCode.ORDER_NOT_FOUND));
-        // 내가 작성한 주문이 아니면 취소 불가능
-        if (!order.getMember()
-                .getId()
-                .equals(teamMemberVO.getMemberId())) {
-            throw new CustomException(OrderErrorCode.ORDER_ACCESS_DENIED);
-        }
-        // 주문 정정 상태가 아니면 취소 불가능
-        if (!order.getOrderStatus()
-                .equals(OrderStatus.PENDING_MODIFY)) {
-            throw new CustomException(OrderErrorCode.ORDER_CANT_CANCEL);
-        }
-        // 언급한 사용자 삭제
-        orderMentionRepository.deleteAllByOrderId(order.getId());
-        // order 삭제
-        orderRepository.delete(order);
+    public void ordererCancelOrder(Long orderId, Long memberId) {
+        Order order = orderReader.read(orderId);
+        orderPermission.onlyOrdererCanAccess(order, memberId);
+        orderManager.canCancelOrder(order);
+        orderManager.reduceProductAmount(order);
+        orderWriter.delete(order);
     }
 
     /**
-     * 주문 댓글 추가 (관리자, 주문자)
+     * 주문 댓글 추가 (관리자, 주문의 주문자)
+     *
+     * @param memberId 사용자 ID
+     * @param role     팀에서 역할
+     * @param dto      주문 댓글 DTO
+     * @return 생성된 댓글의 ID
      */
-    public AddOrderCommentResponse addOrderComment(Long orderId, TeamMemberVO teamMemberVO,
-                                                   AddOrderCommentRequest requestDTO) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new CustomException(OrderErrorCode.ORDER_NOT_FOUND));
-        Member member = memberRepository.findById(teamMemberVO.getMemberId())
-                .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
-        // 접근 권한 확인 : 해당 글의 주문자 인지 확인, 해당 글의 관리자 인지 확인(언급된 사람)
-        if (member.getId()
-                .equals(order.getMember()
-                        .getId()) || orderMentionRepository.existsByMemberIdAndOrderId(member.getId(), order.getId())) {
-            // 댓글 추가 (단방향)
-            OrderComment comment = orderMapper.toOrderComment(requestDTO, member, order);
-            Long commentId = orderCommentRepository.save(comment)
-                    .getId();
-            return orderMapper.toAddOrderCommentResponse(commentId);
-        } else {
-            throw new CustomException(OrderErrorCode.ORDER_ACCESS_DENIED);
-        }
+    public Long addOrderComment(Long memberId, TeamMemberRole role, CreateOrderCommentCommend dto) {
+        Order order = orderReader.read(dto.orderId());
+        orderPermission.adminAndOrdererCanAccess(order, memberId, role);
+        return orderCommentWriter.create(dto);
     }
 
     /**
-     * 주문 생성
+     * 주문 생성 (주문자)
+     *
+     * @param memberId 사용자 ID
+     * @param teamId   팀 ID
+     * @param role     팀에서 역할
+     * @param dto      주문 DTO
+     * @return 생성된 주문의 ID
      */
-    public MakeOrderResponse makeOrder(MakeOrderRequest requestDTO, TeamMemberVO teamMemberVO) {
-        Member member = memberRepository.findById(teamMemberVO.getMemberId())
-                .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
-        Team team = teamRepository.findById(teamMemberVO.getTeamId())
-                .orElseThrow(() -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
-        TeamMemberRole role = teamMemberVO.getRole();
-        // 관리자, 뷰어 주문 불가능
-        ParticipantUtil.forbidAdmin(role);
-        ParticipantUtil.forbidViewer(role);
+    public Long createOrder(Long memberId, Long teamId, TeamMemberRole role, CreateOrderPayload dto) {
+        orderPermission.onlyOrdererCanOrder(role);
         // 관리자 없으면 주문자 주문 불가능
-        Optional<Participant> optionalParticipant = participantRepository.findByTeamIdAndTeamMemberRole(team.getId(),
-                TeamMemberRole.ADMIN);
-        if (optionalParticipant.isEmpty()) {
-            throw new CustomException(OrderErrorCode.ORDER_CREATION_NOT_ALLOWED);
-        }
-        Member admin = optionalParticipant.get()
-                .getMember();
-        // 존재하는 제품인지 확인
-        Product product = productRepository.findById(requestDTO.productId())
-                .orElseThrow(() -> new CustomException(InventoryErrorCode.PRODUCT_NOT_FOUND));
+        orderPermission.cannotOrderWithoutAdmin(teamId);
+        orderManager.existProduct(Long productId);
+        int productAmount = orderManager.readProductAmount(dto.productId());
         // 수량 비교
-        if (product.getAmount() < requestDTO.orderAmount()) {
-            throw new CustomException(OrderErrorCode.ORDER_AMOUNT_EXCEED);
-        }
-        // mapstruct로 주문 생성 - 작성자, 팀, 제품 FK
-        Order order = orderMapper.toOrder(requestDTO, member, team, product);
-        // 함께하는 사용자 테이블에 관리자 추가
-        OrderMention orderMention = orderMapper.toOrderMention(order, admin);
-        Long orderId = orderRepository.save(order)
-                .getId();
-        orderMentionRepository.save(orderMention);
-        return orderMapper.toMakeOrderResponse(orderId);
+        orderManager.isOrderAmountExceedProductAmount(dto.orderAmount(), productAmount);
+        return orderWriter.create(dto, memberId, teamId);
     }
 
-
-    private final OrderRepository orderRepository;
-    private final OrderMentionRepository orderMentionRepository;
-    private final OrderMapper orderMapper;
-
     /**
-     * 주문 댓글 조회
+     * 주문 댓글 조회 (관리자, 주문의 주문자)
+     *
+     * @param orderId  주문 ID
+     * @param memberId 사용자 ID
+     * @param teamId   팀 ID
+     * @param role     팀에서 역할
+     * @return 댓글 리스트
      */
-    public GetOrderCommentsResponse getOrderComments(Long orderId, TeamMemberVO teamMemberVO) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new CustomException(OrderErrorCode.ORDER_NOT_FOUND));
-        // 접근 권한 있는지 확인
-        if (teamMemberVO.getMemberId()
-                .equals(order.getMember()
-                        .getId()) || orderMentionRepository.existsByMemberIdAndOrderId(teamMemberVO.getMemberId(),
-                orderId)) {
-            // 댓글 조회
-            List<QueryOrderComment> orderComments = orderRepository.getOrderComments(orderId);
-            return orderMapper.toGetOrderCommentsResponse(orderComments);
-        } else {
-            throw new CustomException(OrderErrorCode.ORDER_ACCESS_DENIED);
-        }
+    public List<OrderComment> readOrderComments(Long orderId, Long memberId, Long teamId, TeamMemberRole role) {
+        Order order = orderReader.read(orderId);
+        orderPermission.adminAndOrdererCanAccess(order, memberId, role);
+        return orderCommentReader.readByOrderId(order.orderId());
     }
 
     /**
      * 주문 조회
+     *
+     * @param orderId  주문 ID
+     * @param memberId 사용자 ID
+     * @param teamId   팀 ID
+     * @param role     팀에서 역할
+     * @return 주문
      */
-    public GetOrderResponse getOrder(Long orderId, TeamMemberVO teamMemberVO) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new CustomException(OrderErrorCode.ORDER_NOT_FOUND));
-        // 접근 권한 있는지 확인
-        if (teamMemberVO.getMemberId()
-                .equals(order.getMember()
-                        .getId()) || orderMentionRepository.existsByMemberIdAndOrderId(teamMemberVO.getMemberId(),
-                orderId)) {
-            // 주문 조회
-            QueryOrder queryOrder = orderRepository.getOrder(orderId);
-            return orderMapper.toGetOrderResponse(queryOrder);
-        } else {
-            throw new CustomException(OrderErrorCode.ORDER_ACCESS_DENIED);
-        }
+    public Order readOrder(Long orderId, Long memberId, Long teamId, TeamMemberRole role) {
+        Order order = orderReader.read(orderId);
+        orderPermission.adminAndOrdererCanAccess(order, memberId, role);
+        return order;
     }
 
-    public boolean existsByOrderId(Long orderId) {
-        return orderRepository.existsById(orderId);
-    }
 }

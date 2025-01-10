@@ -51,6 +51,7 @@ public enum CoreErrorCode {
     ORDER005("ORDER-005"),
     ORDER006("ORDER-006"),
     ORDER007("ORDER-007"),
+    ORDER008("ORDER-008"),
     TEAM001("TEAM-001"),
     TEAM002("TEAM-002"),
     TEAM003("TEAM-003"),

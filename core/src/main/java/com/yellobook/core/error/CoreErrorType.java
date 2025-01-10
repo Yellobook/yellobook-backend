@@ -83,6 +83,7 @@ public enum CoreErrorType {
     ORDER_CANT_CANCEL(CoreErrorCode.ORDER005, "주문 정정 상태가 아닌 주문은 최소가 불가능 합니다."),
     ORDER_CREATION_NOT_ALLOWED(CoreErrorCode.ORDER006, "팀에 관리자가 없으면 주문 등록이 불가능 합니다."),
     ORDER_AMOUNT_EXCEED(CoreErrorCode.ORDER007, "주문 수량이 제품 수량을 초과할 수 없습니다."),
+    ONLY_ORDERER_CAN_ORDER(CoreErrorCode.ORDER008, "오직 주문자만 주문할 수 있습니다."),
 
     /*
     팀
