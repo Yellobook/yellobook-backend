@@ -33,4 +33,9 @@ public class ProductDao implements ProductRepository {
                 .orderBy(product.name.asc())
                 .fetch();
     }
+
+    @Override
+    public void updateAmount(int amount, Long productId) {
+        productJpaRepository.updateAmount(amount, productId);
+    }
 }

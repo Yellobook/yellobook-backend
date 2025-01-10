@@ -1,4 +1,4 @@
-package com.yellobook;
+package com.yellobook.core.domain.order;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,7 @@ public enum OrderStatus {
      */
     PENDING_CONFIRM,
     /**
-     * 주문 정정 대기중
+     * 주문 정정 요청 완료 후 대기중
      */
     PENDING_MODIFY,
     /**

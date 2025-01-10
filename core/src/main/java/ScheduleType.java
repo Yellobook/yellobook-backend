@@ -1,5 +1,3 @@
-package com.yellobook;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

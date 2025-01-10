@@ -1,7 +1,7 @@
 package com.yellobook.order;
 
 import com.yellobook.BaseEntity;
-import com.yellobook.core.domain.member.Member;
+import com.yellobook.member.MemberEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -30,14 +30,14 @@ public class OrderCommentEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    private MemberEntity member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private OrderEntity order;
 
     @Builder
-    private OrderCommentEntity(String content, Member member, OrderEntity order) {
+    private OrderCommentEntity(String content, MemberEntity member, OrderEntity order) {
         this.content = content;
         this.member = member;
         this.order = order;

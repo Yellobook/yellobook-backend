@@ -1,6 +1,11 @@
 package com.yellobook.order;
 
 import com.yellobook.BaseEntity;
+import com.yellobook.core.domain.order.Order;
+import com.yellobook.core.domain.order.OrderInfo;
+import com.yellobook.core.domain.order.OrderStatus;
+import com.yellobook.core.domain.order.Orderer;
+import com.yellobook.core.domain.order.Product;
 import com.yellobook.inventory.ProductEntity;
 import com.yellobook.member.MemberEntity;
 import com.yellobook.team.TeamEntity;
@@ -41,7 +46,7 @@ public class OrderEntity extends BaseEntity {
      * 상품 주문 상태 주문확정: CONFIRMED 주문확정대기: PENDING_CONFIRM 주문정정대기: PENDING_MODIFY
      */
     @Enumerated(EnumType.STRING)
-    private  orderStatus;
+    private OrderStatus orderStatus;
     /**
      * 주문 수량
      */
@@ -63,7 +68,8 @@ public class OrderEntity extends BaseEntity {
     @JoinColumn(name = "team_id")
     private TeamEntity team;
 
-    protected OrderEntity() {}
+    protected OrderEntity() {
+    }
 
     @Builder
     private OrderEntity(Integer view, String memo, LocalDate date, OrderStatus orderStatus, Integer orderAmount,
@@ -80,12 +86,17 @@ public class OrderEntity extends BaseEntity {
         this.team = team;
     }
 
-    public void requestModifyOrder() {
-        this.orderStatus = OrderStatus.PENDING_MODIFY;
-    }
-
-    public void confirmOrder() {
-        this.orderStatus = OrderStatus.CONFIRMED;
+    public Order toOrder() {
+        return new Order(
+                id,
+                new Orderer(member.getId(), member.getNickname()),
+                orderStatus,
+                new OrderInfo(new Product(product.getName(), product.getSubProduct(), product.getAmount()),
+                        orderAmount),
+                view,
+                memo,
+                date
+        );
     }
 
 }
