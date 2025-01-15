@@ -1,10 +1,20 @@
 package com.yellobook.core.domain.inventory;
 
+import java.util.List;
+import java.util.Optional;
+import org.springframework.stereotype.Repository;
+
+@Repository
 public interface InventoryRepository {
-    List<Persistence 의 DTO>
+    Optional<Inventory> findById(Long id);
 
-    // 도메인에 dto 를 정의해 놔야하는데 -> 도메인이 오염되는 (조회땜에)
-    // 비즈니스적으로 필요한데이터가 있고, 도메인모델이 표현하는 데이터
+    Long save(Long teamId, String title);
 
-    // 이래서 CQRS 를 본 이유가 이것도 있음
+    List<Inventory> findInventoriesByTeamId(Long teamId, Integer page, Integer size);
+
+    Optional<Inventory> findLastByTeamIdAndCreatedAt(Long teamId);
+
+    void updateUpdatedAt(Long id);
+
+    void increaseView(Long id);
 }

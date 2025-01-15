@@ -37,6 +37,7 @@ dependencies {
 
     runtimeOnly project(":infrastructure:db-core")
     implementation project(':core')
+    implementation project(':infrastructure:parser-excel')
 //    implementation project(":storage:storage-redis")
 
     // validation

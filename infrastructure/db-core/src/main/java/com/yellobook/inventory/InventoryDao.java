@@ -3,6 +3,7 @@ package com.yellobook.inventory;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yellobook.core.domain.inventory.InventoryRepository;
+import com.yellobook.team.TeamEntity;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Repository;
 public class InventoryDao implements InventoryRepository {
     private final JPAQueryFactory jpaQueryFactory;
     private final InventoryJpaRepository inventoryJpaRepository;
+    private final TeamJpaRepository teamJpaRepository;
 
     public InventoryDao(JPAQueryFactory jpaQueryFactory, InventoryJpaRepository inventoryJpaRepository) {
         this.jpaQueryFactory = jpaQueryFactory;
@@ -36,6 +38,17 @@ public class InventoryDao implements InventoryRepository {
                 .offset(page.getOffset())
                 .limit(page.getPageSize())
                 .fetch();
+    }
+
+    @Override
+    public Long save(Long teamId, String title) {
+        TeamEntity teamEntity = teamJpaRepository.getReferenceById(teamId);
+        InventoryEntity inventoryEntity = InventoryEntity.builder()
+                .team(teamEntity)
+                .title(title)
+                .build();
+        return inventoryJpaRepository.save(inventoryEntity)
+                .getId();
     }
 }
 

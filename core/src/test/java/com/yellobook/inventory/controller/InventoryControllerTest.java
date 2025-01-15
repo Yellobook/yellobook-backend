@@ -489,7 +489,7 @@ class InventoryControllerTest {
                         .inventoryId(1L)
                         .productIds(Arrays.asList(1L, 2L, 3L))
                         .build();
-                when(inventoryCommandService.addInventory(file, teamMemberVO)).thenReturn(response);
+                when(inventoryCommandService.createInventory(file, teamMemberVO)).thenReturn(response);
             }
 
             @Test

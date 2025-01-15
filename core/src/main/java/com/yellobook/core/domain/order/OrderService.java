@@ -3,6 +3,7 @@ package com.yellobook.core.domain.order;
 import com.yellobook.core.domain.common.TeamMemberRole;
 import com.yellobook.core.domain.order.dto.CreateOrderCommentCommend;
 import com.yellobook.core.domain.order.dto.CreateOrderPayload;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@Transactional
 public class OrderService {
     private final OrderReader orderReader;
     private final OrderWriter orderWriter;
@@ -104,7 +106,7 @@ public class OrderService {
         orderPermission.onlyOrdererCanOrder(role);
         // 관리자 없으면 주문자 주문 불가능
         orderPermission.cannotOrderWithoutAdmin(teamId);
-        orderManager.existProduct(Long productId);
+        orderManager.existProduct(dto.productId());
         int productAmount = orderManager.readProductAmount(dto.productId());
         // 수량 비교
         orderManager.isOrderAmountExceedProductAmount(dto.orderAmount(), productAmount);

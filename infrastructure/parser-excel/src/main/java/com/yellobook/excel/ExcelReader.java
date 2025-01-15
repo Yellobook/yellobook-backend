@@ -1,16 +1,17 @@
-package com.yellobook.core.domain.inventory;
+package com.yellobook.excel;
 
-import com.yellobook.core.error.CoreErrorType;
-import com.yellobook.core.error.CoreException;
-import com.yellobook.inventory.dto.cond.ExcelProductCond;
-import com.yellobook.core.error.CoreErrorType;
-import com.yellobook.support.error.exception.CoreException();
+import static com.yellobook.excel.ExcelErrorType.CELL_INVALID_TYPE;
+import static com.yellobook.excel.ExcelErrorType.FILE_NOT_EXCEL;
+import static com.yellobook.excel.ExcelErrorType.FILE_NOT_EXIST;
+import static com.yellobook.excel.ExcelErrorType.INT_OVER_ONE;
+import static com.yellobook.excel.ExcelErrorType.ROW_HAS_EMPTY_CELL;
+import static com.yellobook.excel.ExcelErrorType.SKU_DUPLICATE;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.EmptyFileException;
 import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -19,43 +20,40 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
+
 
 @Component
-@Slf4j
-public class ExcelReadUtil {
+public class ExcelReader {
     /**
      * 1. 해당 파일이 엑셀 파일이 맞는지 확인 2. B ~ G가 엑셀에 맞는 양식인지 확인 3. 각 행을 읽으면서 값 유효성 확인 (and 만약 각 행중 어느 하나라도 값이 없거나 유효하지 않으면 예외
      * 처리) 3-a. 문자열, 정수가 맞는지 확인 4. sku 중복 있는지 확인 5. 유효성 확인이 끝났으면 제품들 record로 저장
      */
-    public List<ExcelProductCond> read(MultipartFile excelFile) throws IOException {
-        List<ExcelProductCond> productConds = new ArrayList<>();
+    public List<ExcelProductCell> convertFileToDTO(InputStream inputStream) throws IOException {
+        List<ExcelProductCell> productConds = new ArrayList<>();
         HashSet<Integer> skuSet = new HashSet<>();
 
-        // 빈 파일은 아닌지, .xlsx의 확장자가 맞는지 확인
-        InputStream file = excelFile.getInputStream();
         XSSFWorkbook workbook;
         try {
             // workbook 생성
-            workbook = new XSSFWorkbook(file);
+            workbook = new XSSFWorkbook(inputStream);
         } catch (EmptyFileException e) {
-            throw new CoreException(CoreErrorType.FILE_NOT_EXIST);
+            throw new ExcelParsingException(FILE_NOT_EXIST);
         } catch (NotOfficeXmlFileException e) {
-            throw new CoreException(CoreErrorType.FILE_NOT_EXCEL);
+            throw new ExcelParsingException(FILE_NOT_EXCEL);
+
         }
 
         // sheet 가져오기
         XSSFSheet sheet = workbook.getSheetAt(0);
         for (Row row : sheet) {
             if (row.getRowNum() >= 2) {  // 세번째 row
-                ExcelProductCond productCond = validProductRow(row, 1, 6, skuSet);
+                ExcelProductCell productCond = validProductRow(row, 1, 6, skuSet);
                 if (productCond != null) {
                     productConds.add(productCond);
                 }
             }
         }
         workbook.close();
-        file.close();
 
         return productConds;
     }
@@ -63,7 +61,7 @@ public class ExcelReadUtil {
     /**
      * 제품 값이 있는 row 조사
      */
-    private ExcelProductCond validProductRow(Row row, int startCol, int endCol, HashSet<Integer> skuSet) {
+    private ExcelProductCell validProductRow(Row row, int startCol, int endCol, HashSet<Integer> skuSet) {
         // B열부터 G열까지 조사 (인덱스 1부터 6까지)
         String name = null;
         String subProduct = null;
@@ -96,12 +94,12 @@ public class ExcelReadUtil {
         }
         // row가 비어있는지 확인
         if (isRowEmpty) {
-            log.info("[EXCEL] Row is Empty");
+            //log.info("[EXCEL] Row is Empty");
             return null;
         }
         // 빈 값이 있는지 없는지 확인
         if (isRowValid(name, subProduct, sku, purchasePrice, salePrice, amount)) {
-            return ExcelProductCond.builder()
+            return ExcelProductCell.builder()
                     .name(name)
                     .subProduct(subProduct)
                     .sku(sku)
@@ -110,7 +108,7 @@ public class ExcelReadUtil {
                     .amount(amount)
                     .build();
         } else {
-            throw new CoreException(CoreErrorType.ROW_HAS_EMPTY_CELL);
+            throw new ExcelParsingException(ROW_HAS_EMPTY_CELL);
         }
     }
 
@@ -130,7 +128,7 @@ public class ExcelReadUtil {
         if (cell.getCellType() == CellType.STRING) {
             return cell.getStringCellValue();
         }
-        throw new CoreException(CoreErrorType.CELL_INVALID_TYPE);
+        throw new ExcelParsingException(CELL_INVALID_TYPE);
     }
 
     /**
@@ -140,11 +138,11 @@ public class ExcelReadUtil {
         if (cell.getCellType() == CellType.NUMERIC) {
             int num = (int) cell.getNumericCellValue();
             if (num < 0) {
-                throw new CoreException(CoreErrorType.INT_OVER_ONE);
+                throw new ExcelParsingException(INT_OVER_ONE);
             }
             return num;
         }
-        throw new CoreException(CoreErrorType.CELL_INVALID_TYPE);
+        throw new ExcelParsingException(CELL_INVALID_TYPE);
     }
 
     /**
@@ -152,8 +150,8 @@ public class ExcelReadUtil {
      */
     private void isSKUDuplicate(Integer sku, HashSet<Integer> skuSet) {
         if (skuSet.contains(sku)) {
-            log.info("[EXCEL] dupSKU# : {}", sku);
-            throw new CoreException(CoreErrorType.SKU_DUPLICATE);
+            //log.info("[EXCEL] dupSKU# : {}", sku);
+            throw new ExcelParsingException(SKU_DUPLICATE);
         } else {
             skuSet.add(sku);
         }

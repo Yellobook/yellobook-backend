@@ -1,5 +1,6 @@
 package com.yellobook.api.support.error;
 
+import com.yellobook.excel.ExcelErrorType;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.http.HttpStatus;
 
@@ -101,5 +102,18 @@ public enum ApiErrorType {
 
     public LogLevel getLogLevel() {
         return logLevel;
+    }
+
+    public static ApiErrorType from(ExcelErrorType excelErrorType) {
+        return switch (excelErrorType) {
+            case FILE_NOT_EXIST -> FILE_NOT_EXIST;
+            case FILE_NOT_EXCEL -> FILE_NOT_EXCEL;
+            case CELL_IS_EMPTY -> CELL_IS_EMPTY;
+            case CELL_INVALID_TYPE -> CELL_INVALID_TYPE;
+            case ROW_HAS_EMPTY_CELL -> ROW_HAS_EMPTY_CELL;
+            case FILE_IO_FAIL -> FILE_IO_FAIL;
+            case SKU_DUPLICATE -> SKU_DUPLICATE;
+            case INT_OVER_ONE -> INT_OVER_ONE;
+        };
     }
 }
