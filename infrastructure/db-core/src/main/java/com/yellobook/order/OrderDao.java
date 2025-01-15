@@ -74,6 +74,11 @@ public class OrderDao implements OrderRepository {
         return orderEntity.map(OrderEntity::toOrder);
     }
 
+    @Override
+    public boolean existByProductId(Long productId) {
+        return orderJpaRepository.existsByProductId(productId);
+    }
+
 
     public QueryOrder getOrder(Long orderId) {
         QOrder order = QOrder.order;

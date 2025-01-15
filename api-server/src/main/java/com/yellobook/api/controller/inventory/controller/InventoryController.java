@@ -1,6 +1,5 @@
 package com.yellobook.api.controller.inventory.controller;
 
-import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.api.controller.inventory.dto.request.AddProductRequest;
 import com.yellobook.api.controller.inventory.dto.request.ModifyProductAmountRequest;
 import com.yellobook.api.controller.inventory.dto.response.AddInventoryResponse;
@@ -9,9 +8,14 @@ import com.yellobook.api.controller.inventory.dto.response.GetProductsNameRespon
 import com.yellobook.api.controller.inventory.dto.response.GetProductsResponse;
 import com.yellobook.api.controller.inventory.dto.response.GetSubProductNameResponse;
 import com.yellobook.api.controller.inventory.dto.response.GetTotalInventoryResponse;
-import com.yellobook.inventory.service.InventoryCommandService;
-import com.yellobook.inventory.service.InventoryQueryService;
 import com.yellobook.api.support.TeamMember;
+import com.yellobook.api.support.error.ApiErrorType;
+import com.yellobook.api.support.error.ApiException;
+import com.yellobook.common.vo.TeamMemberVO;
+import com.yellobook.core.domain.inventory.InventoryService;
+import com.yellobook.core.domain.inventory.dto.CreateProductDetail;
+import com.yellobook.excel.ExcelParsingException;
+import com.yellobook.excel.ExcelReader;
 import com.yellobook.support.common.validation.annotation.ExistInventory;
 import com.yellobook.support.common.validation.annotation.ExistProduct;
 import com.yellobook.support.response.ResponseFactory;
@@ -20,6 +24,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -46,8 +53,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class InventoryController {
 
-    private final InventoryCommandService inventoryCommandService;
-    private final InventoryQueryService inventoryQueryService;
+    private final InventoryService inventoryService;
+    private final ExcelReader excelReadUtil;
 
     @Operation(summary = "전체 재고 현황 글 조회")
     @GetMapping
@@ -56,7 +63,7 @@ public class InventoryController {
             @Min(value = 1, message = "size는 1 이상이여야 합니다.") @RequestParam("size") Integer size,
             @TeamMember TeamMemberVO teamMember
     ) {
-        var result = inventoryQueryService.getTotalInventory(page, size, teamMember);
+        var result = inventoryService.getTotalInventory(page, size, teamMember);
         return ResponseFactory.success(result);
     }
 
@@ -66,7 +73,7 @@ public class InventoryController {
             @ExistInventory @PathVariable("inventoryId") Long inventoryId,
             @TeamMember TeamMemberVO teamMember
     ) {
-        GetProductsResponse response = inventoryQueryService.getProductsByInventory(inventoryId, teamMember);
+        GetProductsResponse response = inventoryService.getProductsByInventory(inventoryId, teamMember);
         return ResponseFactory.success(response);
     }
 
@@ -76,7 +83,7 @@ public class InventoryController {
             @ExistInventory @PathVariable("inventoryId") Long inventoryId,
             @TeamMember TeamMemberVO teamMember
     ) {
-        inventoryCommandService.increaseInventoryView(inventoryId, teamMember);
+        inventoryService.increaseInventoryView(inventoryId, teamMember);
         return ResponseFactory.noContent();
     }
 
@@ -87,7 +94,7 @@ public class InventoryController {
             @RequestParam("keyword") String keyword,
             @TeamMember TeamMemberVO teamMember
     ) {
-        GetProductsResponse response = inventoryQueryService.getProductByKeywordAndInventory(inventoryId, keyword,
+        GetProductsResponse response = inventoryService.searchProductByInventoryAndContainKeyword(inventoryId, keyword,
                 teamMember);
         return ResponseFactory.success(response);
     }
@@ -99,7 +106,7 @@ public class InventoryController {
             @Valid @RequestBody AddProductRequest requestDTO,
             @TeamMember TeamMemberVO teamMember
     ) {
-        AddProductResponse response = inventoryCommandService.addProduct(inventoryId, requestDTO, teamMember);
+        AddProductResponse response = inventoryService.addProduct(inventoryId, requestDTO, teamMember);
         return ResponseFactory.created(response);
     }
 
@@ -110,7 +117,7 @@ public class InventoryController {
             @Valid @RequestBody ModifyProductAmountRequest requestDTO,
             @TeamMember TeamMemberVO teamMember
     ) {
-        inventoryCommandService.modifyProductAmount(productId, requestDTO, teamMember);
+        inventoryService.modifyProductAmount(productId, requestDTO, teamMember);
         return ResponseFactory.noContent();
     }
 
@@ -120,7 +127,7 @@ public class InventoryController {
             @ExistProduct @PathVariable("productId") Long productId,
             @TeamMember TeamMemberVO teamMember
     ) {
-        inventoryCommandService.deleteProduct(productId, teamMember);
+        inventoryService.deleteProduct(productId, teamMember);
         return ResponseFactory.noContent();
     }
 
@@ -130,8 +137,23 @@ public class InventoryController {
             @RequestPart("file") MultipartFile file,
             @TeamMember TeamMemberVO teamMember
     ) {
-        AddInventoryResponse response = inventoryCommandService.addInventory(file, teamMember);
-        return ResponseFactory.created(response);
+        try (InputStream inputStream = file.getInputStream()) {
+            List<CreateProductDetail> productDetails = excelReadUtil.convertFileToDTO(inputStream)
+                    .stream()
+                    .map(
+                            c -> new CreateProductDetail(c.name(), c.subProduct(), c.sku(), c.purchasePrice(),
+                                    c.salePrice(),
+                                    c.amount())
+                    )
+                    .toList();
+            AddInventoryResponse response = inventoryService.createInventory(productDetails, teamId,
+                    role);
+            return ResponseFactory.created(response);
+        } catch (ExcelParsingException e) {
+            throw new ApiException(ApiErrorType.from(e.getErrorType()), e.getData());  //Errorcode 만들어서 code.from 으로 변경
+        } catch (IOException e) {
+            throw new ApiException(ApiErrorType.FILE_IO_FAIL);
+        }
     }
 
     @Operation(summary = "제품 이름으로 제품 조회")
@@ -140,7 +162,7 @@ public class InventoryController {
             @RequestParam("name") String name,
             @TeamMember TeamMemberVO teamMember
     ) {
-        GetProductsNameResponse response = inventoryQueryService.getProductsName(name, teamMember);
+        GetProductsNameResponse response = inventoryService.searchProductsContainKeyword(name, teamMember);
         return ResponseFactory.success(response);
     }
 
@@ -150,7 +172,7 @@ public class InventoryController {
             @RequestParam("name") String name,
             @TeamMember TeamMemberVO teamMember
     ) {
-        GetSubProductNameResponse response = inventoryQueryService.getSubProductName(name, teamMember);
+        GetSubProductNameResponse response = inventoryService.searchProductsByName(name, teamMember);
         return ResponseFactory.success(response);
     }
 

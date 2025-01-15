@@ -1,9 +1,9 @@
-package com.yellobook.api.controller.inventory.dto.cond;
+package com.yellobook.core.domain.inventory.dto;
 
 import lombok.Builder;
 
 @Builder
-public record ExcelProductCond(
+public record CreateProductDetail(
         String name,
         String subProduct,
         Integer sku,

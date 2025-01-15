@@ -13,4 +13,6 @@ public interface OrderRepository {
     Optional<Order> findById(Long orderId);
 
     void updateOrderStatus(OrderStatus status, Long orderId);
+
+    boolean existByProductId(Long productId);
 }

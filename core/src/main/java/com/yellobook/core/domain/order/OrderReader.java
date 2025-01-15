@@ -18,5 +18,7 @@ public class OrderReader {
                 .orElseThrow(() -> new CoreException(ORDER_NOT_FOUND));
     }
 
-
+    public boolean existByProduct(Long productId) {
+        return orderRepository.existByProductId(productId);
+    }
 }

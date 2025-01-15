@@ -18,4 +18,4 @@ include 'api-server'
 include 'core'
 include 'infrastructure:db-core'
 include 'infrastructure:storage-redis'
-
+include 'infrastructure:parser-excel'
