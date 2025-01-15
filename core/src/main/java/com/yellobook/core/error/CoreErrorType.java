@@ -10,11 +10,17 @@ public enum CoreErrorType {
     // Inventory
     INVENTORY_NOT_FOUND(CoreErrorCode.INVENTORY001, CoreErrorKind.NOT_FOUND, "해당 재고 현황은 존재하지 않습니다.",
             CoreErrorLevel.WARN),
-    INVENTORY_PRODUCT_NOT_FOUND(CoreErrorCode.INVENTORY002, CoreErrorKind.NOT_FOUND, "해당 제품은 존재하지 않습니다.",
+    PRODUCT_NOT_FOUND(CoreErrorCode.INVENTORY002, CoreErrorKind.NOT_FOUND, "해당 제품은 존재하지 않습니다.",
             CoreErrorLevel.WARN),
-    INVENTORY_PRODUCT_SKU_ALREADY_EXISTS(CoreErrorCode.INVENTORY003, CoreErrorKind.CONFLICT, "이미 존재하는 품번입니다.",
+    PRODUCT_SKU_ALREADY_EXISTS(CoreErrorCode.INVENTORY003, CoreErrorKind.CONFLICT, "이미 존재하는 품번입니다.",
             CoreErrorLevel.ERROR), // 시스템 데이터 중복은 ERROR
     ORDER_RELATED(CoreErrorCode.INVENTORY004, CoreErrorKind.BAD_REQUEST, "주문과 연결되어 있는 제품이라서 삭제가 불가능합니다.",
+            CoreErrorLevel.WARN),
+    VIEWER_CANT_ACCESS_INVENTORY(CoreErrorCode.INVENTORY005, CoreErrorKind.CONFLICT, "뷰어는 재고 현황에 접근할 수 없습니다",
+            CoreErrorLevel.WARN),
+    TEAM_INVENTORY_EMPTY(CoreErrorCode.INVENTORY006, CoreErrorKind.NOT_FOUND, "팀에 재고 현황이 존재하지 않습니다",
+            CoreErrorLevel.WARN),
+    ONLY_ADMIN_CAN_MANIPULATE_INVENTORY(CoreErrorCode.INVENTORY007, CoreErrorKind.FORBIDDEN, "오직 관리자만 재고를 관리할 수 있습니다.",
             CoreErrorLevel.WARN),
 
     // Member
