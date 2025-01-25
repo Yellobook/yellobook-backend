@@ -1,8 +1,8 @@
 package com.yellobook.team;
 
 import com.yellobook.BaseEntity;
-import com.yellobook.TeamMemberRole;
-import com.yellobook.core.domain.member.Member;
+import com.yellobook.core.domain.common.TeamMemberRole;
+import com.yellobook.member.MemberEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -35,27 +35,20 @@ public class Participant extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id", nullable = false)
-    private Team team;
+    private TeamEntity team;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    private MemberEntity member;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TeamMemberRole teamMemberRole;
 
     @Builder
-    public Participant(Team team, Member member, TeamMemberRole teamMemberRole) {
-        isValid(team, member, teamMemberRole);
+    public Participant(TeamEntity team, MemberEntity member, TeamMemberRole teamMemberRole) {
         this.team = team;
         this.member = member;
         this.teamMemberRole = teamMemberRole;
-    }
-
-    private void isValid(Team team, Member member, TeamMemberRole role) {
-        if (team == null || member == null || role == null) {
-            throw new IllegalArgumentException("null값이 존재합니다.");
-        }
     }
 }

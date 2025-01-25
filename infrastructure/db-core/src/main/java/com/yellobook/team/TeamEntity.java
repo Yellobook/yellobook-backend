@@ -38,18 +38,9 @@ public class TeamEntity extends BaseEntity {
 
     @Builder
     private TeamEntity(String name, String phoneNumber, String address) {
-        isValid(name, phoneNumber, address);
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.address = address;
-    }
-
-    // 로직 분리 필요
-    private void isValid(String name, String phoneNumber, String address) {
-        if (name == null || name.isEmpty() || phoneNumber == null || phoneNumber.isEmpty() || address == null
-                || address.isEmpty()) {
-            throw new IllegalArgumentException("빈칸이 존재합니다.");
-        }
     }
 
     Team toTeam() {
