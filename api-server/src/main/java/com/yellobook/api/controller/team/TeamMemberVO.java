@@ -1,4 +1,4 @@
-package com.yellobook.core.domain.team;
+package com.yellobook.controller.team;
 
 import com.yellobook.TeamMemberRole;
 import java.util.Objects;

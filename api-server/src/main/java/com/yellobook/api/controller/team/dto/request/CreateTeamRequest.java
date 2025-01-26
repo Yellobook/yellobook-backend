@@ -1,6 +1,7 @@
 package com.yellobook.api.controller.team.dto.request;
 
 import com.yellobook.TeamMemberRole;
+import com.yellobook.core.domain.team.CreateTeamCommand;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -19,4 +20,7 @@ public record CreateTeamRequest(
         @Schema(description = "팀을 생성한 사람의 권한", example = "ADMIN")
         TeamMemberRole role
 ) {
+    CreateTeamCommand toCommand() {
+        return new CreateTeamCommand(name, phoneNumber, address, role);
+    }
 }

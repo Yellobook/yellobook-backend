@@ -1,6 +1,6 @@
-package com.yellobook.domains.team.dto.query;
+package com.yellobook.team.dto.query;
 
-import com.yellobook.TeamMemberRole;
+import com.yellobook.core.domain.common.TeamMemberRole;
 import lombok.Builder;
 
 @Builder

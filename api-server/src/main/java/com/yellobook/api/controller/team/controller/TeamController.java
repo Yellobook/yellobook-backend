@@ -10,16 +10,23 @@ import com.yellobook.api.controller.team.dto.response.TeamMemberListResponse;
 import com.yellobook.common.vo.TeamMemberVO;
 import com.yellobook.api.controller.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.api.support.TeamMember;
+import com.yellobook.controller.auth.security.oauth2.dto.CustomOAuth2User;
+import com.yellobook.controller.team.dto.request.CreateTeamRequest;
+import com.yellobook.controller.team.dto.request.InvitationCodeRequest;
+import com.yellobook.controller.team.dto.response.CreateTeamResponse;
+import com.yellobook.controller.team.dto.response.GetTeamResponse;
+import com.yellobook.controller.team.dto.response.InvitationCodeResponse;
+import com.yellobook.controller.team.dto.response.JoinTeamResponse;
+import com.yellobook.controller.team.dto.response.TeamMemberListResponse;
+import com.yellobook.core.domain.team.TeamService;
+import com.yellobook.support.common.resolver.annotation.TeamMember;
 import com.yellobook.support.common.validation.annotation.ExistTeam;
 import com.yellobook.support.response.ResponseFactory;
 import com.yellobook.support.response.SuccessResponse;
-import com.yellobook.team.TeamCommandService;
-import com.yellobook.team.TeamQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -35,13 +42,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Validated
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/v1/teams")
 @Tag(name = "\uD83D\uDC65 팀", description = "Team API")
 public class TeamController {
-    private final TeamCommandService teamCommandService;
-    private final TeamQueryService teamQueryService;
+    private final TeamService teamService;
 
+    public TeamController(TeamService teamService) {
+        this.teamService = teamService;
+    }
+
+    //팀 생성에 필요한 정보들 및 유저 정보 writer 사용
     @PostMapping
     @Operation(summary = "팀 만들기 API", description = "새로운 팀을 생성하는 API입니다.")
     public ResponseEntity<SuccessResponse<CreateTeamResponse>> createTeam(
@@ -52,6 +62,7 @@ public class TeamController {
         return ResponseFactory.created(response);
     }
 
+    //teamId, memberId 둘 다 필요함
     @PostMapping("/{teamId}/invite")
     @Operation(summary = "팀 초대", description = "팀원이 다른 구성원을 초대하기 위해 URL을 생성하는 API입니다.")
     public ResponseEntity<SuccessResponse<InvitationCodeResponse>> inviteTeam(
@@ -64,6 +75,7 @@ public class TeamController {
         return ResponseFactory.created(response);
     }
 
+    //writer 사용
     @DeleteMapping("/{teamId}/leave")
     @Operation(summary = "팀 나가기", description = "팀원이 본인이 속한 팀에서 나가기 위한 API입니다.")
     public ResponseEntity<Void> leaveTeam(
@@ -85,6 +97,7 @@ public class TeamController {
         return ResponseFactory.success(response);
     }
 
+    //reader 사용
     @GetMapping("/{teamId}")
     @Operation(summary = "팀 전환", description = "멤버가 다른 팀의 정보를 가지고 오는 API입니다.")
     public ResponseEntity<SuccessResponse<GetTeamResponse>> getTeam(
@@ -95,6 +108,7 @@ public class TeamController {
         return ResponseFactory.success(response);
     }
 
+    //reader
     @GetMapping("/members")
     @Operation(summary = "팀 내의 모든 멤버 조회")
     public ResponseEntity<SuccessResponse<TeamMemberListResponse>> getTeamMembers(
