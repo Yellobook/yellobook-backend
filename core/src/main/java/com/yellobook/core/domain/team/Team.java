@@ -5,6 +5,7 @@ public record Team(
         Long teamId,
         String name,
         String phoneNumber,
-        String address
+        String address,
+        Searchable searchable
 ) {
 }

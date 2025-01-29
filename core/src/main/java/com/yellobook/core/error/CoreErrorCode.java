@@ -66,7 +66,14 @@ public enum CoreErrorCode {
     TEAM009("TEAM-009"),
     TEAM010("TEAM-010"),
     TEAM011("TEAM-011"),
-    TEAM012("TEAM-012");
+    TEAM012("TEAM-012"),
+    TEAM013("TEAM-013"),
+    TEAM014("TEAM-014"),
+    TEAM015("TEAM-015"),
+    TEAM016("TEAM-016"),
+    TEAM017("TEAM-017"),
+    TEAM018("TEAM-018"),
+    TEAM019("TEAM-019");
 
     private final String code;
 

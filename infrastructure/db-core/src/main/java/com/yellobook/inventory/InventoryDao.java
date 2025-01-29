@@ -4,9 +4,11 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yellobook.core.domain.inventory.InventoryRepository;
 import com.yellobook.team.TeamEntity;
-import java.util.List;
+import com.yellobook.team.TeamJpaRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public class InventoryDao implements InventoryRepository {
@@ -14,9 +16,10 @@ public class InventoryDao implements InventoryRepository {
     private final InventoryJpaRepository inventoryJpaRepository;
     private final TeamJpaRepository teamJpaRepository;
 
-    public InventoryDao(JPAQueryFactory jpaQueryFactory, InventoryJpaRepository inventoryJpaRepository) {
+    public InventoryDao(JPAQueryFactory jpaQueryFactory, InventoryJpaRepository inventoryJpaRepository, TeamJpaRepository teamJpaRepository) {
         this.jpaQueryFactory = jpaQueryFactory;
         this.inventoryJpaRepository = inventoryJpaRepository;
+        this.teamJpaRepository = teamJpaRepository;
     }
 
     // 조회관련이라서 dto 로 넘겨야 하고 domain 엔티티를 사용할 수 없을 때

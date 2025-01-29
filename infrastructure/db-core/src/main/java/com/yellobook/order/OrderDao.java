@@ -14,10 +14,12 @@ import com.yellobook.inventory.ProductJpaRepository;
 import com.yellobook.member.MemberEntity;
 import com.yellobook.member.MemberJpaRepository;
 import com.yellobook.team.TeamEntity;
-import java.time.LocalDate;
-import java.util.Optional;
+import com.yellobook.team.TeamJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.time.LocalDate;
+import java.util.Optional;
 
 @Repository
 public class OrderDao implements OrderRepository {
@@ -31,11 +33,11 @@ public class OrderDao implements OrderRepository {
     @Autowired
     public OrderDao(OrderJpaRepository orderJpaRepository,
                     ProductJpaRepository productJpaRepository, MemberJpaRepository memberJpaRepository,
-                    TeamJpaRepository teamRepository, JPAQueryFactory queryFactory) {
+                    TeamJpaRepository teamRepository, TeamJpaRepository teamJpaRepository, JPAQueryFactory queryFactory) {
         this.orderJpaRepository = orderJpaRepository;
         this.productJpaRepository = productJpaRepository;
         this.memberJpaRepository = memberJpaRepository;
-        this.teamRepository = teamRepository;
+        this.teamJpaRepository = teamJpaRepository;
         this.queryFactory = queryFactory;
     }
 

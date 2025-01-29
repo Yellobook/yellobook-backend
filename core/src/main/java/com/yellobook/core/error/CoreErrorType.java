@@ -57,7 +57,16 @@ public enum CoreErrorType {
     MEMBER_ALREADY_EXIST(CoreErrorCode.TEAM010, CoreErrorKind.CONFLICT, "이미 팀에 참여한 멤버입니다.", CoreErrorLevel.WARN),
     EXIST_TEAM_NAME(CoreErrorCode.TEAM011, CoreErrorKind.CONFLICT, "이미 존재하는 팀 이름입니다.", CoreErrorLevel.WARN),
     MENTIONED_MEMBER_NOT_FOUND(CoreErrorCode.TEAM012, CoreErrorKind.NOT_FOUND, "존재하지 않는 사용자에 대한 언급입니다.",
-            CoreErrorLevel.WARN);
+            CoreErrorLevel.WARN),
+    ONLY_ADMIN_CAN_UPDATE(CoreErrorCode.TEAM013, CoreErrorKind.CONFLICT, "오직 관리자만 변경할 수 있는 정보 입니다.", CoreErrorLevel.WARN),
+    MEMBER_ALREADY_APPLY(CoreErrorCode.TEAM014, CoreErrorKind.CONFLICT, "이미 가입 요청을 한 멤버입니다.", CoreErrorLevel.WARN),
+    ADMIN_AND_ORDERER_CAN_UPDATE_JOIN_REQUEST(CoreErrorCode.TEAM015, CoreErrorKind.CONFLICT, "오직 관리자와 주문자만 가입 요청을 승인 또는 거절할 수 있습니다.", CoreErrorLevel.WARN),
+    APPLY_TEAM_NOT_FOUND(CoreErrorCode.TEAM016, CoreErrorKind.NOT_FOUND, "존재하지 않는 가입 요청입니다.", CoreErrorLevel.WARN),
+    ONLY_VIEWER_CAN_REQUESTED_ORDERER_CONVERSION(CoreErrorCode.TEAM017, CoreErrorKind.CONFLICT, "뷰어만 주문자로 권한 변경을 요청할 수 있습니다.", CoreErrorLevel.WARN),
+    ALREADY_REQUESTED_ORDERER_CONVERSION(CoreErrorCode.TEAM018, CoreErrorKind.CONFLICT, "이미 주문자로 권한 변경 요청을 했습니다.", CoreErrorLevel.WARN),
+    ROLE_CONVERSION_NOT_FOUND(CoreErrorCode.TEAM019, CoreErrorKind.NOT_FOUND, "권한 변경 요청이 존재하지 않습니다.", CoreErrorLevel.WARN),
+    ;
+
 
     private final CoreErrorCode code;
     private final CoreErrorKind kind;

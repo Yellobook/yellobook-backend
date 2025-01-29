@@ -2,35 +2,39 @@ package com.yellobook.team;
 
 import com.yellobook.core.domain.common.TeamMemberRole;
 import com.yellobook.core.domain.member.Member;
-import com.yellobook.core.domain.team.Team;
-import com.yellobook.core.domain.team.TeamRepository;
+import com.yellobook.core.domain.team.*;
 import com.yellobook.member.MemberEntity;
 import com.yellobook.member.MemberJpaRepository;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Optional;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public class TeamDao implements TeamRepository {
     private final TeamJpaRepository teamJpaRepository;
     private final ParticipantJpaRepository participantJpaRepository;
     private final MemberJpaRepository memberJpaRepository;
+    private final TeamApplyJpaRepository teamApplyJpaRepository;
+    private final TeamRoleChangeJpaRepository teamRoleChangeJpaRepository;
 
     public TeamDao(TeamJpaRepository teamJpaRepository, ParticipantJpaRepository participantJpaRepository,
-                   MemberJpaRepository memberJpaRepository) {
+                   MemberJpaRepository memberJpaRepository, TeamApplyJpaRepository teamApplyJpaRepository, TeamRoleChangeJpaRepository teamRoleChangeJpaRepository) {
         this.teamJpaRepository = teamJpaRepository;
         this.participantJpaRepository = participantJpaRepository;
         this.memberJpaRepository = memberJpaRepository;
+        this.teamApplyJpaRepository = teamApplyJpaRepository;
+        this.teamRoleChangeJpaRepository = teamRoleChangeJpaRepository;
     }
 
     @Override
     public boolean existByTeamAndMemberAndRole(Long teamId, Long memberId, TeamMemberRole role) {
-        return participantJpaRepository.existsByTeamEntityIdAndMemberEntityIdAndTeamMemberRole(teamId, memberId, role);
+        return participantJpaRepository.existsByTeamIdAndMemberIdAndTeamMemberRole(teamId, memberId, role);
     }
 
     @Override
     public boolean existByTeamAndRole(Long teamId, TeamMemberRole role) {
-        return participantJpaRepository.existsByTeamEntityIdAndTeamMemberRole(teamId, role);
+        return participantJpaRepository.existsByTeamIdAndTeamMemberRole(teamId, role);
     }
 
     @Override
@@ -39,11 +43,12 @@ public class TeamDao implements TeamRepository {
     }
 
     @Override
-    public Long save(String name, String phoneNumber, String address) {
+    public Long save(String name, String phoneNumber, String address, Searchable searchable) {
         TeamEntity team = TeamEntity.builder()
                 .name(name)
                 .phoneNumber(phoneNumber)
                 .address(address)
+                .searchable(searchable)
                 .build();
         return teamJpaRepository.save(team)
                 .getId();
@@ -79,8 +84,8 @@ public class TeamDao implements TeamRepository {
     }
 
     @Override
-    public boolean existByTeamAndMemberId(Long teamId, Member member) {
-        return participantJpaRepository.existsByTeamIdAndMemberId(teamId, member.memberId());
+    public boolean existByTeamIdAndMemberId(Long teamId, Long memberId) {
+        return participantJpaRepository.existsByTeamIdAndMemberId(teamId, memberId);
     }
 
     @Override
@@ -88,4 +93,74 @@ public class TeamDao implements TeamRepository {
         return participantJpaRepository.findByTeamIdAndMemberId(teamId, memberId)
                 .getTeamMemberRole();
     }
+
+    @Override
+    public List<Team> getPublicTeamsByName(String keyword) {
+        List<TeamEntity> teamEntities = teamJpaRepository.findByNameContainingAndSearchable(keyword, Searchable.PUBLIC);
+        return teamEntities.stream().map(TeamEntity::toTeam).toList();
+    }
+
+    @Override
+    public void updateSearchable(Long teamId, Searchable searchable) {
+        teamJpaRepository.updateSearchable(teamId, searchable);
+    }
+
+    @Override
+    public Long applyTeam(Long teamId, Long memberId) {
+        TeamEntity teamEntity = teamJpaRepository.getReferenceById(teamId);
+        MemberEntity memberEntity = memberJpaRepository.getReferenceById(memberId);
+        TeamApplyEntity teamApplyEntity = new TeamApplyEntity(teamEntity, memberEntity, JoinStatus.PENDING);
+        return teamApplyJpaRepository.save(teamApplyEntity).getId();
+    }
+
+    @Override
+    public boolean hasAppliedTeam(Long teamId, Long memberId) {
+        return teamApplyJpaRepository.existsByTeamIdAndMemberId(teamId, memberId);
+    }
+
+    @Override
+    public Optional<TeamApplyInfo> findTeamApplyById(Long applyId) {
+        return teamApplyJpaRepository.findById(applyId)
+                .map(TeamApplyEntity::toTeamApplyInfo);
+    }
+
+    @Override
+    public void updateJoinStatus(Long applyId, JoinStatus joinStatus) {
+        teamApplyJpaRepository.updateJoinStatus(applyId, joinStatus);
+    }
+
+    @Override
+    public boolean hasRequestedOrdererConversion(Long teamId, Long memberId) {
+        return teamRoleChangeJpaRepository.existsByTeamIdAndMemberIdAndRequestRole(teamId, memberId, TeamMemberRole.ORDERER);
+    }
+
+    @Override
+    public Long requestOrdererConversion(Long teamId, Long memberId) {
+        TeamEntity teamEntity = teamJpaRepository.getReferenceById(teamId);
+        MemberEntity memberEntity = memberJpaRepository.getReferenceById(memberId);
+        TeamRoleChangeEntity teamRoleChangeEntity = new TeamRoleChangeEntity(
+                teamEntity,
+                memberEntity,
+                TeamMemberRole.ORDERER,
+                ChangeRoleStatus.PENDING
+        );
+        return teamRoleChangeJpaRepository.save(teamRoleChangeEntity).getId();
+    }
+
+    @Override
+    public Optional<RoleConversionInfo> findTeamRoleConversionById(Long conversionId) {
+        return teamRoleChangeJpaRepository.findById(conversionId)
+                .map(TeamRoleChangeEntity::toRoleConversionInfo);
+    }
+
+    @Override
+    public void updateRoleConversionStatus(Long requestId, ChangeRoleStatus status) {
+        teamRoleChangeJpaRepository.updateChangeRoleStatus(requestId, status);
+    }
+
+    @Override
+    public void updateTeamMemberRole(Long teamId, Long memberId, TeamMemberRole role) {
+        participantJpaRepository.updateTeamMemberRole(teamId, memberId, role);
+    }
+
 }
