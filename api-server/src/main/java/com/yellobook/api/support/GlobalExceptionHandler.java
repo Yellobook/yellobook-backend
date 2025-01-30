@@ -1,16 +1,18 @@
 package com.yellobook.api.support;
 
-import com.yellobook.core.error.CoreErrorKind;
-import com.yellobook.core.error.CoreException;
+import com.yellobook.api.support.auth.error.AuthException;
 import com.yellobook.api.support.error.ApiErrorType;
 import com.yellobook.api.support.error.ApiException;
 import com.yellobook.api.support.error.ValidationError;
 import com.yellobook.api.support.response.ApiResponse;
+import com.yellobook.core.error.CoreErrorKind;
+import com.yellobook.core.error.CoreException;
 import jakarta.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -24,9 +26,10 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     @ExceptionHandler(value = CoreException.class)
     public ResponseEntity<Object> handleCoreException(CoreException e) {
@@ -57,6 +60,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             case INFO -> log.info("ApiException : {}", e.getMessage(), e);
         }
         return new ResponseEntity<>(ApiResponse.error(e.getErrorType(), e.getData()), e.getErrorType()
+                .getStatus());
+    }
+
+    @ExceptionHandler(value = AuthException.class)
+    public ResponseEntity<Object> handleAuthException(AuthException e) {
+        switch (e.getErrorType()
+                .getLogLevel()) {
+            case ERROR -> log.error("AuthException : {}", e.getMessage(), e);
+            case WARN -> log.warn("AuthException : {}", e.getMessage(), e);
+            case INFO -> log.info("AuthException : {}", e.getMessage(), e);
+        }
+        return new ResponseEntity<>(ApiResponse.error(e.getErrorType()), e.getErrorType()
                 .getStatus());
     }
 
