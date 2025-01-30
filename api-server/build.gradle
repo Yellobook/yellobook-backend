@@ -24,52 +24,32 @@ configurations {
 }
 
 dependencies {
-    // springs
+    implementation project(':core')
+    runtimeOnly project(":storage:db-core")
+
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter'
 
-    // mapStruct
-    implementation 'org.mapstruct:mapstruct:1.5.3.Final'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
-    runtimeOnly project(":infrastructure:db-core")
-    implementation project(':core')
-    implementation project(':infrastructure:parser-excel')
-//    implementation project(":storage:storage-redis")
+    compileOnly 'io.jsonwebtoken:jjwt-api:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 
-    // validation
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'com.github.maricn:logback-slack-appender:1.6.1'
 
-    // spring boot test
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-    // rest assured
     integrationTestImplementation 'io.rest-assured:rest-assured:5.3.1'
     integrationTestImplementation 'io.rest-assured:json-path:5.3.1'
 
-    // testcontainers
     integrationTestImplementation 'org.testcontainers:testcontainers:1.20.1'
     integrationTestImplementation 'org.testcontainers:junit-jupiter:1.20.1'
     integrationTestImplementation "org.testcontainers:mysql:1.20.1"
     integrationTestImplementation "com.redis:testcontainers-redis:2.2.2"
-
-    // swagger
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
-
-    // jwt
-    implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
-    implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
-    implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
-
-    // lombok (test)
-    testCompileOnly 'org.projectlombok:lombok'
-    testAnnotationProcessor 'org.projectlombok:lombok'
-
-    // logback slack
-    implementation 'com.github.maricn:logback-slack-appender:1.6.1'
 }
 
 tasks.register('integrationTest', Test) {
