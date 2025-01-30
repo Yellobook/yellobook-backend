@@ -1,6 +1,6 @@
 package com.yellobook.api.config;
 
-import com.yellobook.SocialType;
+import com.yellobook.api.support.auth.security.oauth2.SocialType;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -62,7 +62,7 @@ public class SwaggerConfig {
 
     private PathItem oauth2PathItem(SocialType socialLoginType) {
         String socialId = socialLoginType.getRegistrationId();
-        String socialTitle = socialLoginType.getTitle();
+        String socialTitle = socialLoginType.getDescription();
         return new PathItem().get(new Operation()
                 .tags(List.of(SOCIAL_TAG_NAME))
                 .summary(socialTitle)

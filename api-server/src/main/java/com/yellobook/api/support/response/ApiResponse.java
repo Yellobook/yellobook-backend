@@ -2,9 +2,10 @@ package com.yellobook.api.support.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.yellobook.api.support.auth.error.AuthErrorType;
+import com.yellobook.api.support.error.ApiErrorMessage;
 import com.yellobook.api.support.error.ApiErrorType;
 import com.yellobook.core.error.CoreErrorType;
-import com.yellobook.api.support.error.ApiErrorMessage;
 
 public class ApiResponse<S> {
     private final ResultType result;
@@ -42,6 +43,10 @@ public class ApiResponse<S> {
 
     public static ApiResponse<?> error(CoreErrorType error, Object errorData) {
         return new ApiResponse<>(ResultType.ERROR, null, new ApiErrorMessage(error, errorData));
+    }
+
+    public static ApiResponse<?> error(AuthErrorType error) {
+        return new ApiResponse<>(ResultType.ERROR, null, new ApiErrorMessage(error));
     }
 
     public ResultType getResult() {
