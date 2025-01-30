@@ -3,7 +3,7 @@ package com.yellobook.api.support.auth.security.oauth2;
 import com.yellobook.api.support.auth.AccessTokenPayload;
 import com.yellobook.api.support.auth.AppMemberRole;
 import com.yellobook.api.support.auth.CookieProvider;
-import com.yellobook.api.support.auth.JwtManager;
+import com.yellobook.api.support.auth.JwtProvider;
 import com.yellobook.api.support.auth.security.RedirectProperties;
 import com.yellobook.api.support.error.ApiErrorType;
 import com.yellobook.api.support.error.ApiException;
@@ -30,15 +30,15 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
 
     private final MemberService memberService;
     private final TermsService termsService;
-    private final JwtManager tokenManager;
+    private final JwtProvider jwtProvider;
     private final CookieProvider cookieManager;
     private final RedirectProperties redirectProperties;
 
-    public CustomOAuth2SuccessHandler(MemberService memberService, TermsService termsService, JwtManager tokenManager,
+    public CustomOAuth2SuccessHandler(MemberService memberService, TermsService termsService, JwtProvider jwtProvider,
                                       CookieProvider cookieManager, RedirectProperties redirectProperties) {
         this.memberService = memberService;
         this.termsService = termsService;
-        this.tokenManager = tokenManager;
+        this.jwtProvider = jwtProvider;
         this.cookieManager = cookieManager;
         this.redirectProperties = redirectProperties;
     }
@@ -80,8 +80,8 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
             return;
         }
 
-        String accessToken = tokenManager.createAccessToken(new AccessTokenPayload(memberId, AppMemberRole.ROLE_USER));
-        String refreshToken = tokenManager.createRefreshToken(memberId);
+        String accessToken = jwtProvider.createAccessToken(new AccessTokenPayload(memberId, AppMemberRole.ROLE_USER));
+        String refreshToken = jwtProvider.createRefreshToken(memberId);
 
         response.addCookie(cookieManager.createAccessTokenCookie(accessToken));
         response.addCookie(cookieManager.createRefreshTokenCookie(refreshToken));
