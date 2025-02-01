@@ -1,5 +1,4 @@
 plugins {
-    id 'java-library'
     id 'io.spring.dependency-management'
     id "java-test-fixtures"
 }
@@ -11,8 +10,10 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-    annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
+    implementation "com.querydsl:querydsl-jpa:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    implementation "com.querydsl:querydsl-core"
+    implementation "com.querydsl:querydsl-collections"
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
@@ -25,7 +26,40 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter:1.20.1'
     testImplementation "org.testcontainers:mysql:1.20.1"
     testImplementation "com.redis:testcontainers-redis:2.2.2"
+    testImplementation project(':core') git
 }
+
+
+def generated = layout.buildDirectory.dir("generated/sources/annotationProcessor/java/main")
+
+
+tasks.withType(JavaCompile).configureEach {
+    options.getGeneratedSourceOutputDirectory().set(file(generated))
+}
+
+
+sourceSets {
+    main.java.srcDirs += [generated]
+}
+
+clean {
+    delete file(generated)
+}
+
+
+tasks.register("compileQuerydsl", JavaCompile) {
+    group = "build"
+    source = sourceSets.main.java
+    classpath = sourceSets.main.compileClasspath
+    destinationDirectory.set(file(generated))
+
+    options.annotationProcessorPath = configurations.named("annotationProcessor").get()
+    options.compilerArgs += [
+            "-proc:only",
+            "-s", file(generated).absolutePath
+    ]
+}
+
 
 processResources.dependsOn('copyConfig')
 
