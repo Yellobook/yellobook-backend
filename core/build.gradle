@@ -1,14 +1,4 @@
 dependencies {
     compileOnly 'org.springframework:spring-context'
     compileOnly 'jakarta.transaction:jakarta.transaction-api'
-    // testFixtures
-    testImplementation(testFixtures(project(":infrastructure:db-core")))
 }
-
-tasks.register('copyConfig', Copy) {
-    from '../../Config/yellobook-api/'
-    include "application*.yml"
-    into 'src/main/resources'
-}
-
-processResources.dependsOn('copyConfig')
