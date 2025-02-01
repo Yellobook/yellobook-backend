@@ -1,12 +1,12 @@
 package com.yellobook.inform.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.yellobook.core.domain.schedule.mapper.InformMapper;
 import com.yellobook.inform.InformQueryService;
 import com.yellobook.inform.dto.response.GetInformResponse;
 import com.yellobook.inform.dto.response.GetInformResponse.CommentItem;
@@ -14,7 +14,6 @@ import com.yellobook.inform.dto.response.GetInformResponse.MentionItem;
 import com.yellobook.inform.entity.Inform;
 import com.yellobook.inform.entity.InformComment;
 import com.yellobook.inform.entity.InformMention;
-import com.yellobook.core.domain.inform.mapper.InformMapper;
 import com.yellobook.inform.repository.InformMentionRepository;
 import com.yellobook.inform.repository.InformRepository;
 import com.yellobook.member.entity.Member;

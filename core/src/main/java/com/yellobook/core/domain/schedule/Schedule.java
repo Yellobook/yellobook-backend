@@ -1,10 +1,10 @@
-package com.yellobook.core.domain.inform;
+package com.yellobook.core.domain.schedule;
 
 import com.yellobook.core.domain.member.Member;
 import java.time.LocalDate;
 
-public record Inform(
-        Long informId,
+public record Schedule(
+        Long scheduleId,
         Member author,
         String title,
         String content,

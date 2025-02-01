@@ -1,4 +1,4 @@
-package com.yellobook.storage.db.core.inform;
+package com.yellobook.storage.db.core.schedule;
 
 import com.yellobook.storage.db.core.BaseEntity;
 import com.yellobook.storage.db.core.member.MemberEntity;
@@ -13,7 +13,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "informs")
-public class InformEntity extends BaseEntity {
+public class ScheduleEntity extends BaseEntity {
     private String title;
 
     @Column(length = 200)
@@ -39,10 +39,10 @@ public class InformEntity extends BaseEntity {
     @Column(name = "member_id")
     private Long memberId;
 
-    protected InformEntity() {
+    protected ScheduleEntity() {
     }
 
-    public InformEntity(String title, String content, LocalDate date, Long teamId, Long memberId) {
+    public ScheduleEntity(String title, String content, LocalDate date, Long teamId, Long memberId) {
         this.title = title;
         this.content = content;
         this.date = date;

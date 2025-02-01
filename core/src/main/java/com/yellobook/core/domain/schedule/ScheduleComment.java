@@ -1,8 +1,8 @@
-package com.yellobook.core.domain.inform;
+package com.yellobook.core.domain.schedule;
 
 import com.yellobook.core.domain.member.Member;
 
-public record InformComment(
+public record ScheduleComment(
         Long commentId,
         Member commenter
 ) {

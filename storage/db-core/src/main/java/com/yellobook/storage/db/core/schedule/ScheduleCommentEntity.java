@@ -1,4 +1,4 @@
-package com.yellobook.storage.db.core.inform;
+package com.yellobook.storage.db.core.schedule;
 
 import com.yellobook.storage.db.core.BaseEntity;
 import com.yellobook.storage.db.core.member.MemberEntity;
@@ -10,8 +10,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "inform_comments")
-public class InformCommentEntity extends BaseEntity {
+@Table(name = "schedule_comments")
+public class ScheduleCommentEntity extends BaseEntity {
     @Column(nullable = false, length = 200)
     private String content;
 
@@ -20,16 +20,16 @@ public class InformCommentEntity extends BaseEntity {
     private MemberEntity member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inform_id", nullable = false)
-    private InformEntity inform;
+    @JoinColumn(name = "schedule_id", nullable = false)
+    private ScheduleEntity schedule;
 
-    protected InformCommentEntity() {
+    protected ScheduleCommentEntity() {
     }
 
-    public InformCommentEntity(String content, MemberEntity member, InformEntity inform) {
+    public ScheduleCommentEntity(String content, MemberEntity member, ScheduleEntity schedule) {
         this.content = content;
         this.member = member;
-        this.inform = inform;
+        this.schedule = schedule;
     }
 
     public String getContent() {
@@ -40,7 +40,7 @@ public class InformCommentEntity extends BaseEntity {
         return member;
     }
 
-    public InformEntity getInform() {
-        return inform;
+    public ScheduleEntity getSchedule() {
+        return schedule;
     }
 }

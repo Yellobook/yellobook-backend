@@ -1,4 +1,4 @@
-package com.yellobook.storage.db.core.inform;
+package com.yellobook.storage.db.core.schedule;
 
 import com.yellobook.storage.db.core.BaseEntity;
 import com.yellobook.storage.db.core.member.MemberEntity;
@@ -10,28 +10,28 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "inform_mentions",
+@Table(name = "schedule_mentions",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uc_member_inform", columnNames = {"member_id", "inform_id"})
+                @UniqueConstraint(name = "uc_member_schedule", columnNames = {"member_id", "schedule_id"})
         }
 )
-public class InformMentionEntity extends BaseEntity {
+public class ScheduleMentionEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private MemberEntity member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inform_id", nullable = false)
-    private InformEntity inform;
+    @JoinColumn(name = "schedule_id", nullable = false)
+    private ScheduleEntity inform;
 
-    protected InformMentionEntity() {
+    protected ScheduleMentionEntity() {
     }
 
     public MemberEntity getMember() {
         return member;
     }
 
-    public InformEntity getInform() {
+    public ScheduleEntity getSchedule() {
         return inform;
     }
 }
