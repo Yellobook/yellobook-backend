@@ -16,6 +16,6 @@ rootProject.name = 'yellobook'
 
 include 'api-server'
 include 'core'
-include 'infrastructure:db-core'
-include 'infrastructure:storage-redis'
-include 'infrastructure:parser-excel'
+include 'storage:db-core'
+include 'storage:storage-redis'
+
