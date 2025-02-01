@@ -42,10 +42,6 @@ allprojects {
     }
 }
 
-tasks.withType(Test).configureEach {
-    useJUnitPlatform()
-}
-
 subprojects {
     apply plugin: 'java-library'
     apply plugin: 'org.springframework.boot'
@@ -59,17 +55,6 @@ subprojects {
     }
 
     dependencies {
-        // Lombok
-        compileOnly 'org.projectlombok:lombok'
-        annotationProcessor 'org.projectlombok:lombok'
-        testCompileOnly 'org.projectlombok:lombok'
-        testAnnotationProcessor 'org.projectlombok:lombok'
-
-        // MapStruct
-        implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-        annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
-
-        // Spring Boot Test
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
     }
 
