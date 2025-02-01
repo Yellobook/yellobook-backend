@@ -3,15 +3,12 @@ package com.yellobook.api.controller.order.dto.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
-import lombok.Builder;
 
-@Builder
 public record GetOrderCommentsResponse(
         @Schema(description = "댓글 전체")
         List<CommentInfo> comments
 ) {
 
-    @Builder
     public record CommentInfo(
             @Schema(description = "댓글 Id", example = "1")
             Long commentId,

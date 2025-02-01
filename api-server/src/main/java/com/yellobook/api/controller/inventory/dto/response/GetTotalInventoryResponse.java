@@ -2,10 +2,8 @@ package com.yellobook.api.controller.inventory.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
-import lombok.Builder;
 
 @Schema(description = "전체 재고 현황 글 조회 - 응답 DTO")
-@Builder
 public record GetTotalInventoryResponse(
         @Schema(description = "페이지 번호 (1번부터 시작)")
         Integer page,
@@ -15,7 +13,6 @@ public record GetTotalInventoryResponse(
         List<InventoryInfo> inventories
 ) {
 
-    @Builder
     public record InventoryInfo(
             @Schema(description = "재고 현황 id")
             Long inventoryId,

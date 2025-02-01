@@ -1,9 +1,7 @@
 package com.yellobook.api.controller.team.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
 
-@Builder
 public record GetTeamResponse(
         @Schema(description = "가져오는 팀의 고유 id", example = "123")
         Long teamId,

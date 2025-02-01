@@ -25,7 +25,7 @@ configurations {
 
 dependencies {
     implementation project(':core')
-    runtimeOnly project(":storage:db-core")
+    implementation project(":storage:db-core")
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -51,6 +51,14 @@ dependencies {
     integrationTestImplementation "org.testcontainers:mysql:1.20.1"
     integrationTestImplementation "com.redis:testcontainers-redis:2.2.2"
 }
+
+tasks.register('copyConfig', Copy) {
+    from '../../Config/yellobook-api/'
+    include "application*.yml"
+    into 'src/main/resources'
+}
+
+processResources.dependsOn('copyConfig')
 
 tasks.register('integrationTest', Test) {
     group 'verification'

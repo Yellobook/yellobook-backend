@@ -1,67 +1,54 @@
 package com.yellobook.core.domain.member;
 
-import com.yellobook.core.domain.team.Team;
-import com.yellobook.core.domain.team.TeamReader;
-import jakarta.transaction.Transactional;
+import com.yellobook.core.error.CoreErrorType;
+import com.yellobook.core.error.CoreException;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
-//@Transactional(readOnly = true)
 public class MemberService {
-
-    private final MemberWriter memberWriter;
     private final MemberReader memberReader;
-    // 사용사가 속한 팀 조회 -> MemberReader 의 반환값이 List<Team> 이다
-    private final TeamReader teamReader;
+    private final JoinedTeamReader joinedTeamReader;
+    private final MemberWriter memberWriter;
+    private final ProfileEditor profileEditor;
 
-    public MemberService(MemberWriter memberWriter, MemberReader memberReader, TeamReader teamReader) {
-        this.memberWriter = memberWriter;
+    public MemberService(MemberReader memberReader, JoinedTeamReader joinedTeamReader, MemberWriter memberWriter,
+                         ProfileEditor profileEditor) {
         this.memberReader = memberReader;
-        this.teamReader = teamReader;
+        this.joinedTeamReader = joinedTeamReader;
+        this.memberWriter = memberWriter;
+        this.profileEditor = profileEditor;
     }
 
-    public Long registerMember(String nickname, String email, String profileImage) {
-        return memberWriter.add(nickname, email, profileImage, MemberRole.USER, false);
+    public Long getIdOrRegister(ProfileInfo profileInfo, SocialInfo socialInfo) {
+        return memberReader.read(socialInfo)
+                .map(Member::memberId)
+                .orElseGet(() -> memberWriter.add(profileInfo, socialInfo));
     }
 
-    @Transactional
     public Member read(Long memberId) {
-        return memberReader.read(memberId).orElseThrow(() -> new CustomException);
+        return memberReader.read(memberId);
     }
 
-    public Boolean getMemberAllowance(Long memberId) {
-        return memberReader.read(memberId).allowance();
+    public void updateNickname(Member member, String newNickname) {
+        if (!profileEditor.canChangeNickname(member)) {
+            throw new CoreException(CoreErrorType.NICKNAME_CHANGE_NOT_ALLOWED);
+        }
+        profileEditor.updateNickname(member, newNickname);
     }
 
-    public List<Team> getMemberJoinedTeams(Long memberId) {
-        return teamReader.readTeamsByMemberId(memberId);
+    public void updateBio(Member member, String newBio) {
+        profileEditor.updateBio(member, newBio);
     }
 
-//    public ProfileResponse getMemberProfile(Long memberId) {
-//        Member member = memberRepository.findById(memberId)
-//                .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
-//        List<ParticipantInfo> participantInfos = participantRepository.getMemberJoinTeam(memberId)
-//                .stream()
-//                .map(memberMapper::toParticipantInfo)
-//                .toList();
-//        return memberMapper.toProfileResponseDTO(member, participantInfos);
-//    }
+    public void deleteMember(Member member) {
+        memberWriter.delete(member);
+    }
 
-
-
-//    public TermAllowanceResponse getAllowanceById(Long memberId) {
-//        Member member = memberRepository.findById(memberId)
-//                .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
-//        boolean allowed = member.getAllowance() != null ? member.getAllowance() : false;
-//        return memberMapper.toAllowanceResponseDTO(allowed);
-//    }
-
-
-    public CurrentTeamResponse getMemberCurrentTeam(Long teamId) {
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() ->
-                        new CustomException(MemberErrorCode.MEMBER_TEAM_NOT_FOUND));
-        return memberMapper.toCurrentTeamResponse(team);
+    public List<JoinedTeamResult> getMemberJoinedTeams(Member member) {
+        return joinedTeamReader.read(member);
     }
 }
+
+
+

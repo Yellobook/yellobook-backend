@@ -4,10 +4,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import lombok.Builder;
 import org.springdoc.core.annotations.ParameterObject;
 
-@Builder
 @ParameterObject
 @Schema(description = "월 일정 조회를 위한 파라미터")
 public record MonthlySearchParam(

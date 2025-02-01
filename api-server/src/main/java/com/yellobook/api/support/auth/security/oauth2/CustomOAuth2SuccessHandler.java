@@ -54,13 +54,15 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
 
             SocialInfo socialInfo = new SocialInfo(
                     (String) attributes.get("id"),
-                    provider
+                    provider,
+                    (String) attributes.get("email")
             );
 
             ProfileInfo profileInfo = new ProfileInfo(
-                    (String) attributes.get("email"),
                     (String) attributes.get("nickname"),
-                    (String) attributes.get("profileImage")
+                    null,
+                    (String) attributes.get("profileImage"),
+                    null
             );
 
             Long memberId = memberService.getIdOrRegister(profileInfo, socialInfo);

@@ -9,19 +9,19 @@ import com.yellobook.api.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
 @Tag(name = "\uD83D\uDD11 인증", description = "Auth API")
 public class AuthController {
     private final JwtService jwtService;
+
+    public AuthController(JwtService jwtService) {
+        this.jwtService = jwtService;
+    }
 
     @Operation(summary = "accessToken 재발급")
     @PostMapping("/token/reissue")

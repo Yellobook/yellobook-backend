@@ -7,7 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -16,26 +17,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-// 로깅의 종류가 많잖아여
-// http 로깅
-// slf4j 처럼 로그찍는
-// 데이터베이스 쿼리 로깅설정
-
-// 이 모듈이 이걸 다 가지고 있다라고 하면
-// http 로깅이 필요없는 모듈 core 에서는 slf4J 로깅만 필요한데
-// 이 의존성을 implement 받게 되는 문제가 존재한다.
-// implement project(":supprot:logging")
-// support - 상위모듈
-//  - logging - 상위모듈
-//   - http-loging
-//   - db-logging
-//   -
-// 당장에는 필요없으니 일단 다 만들고 필요해지면 분리하자
-
-@Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Component
 public class ReqResLoggingFilter extends OncePerRequestFilter {
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private static final String REQUEST_ID = "request_id";
 
