@@ -2,16 +2,13 @@ package com.yellobook.api.controller.inventory.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
-import lombok.Builder;
 
 @Schema(description = "다수의 제품 정보 조회 - 응답 DTO")
-@Builder
 public record GetProductsResponse(
         @Schema(description = "제품")
         List<ProductInfo> products
 ) {
 
-    @Builder
     public record ProductInfo(
             @Schema(description = "제품 id")
             Long productId,

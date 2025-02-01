@@ -4,10 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
 
 @Schema(description = "제품 추가 - 요청 DTO")
-@Builder
 public record AddProductRequest(
         @Schema(description = "제품명")
         @NotBlank

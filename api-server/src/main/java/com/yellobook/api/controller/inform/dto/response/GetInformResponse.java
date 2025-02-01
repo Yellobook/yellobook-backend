@@ -4,9 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import lombok.Builder;
 
-@Builder
 public record GetInformResponse(
         @Schema(description = "가지고 오는 글의 작성자")
         String author,
@@ -23,7 +21,6 @@ public record GetInformResponse(
         @Schema(description = "날짜")
         LocalDate date
 ) {
-    @Builder
     public record MentionItem(
             @Schema(description = "언급된 사용자 ID")
             Long memberId,
@@ -32,7 +29,6 @@ public record GetInformResponse(
     ) {
     }
 
-    @Builder
     public record CommentItem(
             @Schema(description = "작성한 댓글의 고유 ID")
             Long id,

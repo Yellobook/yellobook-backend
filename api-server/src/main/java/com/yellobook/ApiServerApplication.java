@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 @SpringBootApplication
-@ConfigurationPropertiesScan
+@ConfigurationPropertiesScan("com.yellobook")
 public class ApiServerApplication {
     public static void main(String[] args) {
         SpringApplication.run(ApiServerApplication.class, args);

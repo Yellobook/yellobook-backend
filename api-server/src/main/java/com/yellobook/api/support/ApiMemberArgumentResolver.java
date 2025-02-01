@@ -45,7 +45,7 @@ public class ApiMemberArgumentResolver implements HandlerMethodArgumentResolver 
         }
 
         if (!(authentication.getPrincipal() instanceof CustomUserDetails customUserDetails)) {
-            log.error("인증 객체가 CustomUserDetails 타입이 아님: {}", authentication.getPrincipal()
+            log.error("Principal 객체가 CustomUserDetails 타입이 아님 - Principal class: {}", authentication.getPrincipal()
                     .getClass());
             throw new AuthException(AuthErrorType.ACCESS_DENIED);
         }
