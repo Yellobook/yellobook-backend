@@ -14,7 +14,7 @@ public class ScheduleReader {
 
     public Schedule read(Long scheduleId) {
         return scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new CoreException(CoreErrorType.INFORM_NOT_FOUND));
+                .orElseThrow(() -> new CoreException(CoreErrorType.SCHEDULE_NOT_FOUND));
     }
 
     public Boolean exist(Long scheduleId) {

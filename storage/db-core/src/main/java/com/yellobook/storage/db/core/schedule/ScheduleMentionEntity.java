@@ -22,7 +22,7 @@ public class ScheduleMentionEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule_id", nullable = false)
-    private ScheduleEntity inform;
+    private ScheduleEntity schedule;
 
     protected ScheduleMentionEntity() {
     }
@@ -32,6 +32,6 @@ public class ScheduleMentionEntity extends BaseEntity {
     }
 
     public ScheduleEntity getSchedule() {
-        return inform;
+        return schedule;
     }
 }

@@ -11,7 +11,7 @@ public class ScheduleCommentReader {
         this.scheduleCommentRepository = scheduleCommentRepository;
     }
 
-    public List<ScheduleComment> readComments(Long informId) {
-        return scheduleCommentRepository.findCommentsByInformId(informId);
+    public List<ScheduleComment> readComments(Long scheduleId) {
+        return scheduleCommentRepository.findCommentsByScheduleId(scheduleId);
     }
 }

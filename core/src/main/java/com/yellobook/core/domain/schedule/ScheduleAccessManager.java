@@ -10,9 +10,9 @@ public class ScheduleAccessManager {
     private final ScheduleReader scheduleReader;
     private final ScheduleMentionProcessor scheduleMentionProcessor;
 
-    public ScheduleAccessManager(ScheduleReader informReader, ScheduleMentionProcessor informMentionProcessor) {
-        this.scheduleReader = informReader;
-        this.scheduleMentionProcessor = informMentionProcessor;
+    public ScheduleAccessManager(ScheduleReader scheduleReader, ScheduleMentionProcessor scheduleMentionProcessor) {
+        this.scheduleReader = scheduleReader;
+        this.scheduleMentionProcessor = scheduleMentionProcessor;
     }
 
     public void isAuthorOrMentioned(Long scheduleId, Long memberId) {
@@ -20,7 +20,7 @@ public class ScheduleAccessManager {
         if (!schedule.author()
                 .memberId()
                 .equals(memberId) && !scheduleMentionProcessor.isMentioned(scheduleId, memberId)) {
-            throw new CoreException(CoreErrorType.INFORM_ACCESS_NOT_ALLOWED);
+            throw new CoreException(CoreErrorType.SCHEDULE_ACCESS_NOT_ALLOWED);
         }
     }
 
@@ -28,7 +28,7 @@ public class ScheduleAccessManager {
         Schedule schedule = scheduleReader.read(scheduleId);
         if (!schedule.author()
                 .equals(author)) {
-            throw new CoreException(CoreErrorType.INFORM_AUTHOR_NOT_MATCH);
+            throw new CoreException(CoreErrorType.SCHEDULE_AUTHOR_NOT_MATCH);
         }
     }
 }

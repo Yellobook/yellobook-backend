@@ -10,7 +10,7 @@ public class ScheduleCommentWriter {
         this.scheduleCommentRepository = scheduleCommentRepository;
     }
 
-    public Long add(NewScheduleComment commend) {
-        return scheduleCommentRepository.save(commend);
+    public Long add(NewScheduleComment comment) {
+        return scheduleCommentRepository.save(comment);
     }
 }

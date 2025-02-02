@@ -8,8 +8,14 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class ScheduleCommentCoreRepository implements ScheduleCommentRepository {
+    private final ScheduleCommentJpaRepository scheduleCommentJpaRepository;
+
+    public ScheduleCommentCoreRepository(ScheduleCommentJpaRepository scheduleCommentJpaRepository) {
+        this.scheduleCommentJpaRepository = scheduleCommentJpaRepository;
+    }
+
     @Override
-    public Long save(NewScheduleComment commend) {
+    public Long save(NewScheduleComment comment) {
         return 1L;
     }
 

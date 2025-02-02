@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ScheduleCommentRepository {
-    Long save(NewScheduleComment commend);
+    Long save(NewScheduleComment comment);
 
     List<ScheduleComment> findCommentsByScheduleId(Long scheduleId);
 }

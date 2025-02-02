@@ -10,16 +10,17 @@ public class ScheduleCommentService {
     private final ScheduleCommentWriter scheduleCommentWriter;
     private final ScheduleAccessManager scheduleAccessManager;
 
-    public ScheduleCommentService(ScheduleCommentReader informCommentReader, ScheduleCommentWriter informCommentWriter,
-                                  ScheduleAccessManager informAccessManager) {
-        this.scheduleCommentReader = informCommentReader;
-        this.scheduleCommentWriter = informCommentWriter;
-        this.scheduleAccessManager = informAccessManager;
+    public ScheduleCommentService(ScheduleCommentReader scheduleCommentReader,
+                                  ScheduleCommentWriter scheduleCommentWriter,
+                                  ScheduleAccessManager scheduleAccessManager) {
+        this.scheduleCommentReader = scheduleCommentReader;
+        this.scheduleCommentWriter = scheduleCommentWriter;
+        this.scheduleAccessManager = scheduleAccessManager;
     }
 
     @Transactional
-    public Long add(NewScheduleComment commend) {
-        return scheduleCommentWriter.add(commend);
+    public Long add(NewScheduleComment comment) {
+        return scheduleCommentWriter.add(comment);
     }
 
 
