@@ -27,7 +27,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 

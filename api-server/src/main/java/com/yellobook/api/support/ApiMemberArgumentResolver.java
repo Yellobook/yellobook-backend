@@ -60,8 +60,7 @@ public class ApiMemberArgumentResolver implements HandlerMethodArgumentResolver 
         return new ApiMember(
                 memberId,
                 member.socialInfo(),
-                member.profileInfo(),
-                role
+                member.profileInfo()
         );
     }
 }
