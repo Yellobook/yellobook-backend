@@ -8,10 +8,8 @@ plugins {
 
 ext {
     defineExcludes = {
-        // 제외할 경로들 선언
         def excludes = []
 
-        // QueryDSL Q 클래스 제외
         for (qPattern in 'QA'..'QZ') {
             excludes.add('**/${qPattern}*')
         }
