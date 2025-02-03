@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "informs")
+@Table(name = "schedule")
 public class ScheduleEntity extends BaseEntity {
     private String title;
 

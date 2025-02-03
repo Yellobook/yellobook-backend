@@ -1,8 +1,10 @@
 package com.yellobook.core.domain.schedule;
 
 import com.yellobook.core.domain.member.Member;
-import com.yellobook.core.domain.member.MemberReader;
+import com.yellobook.core.domain.team.Team;
 import jakarta.transaction.Transactional;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.logging.Logger;
 import org.springframework.stereotype.Service;
 
@@ -11,28 +13,29 @@ import org.springframework.stereotype.Service;
 public class ScheduleService {
     private final ScheduleReader scheduleReader;
     private final ScheduleViewProcessor scheduleViewProcessor;
-    private final MemberReader memberReader;
     private final ScheduleAccessManager scheduleAccessManager;
     private final ScheduleWriter scheduleWriter;
+    private final ScheduleMentionProcessor scheduleMentionProcessor;
     private static final Logger logger = Logger.getLogger(ScheduleService.class.getName());
 
     public ScheduleService(ScheduleReader scheduleReader,
-                           ScheduleViewProcessor scheduleViewProcessor,
-                           MemberReader memberReader, ScheduleAccessManager scheduleAccessManager,
-                           ScheduleWriter scheduleWriter) {
+                           ScheduleViewProcessor scheduleViewProcessor, ScheduleAccessManager scheduleAccessManager,
+                           ScheduleWriter scheduleWriter, ScheduleMentionProcessor scheduleMentionProcessor) {
         this.scheduleReader = scheduleReader;
         this.scheduleViewProcessor = scheduleViewProcessor;
-        this.memberReader = memberReader;
         this.scheduleAccessManager = scheduleAccessManager;
         this.scheduleWriter = scheduleWriter;
+        this.scheduleMentionProcessor = scheduleMentionProcessor;
     }
 
-//    @Transactional
-//    public Long create(String title, String content, Member author, List<Long> mentionedMemberIds)
-//    ) {
-//        List<Member>
-//        return scheduleWriter.create(createInformCommend);
-//    }
+    @Transactional
+    public Long create(String title, String content, LocalDate plannedDate, Member author,
+                       List<Long> mentionedMemberIds, Team team) {
+        Long scheduleId = scheduleWriter.create(
+                new NewSchedule(title, content, plannedDate, author, mentionedMemberIds, team));
+        scheduleMentionProcessor.mention(scheduleId, mentionedMemberIds);
+        return scheduleId;
+    }
 
     // Infom 도메인에 필요한 객체는
     // Author, MentionedMember

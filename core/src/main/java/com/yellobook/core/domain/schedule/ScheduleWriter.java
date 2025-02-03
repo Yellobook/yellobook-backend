@@ -3,14 +3,14 @@ package com.yellobook.core.domain.schedule;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ScheduleViewProcessor {
+public class ScheduleWriter {
     private final ScheduleRepository scheduleRepository;
 
-    public ScheduleViewProcessor(ScheduleRepository scheduleRepository) {
+    public ScheduleWriter(ScheduleRepository scheduleRepository) {
         this.scheduleRepository = scheduleRepository;
     }
 
-    public void increase(Long scheduleId) {
-        scheduleRepository.increaseView(scheduleId);
+    public Long create(NewSchedule newSchedule) {
+        return scheduleRepository.save(newSchedule);
     }
 }

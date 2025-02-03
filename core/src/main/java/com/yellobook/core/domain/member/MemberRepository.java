@@ -24,4 +24,6 @@ public interface MemberRepository {
     void updateBio(Member member, String newBio);
 
     List<JoinedTeamResult> findJoinedTeamsByMemberId(Member member);
+
+    List<Member> findByIds(List<Long> memberIds);
 }

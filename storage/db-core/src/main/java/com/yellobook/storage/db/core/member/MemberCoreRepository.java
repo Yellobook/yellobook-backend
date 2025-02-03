@@ -89,4 +89,12 @@ public class MemberCoreRepository implements MemberRepository {
         return null;
     }
 
+    @Override
+    public List<Member> findByIds(List<Long> memberIds) {
+        return memberJpaRepository.findAllById(memberIds)
+                .stream()
+                .map(MemberEntity::toMember)
+                .toList();
+    }
+
 }

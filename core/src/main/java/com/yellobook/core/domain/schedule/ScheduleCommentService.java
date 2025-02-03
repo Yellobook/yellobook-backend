@@ -8,21 +8,17 @@ import org.springframework.stereotype.Service;
 public class ScheduleCommentService {
     private final ScheduleCommentReader scheduleCommentReader;
     private final ScheduleCommentWriter scheduleCommentWriter;
-    private final ScheduleAccessManager scheduleAccessManager;
 
     public ScheduleCommentService(ScheduleCommentReader scheduleCommentReader,
-                                  ScheduleCommentWriter scheduleCommentWriter,
-                                  ScheduleAccessManager scheduleAccessManager) {
+                                  ScheduleCommentWriter scheduleCommentWriter) {
         this.scheduleCommentReader = scheduleCommentReader;
         this.scheduleCommentWriter = scheduleCommentWriter;
-        this.scheduleAccessManager = scheduleAccessManager;
     }
 
     @Transactional
     public Long add(NewScheduleComment comment) {
         return scheduleCommentWriter.add(comment);
     }
-
 
     public List<ScheduleComment> getComments(
             Long scheduleId,

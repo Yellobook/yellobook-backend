@@ -27,6 +27,11 @@ public class ScheduleMentionEntity extends BaseEntity {
     protected ScheduleMentionEntity() {
     }
 
+    public ScheduleMentionEntity(MemberEntity member, ScheduleEntity schedule) {
+        this.member = member;
+        this.schedule = schedule;
+    }
+
     public MemberEntity getMember() {
         return member;
     }
