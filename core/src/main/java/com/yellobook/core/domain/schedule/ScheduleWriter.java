@@ -13,4 +13,8 @@ public class ScheduleWriter {
     public Long create(NewSchedule newSchedule) {
         return scheduleRepository.save(newSchedule);
     }
+
+    public void delete(Long scheduleId) {
+        scheduleRepository.deleteById(scheduleId);
+    }
 }

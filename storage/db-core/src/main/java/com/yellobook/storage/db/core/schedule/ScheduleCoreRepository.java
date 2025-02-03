@@ -35,7 +35,7 @@ public class ScheduleCoreRepository implements ScheduleRepository {
 
     @Override
     public void deleteById(Long scheduleId) {
-
+        scheduleJpaRepository.deleteById(scheduleId);
     }
 
     @Override
