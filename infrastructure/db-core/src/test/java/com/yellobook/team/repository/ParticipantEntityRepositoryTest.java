@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @DisplayName("ParticipantRepository Unit Test")
-public class ParticipantRepositoryTest extends RepositoryTest {
+public class ParticipantEntityRepositoryTest extends RepositoryTest {
 
     @Autowired
     private ParticipantRepository participantRepository;
@@ -89,7 +89,7 @@ public class ParticipantRepositoryTest extends RepositoryTest {
     //이름을 넣어서 리스트로 받는 조회
     @Nested
     @DisplayName("참가자 조회")
-    public class searchParticipant {
+    public class searchParticipantEntity {
         @Test
         @DisplayName("검색어를 통해 리스트로 받는 조회")
         public void searchParticipantByPrefix() {

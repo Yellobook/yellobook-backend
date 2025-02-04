@@ -677,7 +677,7 @@ public class ScheduleRepositoryTest extends RepositoryTest {
                 .createQuery(
                         "SELECT COUNT(im) FROM InformEntity i "
                                 + "JOIN InformMention im ON i.id = im.inform.id "
-                                + "JOIN Participant p ON p.member.id = im.member.id  "
+                                + "JOIN ParticipantEntity p ON p.member.id = im.member.id  "
                                 + "WHERE p.teamMemberRole = :teamMemberRole AND YEAR(i.date) = :year AND MONTH(i.date) = :month",
                         Long.class)
                 .setParameter("teamMemberRole", teamMemberRole)
@@ -691,7 +691,7 @@ public class ScheduleRepositoryTest extends RepositoryTest {
                 .createQuery(
                         "SELECT COUNT(om) FROM OrderEntity o "
                                 + "JOIN OrderMention om ON o.id = om.order.id "
-                                + "JOIN Participant p ON p.member.id = om.member.id  "
+                                + "JOIN ParticipantEntity p ON p.member.id = om.member.id  "
                                 + "WHERE p.teamMemberRole = :teamMemberRole AND YEAR(o.date) = :year AND MONTH(o.date) = :month",
                         Long.class)
                 .setParameter("teamMemberRole", teamMemberRole)

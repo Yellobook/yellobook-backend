@@ -1,6 +1,5 @@
 package com.yellobook.team.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -14,17 +13,17 @@ import com.yellobook.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.auth.security.oauth2.dto.OAuth2UserDTO;
 import com.yellobook.auth.service.TeamService;
 import com.yellobook.core.domain.team.TeamMemberVO;
+import com.yellobook.core.domain.team.TeamQueryService;
+import com.yellobook.core.domain.team.mapper.TeamMapper;
 import com.yellobook.member.entity.Member;
 import com.yellobook.support.error.code.TeamErrorCode;
 import com.yellobook.support.error.exception.CustomException;
-import com.yellobook.team.Participant;
-import com.yellobook.core.domain.team.TeamQueryService;
+import com.yellobook.team.ParticipantEntity;
 import com.yellobook.team.dto.query.QueryTeamMember;
 import com.yellobook.team.dto.request.InvitationCodeRequest;
 import com.yellobook.team.dto.response.InvitationCodeResponse;
 import com.yellobook.team.dto.response.TeamMemberListResponse;
 import com.yellobook.team.entity.Team;
-import com.yellobook.core.domain.team.mapper.TeamMapper;
 import com.yellobook.team.repository.ParticipantRepository;
 import com.yellobook.team.repository.TeamRepository;
 import java.lang.reflect.Field;
@@ -61,14 +60,14 @@ public class TeamQueryServiceTest {
 
     private Member member;
     private Team team;
-    private Participant participant;
+    private ParticipantEntity participantEntity;
 
 
     @BeforeEach
     void setUp() {
         member = createMember(1L);
         team = createTeam(1L);
-        participant = createParticipant(1L, team, member, TeamMemberRole.ORDERER);
+        participantEntity = createParticipant(1L, team, member, TeamMemberRole.ORDERER);
 
         OAuth2UserDTO oauth2UserDTO = OAuth2UserDTO.from(member);
         customOAuth2User = new CustomOAuth2User(oauth2UserDTO);
@@ -97,21 +96,21 @@ public class TeamQueryServiceTest {
         return team;
     }
 
-    private Participant createParticipant(Long participantId, Team team, Member member, TeamMemberRole role) {
-        Participant participant = Participant.builder()
+    private ParticipantEntity createParticipant(Long participantId, Team team, Member member, TeamMemberRole role) {
+        ParticipantEntity participantEntity = ParticipantEntity.builder()
                 .team(team)
                 .member(member)
                 .teamMemberRole(role)
                 .build();
         try {
-            Field idField = Participant.class.getDeclaredField("id");
+            Field idField = ParticipantEntity.class.getDeclaredField("id");
             idField.setAccessible(true);
-            idField.set(participant, participantId);
+            idField.set(participantEntity, participantId);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException("Failed to set participant ID", e);
         }
 
-        return participant;
+        return participantEntity;
     }
 
     @Nested
@@ -152,7 +151,7 @@ public class TeamQueryServiceTest {
             Long memberId2;
 
             Member member2;
-            Participant adminPar;
+            ParticipantEntity adminPar;
             InvitationCodeRequest request;
             CustomException exception;
 
@@ -166,7 +165,7 @@ public class TeamQueryServiceTest {
                 request = new InvitationCodeRequest(TeamMemberRole.ADMIN);
 
                 when(participantRepository.findByTeamIdAndMemberId(teamId, memberId))
-                        .thenReturn(Optional.of(participant));
+                        .thenReturn(Optional.of(participantEntity));
                 when(participantRepository.findByTeamIdAndTeamMemberRole(teamId, TeamMemberRole.ADMIN))
                         .thenReturn(Optional.of(adminPar));
 
@@ -194,7 +193,7 @@ public class TeamQueryServiceTest {
                 request = new InvitationCodeRequest(TeamMemberRole.ORDERER);
 
                 when(participantRepository.findByTeamIdAndMemberId(team.getId(), customOAuth2User.getMemberId()))
-                        .thenReturn(Optional.of(participant)); // 참가자 정보
+                        .thenReturn(Optional.of(participantEntity)); // 참가자 정보
                 when(redisService.generateInvitationUrl(team.getId(), request.role()))
                         .thenReturn("http://invitation-url"); // 초대 URL 생성
                 when(teamMapper.toInvitationCodeResponse(anyString()))

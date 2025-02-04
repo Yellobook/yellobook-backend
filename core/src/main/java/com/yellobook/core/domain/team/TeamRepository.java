@@ -1,11 +1,9 @@
 package com.yellobook.core.domain.team;
 
 import com.yellobook.core.domain.common.TeamMemberRole;
-import com.yellobook.core.domain.member.Member;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TeamRepository {
@@ -21,11 +19,11 @@ public interface TeamRepository {
 
     Optional<Team> findById(Long teamId);
 
-    //List<Member> getMembersByTeamId(Long teamId);
+    List<Participant> getMembersByTeamId(Long teamId);
 
-    void join(Long teamId, Member member, TeamMemberRole role);
+    void join(Long teamId, Long memberId, TeamMemberRole role);
 
-    void leave(Long teamId, Member member);
+    void leave(Long teamId, Long memberId);
 
     boolean existByName(String name);
 
@@ -35,21 +33,9 @@ public interface TeamRepository {
 
     void updateSearchable(Long teamId, Searchable searchable);
 
-    Long applyTeam(Long teamId, Long memberId);
-
-    boolean hasAppliedTeam(Long teamId, Long memberId);
-
-    Optional<TeamApplyInfo> findTeamApplyById(Long applyId);
-
-    void updateJoinStatus(Long applyId, JoinStatus joinStatus);
-
-    boolean hasRequestedOrdererConversion(Long teamId, Long memberId);
-
-    Long requestOrdererConversion(Long teamId, Long memberId);
-
-    Optional<RoleConversionInfo> findTeamRoleConversionById(Long conversionId);
-
-    void updateRoleConversionStatus(Long requestId, ChangeRoleStatus changeRoleStatus);
+    boolean isTeamMember(Long teamId, Long memberId);
 
     void updateTeamMemberRole(Long teamId, Long memberId, TeamMemberRole role);
+
+    void deactivateTeam(Long teamId);
 }

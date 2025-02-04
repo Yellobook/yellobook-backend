@@ -2,6 +2,7 @@ package com.yellobook.team;
 
 import com.yellobook.BaseEntity;
 import com.yellobook.core.domain.common.TeamMemberRole;
+import com.yellobook.core.domain.team.Participant;
 import com.yellobook.member.MemberEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,7 +29,7 @@ import lombok.NoArgsConstructor;
         }
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Participant extends BaseEntity {
+public class ParticipantEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -46,9 +47,17 @@ public class Participant extends BaseEntity {
     private TeamMemberRole teamMemberRole;
 
     @Builder
-    public Participant(TeamEntity team, MemberEntity member, TeamMemberRole teamMemberRole) {
+    public ParticipantEntity(TeamEntity team, MemberEntity member, TeamMemberRole teamMemberRole) {
         this.team = team;
         this.member = member;
         this.teamMemberRole = teamMemberRole;
+    }
+
+    Participant toParticipant() {
+        return new Participant(
+                member.getId(),
+                member.getNickname(),
+                teamMemberRole
+        );
     }
 }

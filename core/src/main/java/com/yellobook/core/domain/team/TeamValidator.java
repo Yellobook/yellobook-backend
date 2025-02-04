@@ -7,13 +7,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TeamValidator {
-
     private final TeamRepository teamRepository;
-    private final TeamRoleVerifier teamRoleVerifier;
 
-    public TeamValidator(TeamRepository teamRepository, TeamRoleVerifier teamRoleVerifier) {
+    public TeamValidator(TeamRepository teamRepository) {
         this.teamRepository = teamRepository;
-        this.teamRoleVerifier = teamRoleVerifier;
     }
 
     /*
@@ -48,22 +45,19 @@ public class TeamValidator {
 
 
     /**
-     * 팀에 가입 요청을 할 수 있는지 검증
-     * 이미 가입 요청을 한 사람이면 신규 등록 불가능
+     * 팀에 가입 요청을 할 수 있는지 검증 이미 가입한 사람이면 팀 참가 요청 불가능
      *
      * @param teamId   가입하고 싶은 팀 Id
      * @param memberId 가입하는 사람의 Id
      */
-    public void canApplyTeam(Long teamId, Long memberId) {
-        // 팀에 가입 완료된 사람도 가입 신청 내역을 통해 확인 가능
-        if (teamRepository.hasAppliedTeam(teamId, memberId)) {
-            throw new CoreException(CoreErrorType.MEMBER_ALREADY_APPLY);
+    public void canJoinTeam(Long teamId, Long memberId) {
+        if (teamRepository.isTeamMember(teamId, memberId)) {
+            throw new CoreException(CoreErrorType.MEMBER_ALREADY_EXIST);
         }
     }
 
     /**
-     * 팀의 가입 요청 수정 가능한지 검증
-     * 관리자, 주문자만 승인 또는 거절 할 수 있다.
+     * 팀의 가입 요청 수정 가능한지 검증 관리자, 주문자만 승인 또는 거절 할 수 있다.
      *
      * @param role 승인 또는 거절하는 사람의 역할
      */
@@ -81,21 +75,28 @@ public class TeamValidator {
         if (!role.equals(TeamMemberRole.VIEWER)) {
             throw new CoreException(CoreErrorType.ONLY_VIEWER_CAN_REQUESTED_ORDERER_CONVERSION);
         }
-        // 이미 전환 요청을 보냈는지 확인
-        if (teamRepository.hasRequestedOrdererConversion(teamId, memberId)) {
-            throw new CoreException(CoreErrorType.ALREADY_REQUESTED_ORDERER_CONVERSION);
-        }
     }
 
     /**
-     * 주문자로 역할 변경 요청을 수락 또는 거절 할 수 있는지 검증
-     * 관리자가 아니면 수락 또는 거절 불가능
+     * 주문자로 역할 변경 요청을 수락 또는 거절 할 수 있는지 검증 관리자가 아니면 수락 또는 거절 불가능
      *
      * @param role 역할
      */
     public void canChangeTeamRole(TeamMemberRole role) {
         if (!role.equals(TeamMemberRole.ADMIN)) {
             throw new CoreException(CoreErrorType.ONLY_ADMIN_CAN_UPDATE);
+        }
+    }
+
+    public void isMemberOfTeam(Long teamId, Long memberId) {
+        if (!teamRepository.existByTeamIdAndMemberId(teamId, memberId)) {
+            throw new CoreException(CoreErrorType.TEAM_MEMBER_NOT_FOUND);
+        }
+    }
+
+    public void canCreateInvitationCode(TeamMemberRole role) {
+        if (!role.equals(TeamMemberRole.ADMIN)) {
+            throw new CoreException(CoreErrorType.ONLY_ADMIN_CAN_MAKE_CODE);
         }
     }
 }

@@ -15,13 +15,13 @@ public class RedisTeamDao implements TeamCachedRepository {
     }
 
     @Override
-    public void save(String key, String value, long time, TimeUnit unit) {
+    public void saveInvitationCode(String key, String value, long time, TimeUnit unit) {
         setValueWithExpiry(key, value, time, unit);
     }
 
     @Override
-    public Object read(String key) {
-        return getValue(key);
+    public String readTeamIdByCode(String key) {
+        return getTeamIdByCode(key);
     }
 
     public void delete(String code) {
@@ -44,7 +44,7 @@ public class RedisTeamDao implements TeamCachedRepository {
         valueOps.rightPush(key, role);
     }
 
-    public String generateTeamKey(Long memberId) {
+    private String generateTeamKey(Long memberId) {
         return "member:team:" + memberId;
     }
 
@@ -59,8 +59,55 @@ public class RedisTeamDao implements TeamCachedRepository {
     /**
      * 키에 저장된 value 조회
      */
-    public Object getValue(String key) {
+    public String getTeamIdByCode(String key) {
         return redisTemplate.opsForValue()
                 .get(key);
     }
+
+    @Override
+    public void applyTeam(String key, Long memberId) {
+        addToSet(key, String.valueOf(memberId));
+    }
+
+    @Override
+    public boolean isTeamJoinRequestExist(String key, Long memberId) {
+        return isValueInSet(key, String.valueOf(memberId));
+    }
+
+    @Override
+    public void removeTeamJoinRequest(String key, Long memberId) {
+        removeFromSet(key, String.valueOf(memberId));
+    }
+
+    @Override
+    public void requestOrdererConversion(String key, Long memberId) {
+        addToSet(key, String.valueOf(memberId));
+    }
+
+    @Override
+    public boolean isOrdererConversionRequestExist(String key, Long memberId) {
+        return isValueInSet(key, String.valueOf(memberId));
+    }
+
+    @Override
+    public void removeOrdererConversionRequest(String key, Long memberId) {
+        removeFromSet(key, String.valueOf(memberId));
+    }
+
+    private void addToSet(String key, String value) {
+        redisTemplate.opsForSet()
+                .add(key, value);
+    }
+
+    private void removeFromSet(String key, String value) {
+        redisTemplate.opsForSet()
+                .remove(key, value);
+    }
+
+    private boolean isValueInSet(String key, String value) {
+        return Boolean.TRUE.equals(redisTemplate.opsForSet()
+                .isMember(key, value));
+    }
+
+
 }

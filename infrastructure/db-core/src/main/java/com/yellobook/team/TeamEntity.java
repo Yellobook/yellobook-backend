@@ -3,7 +3,15 @@ package com.yellobook.team;
 import com.yellobook.BaseEntity;
 import com.yellobook.core.domain.team.Searchable;
 import com.yellobook.core.domain.team.Team;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -31,6 +39,9 @@ public class TeamEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Searchable searchable;
 
+    @Column(nullable = false)
+    private boolean isDeleted;
+
     protected TeamEntity() {
     }
 
@@ -40,6 +51,7 @@ public class TeamEntity extends BaseEntity {
         this.phoneNumber = phoneNumber;
         this.address = address;
         this.searchable = searchable;
+        this.isDeleted = false;
     }
 
     Team toTeam() {
@@ -50,5 +62,9 @@ public class TeamEntity extends BaseEntity {
                 address,
                 searchable
         );
+    }
+
+    void delete() {
+        this.isDeleted = true;
     }
 }

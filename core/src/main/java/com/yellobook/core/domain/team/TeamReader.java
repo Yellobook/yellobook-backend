@@ -1,23 +1,23 @@
 package com.yellobook.core.domain.team;
 
 
+import static com.yellobook.core.error.CoreErrorType.EXIST_TEAM_NAME;
+import static com.yellobook.core.error.CoreErrorType.MEMBER_ALREADY_EXIST;
+import static com.yellobook.core.error.CoreErrorType.MEMBER_NOT_FOUND;
+import static com.yellobook.core.error.CoreErrorType.TEAM_NOT_FOUND;
+
 import com.yellobook.core.domain.common.TeamMemberRole;
 import com.yellobook.core.domain.member.Member;
 import com.yellobook.core.error.CoreException;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
-
-import static com.yellobook.core.error.CoreErrorType.*;
+import org.springframework.stereotype.Component;
 
 @Component
 public class TeamReader {
     private final TeamRepository teamRepository;
-    private final TeamRoleVerifier teamRoleVerifier;
 
-    public TeamReader(TeamRepository teamRepository, TeamRoleVerifier teamRoleVerifier) {
+    public TeamReader(TeamRepository teamRepository) {
         this.teamRepository = teamRepository;
-        this.teamRoleVerifier = teamRoleVerifier;
     }
 
     /*
@@ -53,12 +53,9 @@ public class TeamReader {
 
     /**
      * team에 참여해야 할 때 사용 ex.convert
-     *
-     * @param teamId 참여여부를 확인할 팀id
-     * @param member 참여여부를 확인할 멤버 도메인 모델
      */
-    public void validateParticipant(Long teamId, Member member) {
-        if (!teamRepository.existByTeamIdAndMemberId(teamId, member.memberId())) {
+    public void validateParticipant(Long teamId, Long memberId) {
+        if (!teamRepository.existByTeamIdAndMemberId(teamId, memberId)) {
             throw new CoreException(MEMBER_NOT_FOUND);
         }
     }
@@ -76,33 +73,7 @@ public class TeamReader {
     }
 
     /**
-     * @param teamId 초대하는 팀 id
-     * @param role   초대 코드에 있는 권한
-     * @param member 초대를 하는 멤버
-     */
-    public void invitationRoleValidator(Long teamId, TeamMemberRole role, Member member) {
-        //초대하는 멤버의 권한
-        TeamMemberRole memberRole = readRole(teamId, member);
-        switch (memberRole) {
-            case ADMIN -> {
-                if (role == TeamMemberRole.ADMIN) {
-                    throw new CoreException(ADMIN_EXISTS);
-                }
-            }
-            case VIEWER -> {
-                throw new CoreException(VIEWER_CANNOT_INVITE);
-            }
-            default -> {
-                if (role == TeamMemberRole.ADMIN && teamRoleVerifier.hasAdmin(teamId)) {
-                    throw new CoreException(ADMIN_EXISTS);
-                }
-            }
-        }
-    }
-
-    /**
-     * 키워드가 팀의 이름에 포함되어 있는 팀 리스트 반환
-     * 팀은 공개팀만 조회 가능하다.
+     * 키워드가 팀의 이름에 포함되어 있는 팀 리스트 반환 팀은 공개팀만 조회 가능하다.
      *
      * @param keyword 키워드
      * @return 팀 리스트
@@ -111,23 +82,7 @@ public class TeamReader {
         return teamRepository.getPublicTeamsByName(keyword.trim());
     }
 
-    /**
-     * 팀 가입 요청 정보 조회
-     *
-     * @param applyId 가입 요청 Id
-     * @return 팀 가입 요청 정보
-     */
-    public TeamApplyInfo readTeamApplyInfo(Long applyId) {
-        return teamRepository.findTeamApplyById(applyId).orElseThrow(() -> new CoreException(APPLY_TEAM_NOT_FOUND));
-    }
-
-    /**
-     * 권한 변경 요청 정보 조회
-     *
-     * @param conversionId 권한 변경 요청 Id
-     * @return 권한 변경 요청 정보
-     */
-    public RoleConversionInfo readRoleConversionInfo(Long conversionId) {
-        return teamRepository.findTeamRoleConversionById(conversionId).orElseThrow(() -> new CoreException(ROLE_CONVERSION_NOT_FOUND));
+    public List<Participant> getParticipants(Long teamId) {
+        return teamRepository.getMembersByTeamId(teamId);
     }
 }
