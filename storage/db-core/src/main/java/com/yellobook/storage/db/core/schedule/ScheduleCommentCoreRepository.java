@@ -24,8 +24,8 @@ public class ScheduleCommentCoreRepository implements ScheduleCommentRepository 
 
     @Override
     public Long save(NewScheduleComment comment) {
-        ScheduleEntity schedule = scheduleJpaRepository.getReferenceById(comment.scheduleId());
         MemberEntity commenter = memberJpaRepository.getReferenceById(comment.commenterId());
+        ScheduleEntity schedule = scheduleJpaRepository.getReferenceById(comment.scheduleId());
         return scheduleCommentJpaRepository.save(
                         new ScheduleCommentEntity(comment.content(), commenter, schedule))
                 .getId();
@@ -33,6 +33,9 @@ public class ScheduleCommentCoreRepository implements ScheduleCommentRepository 
 
     @Override
     public List<ScheduleComment> findCommentsByScheduleId(Long scheduleId) {
-        return List.of();
+        return scheduleCommentJpaRepository.findByScheduleId(scheduleId)
+                .stream()
+                .map(ScheduleCommentEntity::toScheduleComment)
+                .toList();
     }
 }

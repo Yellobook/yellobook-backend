@@ -9,4 +9,6 @@ public interface ScheduleMentionJpaRepository extends JpaRepository<ScheduleMent
     List<ScheduleMentionEntity> findAllByScheduleId(Long scheduleId);
 
     void deleteByScheduleId(Long scheduleId);
+
+    Boolean existsByScheduleIdAndMemberId(Long scheduleId, Long memberId);
 }

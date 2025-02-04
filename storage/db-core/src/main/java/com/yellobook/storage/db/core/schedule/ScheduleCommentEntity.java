@@ -1,5 +1,6 @@
 package com.yellobook.storage.db.core.schedule;
 
+import com.yellobook.core.domain.schedule.ScheduleComment;
 import com.yellobook.storage.db.core.BaseEntity;
 import com.yellobook.storage.db.core.member.MemberEntity;
 import jakarta.persistence.Column;
@@ -30,6 +31,12 @@ public class ScheduleCommentEntity extends BaseEntity {
         this.content = content;
         this.member = member;
         this.schedule = schedule;
+    }
+
+    ScheduleComment toScheduleComment() {
+        return new ScheduleComment(
+                this.getId(),
+                member.toMember());
     }
 
     public String getContent() {

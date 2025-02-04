@@ -1,5 +1,6 @@
 package com.yellobook.storage.db.core.schedule;
 
+import com.yellobook.core.domain.schedule.Schedule;
 import com.yellobook.storage.db.core.BaseEntity;
 import com.yellobook.storage.db.core.member.MemberEntity;
 import com.yellobook.storage.db.core.team.TeamEntity;
@@ -49,6 +50,21 @@ public class ScheduleEntity extends BaseEntity {
         this.memberId = memberId;
         this.teamId = teamId;
         this.view = 0;
+    }
+
+    Schedule toSchedule() {
+        return new Schedule(
+                this.getId(),
+                member.toMember(),
+                title,
+                content,
+                view,
+                date
+        );
+    }
+
+    public void increaseView() {
+        this.view++;
     }
 
     public String getTitle() {

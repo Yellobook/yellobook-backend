@@ -23,11 +23,12 @@ public class ScheduleCoreRepository implements ScheduleRepository {
         this.memberJpaRepository = memberJpaRepository;
     }
 
-    //TODO: teamId 수정
     @Override
     public Long save(NewSchedule newSchedule) {
         return scheduleJpaRepository.save(
-                        new ScheduleEntity(newSchedule.title(), newSchedule.memo(), newSchedule.plannedDate(), 1L,
+                        new ScheduleEntity(newSchedule.title(), newSchedule.memo(), newSchedule.plannedDate(),
+                                newSchedule.team()
+                                        .teamId(),
                                 newSchedule.author()
                                         .memberId()))
                 .getId();
@@ -36,26 +37,29 @@ public class ScheduleCoreRepository implements ScheduleRepository {
     @Override
     public void deleteById(Long scheduleId) {
         scheduleJpaRepository.deleteById(scheduleId);
+        scheduleMentionJpaRepository.deleteByScheduleId(scheduleId);
     }
 
     @Override
     public Boolean existsById(Long scheduleId) {
-        return null;
+        return scheduleJpaRepository.existsById(scheduleId);
     }
 
     @Override
     public Optional<Schedule> findById(Long scheduleId) {
-        return Optional.empty();
+        return scheduleJpaRepository.findById(scheduleId)
+                .map(ScheduleEntity::toSchedule);
     }
 
     @Override
     public Boolean isMentioned(Long scheduleId, Long memberId) {
-        return null;
+        return scheduleMentionJpaRepository.existsByScheduleIdAndMemberId(scheduleId, memberId);
     }
 
     @Override
     public void increaseView(Long scheduleId) {
-
+        ScheduleEntity schedule = scheduleJpaRepository.getReferenceById(scheduleId);
+        schedule.increaseView();
     }
 
     @Override
