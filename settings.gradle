@@ -15,6 +15,7 @@ pluginManagement {
 rootProject.name = 'yellobook'
 
 include 'api-server'
+include 'admin-api'
 include 'core'
 include 'storage:db-core'
 include 'storage:db-cache'

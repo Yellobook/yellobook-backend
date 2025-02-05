@@ -99,14 +99,7 @@ public class ExcelReader {
         }
         // 빈 값이 있는지 없는지 확인
         if (isRowValid(name, subProduct, sku, purchasePrice, salePrice, amount)) {
-            return ExcelProductCell.builder()
-                    .name(name)
-                    .subProduct(subProduct)
-                    .sku(sku)
-                    .purchasePrice(purchasePrice)
-                    .salePrice(salePrice)
-                    .amount(amount)
-                    .build();
+            return new ExcelProductCell(name, subProduct, sku, purchasePrice, salePrice, amount);
         } else {
             throw new ExcelParsingException(ROW_HAS_EMPTY_CELL);
         }

@@ -2,9 +2,7 @@ package com.yellobook.api.controller.schedule.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
-import lombok.Builder;
 
-@Builder
 @Schema(description = "캘린더 일별 일정목록")
 public record CalendarItem(
         @Schema(description = "일자")

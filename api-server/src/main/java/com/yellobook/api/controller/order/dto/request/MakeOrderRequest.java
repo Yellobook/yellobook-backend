@@ -4,9 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
-import lombok.Builder;
 
-@Builder
 public record MakeOrderRequest(
         @Schema(description = "제품Id", example = "1")
         @NotNull(message = "productId를 입력해주세요")

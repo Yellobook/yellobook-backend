@@ -5,9 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.util.List;
-import lombok.Builder;
 
-@Builder
 public record CreateInformRequest(
         @Schema(description = "작성할 글의 제목", example = "[공지] 공장 휴식")
         @NotBlank(message = "제목은 비워둘 수 없습니다.")

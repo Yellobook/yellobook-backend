@@ -1,5 +1,6 @@
 package com.yellobook.api.support.error;
 
+import com.yellobook.api.support.auth.error.AuthErrorType;
 import com.yellobook.core.error.CoreErrorType;
 
 public record ApiErrorMessage(
@@ -21,5 +22,9 @@ public record ApiErrorMessage(
 
     public ApiErrorMessage(CoreErrorType errorType, Object data) {
         this(errorType.getCode(), errorType.getMessage(), data);
+    }
+
+    public ApiErrorMessage(AuthErrorType errorType) {
+        this(errorType.getCode(), errorType.getMessage(), null);
     }
 }

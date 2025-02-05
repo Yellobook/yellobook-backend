@@ -1,11 +1,9 @@
 package com.yellobook.api.support.error;
 
-import com.yellobook.excel.ExcelErrorType;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.http.HttpStatus;
 
 public enum ApiErrorType {
-    // 시스템 관련 에러
     INTERNAL_SERVER_ERROR(ApiErrorCode.SYS001, HttpStatus.INTERNAL_SERVER_ERROR,
             "서버 내부 오류가 발생했습니다. 다시 시도해주세요.", LogLevel.ERROR),
     SERVICE_UNAVAILABLE(ApiErrorCode.SYS002, HttpStatus.SERVICE_UNAVAILABLE,
@@ -38,43 +36,8 @@ public enum ApiErrorType {
     SKU_DUPLICATE(ApiErrorCode.FILE007, HttpStatus.CONFLICT,
             "중복된 SKU가 존재합니다.", LogLevel.WARN),
     INT_OVER_ONE(ApiErrorCode.FILE008, HttpStatus.BAD_REQUEST,
-            "SKU, 구매가, 판매가, 현재 재고 수량은 0 이상이여야 합니다.", LogLevel.WARN),
+            "SKU, 구매가, 판매가, 현재 재고 수량은 0 이상이여야 합니다.", LogLevel.WARN);
 
-    AUTHENTICATION_FAILED(ApiErrorCode.AUTH001, HttpStatus.UNAUTHORIZED,
-            "사용자 인증에 실패했습니다.", LogLevel.WARN),
-    ACCESS_DENIED(ApiErrorCode.AUTH002, HttpStatus.FORBIDDEN,
-            "접근이 거부되었습니다. 이 리소스에 대한 권한이 없습니다.", LogLevel.WARN),
-    INSUFFICIENT_PERMISSIONS(ApiErrorCode.AUTH003, HttpStatus.FORBIDDEN,
-            "작업을 수행할 권한이 부족합니다.", LogLevel.WARN),
-    LOGIN_FAILED(ApiErrorCode.AUTH004, HttpStatus.UNAUTHORIZED,
-            "로그인에 실패했습니다.", LogLevel.WARN),
-
-    ACCESS_TOKEN_EXPIRED(ApiErrorCode.AUTH005, HttpStatus.UNAUTHORIZED,
-            "엑세스 토큰의 유효기간이 만료되었습니다.", LogLevel.INFO),
-    REFRESH_TOKEN_EXPIRED(ApiErrorCode.AUTH006, HttpStatus.UNAUTHORIZED,
-            "리프레시 토큰의 유효기간이 만료되었습니다.", LogLevel.INFO),
-    TERMS_TOKEN_EXPIRED(ApiErrorCode.AUTH007, HttpStatus.UNAUTHORIZED,
-            "약관 동의 토큰의 유효기간이 만료되었습니다.", LogLevel.INFO),
-    INVALID_TOKEN_FORMAT(ApiErrorCode.AUTH008, HttpStatus.BAD_REQUEST,
-            "잘못된 토큰 형식입니다.", LogLevel.WARN),
-    INVALID_TOKEN_SIGNATURE(ApiErrorCode.AUTH009, HttpStatus.UNAUTHORIZED,
-            "토큰의 서명이 일치하지 않습니다.", LogLevel.WARN),
-    UNSUPPORTED_TOKEN(ApiErrorCode.AUTH010, HttpStatus.BAD_REQUEST,
-            "토큰의 특정 헤더나 클레임이 지원되지 않습니다.", LogLevel.WARN),
-
-    REFRESH_TOKEN_NOT_FOUND(ApiErrorCode.AUTH011, HttpStatus.UNAUTHORIZED,
-            "쿠키에 리프레시 토큰이 없습니다.", LogLevel.WARN),
-    ACCESS_TOKEN_NOT_FOUND(ApiErrorCode.AUTH012, HttpStatus.UNAUTHORIZED,
-            "요청 헤더에 엑세스 토큰이 없습니다.", LogLevel.WARN),
-
-    ADMIN_NOT_ALLOWED(ApiErrorCode.AUTH013, HttpStatus.FORBIDDEN,
-            "관리자는 접근 권한이 없습니다.", LogLevel.WARN),
-    ORDERER_NOT_ALLOWED(ApiErrorCode.AUTH014, HttpStatus.FORBIDDEN,
-            "주문자는 접근 권한이 없습니다.", LogLevel.WARN),
-    VIEWER_NOT_ALLOWED(ApiErrorCode.AUTH015, HttpStatus.FORBIDDEN,
-            "뷰어는 접근 권한이 없습니다.", LogLevel.WARN),
-    USER_NOT_EXIST(ApiErrorCode.AUTH016, HttpStatus.NOT_FOUND,
-            "가입한 사용자가 존재하지 않습니다.", LogLevel.WARN);
 
     private final ApiErrorCode code;
     private final HttpStatus status;
@@ -104,16 +67,16 @@ public enum ApiErrorType {
         return logLevel;
     }
 
-    public static ApiErrorType from(ExcelErrorType excelErrorType) {
-        return switch (excelErrorType) {
-            case FILE_NOT_EXIST -> FILE_NOT_EXIST;
-            case FILE_NOT_EXCEL -> FILE_NOT_EXCEL;
-            case CELL_IS_EMPTY -> CELL_IS_EMPTY;
-            case CELL_INVALID_TYPE -> CELL_INVALID_TYPE;
-            case ROW_HAS_EMPTY_CELL -> ROW_HAS_EMPTY_CELL;
-            case FILE_IO_FAIL -> FILE_IO_FAIL;
-            case SKU_DUPLICATE -> SKU_DUPLICATE;
-            case INT_OVER_ONE -> INT_OVER_ONE;
-        };
-    }
+//    public static ApiErrorType from(ExcelErrorType excelErrorType) {
+//        return switch (excelErrorType) {
+//            case FILE_NOT_EXIST -> FILE_NOT_EXIST;
+//            case FILE_NOT_EXCEL -> FILE_NOT_EXCEL;
+//            case CELL_IS_EMPTY -> CELL_IS_EMPTY;
+//            case CELL_INVALID_TYPE -> CELL_INVALID_TYPE;
+//            case ROW_HAS_EMPTY_CELL -> ROW_HAS_EMPTY_CELL;
+//            case FILE_IO_FAIL -> FILE_IO_FAIL;
+//            case SKU_DUPLICATE -> SKU_DUPLICATE;
+//            case INT_OVER_ONE -> INT_OVER_ONE;
+//        };
+//    }
 }

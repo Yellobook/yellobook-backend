@@ -2,9 +2,7 @@ package com.yellobook.api.controller.inform.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
-import lombok.Builder;
 
-@Builder
 public record CreateInformCommentResponse(
         @Schema(description = "작성한 댓글의 고유 id")
         Long id,

@@ -1,10 +1,19 @@
 package com.yellobook.core.domain.inform;
 
-import java.time.LocalDate;
-import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface InformRepository {
-    Long save(String title, String content, LocalDate plannedDate, Long authorId, List<Long> memberIds);
+    Long save(NewInform newInform);
+
+    void deleteById(Long informId);
+
+    Boolean existsById(Long informId);
+
+    Optional<Inform> findById(Long informId);
+
+    Boolean isMentioned(Long informId, Long memberId);
+
+    void increaseView(Long informId);
 }

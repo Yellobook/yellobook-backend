@@ -2,26 +2,34 @@ package com.yellobook.api.support.logging.dto;
 
 import java.util.Collections;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-@Getter
-@AllArgsConstructor
-@ToString
 public class HttpLogMessage {
-    private String httpMethod;
-    private String requestUri;
-    private HttpStatus httpStatus;
-    private String clientIp;
-    private double elapsedTime;
-    private String headers;
-    private String requestParam;
-    private String requestBody;
-    private String responseBody;
+    private final String httpMethod;
+    private final String requestUri;
+    private final HttpStatus httpStatus;
+    private final String clientIp;
+    private final double elapsedTime;
+    private final String headers;
+    private final String requestParam;
+    private final String requestBody;
+    private final String responseBody;
+
+    public HttpLogMessage(String httpMethod, String requestUri, HttpStatus httpStatus, String clientIp,
+                          double elapsedTime,
+                          String headers, String requestParam, String requestBody, String responseBody) {
+        this.httpMethod = httpMethod;
+        this.requestUri = requestUri;
+        this.httpStatus = httpStatus;
+        this.clientIp = clientIp;
+        this.elapsedTime = elapsedTime;
+        this.headers = headers;
+        this.requestParam = requestParam;
+        this.requestBody = requestBody;
+        this.responseBody = responseBody;
+    }
 
     public static HttpLogMessage createInstance(ContentCachingRequestWrapper requestWrapper,
                                                 ContentCachingResponseWrapper responseWrapper, double elapsedTime) {
