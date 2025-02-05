@@ -31,4 +31,6 @@ public interface ParticipantJpaRepository extends JpaRepository<ParticipantEntit
                               @Param("role") TeamMemberRole role);
 
     List<ParticipantEntity> findAllByTeamId(Long teamId);
+
+    int countAllByTeamIdAndTeamMemberRole(Long teamId, TeamMemberRole role);
 }

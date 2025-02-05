@@ -15,7 +15,7 @@ public interface TeamRepository {
 
     boolean existByTeamIdAndMemberId(Long teamId, Long memberId);
 
-    Long save(String name, String phoneNumber, String address, Searchable searchable);
+    Long save(String name, String phoneNumber, String address, Boolean isSearchable);
 
     Optional<Team> findById(Long teamId);
 
@@ -29,13 +29,14 @@ public interface TeamRepository {
 
     TeamMemberRole getRole(Long teamId, Long memberId);
 
-    List<Team> getPublicTeamsByName(String keyword);
+    List<Team> getSearchableTeamsByName(String keyword);
 
-    void updateSearchable(Long teamId, Searchable searchable);
+    void updateSearchable(Long teamId, Boolean searchable);
 
     boolean isTeamMember(Long teamId, Long memberId);
 
     void updateTeamMemberRole(Long teamId, Long memberId, TeamMemberRole role);
 
-    void deactivateTeam(Long teamId);
+    int countAllByTeamIdAndTeamMemberRole(Long teamId, TeamMemberRole role);
+
 }

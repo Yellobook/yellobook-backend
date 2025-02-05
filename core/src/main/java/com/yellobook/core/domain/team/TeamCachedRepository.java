@@ -1,15 +1,12 @@
 package com.yellobook.core.domain.team;
 
-import java.util.concurrent.TimeUnit;
+import com.yellobook.core.domain.common.TeamMemberRole;
+import com.yellobook.core.domain.team.dto.InvitationInfo;
 import org.springframework.stereotype.Component;
 
 @Component
 public interface TeamCachedRepository {
-    void saveInvitationCode(String key, String value, long time, TimeUnit unit);
-
-    void saveCurrentTeam(Long teamId, Long memberId, String role);
-
-    String readTeamIdByCode(String key);
+    InvitationInfo readTeamIdAndRoleByCode(String key);
 
     void applyTeam(String key, Long memberId);
 
@@ -22,4 +19,6 @@ public interface TeamCachedRepository {
     boolean isOrdererConversionRequestExist(String key, Long memberId);
 
     void removeOrdererConversionRequest(String key, Long memberId);
+
+    void saveInvitationCode(String key, Long teamId, TeamMemberRole inviteRole, long validMinute);
 }

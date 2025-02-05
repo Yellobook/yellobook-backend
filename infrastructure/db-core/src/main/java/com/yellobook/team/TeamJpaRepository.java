@@ -1,6 +1,5 @@
 package com.yellobook.team;
 
-import com.yellobook.core.domain.team.Searchable;
 import com.yellobook.domains.team.dto.query.QueryTeamMember;
 import java.util.List;
 import java.util.Optional;
@@ -14,9 +13,10 @@ public interface TeamJpaRepository extends JpaRepository<TeamEntity, Long> {
 
     List<QueryTeamMember> findTeamMembers(Long teamId);
 
-    List<TeamEntity> findByNameContainingAndSearchable(String keyword, Searchable searchable);
+    List<TeamEntity> findAllByNameContainingAndSearchableIsTrue(String keyword);
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
-    @Query(value = "update TeamEntity t set t.searchable = :searchable where t.id = :teamId")
-    void updateSearchable(@Param("teamId") Long teamId, @Param("searchable") Searchable searchable);
+    @Query(value = "update TeamEntity t set t.isSearchable = :searchable where t.id = :teamId")
+    void updateSearchable(@Param("teamId") Long teamId, @Param("searchable") Boolean searchable);
+
 }

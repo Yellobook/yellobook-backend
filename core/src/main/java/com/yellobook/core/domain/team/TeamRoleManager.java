@@ -1,5 +1,6 @@
 package com.yellobook.core.domain.team;
 
+import com.yellobook.core.domain.common.TeamMemberRole;
 import com.yellobook.core.error.CoreErrorType;
 import com.yellobook.core.error.CoreException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,10 +9,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class TeamRoleManager {
     private final TeamCachedRepository teamCachedRepository;
+    private final TeamRepository teamRepository;
 
     @Autowired
-    public TeamRoleManager(TeamCachedRepository teamCachedRepository) {
+    public TeamRoleManager(TeamCachedRepository teamCachedRepository, TeamRepository teamRepository) {
         this.teamCachedRepository = teamCachedRepository;
+        this.teamRepository = teamRepository;
+    }
+
+    public TeamMemberRole readRole(Long teamId, Long memberId) {
+        return teamRepository.getRole(teamId, memberId);
+    }
+
+    public void updateRole(Long teamId, Long memberId, TeamMemberRole role) {
+        teamRepository.updateTeamMemberRole(teamId, memberId, role);
     }
 
     public void requestOrdererConversion(Long teamId, Long memberId) {

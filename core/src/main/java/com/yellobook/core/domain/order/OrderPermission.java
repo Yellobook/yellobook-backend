@@ -65,7 +65,7 @@ public class OrderPermission {
 
 
     private boolean isAdmin(TeamMemberRole role) {
-        return role.equals(TeamMemberRole.ADMIN);
+        return role.equals(TeamMemberRole.SELLER);
     }
 
     private boolean isOrderer(TeamMemberRole role) {

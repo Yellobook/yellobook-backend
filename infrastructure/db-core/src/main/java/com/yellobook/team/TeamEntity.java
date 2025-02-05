@@ -1,12 +1,9 @@
 package com.yellobook.team;
 
 import com.yellobook.BaseEntity;
-import com.yellobook.core.domain.team.Searchable;
 import com.yellobook.core.domain.team.Team;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -36,22 +33,18 @@ public class TeamEntity extends BaseEntity {
     @Column(nullable = false)
     private String address;
 
-    @Enumerated(EnumType.STRING)
-    private Searchable searchable;
-
     @Column(nullable = false)
-    private boolean isDeleted;
+    private boolean isSearchable;
 
     protected TeamEntity() {
     }
 
     @Builder
-    private TeamEntity(String name, String phoneNumber, String address, Searchable searchable) {
+    private TeamEntity(String name, String phoneNumber, String address, Boolean isSearchable) {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.address = address;
-        this.searchable = searchable;
-        this.isDeleted = false;
+        this.isSearchable = isSearchable;
     }
 
     Team toTeam() {
@@ -60,11 +53,8 @@ public class TeamEntity extends BaseEntity {
                 name,
                 phoneNumber,
                 address,
-                searchable
+                isSearchable
         );
     }
 
-    void delete() {
-        this.isDeleted = true;
-    }
 }

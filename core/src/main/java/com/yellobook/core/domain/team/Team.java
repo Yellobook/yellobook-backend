@@ -6,6 +6,6 @@ public record Team(
         String name,
         String phoneNumber,
         String address,
-        Searchable searchable
+        Boolean isSearchable
 ) {
 }

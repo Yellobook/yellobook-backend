@@ -1,27 +1,41 @@
 package com.yellobook.service;
 
+import com.yellobook.core.domain.common.TeamMemberRole;
 import com.yellobook.core.domain.team.TeamCachedRepository;
-import java.util.concurrent.TimeUnit;
-import org.springframework.data.redis.core.ListOperations;
+import com.yellobook.core.domain.team.dto.InvitationInfo;
+import java.time.Duration;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
 public class RedisTeamDao implements TeamCachedRepository {
     private final RedisTemplate<String, String> redisTemplate;
+    private final HashOperations<String, String, String> hashOperation;
+    private static final String FIELD_TEAM_ID = "teamId";
+    private static final String FILED_ROLE = "role";
 
     public RedisTeamDao(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
+        this.hashOperation = redisTemplate.opsForHash();
     }
 
     @Override
-    public void saveInvitationCode(String key, String value, long time, TimeUnit unit) {
-        setValueWithExpiry(key, value, time, unit);
+    public void saveInvitationCode(String key, Long teamId, TeamMemberRole inviteRole, long validMinute) {
+        hashOperation.put(key, FIELD_TEAM_ID, String.valueOf(teamId));
+        hashOperation.put(key, FILED_ROLE, inviteRole.getDescription());
+
+        redisTemplate.expire(key, Duration.ofSeconds(validMinute));
     }
 
     @Override
-    public String readTeamIdByCode(String key) {
-        return getTeamIdByCode(key);
+    public InvitationInfo readTeamIdAndRoleByCode(String key) {
+        String teamIdStr = hashOperation.get(key, FIELD_TEAM_ID);
+        String roleDescription = hashOperation.get(key, FILED_ROLE);
+        if (teamIdStr == null || roleDescription == null) {
+            return null;
+        }
+        return new InvitationInfo(teamIdStr, roleDescription);
     }
 
     public void delete(String code) {
@@ -33,27 +47,9 @@ public class RedisTeamDao implements TeamCachedRepository {
         return redisTemplate.hasKey(code);
     }
 
-    @Override
-    public void saveCurrentTeam(Long teamId, Long memberId, String role) {
-        ListOperations<String, String> valueOps = redisTemplate.opsForList();
-        String key = generateTeamKey(memberId);
-        // 기존 정보가 있다면 삭제
-        delete(key);
-        // 현재 위치한 팀 정보로 갱신
-        valueOps.rightPush(key, teamId.toString());
-        valueOps.rightPush(key, role);
-    }
 
     private String generateTeamKey(Long memberId) {
         return "member:team:" + memberId;
-    }
-
-    /**
-     * key & value 저장
-     */
-    public void setValueWithExpiry(String key, String value, long timeout, TimeUnit timeUnit) {
-        redisTemplate.opsForValue()
-                .set(key, value, timeout, timeUnit);
     }
 
     /**

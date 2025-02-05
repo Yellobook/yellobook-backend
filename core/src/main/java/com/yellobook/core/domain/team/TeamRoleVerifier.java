@@ -15,7 +15,7 @@ public class TeamRoleVerifier {
 
     // 팀에 관리자가 있는지 검증
     public boolean hasAdmin(Long teamId) {
-        return teamRepository.existByTeamAndRole(teamId, TeamMemberRole.ADMIN);
+        return teamRepository.existByTeamAndRole(teamId, TeamMemberRole.SELLER);
     }
 
 }

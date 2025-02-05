@@ -27,7 +27,7 @@ public class TeamValidator {
      * @param role 역할
      */
     public void canCreateTeam(TeamMemberRole role) {
-        if (!role.equals(TeamMemberRole.ADMIN)) {
+        if (!role.equals(TeamMemberRole.SELLER)) {
             throw new CoreException(CoreErrorType.TEAM_CREATION_FAILED);
         }
     }
@@ -38,8 +38,8 @@ public class TeamValidator {
      * @param role
      */
     public void canModifySearchable(TeamMemberRole role) {
-        if (!role.equals(TeamMemberRole.ADMIN)) {
-            throw new CoreException(CoreErrorType.ONLY_ADMIN_CAN_UPDATE);
+        if (!role.equals(TeamMemberRole.SELLER)) {
+            throw new CoreException(CoreErrorType.ONLY_SELLER_CAN_UPDATE);
         }
     }
 
@@ -62,8 +62,8 @@ public class TeamValidator {
      * @param role 승인 또는 거절하는 사람의 역할
      */
     public void canUpdateTeamJoinRequest(TeamMemberRole role) {
-        if (!(role.equals(TeamMemberRole.ADMIN) || role.equals(TeamMemberRole.ORDERER))) {
-            throw new CoreException(CoreErrorType.ADMIN_AND_ORDERER_CAN_UPDATE_JOIN_REQUEST);
+        if (!(role.equals(TeamMemberRole.SELLER) || role.equals(TeamMemberRole.ORDERER))) {
+            throw new CoreException(CoreErrorType.SELLER_AND_ORDERER_CAN_UPDATE_JOIN_REQUEST);
         }
     }
 
@@ -83,8 +83,8 @@ public class TeamValidator {
      * @param role 역할
      */
     public void canChangeTeamRole(TeamMemberRole role) {
-        if (!role.equals(TeamMemberRole.ADMIN)) {
-            throw new CoreException(CoreErrorType.ONLY_ADMIN_CAN_UPDATE);
+        if (!role.equals(TeamMemberRole.SELLER)) {
+            throw new CoreException(CoreErrorType.ONLY_SELLER_CAN_UPDATE);
         }
     }
 
@@ -95,8 +95,9 @@ public class TeamValidator {
     }
 
     public void canCreateInvitationCode(TeamMemberRole role) {
-        if (!role.equals(TeamMemberRole.ADMIN)) {
-            throw new CoreException(CoreErrorType.ONLY_ADMIN_CAN_MAKE_CODE);
+        if (!role.equals(TeamMemberRole.SELLER)) {
+            throw new CoreException(CoreErrorType.ONLY_SELLER_CAN_MAKE_CODE);
         }
     }
+
 }

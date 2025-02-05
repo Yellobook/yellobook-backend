@@ -16,7 +16,7 @@ public class InventoryPermission {
     }
 
     public void onlyAdminCanManipulate(TeamMemberRole role) {
-        if (!role.equals(TeamMemberRole.ADMIN)) {
+        if (!role.equals(TeamMemberRole.SELLER)) {
             throw new CoreException(ONLY_ADMIN_CAN_MANIPULATE_INVENTORY);
         }
     }
