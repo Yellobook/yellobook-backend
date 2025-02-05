@@ -2,7 +2,7 @@ dependencies {
     compileOnly 'org.springframework:spring-context'
     compileOnly 'jakarta.transaction:jakarta.transaction-api'
     // testFixtures
-    testImplementation(testFixtures(project(":infrastructure:db-core")))
+    testImplementation(testFixtures(project(":storage:db-core")))
 }
 
 tasks.register('copyConfig', Copy) {

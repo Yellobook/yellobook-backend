@@ -35,9 +35,9 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.5.3.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
 
-    runtimeOnly project(":infrastructure:db-core")
+    runtimeOnly project(":storage:db-core")
     implementation project(':core')
-    implementation project(':infrastructure:parser-excel')
+    implementation project(':storage:parser-excel')
 //    implementation project(":storage:storage-redis")
 
     // validation
