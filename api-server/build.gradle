@@ -24,7 +24,9 @@ configurations {
 }
 
 dependencies {
-    runtimeOnly project(":admin-api")
+    // 인증때문에 runtimeOnly 불가
+    implementation project(":admin-api")
+    
     runtimeOnly project(":storage:db-core")
     implementation project(':core')
 
@@ -59,6 +61,7 @@ tasks.register('copyConfig', Copy) {
     into 'src/main/resources'
 }
 
+
 processResources.dependsOn('copyConfig')
 
 tasks.register('integrationTest', Test) {
@@ -70,4 +73,12 @@ tasks.register('integrationTest', Test) {
 
 check {
     dependsOn integrationTest
+}
+
+bootJar {
+    enabled = true
+}
+
+jar {
+    enabled = false
 }

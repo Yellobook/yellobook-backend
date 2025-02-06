@@ -1,10 +1,11 @@
 package com.yellobook.core.domain.terms;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 public record TermsAgreement(
-        Long memberId,
-        Long termsId,
-        List<Long> termsItemIds
+        long agreementId,
+        long memberId,
+        long termsId,
+        LocalDateTime agreeAt
 ) {
 }

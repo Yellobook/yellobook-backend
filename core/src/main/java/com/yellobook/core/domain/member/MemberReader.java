@@ -13,12 +13,21 @@ public class MemberReader {
         this.memberRepository = memberRepository;
     }
 
+    public boolean exist(String email) {
+        return memberRepository.existByEmail(email);
+    }
+
+    public Member read(String email) {
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new CoreException(CoreErrorType.MEMBER_NOT_FOUND));
+    }
+
     public Member read(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new CoreException(CoreErrorType.MEMBER_NOT_FOUND));
     }
 
-    public Optional<Member> read(SocialInfo socialInfo) {
-        return memberRepository.findBySocialInfo(socialInfo);
+    public Optional<Member> find(String email) {
+        return memberRepository.findByEmail(email);
     }
 }

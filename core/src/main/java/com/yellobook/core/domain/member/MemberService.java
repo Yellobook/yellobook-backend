@@ -3,6 +3,7 @@ package com.yellobook.core.domain.member;
 import com.yellobook.core.error.CoreErrorType;
 import com.yellobook.core.error.CoreException;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,14 +21,16 @@ public class MemberService {
         this.profileEditor = profileEditor;
     }
 
-    public Long getIdOrRegister(ProfileInfo profileInfo, SocialInfo socialInfo) {
-        return memberReader.read(socialInfo)
-                .map(Member::memberId)
-                .orElseGet(() -> memberWriter.add(profileInfo, socialInfo));
+    public boolean existMemberByEmail(String email) {
+        return memberReader.exist(email);
     }
 
-    public Member read(Long memberId) {
-        return memberReader.read(memberId);
+    public Optional<Member> findByEmail(String email) {
+        return memberReader.find(email);
+    }
+
+    public Long create(ProfileInfo profileInfo, SocialInfo socialInfo) {
+        return memberWriter.add(profileInfo, socialInfo);
     }
 
     public void updateNickname(Member member, String newNickname) {

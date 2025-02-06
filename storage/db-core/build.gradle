@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     compileOnly project(':core')
+    testImplementation(project(":core"))
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     runtimeOnly 'com.mysql:mysql-connector-j'
@@ -20,11 +21,11 @@ dependencies {
 
     implementation "p6spy:p6spy:3.9.1"
 
+    testCompileOnly project(":core")
     testImplementation 'org.testcontainers:testcontainers:1.20.1'
     testImplementation 'org.testcontainers:junit-jupiter:1.20.1'
     testImplementation "org.testcontainers:mysql:1.20.1"
     testImplementation "com.redis:testcontainers-redis:2.2.2"
-    testImplementation project(':core')
 }
 
 
@@ -53,6 +54,11 @@ tasks.register("compileQuerydsl", JavaCompile) {
             "-proc:only",
             "-s", file(generated).absolutePath
     ]
+}
+
+tasks.withType(Test).configureEach {
+    reports.junitXml.required = false
+    reports.html.required = false
 }
 
 processResources.dependsOn('copyConfig')

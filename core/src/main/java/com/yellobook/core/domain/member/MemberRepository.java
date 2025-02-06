@@ -3,17 +3,17 @@ package com.yellobook.core.domain.member;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public interface MemberRepository {
     Long save(NewMember newMember);
 
-    boolean existById(Long memberId);
+    boolean existByEmail(String email);
 
     Optional<Member> findById(Long memberId);
 
     Optional<Member> findBySocialInfo(SocialInfo socialInfo);
+
+    Optional<Member> findByEmail(String email);
 
     void delete(Member member);
 
@@ -23,5 +23,5 @@ public interface MemberRepository {
 
     void updateBio(Member member, String newBio);
 
-    List<JoinedTeamResult> findJoinedTeamsByMemberId(Member member);
+    List<JoinedTeamResult> findJoinedTeamsByMemberId(Long memberId);
 }
