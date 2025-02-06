@@ -1,6 +1,5 @@
 package com.yellobook.storage.db.core.terms;
 
-import com.yellobook.core.domain.terms.Terms;
 import com.yellobook.storage.db.core.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,15 +18,6 @@ public class TermsEntity extends BaseEntity {
     private Boolean isActive;
 
     protected TermsEntity() {
-    }
-
-    public static Terms toTerms(TermsEntity terms) {
-        return new Terms(
-                terms.id,
-                terms.name,
-                terms.version,
-                null
-        );
     }
 
     public TermsEntity(String name, Integer version, Boolean isActive) {

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.yellobook.core.domain.terms.TermsAgreement;
 import com.yellobook.core.domain.terms.TermsAgreementCheckResult;
+import com.yellobook.core.enums.TermsType;
 import com.yellobook.storage.db.core.member.MemberEntity;
 import com.yellobook.storage.db.core.member.MemberJpaRepository;
 import com.yellobook.storage.db.support.RepositoryTest;

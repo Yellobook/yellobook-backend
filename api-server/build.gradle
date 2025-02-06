@@ -24,11 +24,10 @@ configurations {
 }
 
 dependencies {
-    // 인증때문에 runtimeOnly 불가
-    implementation project(":admin-api")
-    
+    runtimeOnly project(":admin-api")
     runtimeOnly project(":storage:db-core")
-    implementation project(':core')
+    implementation project(':core:core-domain')
+    compileOnly(':core:core-enum')
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'

@@ -3,8 +3,8 @@ plugins {
 }
 
 dependencies {
-    compileOnly project(':core')
-    testImplementation(project(":core"))
+    compileOnly project(':core:core-domain')
+    compileOnly project(':core:core-enum')
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     runtimeOnly 'com.mysql:mysql-connector-j'
@@ -21,11 +21,11 @@ dependencies {
 
     implementation "p6spy:p6spy:3.9.1"
 
-    testCompileOnly project(":core")
+    testImplementation project(":core:core-domain")
+    testImplementation project(":core:core-enum")
     testImplementation 'org.testcontainers:testcontainers:1.20.1'
     testImplementation 'org.testcontainers:junit-jupiter:1.20.1'
     testImplementation "org.testcontainers:mysql:1.20.1"
-    testImplementation "com.redis:testcontainers-redis:2.2.2"
 }
 
 
