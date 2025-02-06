@@ -1,6 +1,7 @@
 package com.yellobook.storage.db.core.terms;
 
 import com.yellobook.core.domain.terms.Terms.TermsItem;
+import com.yellobook.core.enums.TermsType;
 import com.yellobook.storage.db.core.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,8 +43,7 @@ public class TermsItemEntity extends BaseEntity {
                 termsItem.getId(),
                 termsItem.getTitle(),
                 termsItem.getContent(),
-                com.yellobook.core.domain.terms.TermsType.fromName(termsItem.getType()
-                        .getName())
+                termsItem.getType()
         );
     }
 
