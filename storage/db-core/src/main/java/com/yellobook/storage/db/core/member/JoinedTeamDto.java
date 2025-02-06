@@ -1,6 +1,7 @@
 package com.yellobook.storage.db.core.member;
 
 import com.querydsl.core.annotations.QueryProjection;
+import com.yellobook.core.domain.member.JoinedTeamResult;
 
 public class JoinedTeamDto {
     private final Long teamId;
@@ -43,5 +44,16 @@ public class JoinedTeamDto {
 
     public int getMemberCount() {
         return memberCount;
+    }
+
+    public static JoinedTeamResult toJoinedTeamResult(JoinedTeamDto joinedTeamDto) {
+        return new JoinedTeamResult(
+                joinedTeamDto.getTeamId(),
+                joinedTeamDto.getTeamName(),
+                joinedTeamDto.getTeamDescription(),
+                joinedTeamDto.getMyRole(),
+                joinedTeamDto.getSellerName(),
+                joinedTeamDto.getMemberCount()
+        );
     }
 }
