@@ -2,7 +2,6 @@ package com.yellobook.core.domain.terms;
 
 import com.yellobook.core.error.CoreErrorType;
 import com.yellobook.core.error.CoreException;
-import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,14 +12,8 @@ public class TermsReader {
         this.termsRepository = termsRepository;
     }
 
-    public Terms read(Long termsId) {
-        return termsRepository.findTermsById(termsId)
-                .orElseThrow(
-                        () -> new CoreException(CoreErrorType.TERMS_NOT_FOUND)
-                );
-    }
-
-    public Optional<Terms> readActive() {
-        return termsRepository.findActiveTerms();
+    public Terms readActive() {
+        return termsRepository.findActiveTerms()
+                .orElseThrow(() -> new CoreException(CoreErrorType.ACTIVE_TERMS_NOT_FOUND));
     }
 }

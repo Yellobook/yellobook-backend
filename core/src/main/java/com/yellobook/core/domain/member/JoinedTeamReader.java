@@ -12,6 +12,6 @@ public class JoinedTeamReader {
     private final MemberRepository memberRepository;
 
     public List<JoinedTeamResult> read(Member member) {
-        return memberRepository.findJoinedTeamsByMemberId(member);
+        return memberRepository.findJoinedTeamsByMemberId(member.memberId());
     }
 }

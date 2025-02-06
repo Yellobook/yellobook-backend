@@ -56,7 +56,11 @@ public enum CoreErrorType {
             CoreErrorLevel.WARN),
 
     // Terms
-    TERMS_NOT_FOUND(CoreErrorCode.TERMS01, CoreErrorKind.NOT_FOUND, "해당 약관은 존재하지 않습니다.", CoreErrorLevel.WARN);
+    TERMS_NOT_FOUND(CoreErrorCode.TERMS01, CoreErrorKind.NOT_FOUND, "해당 약관은 존재하지 않습니다.", CoreErrorLevel.WARN),
+    ACTIVE_TERMS_NOT_FOUND(CoreErrorCode.TERMS02, CoreErrorKind.NOT_FOUND, "해당 약관은 존재하지 않습니다.", CoreErrorLevel.WARN),
+    TERMS_ALREADY_AGREED(CoreErrorCode.TERMS03, CoreErrorKind.BAD_REQUEST, "이미 해당 약관에 동의하였습니다.", CoreErrorLevel.WARN),
+    REQUIRED_TERMS_NOT_AGREED(CoreErrorCode.TERMS04, CoreErrorKind.BAD_REQUEST, "필수 동의 항목이 누락되었습니다.",
+            CoreErrorLevel.WARN);
 
     private final CoreErrorCode code;
     private final CoreErrorKind kind;
