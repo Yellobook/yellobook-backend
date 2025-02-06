@@ -16,8 +16,6 @@ rootProject.name = 'yellobook'
 
 include 'api-server'
 include 'admin-api'
-include 'core'
+include 'core:core-domain'
+include 'core:core-enum'
 include 'storage:db-core'
-include 'storage:storage-redis'
-
-
