@@ -1,4 +1,4 @@
-package com.yellobook.api.support.auth.security.oauth2;
+package com.yellobook.api.security.oauth2;
 
 public enum SocialType {
     NAVER("naver", "네이버 로그인"),

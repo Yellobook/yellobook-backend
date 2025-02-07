@@ -1,13 +1,10 @@
 package com.yellobook.api.support;
 
-import com.yellobook.api.support.auth.AppMemberRole;
-import com.yellobook.api.support.auth.error.AuthErrorType;
-import com.yellobook.api.support.auth.error.AuthException;
-import com.yellobook.api.support.auth.security.CustomUserDetails;
-import com.yellobook.api.support.error.ApiErrorType;
-import com.yellobook.api.support.error.ApiException;
+import com.yellobook.api.security.CustomUserDetails;
+import com.yellobook.api.security.error.AuthErrorType;
+import com.yellobook.api.security.error.AuthException;
 import com.yellobook.core.domain.member.Member;
-import com.yellobook.core.domain.member.MemberRepository;
+import com.yellobook.core.domain.member.MemberReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodParameter;
@@ -23,11 +20,11 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 public class ApiMemberArgumentResolver implements HandlerMethodArgumentResolver {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    public ApiMemberArgumentResolver(MemberRepository memberRepository) {
-        this.memberRepository = memberRepository;
-    }
+    private final MemberReader memberReader;
 
-    private final MemberRepository memberRepository;
+    public ApiMemberArgumentResolver(MemberReader memberReader) {
+        this.memberReader = memberReader;
+    }
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -50,13 +47,8 @@ public class ApiMemberArgumentResolver implements HandlerMethodArgumentResolver 
             throw new AuthException(AuthErrorType.ACCESS_DENIED);
         }
 
-        Long memberId = customUserDetails.getMemberId();
-        AppMemberRole role = customUserDetails.getRole();
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> {
-                    log.error("인가되었지만, 존재하지 않는 사용자  - memberId: {}", memberId);
-                    return new ApiException(ApiErrorType.INTERNAL_SERVER_ERROR);
-                });
+        Long memberId = customUserDetails.memberId();
+        Member member = memberReader.read(memberId);
         return new ApiMember(
                 memberId,
                 member.socialInfo(),

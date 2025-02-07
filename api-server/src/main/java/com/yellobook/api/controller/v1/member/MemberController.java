@@ -1,5 +1,4 @@
-package com.yellobook.api.controller.member.controller;
-
+package com.yellobook.api.controller.v1.member;
 
 import com.yellobook.api.controller.member.dto.request.UpdateBioRequest;
 import com.yellobook.api.controller.member.dto.request.UpdateNicknameRequest;

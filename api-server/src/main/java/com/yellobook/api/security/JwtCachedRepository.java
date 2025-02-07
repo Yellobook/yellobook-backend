@@ -1,4 +1,4 @@
-package com.yellobook.api.support.auth;
+package com.yellobook.api.security;
 
 import java.time.Duration;
 import java.util.Date;
@@ -8,29 +8,23 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class CachedJwtRepository {
+public class JwtCachedRepository {
     private final RedisTemplate<String, String> redisTemplate;
 
-    public CachedJwtRepository(RedisTemplate<String, String> redisTemplate) {
+    public JwtCachedRepository(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
-    protected void saveRefreshToken(Long memberId, String refreshToken, Duration duration) {
-        String key = "auth:refresh:" + memberId;
+    protected void saveRefreshToken(String refreshToken, Long memberId, Duration duration) {
         redisTemplate.opsForValue()
-                .set(key, refreshToken, duration);
+                .set(refreshToken, memberId.toString(), duration);
     }
 
-    protected Optional<String> findRefreshToken(Long memberId) {
-        String key = "auth:refresh:" + memberId;
-        String refreshToken = redisTemplate.opsForValue()
-                .get(key);
-        return Optional.ofNullable(refreshToken);
-    }
-
-    protected void removeRefreshToken(Long memberId) {
-        String key = "auth:refresh:" + memberId;
-        redisTemplate.delete(key);
+    protected Optional<Long> findMemberIdFromRefreshToken(String refreshToken) {
+        String memberId = redisTemplate.opsForValue()
+                .get(refreshToken);
+        return Optional.ofNullable(memberId)
+                .map(Long::valueOf);
     }
 
     protected void addAccessTokenToBlacklist(String accessToken, Date expiration) {
@@ -40,6 +34,10 @@ public class CachedJwtRepository {
             redisTemplate.opsForValue()
                     .set(key, "", ttl, TimeUnit.MILLISECONDS);
         }
+    }
+
+    protected void removeRefreshToken(String refreshToken) {
+        redisTemplate.delete(refreshToken);
     }
 
     protected Boolean isAccessTokenInBlacklist(String accessToken) {

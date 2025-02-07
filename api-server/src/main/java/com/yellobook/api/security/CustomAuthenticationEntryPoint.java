@@ -1,15 +1,17 @@
-package com.yellobook.api.support.auth.security;
+package com.yellobook.api.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yellobook.api.support.auth.error.AuthErrorType;
-import com.yellobook.api.support.auth.error.AuthException;
+import com.yellobook.api.security.error.AuthErrorType;
+import com.yellobook.api.security.error.AuthException;
 import com.yellobook.api.support.response.ApiResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -38,6 +40,10 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         } else {
             log.error("AuthException : {}", authException.getMessage(), authException);
         }
+
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         ApiResponse<?> errorResponse = ApiResponse.error(AuthErrorType.AUTHORIZE_FAILED);
         response.getWriter()
                 .write(objectMapper.writeValueAsString(errorResponse));

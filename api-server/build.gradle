@@ -25,9 +25,9 @@ configurations {
 
 dependencies {
     runtimeOnly project(":admin-api")
-    runtimeOnly project(":storage:db-core")
+    implementation project(":storage:db-core")
     implementation project(':core:core-domain')
-    compileOnly(':core:core-enum')
+    compileOnly project(':core:core-enum')
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -52,16 +52,18 @@ dependencies {
     integrationTestImplementation 'org.testcontainers:junit-jupiter:1.20.1'
     integrationTestImplementation "org.testcontainers:mysql:1.20.1"
     integrationTestImplementation "com.redis:testcontainers-redis:2.2.2"
-}
 
-tasks.register('copyConfig', Copy) {
-    from '../../Config/yellobook-api/'
-    include "application*.yml"
-    into 'src/main/resources'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 }
 
 
-processResources.dependsOn('copyConfig')
+//tasks.register('copyConfig', Copy) {
+//    from '../../Config/api-server/'
+//    include "application*.yml"
+//    into 'src/main/resources'
+//}
+//
+//processResources.dependsOn('copyConfig')
 
 tasks.register('integrationTest', Test) {
     group 'verification'

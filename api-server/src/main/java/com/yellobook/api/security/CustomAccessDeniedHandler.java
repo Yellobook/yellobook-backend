@@ -1,7 +1,7 @@
-package com.yellobook.api.support.auth.security;
+package com.yellobook.api.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yellobook.api.support.auth.error.AuthErrorType;
+import com.yellobook.api.security.error.AuthErrorType;
 import com.yellobook.api.support.response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,8 +1,8 @@
-package com.yellobook.api.support.auth;
+package com.yellobook.api.security;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties("auth.jwt")
+@ConfigurationProperties("auth.client.jwt")
 public record JwtProperties(
         AccessToken accessToken,
         RefreshToken refreshToken

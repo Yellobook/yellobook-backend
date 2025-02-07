@@ -1,4 +1,4 @@
-package com.yellobook.api.support.auth.error;
+package com.yellobook.api.security.error;
 
 import org.springframework.security.core.AuthenticationException;
 

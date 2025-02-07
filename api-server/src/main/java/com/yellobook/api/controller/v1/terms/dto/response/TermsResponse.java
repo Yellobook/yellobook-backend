@@ -27,7 +27,7 @@ public record TermsResponse(
                                 termsItem.title(),
                                 termsItem.content(),
                                 termsItem.termsType()
-                                        .getName()
+                                        .getDisplayName()
                         ))
                         .toList()
         );

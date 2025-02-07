@@ -1,10 +1,10 @@
-package com.yellobook.api.support.auth.security;
+package com.yellobook.api.security.oauth2;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties("auth.redirect")
+@ConfigurationProperties("auth.client.redirect")
 public record RedirectProperties(
         String authenticatedRedirectUrl,
-        String termRedirectUrl
+        String termsRedirectUrl
 ) {
 }
