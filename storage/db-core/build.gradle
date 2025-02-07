@@ -64,7 +64,7 @@ tasks.withType(Test).configureEach {
 processResources.dependsOn('copyConfig')
 
 tasks.register('copyConfig', Copy) {
-    from '../../Config/yellobook-domain/'
+    from '../../Config/db-core/'
     include "application*.yml"
     into 'src/main/resources'
 }

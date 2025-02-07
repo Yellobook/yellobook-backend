@@ -8,11 +8,11 @@ import com.yellobook.core.domain.member.Member;
 import com.yellobook.core.domain.member.NewMember;
 import com.yellobook.core.domain.member.ProfileInfo;
 import com.yellobook.core.domain.member.SocialInfo;
+import com.yellobook.core.enums.TeamMemberRole;
 import com.yellobook.storage.db.core.team.ParticipantEntity;
 import com.yellobook.storage.db.core.team.ParticipantJpaRepository;
 import com.yellobook.storage.db.core.team.TeamEntity;
 import com.yellobook.storage.db.core.team.TeamJpaRepository;
-import com.yellobook.storage.db.core.team.TeamMemberRole;
 import com.yellobook.storage.db.support.RepositoryTest;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,25 +41,20 @@ class MemberCoreRepositoryTest extends RepositoryTest {
         @Nested
         class 새로운_회원_정보가_주어진_경우 {
 
-            MemberEntity member;
+            NewMember givenMember;
 
             @BeforeEach
             void setUpContext() {
-                member = new MemberEntity(
-                        "김철수", "슈퍼 운영", "chulsoo@naver.com",
-                        "profile1.jpg", "oauth_chulsoo", "naver"
+                givenMember = new NewMember(
+                        new ProfileInfo("김철수", "슈퍼 운영", "profile1.jpg", LocalDateTime.now()),
+                        new SocialInfo("oauth_chulsoo", "naver", "chulsoo@naver.com")
                 );
             }
 
             @Test
             void 회원을_저장하고_회원_ID를_반환한다() {
-                Long memberId = memberRepository.save(
-                        new NewMember(
-                                new ProfileInfo("김철수", "슈퍼 운영", "profile1.jpg", LocalDateTime.now()),
-                                new SocialInfo("oauth_chulsoo", "naver", "chulsoo@naver.com")
-                        )
-                );
-                assertThat(memberId).isNotNull();
+                Long result = memberRepository.save(givenMember);
+                assertThat(result).isNotNull();
             }
         }
     }
@@ -70,7 +65,7 @@ class MemberCoreRepositoryTest extends RepositoryTest {
         @Nested
         class 회원이_존재하는_경우 {
 
-            private Long memberId;
+            long givenMemberId;
 
             @BeforeEach
             void setUpContext() {
@@ -78,22 +73,23 @@ class MemberCoreRepositoryTest extends RepositoryTest {
                         new MemberEntity("김철수", "슈퍼 운영", "chulsoo@naver.com",
                                 "profile1.jpg", "oauth_chulsoo", "naver")
                 );
-                memberId = member.getId();
+                givenMemberId = member.getId();
             }
 
             @Test
             void 회원을_반환한다() {
-                Optional<Member> member = memberRepository.findById(memberId);
-                assertThat(member).isPresent();
+                Optional<Member> result = memberRepository.findById(givenMemberId);
+                assertThat(result).isPresent();
             }
         }
 
         @Nested
         class 회원이_존재하지_않는_경우 {
+            final long givenMemberId = 999L;
 
             @Test
             void 빈_Optional을_반환한다() {
-                assertThat(memberRepository.findById(999L)).isEmpty();
+                assertThat(memberRepository.findById(givenMemberId)).isEmpty();
             }
         }
     }
@@ -104,7 +100,7 @@ class MemberCoreRepositoryTest extends RepositoryTest {
         @Nested
         class 소셜_정보가_일치하는_경우 {
 
-            SocialInfo socialInfo;
+            SocialInfo givenSocialInfo;
 
             @BeforeEach
             void setUpContext() {
@@ -112,22 +108,23 @@ class MemberCoreRepositoryTest extends RepositoryTest {
                         new MemberEntity("김철수", "슈퍼 운영", "chulsoo@naver.com",
                                 "profile1.jpg", "oauth_chulsoo", "naver")
                 );
-                socialInfo = new SocialInfo(member.getOauthId(), member.getOauthProvider(), member.getEmail());
+                givenSocialInfo = new SocialInfo(member.getOauthId(), member.getOauthProvider(), member.getEmail());
             }
 
             @Test
             void 회원을_반환한다() {
-                assertThat(memberRepository.findBySocialInfo(socialInfo)).isPresent();
+                assertThat(memberRepository.findBySocialInfo(givenSocialInfo)).isPresent();
             }
         }
 
         @Nested
         class 소셜_정보가_일치하지_않는_경우 {
+            SocialInfo givenSocialInfo = new SocialInfo("unknown_oauth", "kakao", "unknown@kakao.com");
 
             @Test
             void 빈_Optional을_반환한다() {
-                SocialInfo socialInfo = new SocialInfo("unknown_oauth", "kakao", "unknown@kakao.com");
-                assertThat(memberRepository.findBySocialInfo(socialInfo)).isEmpty();
+                Optional<Member> result = memberRepository.findBySocialInfo(givenSocialInfo);
+                assertThat(result).isEmpty();
             }
         }
     }
@@ -138,7 +135,7 @@ class MemberCoreRepositoryTest extends RepositoryTest {
         @Nested
         class 회원이_존재하는_경우 {
 
-            private Long memberId;
+            long givenMemberId;
 
             @BeforeEach
             void setUpContext() {
@@ -146,13 +143,13 @@ class MemberCoreRepositoryTest extends RepositoryTest {
                         new MemberEntity("김철수", "슈퍼 운영", "chulsoo@naver.com",
                                 "profile1.jpg", "oauth_chulsoo", "naver")
                 );
-                memberId = member.getId();
+                givenMemberId = member.getId();
             }
 
             @Test
             void 회원을_삭제한다() {
-                memberRepository.delete(new Member(memberId, null, null));
-                assertThat(memberJpaRepository.findById(memberId)).isEmpty();
+                memberRepository.delete(new Member(givenMemberId, null, null));
+                assertThat(memberJpaRepository.findById(givenMemberId)).isEmpty();
             }
         }
     }
@@ -163,7 +160,7 @@ class MemberCoreRepositoryTest extends RepositoryTest {
         @Nested
         class 회원이_존재하는_경우 {
 
-            private Long memberId;
+            long givenMemberId;
 
             @BeforeEach
             void setUpContext() {
@@ -171,13 +168,13 @@ class MemberCoreRepositoryTest extends RepositoryTest {
                         new MemberEntity("김철수", "슈퍼 운영", "chulsoo@naver.com",
                                 "profile1.jpg", "oauth_chulsoo", "naver")
                 );
-                memberId = member.getId();
+                givenMemberId = member.getId();
             }
 
             @Test
             void 닉네임을_변경한다() {
-                memberRepository.updateNickname(new Member(memberId, null, null), "철수네 마트");
-                MemberEntity updatedMember = memberJpaRepository.findById(memberId)
+                memberRepository.updateNickname(new Member(givenMemberId, null, null), "철수네 마트");
+                MemberEntity updatedMember = memberJpaRepository.findById(givenMemberId)
                         .get();
                 assertThat(updatedMember.getNickname()).isEqualTo("철수네 마트");
             }
@@ -190,7 +187,7 @@ class MemberCoreRepositoryTest extends RepositoryTest {
         @Nested
         class 회원이_존재하는_경우 {
 
-            private Long memberId;
+            long givenMemberId;
 
             @BeforeEach
             void setUpContext() {
@@ -198,13 +195,13 @@ class MemberCoreRepositoryTest extends RepositoryTest {
                         new MemberEntity("김철수", "슈퍼 운영", "chulsoo@naver.com",
                                 "profile1.jpg", "oauth_chulsoo", "naver")
                 );
-                memberId = member.getId();
+                givenMemberId = member.getId();
             }
 
             @Test
             void 자기소개를_변경한다() {
-                memberRepository.updateBio(new Member(memberId, null, null), "우리 동네 24시간 슈퍼");
-                MemberEntity updatedMember = memberJpaRepository.findById(memberId)
+                memberRepository.updateBio(new Member(givenMemberId, null, null), "우리 동네 24시간 슈퍼");
+                MemberEntity updatedMember = memberJpaRepository.findById(givenMemberId)
                         .get();
                 assertThat(updatedMember.getBio()).isEqualTo("우리 동네 24시간 슈퍼");
             }
@@ -218,7 +215,7 @@ class MemberCoreRepositoryTest extends RepositoryTest {
         @Nested
         class 사용자가_소속된_팀이_존재하는_경우 {
 
-            final Long givenMemberId = 1L;
+            final long givenMemberId = 1L;
 
             @BeforeEach
             void setUpContext() {
@@ -277,7 +274,7 @@ class MemberCoreRepositoryTest extends RepositoryTest {
         @Nested
         class 사용자가_아직_팀에_속하지_않았을_경우 {
 
-            final Long givenMemberId = 1L;
+            final long givenMemberId = 1L;
 
             @BeforeEach
             void setUpContext() {

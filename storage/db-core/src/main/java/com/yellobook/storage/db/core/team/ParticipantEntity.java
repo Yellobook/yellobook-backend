@@ -1,5 +1,6 @@
 package com.yellobook.storage.db.core.team;
 
+import com.yellobook.core.enums.TeamMemberRole;
 import com.yellobook.storage.db.core.BaseEntity;
 import com.yellobook.storage.db.core.member.MemberEntity;
 import jakarta.persistence.Column;
@@ -18,7 +19,7 @@ import jakarta.persistence.UniqueConstraint;
                 @UniqueConstraint(name = "uc_participant", columnNames = {"team_id", "member_id"})
         }
 )
-public class Participant extends BaseEntity {
+public class ParticipantEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id", nullable = false)
     private TeamEntity team;
@@ -31,10 +32,10 @@ public class Participant extends BaseEntity {
     @Column(nullable = false)
     private TeamMemberRole teamMemberRole;
 
-    protected Participant() {
+    protected ParticipantEntity() {
     }
 
-    public Participant(TeamEntity team, MemberEntity member, TeamMemberRole teamMemberRole) {
+    public ParticipantEntity(TeamEntity team, MemberEntity member, TeamMemberRole teamMemberRole) {
         this.team = team;
         this.member = member;
         this.teamMemberRole = teamMemberRole;
@@ -49,7 +50,5 @@ public class Participant extends BaseEntity {
         return member;
     }
 
-    public TeamMemberRole getTeamMemberRole() {
-        return teamMemberRole;
-    }
+
 }
