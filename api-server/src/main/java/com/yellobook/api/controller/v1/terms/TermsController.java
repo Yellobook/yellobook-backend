@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api/v1/terms")
-public class TermsController {
+public class TermsController implements TermsApiDocs {
     private final TermsService termsService;
 
     public TermsController(TermsService termsService) {

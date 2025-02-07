@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yellobook.core.domain.terms.TermsAgreement;
 import com.yellobook.core.domain.terms.TermsAgreementCheckResult;
 import com.yellobook.core.domain.terms.TermsAgreementRepository;
+import com.yellobook.core.enums.TermsType;
 import com.yellobook.storage.db.core.member.MemberEntity;
 import com.yellobook.storage.db.core.member.MemberJpaRepository;
 import jakarta.transaction.Transactional;

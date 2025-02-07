@@ -6,7 +6,7 @@ public enum AppMemberRole {
 
     private final String roleName;
 
-    AppMemberRole(String description) {
+    AppMemberRole(String roleName) {
         this.roleName = roleName;
     }
 
