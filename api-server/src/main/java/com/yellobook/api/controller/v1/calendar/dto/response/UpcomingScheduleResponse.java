@@ -1,0 +1,10 @@
+package com.yellobook.api.controller.v1.calendar.dto.response;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "다가오는 일정 응답")
+public record UpcomingScheduleResponse(
+        @Schema(description = "일정 제목")
+        String scheduleTitle
+) {
+}

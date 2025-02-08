@@ -2,7 +2,7 @@ package com.yellobook.api.support.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.yellobook.api.support.auth.error.AuthErrorType;
+import com.yellobook.api.security.error.AuthErrorType;
 import com.yellobook.api.support.error.ApiErrorMessage;
 import com.yellobook.api.support.error.ApiErrorType;
 import com.yellobook.core.error.CoreErrorType;

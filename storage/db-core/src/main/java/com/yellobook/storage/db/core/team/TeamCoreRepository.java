@@ -1,9 +1,9 @@
 package com.yellobook.storage.db.core.team;
 
-import com.yellobook.core.domain.common.TeamMemberRole;
 import com.yellobook.core.domain.member.Member;
 import com.yellobook.core.domain.team.Team;
 import com.yellobook.core.domain.team.TeamRepository;
+import com.yellobook.core.enums.TeamMemberRole;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;

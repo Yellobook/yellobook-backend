@@ -1,7 +1,6 @@
 package com.yellobook.storage.db.core.terms;
 
 import com.yellobook.core.domain.terms.Terms;
-import com.yellobook.core.domain.terms.TermsAgreement;
 import com.yellobook.core.domain.terms.TermsRepository;
 import java.util.List;
 import java.util.Optional;
@@ -9,43 +8,29 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class TermsCoreRepository implements TermsRepository {
-    private final TermsAgreementJpaRepository termsAgreementJpaRepository;
     private final TermsJpaRepository termsJpaRepository;
+    private final TermsItemJpaRepository termsItemJpaRepository;
 
-    public TermsCoreRepository(TermsAgreementJpaRepository termsAgreementJpaRepository,
-                               TermsJpaRepository termsJpaRepository) {
-        this.termsAgreementJpaRepository = termsAgreementJpaRepository;
+    public TermsCoreRepository(TermsJpaRepository termsJpaRepository, TermsItemJpaRepository termsItemJpaRepository) {
         this.termsJpaRepository = termsJpaRepository;
-    }
-
-
-    @Override
-    public Long save(Terms terms) {
-        return 1L;
-    }
-
-    @Override
-    public void agree(TermsAgreement agreement) {
-
-    }
-
-    @Override
-    public List<Long> findRequiredTermsItemId(Terms terms) {
-        return List.of();
+        this.termsItemJpaRepository = termsItemJpaRepository;
     }
 
     @Override
     public Optional<Terms> findActiveTerms() {
-        return Optional.empty();
-    }
+        Optional<TermsEntity> result = termsJpaRepository.findByIsActiveTrue();
+        if (result.isEmpty()) {
+            return Optional.empty();
+        }
+        TermsEntity terms = result.get();
+        List<TermsItemEntity> termsItems = termsItemJpaRepository.findByTerms(terms);
 
-    @Override
-    public boolean hasMemberAgreedToActiveTerms(Long memberId) {
-        return false;
-    }
-
-    @Override
-    public Optional<Terms> findTermsById(Long id) {
-        return Optional.empty();
+        return Optional.of(new Terms(
+                terms.getId(),
+                terms.getName(),
+                terms.getVersion(),
+                termsItems.stream()
+                        .map(TermsItemEntity::toTermsItem)
+                        .toList()));
     }
 }

@@ -1,6 +1,6 @@
 package com.yellobook.api.config;
 
-import com.yellobook.api.support.auth.security.oauth2.SocialType;
+import com.yellobook.api.security.oauth2.SocialType;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -29,11 +29,13 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class SwaggerConfig {
 
-    @Value("${backend.base-url}")
+    @Value("${server.api-base-url}")
     private String backendBaseURL;
 
-    private final List<String> TAG_ORDER = List.of("개발", "로그인", "인증", "사용자", "팀", "일정", "공지", "주문", "재고", "헬스체크");
-    private final String SOCIAL_TAG_NAME = "\uD83D\uDE80 소셜 로그인";
+    private static final List<String> TAG_ORDER = List.of("개발", "로그인", "인증", "약관", "사용자", "팀", "일정", "공지", "주문", "재고",
+            "관리자",
+            "헬스체크");
+    private static final String SOCIAL_TAG_NAME = "\uD83D\uDE80 소셜 로그인";
 
     @Bean
     public OpenAPI OpenApiConfig(OpenApiCustomizer openApiCustomizer) {
@@ -89,7 +91,6 @@ public class SwaggerConfig {
         return IntStream.range(0, TAG_ORDER.size())
                 .filter(i -> tagName.contains(TAG_ORDER.get(i)))
                 .findFirst()
-                // TAG_ORDER 에 존재하지 않으면 맨 마지막 순서에 위치
                 .orElse(TAG_ORDER.size());
     }
 
@@ -121,4 +122,6 @@ public class SwaggerConfig {
                                                         "accessToken=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c; Max-Age=3600; Path=/; Domain=yellobook.site; HttpOnly=false; Secure=false, refreshToken=dGhpcy1pcy1hLXRlc3QtcmVmcmVzaC10b2tlbg; Max-Age=3600; Path=/; Domain=yellobook.site; HttpOnly=false; Secure=false"
                                                 ))))))));
     }
+
+
 }

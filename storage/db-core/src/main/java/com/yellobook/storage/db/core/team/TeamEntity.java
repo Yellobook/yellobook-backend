@@ -16,6 +16,9 @@ public class TeamEntity extends BaseEntity {
     @Column(nullable = false, length = 40)
     private String name;
 
+    @Column(nullable = false)
+    private String description;
+
     @Column(nullable = false, length = 20)
     private String phoneNumber;
 
@@ -25,14 +28,19 @@ public class TeamEntity extends BaseEntity {
     protected TeamEntity() {
     }
 
-    public TeamEntity(String name, String phoneNumber, String address) {
+    public TeamEntity(String name, String description, String phoneNumber, String address) {
         this.name = name;
+        this.description = description;
         this.phoneNumber = phoneNumber;
         this.address = address;
     }
 
     public String getName() {
         return name;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public String getPhoneNumber() {

@@ -8,6 +8,7 @@ import com.yellobook.core.domain.schedule.ScheduleRepository;
 import com.yellobook.storage.db.core.member.MemberEntity;
 import com.yellobook.storage.db.core.member.MemberJpaRepository;
 import com.yellobook.storage.db.core.team.TeamEntity;
+import com.yellobook.storage.db.core.team.TeamJpaRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;

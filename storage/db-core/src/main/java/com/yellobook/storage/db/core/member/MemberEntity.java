@@ -6,8 +6,6 @@ import com.yellobook.core.domain.member.SocialInfo;
 import com.yellobook.storage.db.core.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -41,10 +39,6 @@ public class MemberEntity extends BaseEntity {
     @Column(nullable = false)
     private String email;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
-    private AppMemberRole role;
-
     @Column(nullable = false)
     private boolean isDeleted = false;
 
@@ -56,14 +50,13 @@ public class MemberEntity extends BaseEntity {
     }
 
     public MemberEntity(String nickname, String bio, String email, String profileImage, String oauthId,
-                        String oauthProvider, AppMemberRole role) {
+                        String oauthProvider) {
         this.nickname = nickname;
         this.bio = bio;
         this.email = email;
         this.profileImage = profileImage;
         this.oauthId = oauthId;
         this.oauthProvider = oauthProvider;
-        this.role = role;
     }
 
     public void updateNickname(String nickname) {
@@ -114,10 +107,6 @@ public class MemberEntity extends BaseEntity {
 
     public String getEmail() {
         return email;
-    }
-
-    public AppMemberRole getRole() {
-        return role;
     }
 
     public boolean isDeleted() {
