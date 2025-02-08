@@ -13,4 +13,12 @@ public class ScheduleCommentWriter {
     public Long add(NewScheduleComment comment) {
         return scheduleCommentRepository.save(comment);
     }
+
+    public void delete(Long commentId) {
+        scheduleCommentRepository.deleteByCommentId(commentId);
+    }
+
+    public void deleteByScheduleId(Long scheduleId) {
+        scheduleCommentRepository.deleteCommentsByScheduleId(scheduleId);
+    }
 }

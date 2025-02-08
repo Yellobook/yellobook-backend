@@ -1,5 +1,6 @@
 package com.yellobook.core.domain.schedule;
 
+import com.yellobook.core.domain.member.Member;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
@@ -14,9 +15,11 @@ public interface ScheduleRepository {
 
     Optional<Schedule> findById(Long scheduleId);
 
-    Boolean isMentioned(Long scheduleId, Long memberId);
+    Boolean isMentioned(Long scheduleId, Member member);
 
     void increaseView(Long scheduleId);
 
     void mention(Long scheduleId, List<Long> mentionIds);
+
+    List<ScheduleMention> getMentionsByScheduleId(Long scheduleId);
 }

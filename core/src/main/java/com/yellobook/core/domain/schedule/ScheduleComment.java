@@ -4,6 +4,7 @@ import com.yellobook.core.domain.member.Member;
 
 public record ScheduleComment(
         Long commentId,
-        Member commenter
+        Member commenter,
+        String content
 ) {
 }

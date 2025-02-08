@@ -1,5 +1,6 @@
 package com.yellobook.storage.db.core.schedule;
 
+import com.yellobook.core.domain.schedule.ScheduleMention;
 import com.yellobook.storage.db.core.BaseEntity;
 import com.yellobook.storage.db.core.member.MemberEntity;
 import jakarta.persistence.Entity;
@@ -30,6 +31,10 @@ public class ScheduleMentionEntity extends BaseEntity {
     public ScheduleMentionEntity(MemberEntity member, ScheduleEntity schedule) {
         this.member = member;
         this.schedule = schedule;
+    }
+
+    public ScheduleMention toScheduleMention() {
+        return new ScheduleMention(this.member.getId(), this.member.getNickname());
     }
 
     public MemberEntity getMember() {

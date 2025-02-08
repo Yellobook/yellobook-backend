@@ -2,7 +2,6 @@ package com.yellobook.core.domain.member;
 
 import com.yellobook.core.error.CoreErrorType;
 import com.yellobook.core.error.CoreException;
-import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 
@@ -21,9 +20,5 @@ public class MemberReader {
 
     public Optional<Member> read(SocialInfo socialInfo) {
         return memberRepository.findBySocialInfo(socialInfo);
-    }
-
-    public List<Member> readMembersInList(List<Long> memberIds) {
-        return memberRepository.findByIds(memberIds);
     }
 }

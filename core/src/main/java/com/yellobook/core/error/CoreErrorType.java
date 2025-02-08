@@ -2,9 +2,11 @@ package com.yellobook.core.error;
 
 public enum CoreErrorType {
     // Schedule
-    SCHEDULE_NOT_FOUND(CoreErrorCode.INFORM01, CoreErrorKind.NOT_FOUND, "공지가 존재하지 않습니다.", CoreErrorLevel.WARN),
-    SCHEDULE_AUTHOR_NOT_MATCH(CoreErrorCode.INFORM02, CoreErrorKind.FORBIDDEN, "공지의 작성자가 아닙니다.", CoreErrorLevel.WARN),
-    SCHEDULE_ACCESS_NOT_ALLOWED(CoreErrorCode.INFORM03, CoreErrorKind.FORBIDDEN, "공지에 접근할 권한이 없습니다.",
+    SCHEDULE_NOT_FOUND(CoreErrorCode.SCHEDULE01, CoreErrorKind.NOT_FOUND, "공지가 존재하지 않습니다.", CoreErrorLevel.WARN),
+    SCHEDULE_AUTHOR_NOT_MATCH(CoreErrorCode.SCHEDULE02, CoreErrorKind.FORBIDDEN, "공지의 작성자가 아닙니다.", CoreErrorLevel.WARN),
+    SCHEDULE_ACCESS_NOT_ALLOWED(CoreErrorCode.SCHEDULE03, CoreErrorKind.FORBIDDEN, "공지에 접근할 권한이 없습니다.",
+            CoreErrorLevel.WARN),
+    SCHEDULE_COMMENT_AUTHOR_NOT_MATCH(CoreErrorCode.SCHEDULE04, CoreErrorKind.FORBIDDEN, "공지 댓글의 작성자가 아닙니다.",
             CoreErrorLevel.WARN),
 
     // Inventory

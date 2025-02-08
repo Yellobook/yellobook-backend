@@ -36,7 +36,8 @@ public class ScheduleCommentEntity extends BaseEntity {
     ScheduleComment toScheduleComment() {
         return new ScheduleComment(
                 this.getId(),
-                member.toMember());
+                member.toMember(),
+                content);
     }
 
     public String getContent() {

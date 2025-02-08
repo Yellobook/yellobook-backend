@@ -1,10 +1,14 @@
 package com.yellobook.storage.db.core.schedule;
 
+import com.yellobook.core.domain.member.Member;
 import com.yellobook.core.domain.schedule.NewSchedule;
 import com.yellobook.core.domain.schedule.Schedule;
+import com.yellobook.core.domain.schedule.ScheduleMention;
 import com.yellobook.core.domain.schedule.ScheduleRepository;
 import com.yellobook.storage.db.core.member.MemberEntity;
 import com.yellobook.storage.db.core.member.MemberJpaRepository;
+import com.yellobook.storage.db.core.team.TeamEntity;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
@@ -14,23 +18,31 @@ public class ScheduleCoreRepository implements ScheduleRepository {
     private final ScheduleJpaRepository scheduleJpaRepository;
     private final ScheduleMentionJpaRepository scheduleMentionJpaRepository;
     private final MemberJpaRepository memberJpaRepository;
+    private final TeamJpaRepository teamJpaRepository;
 
     public ScheduleCoreRepository(ScheduleJpaRepository scheduleJpaRepository,
                                   ScheduleMentionJpaRepository scheduleMentionJpaRepository,
-                                  MemberJpaRepository memberJpaRepository) {
+                                  MemberJpaRepository memberJpaRepository,
+                                  TeamJpaRepository teamJpaRepository) {
         this.scheduleJpaRepository = scheduleJpaRepository;
         this.scheduleMentionJpaRepository = scheduleMentionJpaRepository;
         this.memberJpaRepository = memberJpaRepository;
+        this.teamJpaRepository = teamJpaRepository;
     }
 
     @Override
     public Long save(NewSchedule newSchedule) {
+        MemberEntity author = memberJpaRepository.getReferenceById(newSchedule.author()
+                .memberId());
+        TeamEntity team = teamJpaRepository.getReferenceById(newSchedule.teamId());
         return scheduleJpaRepository.save(
-                        new ScheduleEntity(newSchedule.title(), newSchedule.memo(), newSchedule.plannedDate(),
-                                newSchedule.team()
-                                        .teamId(),
-                                newSchedule.author()
-                                        .memberId()))
+                        new ScheduleEntity(
+                                newSchedule.title(),
+                                newSchedule.content(),
+                                newSchedule.plannedDate(),
+                                author,
+                                team
+                        ))
                 .getId();
     }
 
@@ -52,14 +64,14 @@ public class ScheduleCoreRepository implements ScheduleRepository {
     }
 
     @Override
-    public Boolean isMentioned(Long scheduleId, Long memberId) {
-        return scheduleMentionJpaRepository.existsByScheduleIdAndMemberId(scheduleId, memberId);
+    public Boolean isMentioned(Long scheduleId, Member member) {
+        return scheduleMentionJpaRepository.existsByScheduleIdAndMemberId(scheduleId, member.memberId());
     }
 
     @Override
+    @Transactional
     public void increaseView(Long scheduleId) {
-        ScheduleEntity schedule = scheduleJpaRepository.getReferenceById(scheduleId);
-        schedule.increaseView();
+        scheduleJpaRepository.increaseView(scheduleId);
     }
 
     @Override
@@ -71,5 +83,13 @@ public class ScheduleCoreRepository implements ScheduleRepository {
                 .map(member -> new ScheduleMentionEntity(member, schedule))
                 .toList();
         scheduleMentionJpaRepository.saveAll(scheduleMentions);
+    }
+
+    @Override
+    public List<ScheduleMention> getMentionsByScheduleId(Long scheduleId) {
+        return scheduleMentionJpaRepository.findAllByScheduleId(scheduleId)
+                .stream()
+                .map(ScheduleMentionEntity::toScheduleMention)
+                .toList();
     }
 }

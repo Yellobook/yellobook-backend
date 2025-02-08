@@ -15,19 +15,17 @@ public class ScheduleAccessManager {
         this.scheduleMentionProcessor = scheduleMentionProcessor;
     }
 
-    public void isAuthorOrMentioned(Long scheduleId, Long memberId) {
-        Schedule schedule = scheduleReader.read(scheduleId);
+    public void isAuthorOrMentioned(Schedule schedule, Member requester) {
         if (!schedule.author()
-                .memberId()
-                .equals(memberId) && !scheduleMentionProcessor.isMentioned(scheduleId, memberId)) {
+                .equals(requester) && !scheduleMentionProcessor.isMentioned(schedule.scheduleId(), requester)) {
             throw new CoreException(CoreErrorType.SCHEDULE_ACCESS_NOT_ALLOWED);
         }
     }
 
-    public void isAuthor(Long scheduleId, Member author) {
+    public void isAuthor(Long scheduleId, Member requester) {
         Schedule schedule = scheduleReader.read(scheduleId);
         if (!schedule.author()
-                .equals(author)) {
+                .equals(requester)) {
             throw new CoreException(CoreErrorType.SCHEDULE_AUTHOR_NOT_MATCH);
         }
     }

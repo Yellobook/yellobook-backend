@@ -27,29 +27,23 @@ public class ScheduleEntity extends BaseEntity {
     private LocalDate date;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false, insertable = false, updatable = false)
+    @JoinColumn(name = "member_id", nullable = false)
     private MemberEntity member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_id", nullable = false, insertable = false, updatable = false)
+    @JoinColumn(name = "team_id", nullable = false)
     private TeamEntity team;
-
-    @Column(name = "team_id")
-    private Long teamId;
-
-    @Column(name = "member_id")
-    private Long memberId;
 
     protected ScheduleEntity() {
     }
 
-    public ScheduleEntity(String title, String content, LocalDate date, Long teamId, Long memberId) {
+    public ScheduleEntity(String title, String content, LocalDate date, MemberEntity member, TeamEntity team) {
         this.title = title;
         this.content = content;
         this.date = date;
-        this.memberId = memberId;
-        this.teamId = teamId;
         this.view = 0;
+        this.member = member;
+        this.team = team;
     }
 
     Schedule toSchedule() {
@@ -61,10 +55,6 @@ public class ScheduleEntity extends BaseEntity {
                 view,
                 date
         );
-    }
-
-    public void increaseView() {
-        this.view++;
     }
 
     public String getTitle() {

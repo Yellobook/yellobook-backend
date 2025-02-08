@@ -5,6 +5,7 @@ import com.yellobook.core.domain.schedule.ScheduleComment;
 import com.yellobook.core.domain.schedule.ScheduleCommentRepository;
 import com.yellobook.storage.db.core.member.MemberEntity;
 import com.yellobook.storage.db.core.member.MemberJpaRepository;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import org.springframework.stereotype.Repository;
 
@@ -23,6 +24,7 @@ public class ScheduleCommentCoreRepository implements ScheduleCommentRepository 
     }
 
     @Override
+    @Transactional
     public Long save(NewScheduleComment comment) {
         MemberEntity commenter = memberJpaRepository.getReferenceById(comment.commenterId());
         ScheduleEntity schedule = scheduleJpaRepository.getReferenceById(comment.scheduleId());
@@ -37,5 +39,23 @@ public class ScheduleCommentCoreRepository implements ScheduleCommentRepository 
                 .stream()
                 .map(ScheduleCommentEntity::toScheduleComment)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public void deleteByCommentId(Long commentId) {
+        scheduleCommentJpaRepository.deleteById(commentId);
+    }
+
+    @Override
+    public ScheduleComment findByCommentId(Long commentId) {
+        return scheduleCommentJpaRepository.getReferenceById(commentId)
+                .toScheduleComment();
+    }
+
+    @Override
+    @Transactional
+    public void deleteCommentsByScheduleId(Long scheduleId) {
+        scheduleCommentJpaRepository.deleteAllByScheduleId(scheduleId);
     }
 }
