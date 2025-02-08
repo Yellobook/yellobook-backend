@@ -44,6 +44,7 @@ public class ScheduleService {
         Schedule schedule = scheduleReader.read(scheduleId);
         scheduleAccessManager.isAuthorOrMentioned(schedule, member);
         increaseView(scheduleId);
+        return schedule;
     }
 
     public List<ScheduleMention> getMentions(Schedule schedule) {

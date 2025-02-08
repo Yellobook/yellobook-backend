@@ -1,11 +1,14 @@
-package com.yellobook.api.controller.inform.dto.response;
+package com.yellobook.api.controller.schedule.dto.response;
 
+import com.yellobook.core.domain.schedule.Schedule;
+import com.yellobook.core.domain.schedule.ScheduleComment;
+import com.yellobook.core.domain.schedule.ScheduleMention;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record GetInformResponse(
+public record GetScheduleResponse(
         @Schema(description = "가지고 오는 글의 작성자")
         String author,
         @Schema(description = "가지고 오는 글의 제목")
@@ -33,11 +36,33 @@ public record GetInformResponse(
             @Schema(description = "작성한 댓글의 고유 ID")
             Long id,
             @Schema(description = "댓글을 작성한 멤버의 ID")
-            Long memberId,
+            String commenterNickname,
             @Schema(description = "작성한 댓글의 내용")
             String content,
             @Schema(description = "작성한 댓글의 생성 시간")
             LocalDateTime createdAt
     ) {
+    }
+
+    public static GetScheduleResponse from(Schedule schedule, List<ScheduleMention> mentions,
+                                           List<ScheduleComment> comments) {
+        return new GetScheduleResponse(
+                schedule.author()
+                        .profileInfo()
+                        .nickname(),
+                schedule.title(),
+                schedule.content(),
+                mentions.stream()
+                        .map(mention -> new MentionItem(mention.memberId(), mention.memberName()))
+                        .toList(),
+                schedule.view(),
+                comments.stream()
+                        .map(comment -> new CommentItem(comment.commentId(), comment.commenter()
+                                .profileInfo()
+                                .nickname(),
+                                comment.content(), comment.createTime()))
+                        .toList(),
+                schedule.scheduledDate()
+        );
     }
 }

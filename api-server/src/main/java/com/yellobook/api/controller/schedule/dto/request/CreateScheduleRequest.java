@@ -1,12 +1,14 @@
-package com.yellobook.api.controller.inform.dto.request;
+package com.yellobook.api.controller.schedule.dto.request;
 
+import com.yellobook.core.domain.member.Member;
+import com.yellobook.core.domain.schedule.NewSchedule;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.util.List;
 
-public record CreateInformRequest(
+public record CreateScheduleRequest(
         @Schema(description = "작성할 글의 제목", example = "[공지] 공장 휴식")
         @NotBlank(message = "제목은 비워둘 수 없습니다.")
         String title,
@@ -22,4 +24,7 @@ public record CreateInformRequest(
         @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "날짜 형식은 yyyy-MM-dd 이어야 합니다.")
         LocalDate date
 ) {
+    public NewSchedule to(Member author, Long teamId) {
+        return new NewSchedule(title, memo, date, author, mentionIds, teamId);
+    }
 }
