@@ -54,8 +54,8 @@ public class TeamCoreRepository implements TeamRepository {
     }
 
     @Override
-    public Long save(String name, String description, String phoneNumber, String address, Boolean isSearchable) {
-        TeamEntity team = new TeamEntity(name, description, phoneNumber, address, isSearchable);
+    public Long save(String name, String description, String phoneNumber, String address, Boolean searchable) {
+        TeamEntity team = new TeamEntity(name, description, phoneNumber, address, searchable);
         return teamJpaRepository.save(team)
                 .getId();
     }

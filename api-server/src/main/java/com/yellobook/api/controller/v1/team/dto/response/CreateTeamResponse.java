@@ -1,12 +1,9 @@
-package com.yellobook.api.controller.team.dto.response;
+package com.yellobook.api.controller.v1.team.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
 
 public record CreateTeamResponse(
         @Schema(description = "생성된 팀의 고유 id", example = "123")
-        Long teamId,
-        @Schema(description = "팀이 생성된 시간", example = "2024-07-20T12:34:56")
-        LocalDateTime createdAt
+        Long teamId
 ) {
 }
