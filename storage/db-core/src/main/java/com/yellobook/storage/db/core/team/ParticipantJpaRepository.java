@@ -1,6 +1,6 @@
 package com.yellobook.storage.db.core.team;
 
-import com.yellobook.core.domain.common.TeamMemberRole;
+import com.yellobook.core.enums.TeamMemberRole;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -33,4 +33,5 @@ public interface ParticipantJpaRepository extends JpaRepository<ParticipantEntit
     List<ParticipantEntity> findAllByTeamId(Long teamId);
 
     int countAllByTeamIdAndTeamMemberRole(Long teamId, TeamMemberRole role);
+
 }

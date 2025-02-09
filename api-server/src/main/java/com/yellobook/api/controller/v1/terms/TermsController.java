@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api/v1/terms")
-public class TermsController {
+public class TermsController implements TermsApiDocs {
     private final TermsService termsService;
 
     public TermsController(TermsService termsService) {
@@ -27,14 +27,14 @@ public class TermsController {
             ApiMember apiMember
     ) {
         var result = termsService.agreeToActiveTerms(apiMember.toMember(), request.toNewTermAgreement());
-        return ApiResponse.success(TermsAgreementResponse.of());
+        return ApiResponse.success(TermsAgreementResponse.of(result));
     }
 
     @GetMapping("/active")
     public ApiResponse<TermsResponse> getActiveTerms(
     ) {
         var result = termsService.getActiveTerms();
-        return ApiResponse.success(TermsResponse.of());
+        return ApiResponse.success(TermsResponse.of(result));
     }
 }
 

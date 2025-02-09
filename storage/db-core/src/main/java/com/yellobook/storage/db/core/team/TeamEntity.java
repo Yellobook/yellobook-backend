@@ -17,6 +17,9 @@ public class TeamEntity extends BaseEntity {
     @Column(nullable = false, length = 40)
     private String name;
 
+    @Column(nullable = false)
+    private String description;
+
     @Column(nullable = false, length = 20)
     private String phoneNumber;
 
@@ -24,16 +27,18 @@ public class TeamEntity extends BaseEntity {
     private String address;
 
     @Column(nullable = false)
-    private boolean isSearchable;
+    private boolean searchable;
 
     protected TeamEntity() {
     }
 
-    public TeamEntity(String name, String phoneNumber, String address, Boolean isSearchable) {
+
+    public TeamEntity(String name, String description, String phoneNumber, String address, Boolean searchable) {
         this.name = name;
+        this.description = description;
         this.phoneNumber = phoneNumber;
         this.address = address;
-        this.isSearchable = isSearchable;
+        this.searchable = searchable;
     }
 
     Team toTeam() {
@@ -42,12 +47,16 @@ public class TeamEntity extends BaseEntity {
                 name,
                 phoneNumber,
                 address,
-                isSearchable
+                searchable
         );
     }
-    
+
     public String getName() {
         return name;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public String getPhoneNumber() {

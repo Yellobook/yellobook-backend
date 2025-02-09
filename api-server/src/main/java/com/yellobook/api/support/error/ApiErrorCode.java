@@ -1,21 +1,21 @@
 package com.yellobook.api.support.error;
 
 public enum ApiErrorCode {
-    SYS001("SYS-001"),
-    SYS002("SYS-002"),
-    SYS003("SYS-003"),
-    VAL001("VAL-001"),
-    VAL002("VAL-002"),
-    VAL003("VAL-003"),
-    RES001("RES-001"),
-    FILE001("FILE-001"),
-    FILE002("FILE-002"),
-    FILE003("FILE-003"),
-    FILE004("FILE-004"),
-    FILE005("FILE-005"),
-    FILE006("FILE-006"),
-    FILE007("FILE-007"),
-    FILE008("FILE-008");
+    SYS01("SYS-01"),
+    SYS02("SYS-02"),
+    SYS03("SYS-03"),
+    VAL01("VAL-01"),
+    VAL02("VAL-02"),
+    VAL03("VAL-03"),
+    RES01("RES-01"),
+    FILE01("FILE-01"),
+    FILE02("FILE-02"),
+    FILE03("FILE-03"),
+    FILE04("FILE-04"),
+    FILE05("FILE-05"),
+    FILE06("FILE-06"),
+    FILE07("FILE-07"),
+    FILE08("FILE-08");
 
     private final String errorCode;
 

@@ -1,10 +1,10 @@
 package com.yellobook.storage.db.core.team;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.yellobook.core.domain.common.TeamMemberRole;
 import com.yellobook.core.domain.team.Participant;
 import com.yellobook.core.domain.team.Team;
 import com.yellobook.core.domain.team.TeamRepository;
+import com.yellobook.core.enums.TeamMemberRole;
 import com.yellobook.storage.db.core.member.MemberEntity;
 import com.yellobook.storage.db.core.member.MemberJpaRepository;
 import java.util.List;
@@ -54,8 +54,8 @@ public class TeamCoreRepository implements TeamRepository {
     }
 
     @Override
-    public Long save(String name, String phoneNumber, String address, Boolean isSearchable) {
-        TeamEntity team = new TeamEntity(name, phoneNumber, address, isSearchable);
+    public Long save(String name, String description, String phoneNumber, String address, Boolean isSearchable) {
+        TeamEntity team = new TeamEntity(name, description, phoneNumber, address, isSearchable);
         return teamJpaRepository.save(team)
                 .getId();
     }

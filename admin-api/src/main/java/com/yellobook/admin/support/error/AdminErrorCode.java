@@ -1,17 +1,14 @@
 package com.yellobook.admin.support.error;
 
 public enum AdminErrorCode {
-    SYS01("SYS-01"),
-    SYS02("SYS-02"),
-    SYS03("SYS-03"),
-    VAL01("VAL-01"),
-    VAL02("VAL-02"),
-    VAL03("VAL-03"),
-    RES01("RES-01"),
-    TERMS01("TERMS-01"),
-    TERMS02("TERMS-02"),
-    TERMS03("TERMS-03"),
-    TERMS04("TERMS-04");
+    ADMIN01("ADMIN-01"),
+    ADMIN02("ADMIN-02"),
+    ADMIN03("ADMIN-03"),
+    ADMIN04("ADMIN-04"),
+    ADMIN05("ADMIN-05"),
+    ADMIN06("ADMIN-06"),
+    ADMIN07("ADMIN-07"),
+    ADMIN08("ADMIN-08");
 
     private final String errorCode;
 

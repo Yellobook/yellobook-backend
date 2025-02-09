@@ -1,14 +1,14 @@
 package com.yellobook.service;
 
-import com.yellobook.core.domain.common.TeamMemberRole;
 import com.yellobook.core.domain.team.TeamCachedRepository;
 import com.yellobook.core.domain.team.dto.InvitationInfo;
+import com.yellobook.core.enums.TeamMemberRole;
 import java.time.Duration;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
-@Component
+@Repository
 public class RedisTeamDao implements TeamCachedRepository {
     private final RedisTemplate<String, String> redisTemplate;
     private final HashOperations<String, String, String> hashOperation;
@@ -23,7 +23,7 @@ public class RedisTeamDao implements TeamCachedRepository {
     @Override
     public void saveInvitationCode(String key, Long teamId, TeamMemberRole inviteRole, long validMinute) {
         hashOperation.put(key, FIELD_TEAM_ID, String.valueOf(teamId));
-        hashOperation.put(key, FILED_ROLE, inviteRole.getDescription());
+        hashOperation.put(key, FILED_ROLE, inviteRole.getDisplayName());
 
         redisTemplate.expire(key, Duration.ofSeconds(validMinute));
     }
@@ -36,28 +36,6 @@ public class RedisTeamDao implements TeamCachedRepository {
             return null;
         }
         return new InvitationInfo(teamIdStr, roleDescription);
-    }
-
-    public void delete(String code) {
-        redisTemplate.delete(code);
-    }
-
-    // 초대 코드 존재 여부 확인
-    public Boolean exists(String code) {
-        return redisTemplate.hasKey(code);
-    }
-
-
-    private String generateTeamKey(Long memberId) {
-        return "member:team:" + memberId;
-    }
-
-    /**
-     * 키에 저장된 value 조회
-     */
-    public String getTeamIdByCode(String key) {
-        return redisTemplate.opsForValue()
-                .get(key);
     }
 
     @Override

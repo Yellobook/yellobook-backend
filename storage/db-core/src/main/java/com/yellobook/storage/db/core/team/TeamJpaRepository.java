@@ -13,7 +13,7 @@ public interface TeamJpaRepository extends JpaRepository<TeamEntity, Long> {
     List<TeamEntity> findAllByNameContainingAndSearchableIsTrue(String keyword);
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
-    @Query(value = "update TeamEntity t set t.isSearchable = :searchable where t.id = :teamId")
+    @Query(value = "update TeamEntity t set t.searchable = :searchable where t.id = :teamId")
     void updateSearchable(@Param("teamId") Long teamId, @Param("searchable") Boolean searchable);
 
 }

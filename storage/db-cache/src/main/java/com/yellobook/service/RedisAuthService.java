@@ -1,15 +1,17 @@
 package com.yellobook.service;
 
 import java.time.Duration;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class RedisAuthService {
     private final StringRedisTemplate stringRedisTemplate;
+
+    public RedisAuthService(StringRedisTemplate stringRedisTemplate) {
+        this.stringRedisTemplate = stringRedisTemplate;
+    }
 
     public void setRefreshToken(Long memberId, String value, long expiresIn) {
         ValueOperations<String, String> valueOps = stringRedisTemplate.opsForValue();

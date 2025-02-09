@@ -1,7 +1,7 @@
 package com.yellobook.storage.db.core.team;
 
-import com.yellobook.core.domain.common.TeamMemberRole;
 import com.yellobook.core.domain.team.Participant;
+import com.yellobook.core.enums.TeamMemberRole;
 import com.yellobook.storage.db.core.BaseEntity;
 import com.yellobook.storage.db.core.member.MemberEntity;
 import jakarta.persistence.Column;
@@ -40,7 +40,6 @@ public class ParticipantEntity extends BaseEntity {
     @Column(nullable = false)
     private TeamMemberRole teamMemberRole;
 
-
     protected ParticipantEntity() {
     }
 
@@ -69,4 +68,5 @@ public class ParticipantEntity extends BaseEntity {
     public TeamMemberRole getTeamMemberRole() {
         return teamMemberRole;
     }
+
 }

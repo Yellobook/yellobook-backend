@@ -1,6 +1,5 @@
 package com.yellobook.api.support;
 
-import com.yellobook.api.support.auth.error.AuthException;
 import com.yellobook.api.support.error.ApiErrorType;
 import com.yellobook.api.support.error.ApiException;
 import com.yellobook.api.support.error.ValidationError;
@@ -60,18 +59,6 @@ public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
             case INFO -> log.info("ApiException : {}", e.getMessage(), e);
         }
         return new ResponseEntity<>(ApiResponse.error(e.getErrorType(), e.getData()), e.getErrorType()
-                .getStatus());
-    }
-
-    @ExceptionHandler(value = AuthException.class)
-    public ResponseEntity<Object> handleAuthException(AuthException e) {
-        switch (e.getErrorType()
-                .getLogLevel()) {
-            case ERROR -> log.error("AuthException : {}", e.getMessage(), e);
-            case WARN -> log.warn("AuthException : {}", e.getMessage(), e);
-            case INFO -> log.info("AuthException : {}", e.getMessage(), e);
-        }
-        return new ResponseEntity<>(ApiResponse.error(e.getErrorType()), e.getErrorType()
                 .getStatus());
     }
 
