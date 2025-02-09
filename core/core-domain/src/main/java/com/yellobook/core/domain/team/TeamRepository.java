@@ -1,6 +1,6 @@
 package com.yellobook.core.domain.team;
 
-import com.yellobook.core.domain.member.Member;
+
 import com.yellobook.core.enums.TeamMemberRole;
 import java.util.List;
 import java.util.Optional;
@@ -14,17 +14,30 @@ public interface TeamRepository {
 
     boolean existByTeamAndRole(Long teamId, TeamMemberRole role);
 
-    boolean existByTeamAndMemberId(Long teamId, Member member);
+    boolean existByTeamIdAndMemberId(Long teamId, Long memberId);
 
-    Long save(String name, String phoneNumber, String address);
+    Long save(String name, String description, String phoneNumber, String address, Boolean isSearchable);
 
     Optional<Team> findById(Long teamId);
 
-    void join(Long teamId, Member member, TeamMemberRole role);
+    List<Participant> getMembersByTeamId(Long teamId);
 
-    void leave(Long teamId, Member member);
+    void join(Long teamId, Long memberId, TeamMemberRole role);
+
+    void leave(Long teamId, Long memberId);
 
     boolean existByName(String name);
 
     TeamMemberRole getRole(Long teamId, Long memberId);
+
+    List<Team> getSearchableTeamsByName(String keyword);
+
+    void updateSearchable(Long teamId, Boolean searchable);
+
+    boolean isTeamMember(Long teamId, Long memberId);
+
+    void updateTeamMemberRole(Long teamId, Long memberId, TeamMemberRole role);
+
+    int countAllByTeamIdAndTeamMemberRole(Long teamId, TeamMemberRole role);
+
 }

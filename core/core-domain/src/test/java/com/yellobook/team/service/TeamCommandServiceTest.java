@@ -1,6 +1,5 @@
 package com.yellobook.team.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
@@ -16,18 +15,18 @@ import com.yellobook.auth.dto.InvitationResponse;
 import com.yellobook.auth.security.oauth2.dto.CustomOAuth2User;
 import com.yellobook.auth.security.oauth2.dto.OAuth2UserDTO;
 import com.yellobook.auth.service.TeamService;
+import com.yellobook.core.domain.team.TeamCommandService;
+import com.yellobook.core.domain.team.mapper.ParticipantMapper;
+import com.yellobook.core.domain.team.mapper.TeamMapper;
 import com.yellobook.member.entity.Member;
 import com.yellobook.member.repository.MemberRepository;
 import com.yellobook.support.error.code.TeamErrorCode;
 import com.yellobook.support.error.exception.CustomException;
-import com.yellobook.team.Participant;
-import com.yellobook.core.domain.team.TeamCommandService;
+import com.yellobook.team.ParticipantEntity;
 import com.yellobook.team.dto.request.CreateTeamRequest;
 import com.yellobook.team.dto.response.CreateTeamResponse;
 import com.yellobook.team.dto.response.JoinTeamResponse;
 import com.yellobook.team.entity.Team;
-import com.yellobook.core.domain.team.mapper.ParticipantMapper;
-import com.yellobook.core.domain.team.mapper.TeamMapper;
 import com.yellobook.team.repository.ParticipantRepository;
 import com.yellobook.team.repository.TeamRepository;
 import java.lang.reflect.Field;
@@ -71,13 +70,13 @@ public class TeamCommandServiceTest {
 
     private Member member;
     private Team team;
-    private Participant participant;
+    private ParticipantEntity participantEntity;
 
     @BeforeEach
     void setUp() {
         member = createMember(1L);
         team = createTeam(1L);
-        participant = createParticipant(1L, team, member, TeamMemberRole.ADMIN);
+        participantEntity = createParticipant(1L, team, member, TeamMemberRole.ADMIN);
 
         OAuth2UserDTO oauth2UserDTO = OAuth2UserDTO.from(member);
         customOAuth2User = new CustomOAuth2User(oauth2UserDTO);
@@ -107,21 +106,21 @@ public class TeamCommandServiceTest {
         return team;
     }
 
-    private Participant createParticipant(Long participantId, Team team, Member member, TeamMemberRole role) {
-        Participant participant = Participant.builder()
+    private ParticipantEntity createParticipant(Long participantId, Team team, Member member, TeamMemberRole role) {
+        ParticipantEntity participantEntity = ParticipantEntity.builder()
                 .team(team)
                 .member(member)
                 .teamMemberRole(role)
                 .build();
         try {
-            Field idField = Participant.class.getDeclaredField("id");
+            Field idField = ParticipantEntity.class.getDeclaredField("id");
             idField.setAccessible(true);
-            idField.set(participant, participantId);
+            idField.set(participantEntity, participantId);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException("Failed to set participant ID", e);
         }
 
-        return participant;
+        return participantEntity;
     }
 
     @Nested
@@ -175,7 +174,7 @@ public class TeamCommandServiceTest {
 
                 when(teamRepository.findByName(validRequest.name())).thenReturn(Optional.empty());
                 when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
-                when(participantMapper.toParticipant(validRequest.role(), team, member)).thenReturn(participant);
+                when(participantMapper.toParticipant(validRequest.role(), team, member)).thenReturn(participantEntity);
                 when(teamMapper.toTeam(validRequest)).thenReturn(team);
                 when(teamMapper.toCreateTeamResponse(any(Team.class))).thenReturn(
                         new CreateTeamResponse(1L, LocalDateTime.now()));
@@ -188,7 +187,7 @@ public class TeamCommandServiceTest {
             void it_can_create() {
                 verify(teamRepository).findByName(validRequest.name());
                 verify(teamRepository).save(team);
-                verify(participantRepository).save(participant);
+                verify(participantRepository).save(participantEntity);
                 verify(teamService).setMemberCurrentTeam(member.getId(), team.getId(), validRequest.role()
                         .name());
 
@@ -226,7 +225,7 @@ public class TeamCommandServiceTest {
             @DisplayName("MEMBER_NOT_FOUND 에러를 반환한다.")
             void it_returns_MemberNotFound() {
                 assertEquals(TeamErrorCode.MEMBER_NOT_FOUND, exception.getErrorCode());
-                verify(participantRepository, never()).save(any(Participant.class));
+                verify(participantRepository, never()).save(any(ParticipantEntity.class));
             }
         }
 
@@ -249,7 +248,7 @@ public class TeamCommandServiceTest {
                 when(teamRepository.findById(anyLong())).thenReturn(Optional.of(team));
                 when(participantRepository.findByTeamIdAndTeamMemberRole(team.getId(),
                         TeamMemberRole.ADMIN)).thenReturn(
-                        Optional.of(participant));
+                        Optional.of(participantEntity));
 
                 exception = assertThrows(CustomException.class, () -> {
                     teamCommandService.joinTeam(customOAuth2User.getMemberId(), adminInvitationCode);
@@ -260,7 +259,7 @@ public class TeamCommandServiceTest {
             @DisplayName("ADMIN_ALREADY_EXIST 에러를 반환한다.")
             void it_returns_AdminAlreadyExist() {
                 assertEquals(TeamErrorCode.ADMIN_EXISTS, exception.getErrorCode());
-                verify(participantRepository, never()).save(any(Participant.class));
+                verify(participantRepository, never()).save(any(ParticipantEntity.class));
             }
         }
 
@@ -290,7 +289,7 @@ public class TeamCommandServiceTest {
             @DisplayName("TEAM_NOT_FOUND 에러를 반환한다.")
             void it_returns_TeamNotFound() {
                 assertEquals(TeamErrorCode.TEAM_NOT_FOUND, exception.getErrorCode());
-                verify(participantRepository, never()).save(any(Participant.class));
+                verify(participantRepository, never()).save(any(ParticipantEntity.class));
             }
         }
 
@@ -313,7 +312,7 @@ public class TeamCommandServiceTest {
                 when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
                 when(teamRepository.findById(anyLong())).thenReturn(Optional.of(team));
                 when(participantRepository.findByTeamIdAndMemberId(belongTeamId, 1L)).thenReturn(
-                        Optional.of(participant));
+                        Optional.of(participantEntity));
 
                 exception = assertThrows(CustomException.class, () -> {
                     teamCommandService.joinTeam(customOAuth2User.getMemberId(), belongTeamCode);
@@ -324,7 +323,7 @@ public class TeamCommandServiceTest {
             @DisplayName("MEMBER_ALREADY_EXIST 에러를 반환한다.")
             void it_returns_MemberAlreadyExist() {
                 assertEquals(TeamErrorCode.MEMBER_ALREADY_EXIST, exception.getErrorCode());
-                verify(participantRepository, never()).save(any(Participant.class));
+                verify(participantRepository, never()).save(any(ParticipantEntity.class));
             }
         }
 
@@ -345,7 +344,7 @@ public class TeamCommandServiceTest {
                 when(teamRepository.findById(team.getId())).thenReturn(Optional.of(team));
                 when(participantRepository.findByTeamIdAndMemberId(team.getId(), member.getId())).thenReturn(
                         Optional.empty());
-                when(participantMapper.toParticipant(TeamMemberRole.ADMIN, team, member)).thenReturn(participant);
+                when(participantMapper.toParticipant(TeamMemberRole.ADMIN, team, member)).thenReturn(participantEntity);
                 when(teamMapper.toJoinTeamResponse(team)).thenReturn(new JoinTeamResponse(team.getId()));
 
                 response = teamCommandService.joinTeam(customOAuth2User.getMemberId(), code);
@@ -354,7 +353,7 @@ public class TeamCommandServiceTest {
             @Test
             @DisplayName("팀에 가입시키고 현재 팀을 가입한 팀으로 변경한다.")
             void it_returns_member_to_join_team() {
-                verify(participantRepository).save(participant);
+                verify(participantRepository).save(participantEntity);
                 verify(teamService).setMemberCurrentTeam(member.getId(), team.getId(), TeamMemberRole.ADMIN.name());
 
                 assertNotNull(response);
@@ -396,7 +395,7 @@ public class TeamCommandServiceTest {
             @DisplayName("USER_NOT_IN_THAT_TEAM 에러를 반환한다.")
             void it_returns_UserNotInThatTeam() {
                 assertEquals(TeamErrorCode.USER_NOT_IN_THAT_TEAM, exception.getErrorCode());
-                verify(participantRepository, never()).delete(any(Participant.class));
+                verify(participantRepository, never()).delete(any(ParticipantEntity.class));
             }
         }
 
@@ -413,9 +412,9 @@ public class TeamCommandServiceTest {
                 memberId = member.getId();
 
                 when(participantRepository.findByTeamIdAndMemberId(teamId, memberId)).thenReturn(
-                        Optional.of(participant));
+                        Optional.of(participantEntity));
                 when(participantRepository.findFirstByMemberIdOrderByCreatedAtAsc(memberId)).thenReturn(
-                        Optional.of(participant));
+                        Optional.of(participantEntity));
 
                 teamCommandService.leaveTeam(teamId, memberId);
             }
@@ -423,7 +422,7 @@ public class TeamCommandServiceTest {
             @Test
             @DisplayName("정상적으로 팀에서 나가고 현재 팀을 가장 최근 팀으로 변경한다.")
             void it_returns_member_to_leave_team() {
-                verify(participantRepository).delete(participant); // 참가자 삭제 확인
+                verify(participantRepository).delete(participantEntity); // 참가자 삭제 확인
                 verify(teamService, times(1)).setMemberCurrentTeam(anyLong(), anyLong(), anyString());
             }
         }

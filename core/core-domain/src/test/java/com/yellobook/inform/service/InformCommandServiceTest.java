@@ -16,8 +16,8 @@ import static org.mockito.Mockito.when;
 
 import com.yellobook.TeamMemberRole;
 import com.yellobook.auth.service.TeamService;
-import com.yellobook.core.domain.schedule.mapper.CommentMapper;
-import com.yellobook.core.domain.schedule.mapper.InformMapper;
+import com.yellobook.core.domain.inform.mapper.CommentMapper;
+import com.yellobook.core.domain.inform.mapper.InformMapper;
 import com.yellobook.core.domain.team.TeamMemberVO;
 import com.yellobook.inform.InformCommandService;
 import com.yellobook.inform.dto.request.CreateInformCommentRequest;
@@ -34,7 +34,7 @@ import com.yellobook.member.repository.MemberRepository;
 import com.yellobook.support.error.code.InformErrorCode;
 import com.yellobook.support.error.code.TeamErrorCode;
 import com.yellobook.support.error.exception.CustomException;
-import com.yellobook.team.Participant;
+import com.yellobook.team.ParticipantEntity;
 import com.yellobook.team.entity.Team;
 import com.yellobook.team.repository.ParticipantRepository;
 import com.yellobook.team.repository.TeamRepository;
@@ -82,7 +82,7 @@ public class InformCommandServiceTest {
 
         @Nested
         @DisplayName("Redis에서 조회한 participant가 존재하지 않는 경우")
-        class Context_Not_Exist_Participant_Searching_From_Redis {
+        class Context_Not_Exist_Participant_Searching_From_RedisEntity {
 
             Member member;
             CreateInformRequest request;
@@ -111,11 +111,11 @@ public class InformCommandServiceTest {
 
         @Nested
         @DisplayName("Redis에서 조회한 participant가 존재하는 경우")
-        class Context_Exist_Participant_Searching_From_Redis {
+        class Context_Exist_Participant_Searching_From_RedisEntity {
 
             Member member;
             Team team;
-            Participant participant;
+            ParticipantEntity participantEntity;
             Inform inform;
             CreateInformRequest request;
             Member member2;
@@ -124,7 +124,7 @@ public class InformCommandServiceTest {
             void setUp() {
                 member = mock(Member.class);
                 team = createTeam("팀1");
-                participant = createParticipant(team, member, TeamMemberRole.ADMIN);
+                participantEntity = createParticipant(team, member, TeamMemberRole.ADMIN);
                 inform = createInform(team, member);
 
                 request = new CreateInformRequest("test", "test", List.of(2L), LocalDate.now());
@@ -138,7 +138,7 @@ public class InformCommandServiceTest {
                         .build();
                 when(memberRepository.findById(2L)).thenReturn(Optional.of(member2));
                 when(participantRepository.findByTeamIdAndMemberId(team.getId(), member.getId())).thenReturn(
-                        Optional.of(participant));
+                        Optional.of(participantEntity));
                 when(informMapper.toInform(request, member, team)).thenReturn(inform);
 
                 informCommandService.createInform(member.getId(), request);

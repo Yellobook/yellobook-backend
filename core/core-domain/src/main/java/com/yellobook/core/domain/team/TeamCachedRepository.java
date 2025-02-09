@@ -1,13 +1,24 @@
 package com.yellobook.core.domain.team;
 
-import java.util.concurrent.TimeUnit;
-import org.springframework.stereotype.Component;
+import com.yellobook.core.domain.team.dto.InvitationInfo;
+import com.yellobook.core.enums.TeamMemberRole;
+import org.springframework.stereotype.Repository;
 
-@Component
+@Repository
 public interface TeamCachedRepository {
-    void save(String key, String value, long time, TimeUnit unit);
+    InvitationInfo readTeamIdAndRoleByCode(String key);
 
-    void saveCurrentTeam(Long teamId, Long memberId, String role);
+    void applyTeam(String key, Long memberId);
 
-    Object read(String key);
+    boolean isTeamJoinRequestExist(String key, Long memberId);
+
+    void removeTeamJoinRequest(String key, Long memberId);
+
+    void requestOrdererConversion(String key, Long memberId);
+
+    boolean isOrdererConversionRequestExist(String key, Long memberId);
+
+    void removeOrdererConversionRequest(String key, Long memberId);
+
+    void saveInvitationCode(String key, Long teamId, TeamMemberRole inviteRole, long validMinute);
 }
