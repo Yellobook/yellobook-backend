@@ -1,4 +1,4 @@
-package com.yellobook.api.controller.schedule.dto.response;
+package com.yellobook.api.controller.v1.schedule.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

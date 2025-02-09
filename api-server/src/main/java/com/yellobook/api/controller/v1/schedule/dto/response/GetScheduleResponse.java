@@ -1,4 +1,4 @@
-package com.yellobook.api.controller.schedule.dto.response;
+package com.yellobook.api.controller.v1.schedule.dto.response;
 
 import com.yellobook.core.domain.schedule.Schedule;
 import com.yellobook.core.domain.schedule.ScheduleComment;

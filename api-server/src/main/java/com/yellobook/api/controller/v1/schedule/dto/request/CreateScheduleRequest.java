@@ -1,4 +1,4 @@
-package com.yellobook.api.controller.schedule.dto.request;
+package com.yellobook.api.controller.v1.schedule.dto.request;
 
 import com.yellobook.core.domain.member.Member;
 import com.yellobook.core.domain.schedule.NewSchedule;
