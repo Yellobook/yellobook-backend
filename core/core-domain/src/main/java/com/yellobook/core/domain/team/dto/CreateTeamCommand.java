@@ -5,8 +5,10 @@ import com.yellobook.core.enums.TeamMemberRole;
 
 public record CreateTeamCommand(
         String name,
+        String description,
         String phoneNumber,
         String address,
-        TeamMemberRole role
+        TeamMemberRole role,
+        Boolean isSearchable
 ) {
 }

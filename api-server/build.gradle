@@ -25,9 +25,13 @@ configurations {
 
 dependencies {
     runtimeOnly project(":admin-api")
-    implementation project(":storage:db-core")
+
     implementation project(':core:core-domain')
     compileOnly project(':core:core-enum')
+    implementation project(':storage:parser-excel')
+    implementation project(":storage:db-core")
+    implementation project(":storage:db-cache")
+
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'

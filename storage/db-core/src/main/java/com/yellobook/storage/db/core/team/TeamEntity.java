@@ -1,5 +1,6 @@
 package com.yellobook.storage.db.core.team;
 
+import com.yellobook.core.domain.team.Team;
 import com.yellobook.storage.db.core.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,14 +26,29 @@ public class TeamEntity extends BaseEntity {
     @Column(nullable = false)
     private String address;
 
+    @Column(nullable = false)
+    private boolean searchable;
+
     protected TeamEntity() {
     }
 
-    public TeamEntity(String name, String description, String phoneNumber, String address) {
+
+    public TeamEntity(String name, String description, String phoneNumber, String address, Boolean searchable) {
         this.name = name;
         this.description = description;
         this.phoneNumber = phoneNumber;
         this.address = address;
+        this.searchable = searchable;
+    }
+
+    Team toTeam() {
+        return new Team(
+                id,
+                name,
+                phoneNumber,
+                address,
+                searchable
+        );
     }
 
     public String getName() {
@@ -50,4 +66,5 @@ public class TeamEntity extends BaseEntity {
     public String getAddress() {
         return address;
     }
+
 }

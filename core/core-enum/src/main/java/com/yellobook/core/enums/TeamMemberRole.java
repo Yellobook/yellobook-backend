@@ -14,4 +14,13 @@ public enum TeamMemberRole {
     public String getDisplayName() {
         return displayName;
     }
+
+    public static TeamMemberRole fromDisplayName(String description) {
+        for (TeamMemberRole role : values()) {
+            if (role.displayName.equals(description)) {
+                return role;
+            }
+        }
+        throw new IllegalArgumentException("존재하지 않는 Role의 description 입니다.");
+    }
 }

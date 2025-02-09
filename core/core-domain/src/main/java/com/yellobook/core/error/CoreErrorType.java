@@ -12,9 +12,15 @@ public enum CoreErrorType {
             CoreErrorLevel.WARN),
     INVENTORY_PRODUCT_NOT_FOUND(CoreErrorCode.INVENTORY02, CoreErrorKind.NOT_FOUND, "해당 제품은 존재하지 않습니다.",
             CoreErrorLevel.WARN),
-    INVENTORY_PRODUCT_SKU_ALREADY_EXISTS(CoreErrorCode.INVENTORY03, CoreErrorKind.CONFLICT, "이미 존재하는 품번입니다.",
-            CoreErrorLevel.ERROR),
+    PRODUCT_SKU_ALREADY_EXISTS(CoreErrorCode.INVENTORY03, CoreErrorKind.CONFLICT, "이미 존재하는 품번입니다.",
+            CoreErrorLevel.ERROR), // 시스템 데이터 중복은 ERROR
     ORDER_RELATED(CoreErrorCode.INVENTORY04, CoreErrorKind.BAD_REQUEST, "주문과 연결되어 있는 제품이라서 삭제가 불가능합니다.",
+            CoreErrorLevel.WARN),
+    VIEWER_CANT_ACCESS_INVENTORY(CoreErrorCode.INVENTORY05, CoreErrorKind.CONFLICT, "뷰어는 재고 현황에 접근할 수 없습니다",
+            CoreErrorLevel.WARN),
+    TEAM_INVENTORY_EMPTY(CoreErrorCode.INVENTORY06, CoreErrorKind.NOT_FOUND, "팀에 재고 현황이 존재하지 않습니다",
+            CoreErrorLevel.WARN),
+    ONLY_SELLER_CAN_MANIPULATE_INVENTORY(CoreErrorCode.INVENTORY07, CoreErrorKind.FORBIDDEN, "오직 관리자만 재고를 관리할 수 있습니다.",
             CoreErrorLevel.WARN),
 
     // Member
@@ -46,13 +52,30 @@ public enum CoreErrorType {
     TEAM_CREATION_FAILED(CoreErrorCode.TEAM04, CoreErrorKind.BAD_REQUEST, "팀 생성에 실패하였습니다.", CoreErrorLevel.ERROR),
     TEAM_MEMBER_NOT_FOUND(CoreErrorCode.TEAM05, CoreErrorKind.NOT_FOUND, "팀에서 해당 사용자를 찾을 수 없습니다.",
             CoreErrorLevel.WARN),
-    VIEWER_CANNOT_INVITE(CoreErrorCode.TEAM06, CoreErrorKind.FORBIDDEN, "뷰어는 초대권한이 없습니다.", CoreErrorLevel.WARN),
-    ADMIN_EXISTS(CoreErrorCode.TEAM07, CoreErrorKind.CONFLICT, "관리자가 이미 존재합니다.", CoreErrorLevel.ERROR),
+    ONLY_SELLER_CAN_MAKE_CODE(CoreErrorCode.TEAM06, CoreErrorKind.FORBIDDEN, "오직 관리자만 초대 코드를 생성할 수 있습니다.",
+            CoreErrorLevel.WARN),
+    SELLER_EXISTS(CoreErrorCode.TEAM07, CoreErrorKind.CONFLICT, "관리자가 이미 존재합니다.", CoreErrorLevel.ERROR),
     INVITATION_NOT_FOUND(CoreErrorCode.TEAM08, CoreErrorKind.NOT_FOUND, "초대장을 찾을 수 없습니다.", CoreErrorLevel.WARN),
     INVALID_INVITATION(CoreErrorCode.TEAM09, CoreErrorKind.BAD_REQUEST, "유효하지 않은 초대장 입니다.", CoreErrorLevel.WARN),
     MEMBER_ALREADY_EXIST(CoreErrorCode.TEAM10, CoreErrorKind.CONFLICT, "이미 팀에 참여한 멤버입니다.", CoreErrorLevel.WARN),
     EXIST_TEAM_NAME(CoreErrorCode.TEAM11, CoreErrorKind.CONFLICT, "이미 존재하는 팀 이름입니다.", CoreErrorLevel.WARN),
     MENTIONED_MEMBER_NOT_FOUND(CoreErrorCode.TEAM12, CoreErrorKind.NOT_FOUND, "존재하지 않는 사용자에 대한 언급입니다.",
+            CoreErrorLevel.WARN),
+    ONLY_SELLER_CAN_UPDATE(CoreErrorCode.TEAM13, CoreErrorKind.CONFLICT, "오직 관리자만 변경할 수 있는 정보 입니다.",
+            CoreErrorLevel.WARN),
+    DID_NOT_APPLY(CoreErrorCode.TEAM14, CoreErrorKind.CONFLICT, "가입 요청을 한적 없습니다.", CoreErrorLevel.WARN),
+    SELLER_AND_ORDERER_CAN_UPDATE_JOIN_REQUEST(CoreErrorCode.TEAM15, CoreErrorKind.CONFLICT,
+            "오직 관리자와 주문자만 가입 요청을 승인 또는 거절할 수 있습니다.", CoreErrorLevel.WARN),
+    APPLY_TEAM_NOT_FOUND(CoreErrorCode.TEAM16, CoreErrorKind.NOT_FOUND, "존재하지 않는 가입 요청입니다.", CoreErrorLevel.WARN),
+    ONLY_VIEWER_CAN_REQUESTED_ORDERER_CONVERSION(CoreErrorCode.TEAM17, CoreErrorKind.CONFLICT,
+            "뷰어만 주문자로 권한 변경을 요청할 수 있습니다.", CoreErrorLevel.WARN),
+    ALREADY_REQUESTED_ORDERER_CONVERSION(CoreErrorCode.TEAM18, CoreErrorKind.CONFLICT, "이미 주문자로 권한 변경 요청을 했습니다.",
+            CoreErrorLevel.WARN),
+    ROLE_CONVERSION_NOT_FOUND(CoreErrorCode.TEAM19, CoreErrorKind.NOT_FOUND, "권한 변경 요청이 존재하지 않습니다.",
+            CoreErrorLevel.WARN),
+    SELLER_MUST_EXIST_IN_TEAM(CoreErrorCode.TEAM20, CoreErrorKind.CONFLICT, "팀에는 한명 이상의 판매자가 존재해야합니다.",
+            CoreErrorLevel.WARN),
+    ROLE_DESCRIPTION_NOT_FOUND(CoreErrorCode.TEAM21, CoreErrorKind.NOT_FOUND, "존재하지 않는 역할의 description 입니다.",
             CoreErrorLevel.WARN),
 
     // Terms
@@ -61,6 +84,7 @@ public enum CoreErrorType {
     TERMS_ALREADY_AGREED(CoreErrorCode.TERMS03, CoreErrorKind.BAD_REQUEST, "이미 해당 약관에 동의하였습니다.", CoreErrorLevel.WARN),
     REQUIRED_TERMS_NOT_AGREED(CoreErrorCode.TERMS04, CoreErrorKind.BAD_REQUEST, "필수 동의 항목이 누락되었습니다.",
             CoreErrorLevel.WARN);
+
 
     private final CoreErrorCode code;
     private final CoreErrorKind kind;
