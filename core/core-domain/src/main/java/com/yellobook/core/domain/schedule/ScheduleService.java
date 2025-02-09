@@ -26,6 +26,7 @@ public class ScheduleService {
 
     @Transactional
     public Long create(NewSchedule newSchedule) {
+        scheduleAccessManager.isAbleToCreate(newSchedule.teamId(), newSchedule.author());
         Long scheduleId = scheduleWriter.create(newSchedule);
         scheduleMentionProcessor.mention(scheduleId, newSchedule.memberIds());
         return scheduleId;

@@ -29,12 +29,11 @@ public interface ScheduleApiDocs {
                             examples = @ExampleObject(value = """
                                     {
                                         "result": "ERROR",
-                                        "data": "",
+                                        "data": null,
                                         "error":{
-                                            "code": "",
-                                            "message": "",
-                                            "data": {
-                                            }
+                                            "code": "USER_NOT_IN_THAT_TEAM",
+                                            "message": "해당 팀에 속하지 않은 사용자입니다.",
+                                            "data": null
                                         }
                                     }""")
                     ))
