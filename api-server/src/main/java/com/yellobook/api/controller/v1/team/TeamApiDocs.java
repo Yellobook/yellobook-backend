@@ -68,7 +68,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM03",
+                                    "code": "STORE-03",
                                     "message": "팀에서 해당 사용자를 찾을 수 없습니다.",
                                     "data": null
                                 }
@@ -81,7 +81,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM02",
+                                    "code": "STORE-02",
                                     "message": "가게을 찾을 수 없습니다.",
                                     "data": null
                                 }
@@ -107,7 +107,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM02",
+                                    "code": "STORE-02",
                                     "message": "가게을 찾을 수 없습니다.",
                                     "data": null
                                 }
@@ -120,7 +120,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM10",
+                                    "code": "STORE-10",
                                     "message": "이미 가게에 참여한 멤버입니다.",
                                     "data": null
                                 }
@@ -146,7 +146,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM03",
+                                    "code": "STORE-03",
                                     "message": "가게에서 해당 사용자를 찾을 수 없습니다.",
                                     "data": null
                                 }
@@ -157,7 +157,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM15",
+                                    "code": "STORE-15",
                                     "message": "오직 판매자와 주문자만 가입 요청을 승인 또는 거절할 수 있습니다.",
                                     "data": null
                                 }
@@ -170,7 +170,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM16",
+                                    "code": "STORE-16",
                                     "message": "존재하지 않는 가입 요청입니다.",
                                     "data": null
                                 }
@@ -183,7 +183,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM10",
+                                    "code": "STORE-10",
                                     "message": "이미 가게에 참여한 멤버입니다.",
                                     "data": null
                                 }
@@ -212,7 +212,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM03",
+                                    "code": "STORE-03",
                                     "message": "가게에서 해당 사용자를 찾을 수 없습니다.",
                                     "data": null
                                 }
@@ -223,7 +223,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM06",
+                                    "code": "STORE-06",
                                     "message": "오직 관리자만 초대 코드를 생성할 수 있습니다.",
                                     "data": null
                                 }
@@ -234,7 +234,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM21",
+                                    "code": "STORE-21",
                                     "message": "주문자를 가게에 초대할 수 없습니다.",
                                     "data": null
                                 }
@@ -263,7 +263,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM08",
+                                    "code": "STORE-08",
                                     "message": "초대장을 찾을 수 없습니다.",
                                     "data": null
                                 }
@@ -276,7 +276,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM10",
+                                    "code": "STORE-10",
                                     "message": "이미 가게에 참여한 멤버입니다.",
                                     "data": null
                                 }
@@ -303,7 +303,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM03",
+                                    "code": "STORE-03",
                                     "message": "가게에서 해당 사용자를 찾을 수 없습니다.",
                                     "data": null
                                 }
@@ -314,7 +314,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM17",
+                                    "code": "STORE-17",
                                     "message": "뷰어만 주문자로 권한 변경을 요청할 수 있습니다.",
                                     "data": null
                                 }
@@ -340,7 +340,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM03",
+                                    "code": "STORE-03",
                                     "message": "가게에서 해당 사용자를 찾을 수 없습니다.",
                                     "data": null
                                 }
@@ -351,7 +351,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM13",
+                                    "code": "STORE-13",
                                     "message": "오직 판매자만 변경할 수 있는 정보 입니다.",
                                     "data": null
                                 }
@@ -362,7 +362,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM03",
+                                    "code": "STORE-03",
                                     "message": "가게에서 해당 사용자를 찾을 수 없습니다.",
                                     "data": null
                                 }
@@ -391,7 +391,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,지
                                 "error": {
-                                    "code": "TEAM03",
+                                    "code": "STORE-03",
                                     "message": "가게에서 해당 사용자를 찾을 수 없습니다.",
                                     "data": null
                                 }
@@ -402,7 +402,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM13",
+                                    "code": "STORE-13",
                                     "message": "오직 판매자만 변경할 수 있는 정보 입니다.",
                                     "data": null
                                 }
@@ -430,7 +430,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM05",
+                                    "code": "STORE-05",
                                     "message": "가게에서 해당 사용자를 찾을 수 없습니다.",
                                     "data": null
                                 }
@@ -441,7 +441,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM20",
+                                    "code": "STORE-20",
                                     "message": "가게에는 한명 이상의 판매자가 존재해야합니다.",
                                     "data": null
                                 }
@@ -454,7 +454,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM02",
+                                    "code": "STORE-02",
                                     "message": "가게을 찾을 수 없습니다.",
                                     "data": null
                                 }
@@ -480,7 +480,7 @@ public interface TeamApiDocs {
                                 "result" : "ERROR",
                                 "data": null,
                                 "error": {
-                                    "code": "TEAM03",
+                                    "code": "STORE-03",
                                     "message": "가게에서 해당 사용자를 찾을 수 없습니다.",
                                     "data": null
                                 }

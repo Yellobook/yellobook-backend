@@ -24,7 +24,7 @@ public class TeamJoinLeaveManager {
 
     public void leaveTeam(Long teamId, Long memberId, TeamMemberRole role) {
         if (role.equals(TeamMemberRole.SELLER) && teamRepository.countAllByTeamIdAndTeamMemberRole(teamId, role) < 2) {
-            throw new CoreException(CoreErrorType.SELLER_MUST_EXIST_IN_TEAM);
+            throw new CoreException(CoreErrorType.SELLER_MUST_EXIST_IN_STORE);
         }
         teamRepository.leave(teamId, memberId);
     }
@@ -57,7 +57,7 @@ public class TeamJoinLeaveManager {
     public void deleteJoinRequest(Long teamId, Long memberId) {
         String key = generateApplyTeamKey(teamId);
         if (teamCachedRepository.isTeamJoinRequestExist(key, memberId)) {
-            throw new CoreException(CoreErrorType.APPLY_TEAM_NOT_FOUND);
+            throw new CoreException(CoreErrorType.APPLY_STORE_NOT_FOUND);
         }
         teamCachedRepository.removeTeamJoinRequest(key, memberId);
     }

@@ -20,7 +20,7 @@ public class TeamValidator {
      */
     public void canCreateTeam(TeamMemberRole role) {
         if (!role.equals(TeamMemberRole.SELLER)) {
-            throw new CoreException(CoreErrorType.TEAM_CREATION_FAILED);
+            throw new CoreException(CoreErrorType.STORE_CREATION_FAILED);
         }
     }
 
@@ -37,7 +37,7 @@ public class TeamValidator {
 
     public void isMemberOfTeam(Long teamId, Long memberId) {
         if (!teamRepository.isTeamMember(teamId, memberId)) {
-            throw new CoreException(CoreErrorType.USER_NOT_IN_THE_TEAM);
+            throw new CoreException(CoreErrorType.USER_NOT_IN_THE_STORE);
         }
     }
 
