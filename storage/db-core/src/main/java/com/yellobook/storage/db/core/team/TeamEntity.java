@@ -45,6 +45,7 @@ public class TeamEntity extends BaseEntity {
         return new Team(
                 id,
                 name,
+                description,
                 phoneNumber,
                 address,
                 searchable

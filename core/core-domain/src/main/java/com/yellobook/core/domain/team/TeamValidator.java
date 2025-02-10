@@ -13,14 +13,6 @@ public class TeamValidator {
         this.teamRepository = teamRepository;
     }
 
-    /*
-    TODO: controller 단으로 넘길 것
-     */
-    public boolean isValidCreation(String name, String phoneNumber, String address) {
-        return name != null && !name.isEmpty() && phoneNumber != null && !phoneNumber.isEmpty() && address != null
-                && !address.isEmpty() && !teamRepository.existByName(name);
-    }
-
     /**
      * 관리자가 아니면 팀 생성 불가능
      *
@@ -28,7 +20,7 @@ public class TeamValidator {
      */
     public void canCreateTeam(TeamMemberRole role) {
         if (!role.equals(TeamMemberRole.SELLER)) {
-            throw new CoreException(CoreErrorType.TEAM_CREATION_FAILED);
+            throw new CoreException(CoreErrorType.STORE_CREATION_FAILED);
         }
     }
 
@@ -43,13 +35,12 @@ public class TeamValidator {
         }
     }
 
+    public void isMemberOfTeam(Long teamId, Long memberId) {
+        if (!teamRepository.isTeamMember(teamId, memberId)) {
+            throw new CoreException(CoreErrorType.USER_NOT_IN_THE_STORE);
+        }
+    }
 
-    /**
-     * 팀에 가입 요청을 할 수 있는지 검증 이미 가입한 사람이면 팀 참가 요청 불가능
-     *
-     * @param teamId   가입하고 싶은 팀 Id
-     * @param memberId 가입하는 사람의 Id
-     */
     public void canJoinTeam(Long teamId, Long memberId) {
         if (teamRepository.isTeamMember(teamId, memberId)) {
             throw new CoreException(CoreErrorType.MEMBER_ALREADY_EXIST);
@@ -88,16 +79,15 @@ public class TeamValidator {
         }
     }
 
-    public void isMemberOfTeam(Long teamId, Long memberId) {
-        if (!teamRepository.existByTeamIdAndMemberId(teamId, memberId)) {
-            throw new CoreException(CoreErrorType.TEAM_MEMBER_NOT_FOUND);
-        }
-    }
-
     public void canCreateInvitationCode(TeamMemberRole role) {
         if (!role.equals(TeamMemberRole.SELLER)) {
             throw new CoreException(CoreErrorType.ONLY_SELLER_CAN_MAKE_CODE);
         }
     }
 
+    public void canInviteWithRole(TeamMemberRole role) {
+        if (role.equals(TeamMemberRole.ORDERER)) {
+            throw new CoreException(CoreErrorType.CAN_INVITE_ORDERER);
+        }
+    }
 }

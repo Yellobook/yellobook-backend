@@ -18,7 +18,9 @@ public class TeamRoleManager {
     }
 
     public TeamMemberRole readRole(Long teamId, Long memberId) {
-        return teamRepository.getRole(teamId, memberId);
+        Participant participant = teamRepository.findParticipantByTeamIdAndMemberId(teamId, memberId)
+                .orElseThrow(() -> new CoreException(CoreErrorType.USER_NOT_IN_THE_STORE));
+        return participant.role();
     }
 
     public void updateRole(Long teamId, Long memberId, TeamMemberRole role) {

@@ -27,89 +27,86 @@ public class TeamService {
     }
 
     public Long create(CreateTeamCommand command, Long memberId) {
-        teamValidator.canCreateTeam(command.role());
-        teamReader.isPresent(command.name());
+        teamReader.isTeamNameExist(command.name());
         Long teamId = teamWriter.create(command.name(), command.description(), command.phoneNumber(), command.address(),
-                command.isSearchable());
-        teamJoinLeaveManager.join(teamId, memberId, command.role());
+                command.searchable());
+        teamJoinLeaveManager.join(teamId, memberId, TeamMemberRole.SELLER);
         return teamId;
     }
 
-    public void leaveTeam(Long teamId, Long memberId) {
-        TeamMemberRole role = teamRoleManager.readRole(teamId, memberId);
-        teamJoinLeaveManager.hasJoinedTeam(teamId, memberId);
+    public Team getTeam(Long teamId, Long memberId) {
         Team team = teamReader.read(teamId);
-        teamJoinLeaveManager.leaveTeam(teamId, memberId, role);
-    }
-
-    public String createInvitationCode(Long teamId, Long memberId, TeamMemberRole inviteRole) {
-        TeamMemberRole role = teamRoleManager.readRole(teamId, memberId);
-        teamValidator.canCreateInvitationCode(role);
-        return teamJoinLeaveManager.generateInvitationCode(teamId, inviteRole);
-    }
-
-    public void joinByCode(String key, Member member) {
-        InvitationInfo info = teamJoinLeaveManager.getTeamIdByInvitationCode(key);
-        teamJoinLeaveManager.hasNotJoinedTeam(info.teamId(), member);
-        teamJoinLeaveManager.join(info.teamId(), member.memberId(), info.role());
-    }
-
-    public void requestOrdererConversion(Long teamId, Long memberId) {
-        TeamMemberRole role = teamRoleManager.readRole(teamId, memberId);
-        Team team = teamReader.read(teamId);
-        teamValidator.canRequestOrdererConversion(teamId, memberId, role);
-        teamRoleManager.requestOrdererConversion(teamId, memberId);
-    }
-
-    public void acceptOrdererConversionRequest(Long teamId, Long memberId) {
-        TeamMemberRole role = teamRoleManager.readRole(teamId, memberId);
-        teamValidator.canChangeTeamRole(role);
-        teamValidator.isMemberOfTeam(teamId, memberId);
-        teamRoleManager.deleteOrdererConversionRequest(teamId, memberId);
-        teamRoleManager.updateRole(teamId, memberId, TeamMemberRole.ORDERER);
-    }
-
-    public void rejectOrdererConversionRequest(Long teamId, Long memberId) {
-        TeamMemberRole role = teamRoleManager.readRole(teamId, memberId);
-        teamValidator.canChangeTeamRole(role);
-        teamRoleManager.deleteOrdererConversionRequest(teamId, memberId);
+        if (!team.isSearchable()) {
+            teamValidator.isMemberOfTeam(teamId, memberId);
+        }
+        return team;
     }
 
     public List<Team> searchTeamByName(String keyword) {
         return teamReader.readSearchableTeamsByName(keyword);
     }
 
-    public void requestTeamJoin(Long teamId, Long memberId) {
-        teamValidator.canJoinTeam(teamId, memberId);
+    public void leaveTeam(Long teamId, Long memberId) {
         Team team = teamReader.read(teamId);
+        TeamMemberRole role = teamRoleManager.readRole(teamId, memberId);
+        teamJoinLeaveManager.leaveTeam(teamId, memberId, role);
+    }
+
+    public String createInvitationCode(Long teamId, Long memberId, TeamMemberRole inviteRole) {
+        TeamMemberRole role = teamRoleManager.readRole(teamId, memberId);
+        teamValidator.canCreateInvitationCode(role);
+        teamValidator.canInviteWithRole(role);
+        return teamJoinLeaveManager.generateInvitationCode(teamId, inviteRole);
+    }
+
+    public Long joinByCode(String code, Long memberId) {
+        InvitationInfo info = teamJoinLeaveManager.getTeamIdByInvitationCode(code);
+        teamValidator.canJoinTeam(info.teamId(), memberId);
+        teamJoinLeaveManager.join(info.teamId(), memberId, info.role());
+        return info.teamId();
+    }
+
+    public void requestOrdererConversion(Long teamId, Long memberId) {
+        TeamMemberRole role = teamRoleManager.readRole(teamId, memberId);
+        teamValidator.canRequestOrdererConversion(teamId, memberId, role);
+        teamRoleManager.requestOrdererConversion(teamId, memberId);
+    }
+
+    public void changeRoleToOrderer(Long teamId, Long requesterId, Member member, Boolean approve) {
+        TeamMemberRole role = teamRoleManager.readRole(teamId, member.memberId());
+        teamValidator.canChangeTeamRole(role);
+        teamRoleManager.deleteOrdererConversionRequest(teamId, requesterId);
+        if (approve) {
+            teamValidator.isMemberOfTeam(teamId, requesterId);
+            teamRoleManager.updateRole(teamId, requesterId, TeamMemberRole.ORDERER);
+        }
+    }
+
+    public void requestTeamJoin(Long teamId, Long memberId) {
+        Team team = teamReader.read(teamId);
+        teamValidator.canJoinTeam(teamId, memberId);
         teamJoinLeaveManager.requestTeamJoin(teamId, memberId);
     }
 
-    public void acceptTeamJoinRequest(Long teamId, Long memberId) {
-        TeamMemberRole role = teamRoleManager.readRole(teamId, memberId);
+    public void manageTeamJoinRequest(Long teamId, Long requesterId, Member member, Boolean approve) {
+        TeamMemberRole role = teamRoleManager.readRole(teamId, member.memberId());
         teamValidator.canUpdateTeamJoinRequest(role);
-        teamValidator.canJoinTeam(teamId, memberId);
-        teamJoinLeaveManager.deleteJoinRequest(teamId, memberId);
-        teamJoinLeaveManager.join(teamId, memberId, TeamMemberRole.VIEWER);
+        teamJoinLeaveManager.deleteJoinRequest(teamId, requesterId);
+        if (approve) {
+            teamValidator.canJoinTeam(teamId, requesterId);
+            teamJoinLeaveManager.join(teamId, requesterId, TeamMemberRole.VIEWER);
+        }
     }
-
-    public void rejectTeamJoinRequest(Long teamId, Long memberId) {
-        TeamMemberRole role = teamRoleManager.readRole(teamId, memberId);
-        teamValidator.canUpdateTeamJoinRequest(role);
-        teamJoinLeaveManager.deleteJoinRequest(teamId, memberId);
-    }
-
 
     public void updateSearchable(Long teamId, Long memberId, boolean searchable) {
-        TeamMemberRole role = teamRoleManager.readRole(teamId, memberId);
         Team team = teamReader.read(teamId);
+        TeamMemberRole role = teamRoleManager.readRole(teamId, memberId);
         teamValidator.canModifySearchable(role);
         teamWriter.updateSearchable(teamId, searchable);
     }
 
-    public List<Participant> getParticipants(Long teamId) {
-        Team team = teamReader.read(teamId);
-        return teamJoinLeaveManager.getParticipants(teamId);
+    public List<Participant> getParticipants(Long teamId, Long memberId) {
+        teamValidator.isMemberOfTeam(teamId, memberId);
+        return teamReader.getParticipants(teamId);
     }
-
 }

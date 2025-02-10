@@ -4,6 +4,7 @@ package com.yellobook.core.domain.team;
 public record Team(
         Long teamId,
         String name,
+        String description,
         String phoneNumber,
         String address,
         Boolean isSearchable

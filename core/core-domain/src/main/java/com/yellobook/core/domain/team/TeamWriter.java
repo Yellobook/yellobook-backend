@@ -14,8 +14,8 @@ public class TeamWriter {
     /*
     팀 생성
      */
-    public Long create(String name, String description, String phoneNumber, String address, Boolean isSearchable) {
-        return teamRepository.save(name, description, phoneNumber, address, isSearchable);
+    public Long create(String name, String description, String phoneNumber, String address, Boolean searchable) {
+        return teamRepository.save(name, description, phoneNumber, address, searchable);
     }
 
 
