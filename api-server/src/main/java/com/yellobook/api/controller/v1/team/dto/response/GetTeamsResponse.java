@@ -5,10 +5,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 public record GetTeamsResponse(
-        List<TeamResponse> teams
+        List<GetTeamResponse> teams
 
 ) {
-    public record TeamResponse(
+    public record GetTeamResponse(
             @Schema(description = "팀의 고유 id", example = "123")
             Long teamId,
             @Schema(description = "팀의 이름", example = "나이키")
@@ -20,12 +20,21 @@ public record GetTeamsResponse(
             @Schema(description = "팀의 주소", example = "서울특별시 강남구")
             String address
     ) {
+        public GetTeamResponse(Team team) {
+            this(
+                    team.teamId(),
+                    team.name(),
+                    team.description(),
+                    team.phoneNumber(),
+                    team.address()
+            );
+        }
     }
 
     public static GetTeamsResponse from(List<Team> teams) {
         return new GetTeamsResponse(
                 teams.stream()
-                        .map(t -> new TeamResponse(t.teamId(), t.name(), t.description(), t.phoneNumber(), t.address()))
+                        .map(GetTeamResponse::new)
                         .toList()
         );
     }

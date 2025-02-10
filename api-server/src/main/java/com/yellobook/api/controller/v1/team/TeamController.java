@@ -1,5 +1,6 @@
 package com.yellobook.api.controller.v1.team;
 
+import com.yellobook.api.controller.v1.team.dto.request.ApproveRejectRequest;
 import com.yellobook.api.controller.v1.team.dto.request.CreateTeamRequest;
 import com.yellobook.api.controller.v1.team.dto.request.GenerateInvitationCodeRequest;
 import com.yellobook.api.controller.v1.team.dto.request.PatchSearchableRequest;
@@ -7,6 +8,7 @@ import com.yellobook.api.controller.v1.team.dto.response.CreateTeamResponse;
 import com.yellobook.api.controller.v1.team.dto.response.GenerateInvitationCodeResponse;
 import com.yellobook.api.controller.v1.team.dto.response.GetParticipantsResponse;
 import com.yellobook.api.controller.v1.team.dto.response.GetTeamsResponse;
+import com.yellobook.api.controller.v1.team.dto.response.GetTeamsResponse.GetTeamResponse;
 import com.yellobook.api.support.ApiMember;
 import com.yellobook.api.support.response.ApiResponse;
 import com.yellobook.core.domain.team.Participant;
@@ -30,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Validated
 @RestController
-@RequestMapping("/api/v1/teams")
+@RequestMapping("/api/v1/stores")
 public class TeamController implements TeamApiDocs {
     private final TeamService teamService;
 
@@ -40,10 +42,10 @@ public class TeamController implements TeamApiDocs {
 
     @Override
     @PostMapping
-    public ApiResponse<CreateTeamResponse> createTeam(@RequestBody CreateTeamRequest request,
+    public ApiResponse<CreateTeamResponse> createTeam(@RequestBody CreateTeamRequest dto,
                                                       @AuthenticationPrincipal ApiMember apiMember) {
-        Long teamId = teamService.create(request.toCommand(), apiMember.memberId());
-        return ApiResponse.success(new CreateTeamResponse(teamId));
+        Long storeId = teamService.create(dto.toCommand(), apiMember.memberId());
+        return ApiResponse.success(new CreateTeamResponse(storeId));
     }
 
     @Override
@@ -55,41 +57,6 @@ public class TeamController implements TeamApiDocs {
     }
 
     @Override
-    @PostMapping("{teamId}/apply")
-    public ApiResponse<Void> requestTeamJoin(@PathVariable @NotNull Long teamId,
-                                             @AuthenticationPrincipal ApiMember apiMember) {
-        teamService.requestTeamJoin(teamId, apiMember.memberId());
-        return ApiResponse.success(null);
-    }
-
-    @Override
-    @PostMapping("{teamId}/apply/{requesterId}/accept")
-    public ApiResponse<Void> acceptTeamJoinRequest(@PathVariable @NotNull Long teamId,
-                                                   @PathVariable @NotNull Long requesterId,
-                                                   @AuthenticationPrincipal ApiMember apiMember) {
-        teamService.acceptTeamJoinRequest(teamId, requesterId, apiMember.toMember());
-        return ApiResponse.success(null);
-    }
-
-    @Override
-    @PostMapping("{teamId}/apply/{requesterId}/reject")
-    public ApiResponse<Void> rejectTeamJoinRequest(@PathVariable @NotNull Long teamId,
-                                                   @PathVariable @NotNull Long requesterId,
-                                                   @AuthenticationPrincipal ApiMember apiMember) {
-        teamService.rejectTeamJoinRequest(teamId, requesterId, apiMember.toMember());
-        return ApiResponse.success(null);
-    }
-
-    @Override
-    @PostMapping("{teamId}/invitation")
-    public ApiResponse<GenerateInvitationCodeResponse> generateInvitationCode(@PathVariable @NotNull Long teamId,
-                                                                              @RequestBody @Valid GenerateInvitationCodeRequest request,
-                                                                              @AuthenticationPrincipal ApiMember apiMember) {
-        String code = teamService.createInvitationCode(teamId, apiMember.memberId(), request.role());
-        return ApiResponse.success(new GenerateInvitationCodeResponse(code));
-    }
-
-    @Override
     @PostMapping("/join")
     public ApiResponse<Void> joinTeamByCode(@RequestParam @NotBlank String code,
                                             @AuthenticationPrincipal ApiMember apiMember) {
@@ -98,56 +65,81 @@ public class TeamController implements TeamApiDocs {
     }
 
     @Override
-    @PostMapping("{teamId}/role-change")
-    public ApiResponse<Void> requestOrdererConversion(@PathVariable @NotNull Long teamId,
-                                                      @AuthenticationPrincipal ApiMember apiMember) {
-        teamService.requestOrdererConversion(teamId, apiMember.memberId());
-        return ApiResponse.success(null);
-    }
-
-
-    @Override
-    @PostMapping("{teamId}/role-change/{requesterId}/accept")
-    public ApiResponse<Void> acceptOrdererConversionRequest(@PathVariable @NotNull Long teamId,
-                                                            @PathVariable @NotNull Long requesterId,
-                                                            @AuthenticationPrincipal ApiMember apiMember) {
-        teamService.acceptOrdererConversionRequest(teamId, requesterId, apiMember.toMember());
-        return ApiResponse.success(null);
+    @GetMapping("/{storeId}")
+    public ApiResponse<GetTeamResponse> getStore(@PathVariable @NotNull Long storeId,
+                                                 @AuthenticationPrincipal ApiMember apiMember) {
+        Team team = teamService.getTeam(storeId, apiMember.memberId());
+        return ApiResponse.success(new GetTeamResponse(team));
     }
 
     @Override
-    @PostMapping("{teamId}/role-change/{requesterId}/reject")
-    public ApiResponse<Void> rejectOrdererConversionRequest(@PathVariable @NotNull Long teamId,
-                                                            @PathVariable @NotNull Long requesterId,
-                                                            @AuthenticationPrincipal ApiMember apiMember) {
-        teamService.rejectOrdererConversionRequest(teamId, requesterId, apiMember.toMember());
-        return ApiResponse.success(null);
-    }
-
-    @Override
-    @PatchMapping("{teamId}/searchable")
-    public ApiResponse<Void> patchSearchable(@PathVariable @NotNull Long teamId,
-                                             @RequestBody @Valid PatchSearchableRequest request,
+    @PatchMapping("/{storeId}/searchable")
+    public ApiResponse<Void> patchSearchable(@PathVariable @NotNull Long storeId,
+                                             @RequestBody @Valid PatchSearchableRequest dto,
                                              @AuthenticationPrincipal ApiMember apiMember) {
-        teamService.updateSearchable(teamId, apiMember.memberId(), request.searchable());
+        teamService.updateSearchable(storeId, apiMember.memberId(), dto.searchable());
         return ApiResponse.success(null);
     }
 
     @Override
-    @DeleteMapping("{teamId}/leave")
-    public ApiResponse<Void> leaveTeam(@PathVariable @NotNull Long teamId,
+    @PostMapping("/{storeId}/join")
+    public ApiResponse<Void> requestTeamJoin(@PathVariable @NotNull Long storeId,
+                                             @AuthenticationPrincipal ApiMember apiMember) {
+        teamService.requestTeamJoin(storeId, apiMember.memberId());
+        return ApiResponse.success(null);
+    }
+
+    @Override
+    @PatchMapping("/{storeId}/join/members/{memberId}")
+    public ApiResponse<Void> manageTeamJoinRequest(@PathVariable @NotNull Long storeId,
+                                                   @PathVariable @NotNull Long memberId,
+                                                   @RequestBody ApproveRejectRequest dto,
+                                                   @AuthenticationPrincipal ApiMember apiMember) {
+        teamService.manageTeamJoinRequest(storeId, memberId, apiMember.toMember(), dto.approve());
+        return ApiResponse.success(null);
+    }
+
+    @Override
+    @PostMapping("/{storeId}/invite")
+    public ApiResponse<GenerateInvitationCodeResponse> generateInvitationCode(@PathVariable @NotNull Long storeId,
+                                                                              @RequestBody @Valid GenerateInvitationCodeRequest request,
+                                                                              @AuthenticationPrincipal ApiMember apiMember) {
+        String code = teamService.createInvitationCode(storeId, apiMember.memberId(), request.role());
+        return ApiResponse.success(new GenerateInvitationCodeResponse(code));
+    }
+
+    @Override
+    @DeleteMapping("/{storeId}/leave")
+    public ApiResponse<Void> leaveTeam(@PathVariable @NotNull Long storeId,
                                        @AuthenticationPrincipal ApiMember apiMember) {
-        teamService.leaveTeam(teamId, apiMember.memberId());
+        teamService.leaveTeam(storeId, apiMember.memberId());
         return ApiResponse.success(null);
     }
 
     @Override
-    @GetMapping("{teamId}/participants")
-    public ApiResponse<GetParticipantsResponse> getParticipants(@PathVariable @NotNull Long teamId,
+    @GetMapping("/{storeId}/members")
+    public ApiResponse<GetParticipantsResponse> getParticipants(@PathVariable @NotNull Long storeId,
                                                                 @AuthenticationPrincipal ApiMember apiMember) {
-        List<Participant> participants = teamService.getParticipants(teamId, apiMember.memberId());
+        List<Participant> participants = teamService.getParticipants(storeId, apiMember.memberId());
         return ApiResponse.success(GetParticipantsResponse.from(participants));
     }
 
+    @Override
+    @PostMapping("/{storeId}/members/role/orderer")
+    public ApiResponse<Void> requestOrdererConversion(@PathVariable @NotNull Long storeId,
+                                                      @AuthenticationPrincipal ApiMember apiMember) {
+        teamService.requestOrdererConversion(storeId, apiMember.memberId());
+        return ApiResponse.success(null);
+    }
+
+    @Override
+    @PatchMapping("/{storeId}/members/{memberId}/role/orderer")
+    public ApiResponse<Void> changeRoleToOrderer(@PathVariable @NotNull Long storeId,
+                                                 @PathVariable @NotNull Long memberId,
+                                                 @RequestBody ApproveRejectRequest dto,
+                                                 @AuthenticationPrincipal ApiMember apiMember) {
+        teamService.changeRoleToOrderer(storeId, memberId, apiMember.toMember(), dto.approve());
+        return ApiResponse.success(null);
+    }
 
 }

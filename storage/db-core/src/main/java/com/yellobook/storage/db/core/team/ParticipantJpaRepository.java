@@ -23,7 +23,7 @@ public interface ParticipantJpaRepository extends JpaRepository<ParticipantEntit
 
     boolean existsByTeamIdAndTeamMemberRole(Long teamId, TeamMemberRole role);
 
-    ParticipantEntity findByTeamIdAndMemberId(Long teamId, Long memberId);
+    Optional<ParticipantEntity> findByTeamIdAndMemberId(Long teamId, Long memberId);
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query(value = "update ParticipantEntity p set p.teamMemberRole = :role where p.team.id = :teamId and p.member.id = :memberId")
