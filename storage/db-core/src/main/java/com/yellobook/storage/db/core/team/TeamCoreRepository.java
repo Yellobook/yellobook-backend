@@ -54,8 +54,8 @@ public class TeamCoreRepository implements TeamRepository {
     }
 
     @Override
-    public Long save(String name, String description, String phoneNumber, String address, Boolean isSearchable) {
-        TeamEntity team = new TeamEntity(name, description, phoneNumber, address, isSearchable);
+    public Long save(String name, String description, String phoneNumber, String address, Boolean searchable) {
+        TeamEntity team = new TeamEntity(name, description, phoneNumber, address, searchable);
         return teamJpaRepository.save(team)
                 .getId();
     }
@@ -67,7 +67,7 @@ public class TeamCoreRepository implements TeamRepository {
     }
 
     @Override
-    public List<Participant> getMembersByTeamId(Long teamId) {
+    public List<Participant> getParticipantsByTeamId(Long teamId) {
         return participantJpaRepository.findAllByTeamId(teamId)
                 .stream()
                 .map(ParticipantEntity::toParticipant)
@@ -90,17 +90,6 @@ public class TeamCoreRepository implements TeamRepository {
     public boolean existByName(String name) {
         return teamJpaRepository.findByName(name)
                 .isPresent();
-    }
-
-    @Override
-    public boolean existByTeamIdAndMemberId(Long teamId, Long memberId) {
-        return participantJpaRepository.existsByTeamIdAndMemberId(teamId, memberId);
-    }
-
-    @Override
-    public TeamMemberRole getRole(Long teamId, Long memberId) {
-        return participantJpaRepository.findByTeamIdAndMemberId(teamId, memberId)
-                .getTeamMemberRole();
     }
 
     @Override
@@ -129,6 +118,12 @@ public class TeamCoreRepository implements TeamRepository {
     @Override
     public int countAllByTeamIdAndTeamMemberRole(Long teamId, TeamMemberRole role) {
         return participantJpaRepository.countAllByTeamIdAndTeamMemberRole(teamId, role);
+    }
+
+    @Override
+    public Optional<Participant> findParticipantByTeamIdAndMemberId(Long teamId, Long memberId) {
+        return participantJpaRepository.findByTeamIdAndMemberId(teamId, memberId)
+                .map(ParticipantEntity::toParticipant);
     }
 
 

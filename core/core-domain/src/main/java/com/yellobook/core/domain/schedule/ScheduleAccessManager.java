@@ -2,6 +2,7 @@ package com.yellobook.core.domain.schedule;
 
 import com.yellobook.core.domain.member.Member;
 import com.yellobook.core.domain.team.TeamJoinLeaveManager;
+import com.yellobook.core.domain.team.TeamValidator;
 import com.yellobook.core.error.CoreErrorType;
 import com.yellobook.core.error.CoreException;
 import org.springframework.stereotype.Component;
@@ -10,13 +11,13 @@ import org.springframework.stereotype.Component;
 public class ScheduleAccessManager {
     private final ScheduleReader scheduleReader;
     private final ScheduleMentionProcessor scheduleMentionProcessor;
-    private final TeamJoinLeaveManager teamJoinLeaveManager;
+    private final TeamValidator teamValidator;
 
     public ScheduleAccessManager(ScheduleReader scheduleReader, ScheduleMentionProcessor scheduleMentionProcessor,
-                                 TeamJoinLeaveManager teamJoinLeaveManager) {
+                                 TeamJoinLeaveManager teamJoinLeaveManager, TeamValidator teamValidator) {
         this.scheduleReader = scheduleReader;
         this.scheduleMentionProcessor = scheduleMentionProcessor;
-        this.teamJoinLeaveManager = teamJoinLeaveManager;
+        this.teamValidator = teamValidator;
     }
 
     public void isAuthorOrMentioned(Schedule schedule, Member requester) {
@@ -35,6 +36,6 @@ public class ScheduleAccessManager {
     }
 
     public void isAbleToCreate(Long teamId, Member requester) {
-        teamJoinLeaveManager.hasJoinedTeam(teamId, requester.memberId());
+        teamValidator.isMemberOfTeam(teamId, requester.memberId());
     }
 }
