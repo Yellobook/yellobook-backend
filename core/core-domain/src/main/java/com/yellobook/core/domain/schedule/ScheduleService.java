@@ -55,4 +55,9 @@ public class ScheduleService {
     public void increaseView(Long scheduleId) {
         scheduleViewProcessor.increase(scheduleId);
     }
+
+    public List<ScheduleMemberSearchItem> findMembers(String keyword, Long teamId, Member member) {
+        scheduleAccessManager.isAbleToCreate(teamId, member);
+        return scheduleReader.findMembersByKeyword(keyword, teamId);
+    }
 }

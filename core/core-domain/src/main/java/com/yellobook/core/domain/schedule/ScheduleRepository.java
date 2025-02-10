@@ -22,4 +22,6 @@ public interface ScheduleRepository {
     void mention(Long scheduleId, List<Long> mentionIds);
 
     List<ScheduleMention> getMentionsByScheduleId(Long scheduleId);
+
+    List<ScheduleMemberSearchItem> findMembersByKeywordAndTeamId(String keyword, Long teamId);
 }

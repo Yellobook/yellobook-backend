@@ -4,27 +4,29 @@ import com.yellobook.api.controller.v1.schedule.dto.request.CreateScheduleCommen
 import com.yellobook.api.controller.v1.schedule.dto.request.CreateScheduleRequest;
 import com.yellobook.api.controller.v1.schedule.dto.response.CreateScheduleCommentResponse;
 import com.yellobook.api.controller.v1.schedule.dto.response.CreateScheduleResponse;
+import com.yellobook.api.controller.v1.schedule.dto.response.GetMemberMentionResponse;
 import com.yellobook.api.controller.v1.schedule.dto.response.GetScheduleResponse;
 import com.yellobook.api.support.ApiMember;
+import com.yellobook.api.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "\uD83D\uDCBC 일정", description = "Schedule EndPoints")
 public interface ScheduleApiDocs {
 
     @Operation(summary = "일정 생성", description = "새로운 일정을 생성하는 Endpoint 입니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "일정 생성 성공",
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "일정 생성 성공",
                     content = @Content(schema = @Schema(implementation = CreateScheduleResponse.class))),
-            @ApiResponse(responseCode = "403", description = "권한 없음",
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "권한 없음",
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
                                     {
@@ -38,7 +40,7 @@ public interface ScheduleApiDocs {
                                     }""")
                     ))
     })
-    com.yellobook.api.support.response.ApiResponse<CreateScheduleResponse> createSchedule(
+    ApiResponse<CreateScheduleResponse> createSchedule(
             @PathVariable("teamId") Long teamId,
             @RequestBody
             CreateScheduleRequest createScheduleRequest,
@@ -46,8 +48,8 @@ public interface ScheduleApiDocs {
 
     @Operation(summary = "일정 삭제", description = "등록된 일정을 삭제하는 Endpoint 입니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "일정 삭제 성공"),
-            @ApiResponse(responseCode = "403", description = "권한 없음",
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "일정 삭제 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "권한 없음",
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
                                     {
@@ -60,7 +62,7 @@ public interface ScheduleApiDocs {
                                         }
                                     }""")
                     )),
-            @ApiResponse(responseCode = "404", description = "일정을 찾을 수 없음",
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "일정을 찾을 수 없음",
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
                                     {
@@ -76,14 +78,14 @@ public interface ScheduleApiDocs {
                                     }""")
                     ))
     })
-    com.yellobook.api.support.response.ApiResponse<?> deleteSchedule(@Parameter(hidden = true) ApiMember requester,
-                                                                     @PathVariable Long scheduleId);
+    ApiResponse<?> deleteSchedule(@Parameter(hidden = true) ApiMember requester,
+                                  @PathVariable Long scheduleId);
 
     @Operation(summary = "일정 조회", description = "등록된 일정를 조회하는 Endpoint 입니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "일정 조회 성공",
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "일정 조회 성공",
                     content = @Content(schema = @Schema(implementation = GetScheduleResponse.class))),
-            @ApiResponse(responseCode = "403", description = "권한 없음",
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "권한 없음",
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
                                     {
@@ -96,7 +98,7 @@ public interface ScheduleApiDocs {
                                         }
                                     }""")
                     )),
-            @ApiResponse(responseCode = "404", description = "일정을 찾을 수 없음",
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "일정을 찾을 수 없음",
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
                                     {
@@ -112,15 +114,15 @@ public interface ScheduleApiDocs {
                                     }""")
                     ))
     })
-    com.yellobook.api.support.response.ApiResponse<GetScheduleResponse> getSchedule(
+    ApiResponse<GetScheduleResponse> getSchedule(
             @PathVariable("scheduleId") Long scheduleId, @Parameter(hidden = true) ApiMember apiMember
     );
 
     @Operation(summary = "일정 댓글 작성", description = "일정에 댓글을 작성하는 Endpoint 입니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "댓글 작성 성공",
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "댓글 작성 성공",
                     content = @Content(schema = @Schema(implementation = CreateScheduleCommentResponse.class))),
-            @ApiResponse(responseCode = "403", description = "권한 없음",
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "권한 없음",
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
                                     {
@@ -133,7 +135,7 @@ public interface ScheduleApiDocs {
                                         }
                                     }""")
                     )),
-            @ApiResponse(responseCode = "404", description = "일정을 찾을 수 없음",
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "일정을 찾을 수 없음",
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
                                     {
@@ -149,7 +151,7 @@ public interface ScheduleApiDocs {
                                     }""")
                     ))
     })
-    com.yellobook.api.support.response.ApiResponse<CreateScheduleCommentResponse> addComment(
+    ApiResponse<CreateScheduleCommentResponse> addComment(
             @PathVariable("scheduleId") Long scheduleId,
             @RequestBody CreateScheduleCommentRequest request,
             @Parameter(hidden = true) ApiMember apiMember
@@ -157,8 +159,8 @@ public interface ScheduleApiDocs {
 
     @Operation(summary = "일정 댓글 삭제", description = "일정에 댓글을 삭제하는 Endpoint 입니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "댓글 삭제 성공"),
-            @ApiResponse(responseCode = "403", description = "권한 없음",
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "댓글 삭제 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "권한 없음",
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
                                     {
@@ -171,7 +173,7 @@ public interface ScheduleApiDocs {
                                         }
                                     }""")
                     )),
-            @ApiResponse(responseCode = "404", description = "댓글을 찾을 수 없음",
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "댓글을 찾을 수 없음",
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
                                     {
@@ -187,6 +189,28 @@ public interface ScheduleApiDocs {
                                     }""")
                     ))
     })
-    com.yellobook.api.support.response.ApiResponse<?> deleteComment(@PathVariable("commentId") Long commentId,
-                                                                    @Parameter(hidden = true) ApiMember apiMember);
+    ApiResponse<?> deleteComment(@PathVariable("commentId") Long commentId,
+                                 @Parameter(hidden = true) ApiMember apiMember);
+
+    @Operation(summary = "일정 멘션 멤버 검색", description = "일정 멘션을 위한 검색을 지원하는 Endpoint입니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "검색 성공",
+                    content = @Content(schema = @Schema(implementation = GetMemberMentionResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "권한 없음",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                        "result": "ERROR",
+                                        "data": null,
+                                        "error":{
+                                            "code": "USER_NOT_IN_THE_STORE",
+                                            "message": "가게에서 해당 사용자를 찾을 수 없습니다.",
+                                            "data": null
+                                        }
+                                    }""")
+                    ))
+    })
+    ApiResponse<GetMemberMentionResponse> searchMemberMention(ApiMember apiMember,
+                                                              @PathVariable("teamId") Long teamId,
+                                                              @RequestParam(required = false) String keyword);
 }

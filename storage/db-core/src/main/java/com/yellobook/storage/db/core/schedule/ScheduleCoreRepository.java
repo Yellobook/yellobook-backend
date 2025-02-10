@@ -1,12 +1,17 @@
 package com.yellobook.storage.db.core.schedule;
 
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yellobook.core.domain.member.Member;
 import com.yellobook.core.domain.schedule.NewSchedule;
 import com.yellobook.core.domain.schedule.Schedule;
+import com.yellobook.core.domain.schedule.ScheduleMemberSearchItem;
 import com.yellobook.core.domain.schedule.ScheduleMention;
 import com.yellobook.core.domain.schedule.ScheduleRepository;
 import com.yellobook.storage.db.core.member.MemberEntity;
 import com.yellobook.storage.db.core.member.MemberJpaRepository;
+import com.yellobook.storage.db.core.member.QMemberEntity;
+import com.yellobook.storage.db.core.team.QParticipantEntity;
 import com.yellobook.storage.db.core.team.TeamEntity;
 import com.yellobook.storage.db.core.team.TeamJpaRepository;
 import jakarta.transaction.Transactional;
@@ -20,15 +25,18 @@ public class ScheduleCoreRepository implements ScheduleRepository {
     private final ScheduleMentionJpaRepository scheduleMentionJpaRepository;
     private final MemberJpaRepository memberJpaRepository;
     private final TeamJpaRepository teamJpaRepository;
+    private final JPAQueryFactory jpaQueryFactory;
 
     public ScheduleCoreRepository(ScheduleJpaRepository scheduleJpaRepository,
                                   ScheduleMentionJpaRepository scheduleMentionJpaRepository,
                                   MemberJpaRepository memberJpaRepository,
-                                  TeamJpaRepository teamJpaRepository) {
+                                  TeamJpaRepository teamJpaRepository,
+                                  JPAQueryFactory jpaQueryFactory) {
         this.scheduleJpaRepository = scheduleJpaRepository;
         this.scheduleMentionJpaRepository = scheduleMentionJpaRepository;
         this.memberJpaRepository = memberJpaRepository;
         this.teamJpaRepository = teamJpaRepository;
+        this.jpaQueryFactory = jpaQueryFactory;
     }
 
     @Override
@@ -92,5 +100,27 @@ public class ScheduleCoreRepository implements ScheduleRepository {
                 .stream()
                 .map(ScheduleMentionEntity::toScheduleMention)
                 .toList();
+    }
+
+    @Override
+    public List<ScheduleMemberSearchItem> findMembersByKeywordAndTeamId(String keyword, Long teamId) {
+        QMemberEntity memberEntity = QMemberEntity.memberEntity;
+        QParticipantEntity participantEntity = QParticipantEntity.participantEntity;
+
+        return jpaQueryFactory.select(
+                        Projections.constructor(
+                                ScheduleMemberSearchItem.class,
+                                memberEntity.id,
+                                memberEntity.nickname,
+                                memberEntity.profileImage))
+                .from(participantEntity)
+                .join(participantEntity.member, memberEntity)
+                .where(
+                        participantEntity.team.id.eq(teamId),
+                        memberEntity.isDeleted.eq(false),
+                        (keyword != null && !keyword.isEmpty()) ?
+                                memberEntity.nickname.startsWithIgnoreCase(keyword) : null
+                )
+                .fetch();
     }
 }

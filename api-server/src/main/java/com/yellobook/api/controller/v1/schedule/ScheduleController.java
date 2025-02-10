@@ -4,6 +4,7 @@ import com.yellobook.api.controller.v1.schedule.dto.request.CreateScheduleCommen
 import com.yellobook.api.controller.v1.schedule.dto.request.CreateScheduleRequest;
 import com.yellobook.api.controller.v1.schedule.dto.response.CreateScheduleCommentResponse;
 import com.yellobook.api.controller.v1.schedule.dto.response.CreateScheduleResponse;
+import com.yellobook.api.controller.v1.schedule.dto.response.GetMemberMentionResponse;
 import com.yellobook.api.controller.v1.schedule.dto.response.GetScheduleResponse;
 import com.yellobook.api.support.ApiMember;
 import com.yellobook.api.support.response.ApiResponse;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -75,5 +77,13 @@ public class ScheduleController implements ScheduleApiDocs {
     public ApiResponse<?> deleteComment(@PathVariable("commentId") Long commentId, ApiMember apiMember) {
         scheduleCommentService.delete(commentId, apiMember.toMember());
         return ApiResponse.success();
+    }
+
+    @GetMapping("/search")
+    public ApiResponse<GetMemberMentionResponse> searchMemberMention(ApiMember apiMember,
+                                                                     @PathVariable("teamId") Long teamId,
+                                                                     @RequestParam(required = false) String keyword) {
+        var members = scheduleService.findMembers(keyword, teamId, apiMember.toMember());
+        return ApiResponse.success(GetMemberMentionResponse.from(members));
     }
 }
