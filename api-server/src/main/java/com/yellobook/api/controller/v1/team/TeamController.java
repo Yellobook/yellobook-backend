@@ -40,7 +40,6 @@ public class TeamController implements TeamApiDocs {
         this.teamService = teamService;
     }
 
-    @Override
     @PostMapping
     public ApiResponse<CreateTeamResponse> createTeam(@RequestBody CreateTeamRequest dto,
                                                       @AuthenticationPrincipal ApiMember apiMember) {
@@ -48,7 +47,6 @@ public class TeamController implements TeamApiDocs {
         return ApiResponse.success(new CreateTeamResponse(storeId));
     }
 
-    @Override
     @GetMapping
     public ApiResponse<GetTeamsResponse> searchPublicTeam(@RequestParam @NotBlank String name,
                                                           @AuthenticationPrincipal ApiMember apiMember) {
@@ -56,7 +54,6 @@ public class TeamController implements TeamApiDocs {
         return ApiResponse.success(GetTeamsResponse.from(teams));
     }
 
-    @Override
     @PostMapping("/join")
     public ApiResponse<Void> joinTeamByCode(@RequestParam @NotBlank String code,
                                             @AuthenticationPrincipal ApiMember apiMember) {
@@ -64,7 +61,6 @@ public class TeamController implements TeamApiDocs {
         return ApiResponse.success(null);
     }
 
-    @Override
     @GetMapping("/{storeId}")
     public ApiResponse<GetTeamResponse> getStore(@PathVariable @NotNull Long storeId,
                                                  @AuthenticationPrincipal ApiMember apiMember) {
@@ -72,7 +68,6 @@ public class TeamController implements TeamApiDocs {
         return ApiResponse.success(new GetTeamResponse(team));
     }
 
-    @Override
     @PatchMapping("/{storeId}/searchable")
     public ApiResponse<Void> patchSearchable(@PathVariable @NotNull Long storeId,
                                              @RequestBody @Valid PatchSearchableRequest dto,
@@ -81,7 +76,6 @@ public class TeamController implements TeamApiDocs {
         return ApiResponse.success(null);
     }
 
-    @Override
     @PostMapping("/{storeId}/join")
     public ApiResponse<Void> requestTeamJoin(@PathVariable @NotNull Long storeId,
                                              @AuthenticationPrincipal ApiMember apiMember) {
@@ -89,7 +83,6 @@ public class TeamController implements TeamApiDocs {
         return ApiResponse.success(null);
     }
 
-    @Override
     @PatchMapping("/{storeId}/join/members/{memberId}")
     public ApiResponse<Void> manageTeamJoinRequest(@PathVariable @NotNull Long storeId,
                                                    @PathVariable @NotNull Long memberId,
@@ -99,7 +92,6 @@ public class TeamController implements TeamApiDocs {
         return ApiResponse.success(null);
     }
 
-    @Override
     @PostMapping("/{storeId}/invite")
     public ApiResponse<GenerateInvitationCodeResponse> generateInvitationCode(@PathVariable @NotNull Long storeId,
                                                                               @RequestBody @Valid GenerateInvitationCodeRequest request,
@@ -108,7 +100,6 @@ public class TeamController implements TeamApiDocs {
         return ApiResponse.success(new GenerateInvitationCodeResponse(code));
     }
 
-    @Override
     @DeleteMapping("/{storeId}/leave")
     public ApiResponse<Void> leaveTeam(@PathVariable @NotNull Long storeId,
                                        @AuthenticationPrincipal ApiMember apiMember) {
@@ -116,7 +107,6 @@ public class TeamController implements TeamApiDocs {
         return ApiResponse.success(null);
     }
 
-    @Override
     @GetMapping("/{storeId}/members")
     public ApiResponse<GetParticipantsResponse> getParticipants(@PathVariable @NotNull Long storeId,
                                                                 @AuthenticationPrincipal ApiMember apiMember) {
@@ -124,7 +114,6 @@ public class TeamController implements TeamApiDocs {
         return ApiResponse.success(GetParticipantsResponse.from(participants));
     }
 
-    @Override
     @PostMapping("/{storeId}/members/role/orderer")
     public ApiResponse<Void> requestOrdererConversion(@PathVariable @NotNull Long storeId,
                                                       @AuthenticationPrincipal ApiMember apiMember) {
@@ -132,7 +121,6 @@ public class TeamController implements TeamApiDocs {
         return ApiResponse.success(null);
     }
 
-    @Override
     @PatchMapping("/{storeId}/members/{memberId}/role/orderer")
     public ApiResponse<Void> changeRoleToOrderer(@PathVariable @NotNull Long storeId,
                                                  @PathVariable @NotNull Long memberId,

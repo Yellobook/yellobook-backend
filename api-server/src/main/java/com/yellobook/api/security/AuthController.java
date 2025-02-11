@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@Tag(name = "\uD83D\uDD11 인증", description = "Auth API")
+@Tag(name = "AUTHAPI", description = "Auth Endpoints")
 public class AuthController {
     private final JwtService jwtService;
     private final CookieProperties properties;

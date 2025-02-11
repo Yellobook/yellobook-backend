@@ -1,18 +1,19 @@
 package com.yellobook.api.support.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.yellobook.api.security.error.AuthErrorType;
 import com.yellobook.api.support.error.ApiErrorMessage;
 import com.yellobook.api.support.error.ApiErrorType;
 import com.yellobook.core.error.CoreErrorType;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class ApiResponse<S> {
+    @Schema(description = "응답 결과 상태 (SUCCESS 또는 ERROR)", example = "SUCCESS")
     private final ResultType result;
 
+    @Schema(description = "성공 시 반환되는 데이터")
     private final S data;
 
-    @JsonInclude(Include.NON_EMPTY)
+    @Schema(description = "에러 발생 시 에러 메시지")
     private final ApiErrorMessage error;
 
     private ApiResponse(ResultType result, S data, ApiErrorMessage error) {
