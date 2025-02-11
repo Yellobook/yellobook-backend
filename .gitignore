@@ -63,3 +63,6 @@ infra/monitoring/logs/*
 
 ### csv
 infra/**/*.csv
+
+../yellobook-infra/ngrinder/
+../yellobook-infra/pinpoint/
