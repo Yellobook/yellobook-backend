@@ -82,6 +82,12 @@ public enum CoreErrorType {
     ACTIVE_TERMS_NOT_FOUND(CoreErrorCode.TERMS02, CoreErrorKind.NOT_FOUND, "해당 약관은 존재하지 않습니다.", CoreErrorLevel.WARN),
     TERMS_ALREADY_AGREED(CoreErrorCode.TERMS03, CoreErrorKind.BAD_REQUEST, "이미 해당 약관에 동의하였습니다.", CoreErrorLevel.WARN),
     REQUIRED_TERMS_NOT_AGREED(CoreErrorCode.TERMS04, CoreErrorKind.BAD_REQUEST, "필수 동의 항목이 누락되었습니다.",
+            CoreErrorLevel.WARN),
+
+    // Announcement
+    ONLY_SELLER_CAN_CREATE_ANNOUNCEMENT(CoreErrorCode.ANNOUNCEMENT01, CoreErrorKind.FORBIDDEN, "판매자만 공지를 작성할 수 있습니다.",
+            CoreErrorLevel.WARN),
+    ONLY_AUTHOR_CAN_COMMENT(CoreErrorCode.ANNOUNCEMENT02, CoreErrorKind.FORBIDDEN, "공지 작성자만 댓글을 달 수 있습니다.",
             CoreErrorLevel.WARN);
 
 

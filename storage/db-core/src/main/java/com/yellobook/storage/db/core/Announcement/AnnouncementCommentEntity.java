@@ -1,6 +1,7 @@
 package com.yellobook.storage.db.core.Announcement;
 
 import com.yellobook.storage.db.core.BaseEntity;
+import com.yellobook.storage.db.core.member.MemberEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -18,12 +19,17 @@ public class AnnouncementCommentEntity extends BaseEntity {
     @JoinColumn(name = "announcement_id", nullable = false)
     private AnnouncementEntity announcement;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private MemberEntity member;
+
     protected AnnouncementCommentEntity() {
     }
 
-    public AnnouncementCommentEntity(String content, AnnouncementEntity announcement) {
+    public AnnouncementCommentEntity(String content, AnnouncementEntity announcement, MemberEntity member) {
         this.content = content;
         this.announcement = announcement;
+        this.member = member;
     }
 
     public String getContent() {

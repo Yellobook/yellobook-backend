@@ -80,7 +80,9 @@ public enum CoreErrorCode {
     TERMS01("TERMS-01"),
     TERMS02("TERMS-02"),
     TERMS03("TERMS-03"),
-    TERMS04("TERMS-04");
+    TERMS04("TERMS-04"),
+    ANNOUNCEMENT01("ANNOUNCEMENT-01"),
+    ANNOUNCEMENT02("ANNOUNCEMENT-02");
 
     private final String code;
 
