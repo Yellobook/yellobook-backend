@@ -88,7 +88,11 @@ public enum CoreErrorType {
     ONLY_SELLER_CAN_CREATE_ANNOUNCEMENT(CoreErrorCode.ANNOUNCEMENT01, CoreErrorKind.FORBIDDEN, "판매자만 공지를 작성할 수 있습니다.",
             CoreErrorLevel.WARN),
     ONLY_AUTHOR_CAN_COMMENT(CoreErrorCode.ANNOUNCEMENT02, CoreErrorKind.FORBIDDEN, "공지 작성자만 댓글을 달 수 있습니다.",
-            CoreErrorLevel.WARN);
+            CoreErrorLevel.WARN),
+    ANNOUNCEMENT_NOT_FOUND(CoreErrorCode.ANNOUNCEMENT03, CoreErrorKind.NOT_FOUND, "존재하지 않는 공지입니다.",
+            CoreErrorLevel.WARN),
+    INACTIVE_ANNOUNCEMENT(CoreErrorCode.ANNOUNCEMENT04, CoreErrorKind.FORBIDDEN, "비활성화된 공지입니다.", CoreErrorLevel.WARN),
+    ;
 
 
     private final CoreErrorCode code;

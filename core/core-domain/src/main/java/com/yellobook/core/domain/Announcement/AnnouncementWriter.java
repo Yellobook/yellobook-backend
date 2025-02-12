@@ -14,4 +14,8 @@ public class AnnouncementWriter {
     public Long create(NewAnnouncement newAnnouncement) {
         return announcementRepository.save(newAnnouncement);
     }
+
+    public void increaseView(Long announcementId) {
+        announcementRepository.increaseView(announcementId);
+    }
 }

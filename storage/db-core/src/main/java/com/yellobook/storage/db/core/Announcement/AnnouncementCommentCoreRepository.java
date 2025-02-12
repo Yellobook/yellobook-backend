@@ -1,9 +1,11 @@
 package com.yellobook.storage.db.core.Announcement;
 
+import com.yellobook.core.domain.Announcement.AnnouncementComment;
 import com.yellobook.core.domain.Announcement.AnnouncementCommentRepository;
 import com.yellobook.core.domain.Announcement.NewAnnouncementComment;
 import com.yellobook.storage.db.core.member.MemberEntity;
 import com.yellobook.storage.db.core.member.MemberJpaRepository;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -30,5 +32,13 @@ public class AnnouncementCommentCoreRepository implements AnnouncementCommentRep
         return announcementCommentJpaRepository.save(
                         new AnnouncementCommentEntity(newAnnounceComment.content(), announcementEntity, memberEntity))
                 .getId();
+    }
+
+    @Override
+    public List<AnnouncementComment> findByAnnouncementId(Long announcementId) {
+        return announcementCommentJpaRepository.findByAnnouncementId(announcementId)
+                .stream()
+                .map(AnnouncementCommentEntity::toAnnouncementComment)
+                .toList();
     }
 }

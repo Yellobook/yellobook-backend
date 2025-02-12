@@ -1,25 +1,29 @@
 package com.yellobook.core.domain.Announcement;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AnnouncementCommentService {
-
-    private final AnnouncementAccessManager announcementAccessManager;
     private final AnnouncementCommentWriter announcementCommentWriter;
     private final AnnouncementCommentAccessManager announcementCommentAccessManager;
+    private final AnnouncementCommentReader announcementCommentReader;
 
-    public AnnouncementCommentService(AnnouncementAccessManager announcementAccessManager,
-                                      AnnouncementCommentWriter announcementCommentWriter,
-                                      AnnouncementCommentAccessManager announcementCommentAccessManager) {
-        this.announcementAccessManager = announcementAccessManager;
+    public AnnouncementCommentService(AnnouncementCommentWriter announcementCommentWriter,
+                                      AnnouncementCommentAccessManager announcementCommentAccessManager,
+                                      AnnouncementCommentReader announcementCommentReader) {
         this.announcementCommentWriter = announcementCommentWriter;
         this.announcementCommentAccessManager = announcementCommentAccessManager;
+        this.announcementCommentReader = announcementCommentReader;
     }
 
     public Long createComment(NewAnnouncementComment newAnnounceComment) {
         announcementCommentAccessManager.isAbleToCreateComment(newAnnounceComment.member(),
                 newAnnounceComment.announcementId());
         return announcementCommentWriter.createComment(newAnnounceComment);
+    }
+
+    public List<AnnouncementComment> getComments(Long announcementId) {
+        return announcementCommentReader.getComments(announcementId);
     }
 }

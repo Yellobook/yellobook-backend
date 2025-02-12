@@ -1,5 +1,6 @@
 package com.yellobook.storage.db.core.Announcement;
 
+import com.yellobook.core.domain.Announcement.AnnouncementComment;
 import com.yellobook.storage.db.core.BaseEntity;
 import com.yellobook.storage.db.core.member.MemberEntity;
 import jakarta.persistence.Column;
@@ -30,6 +31,15 @@ public class AnnouncementCommentEntity extends BaseEntity {
         this.content = content;
         this.announcement = announcement;
         this.member = member;
+    }
+
+    public AnnouncementComment toAnnouncementComment() {
+        return new AnnouncementComment(
+                this.getId(),
+                content,
+                member.toMember(),
+                createdAt
+        );
     }
 
     public String getContent() {

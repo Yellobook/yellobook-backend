@@ -20,15 +20,16 @@ public class AnnouncementEntity extends BaseEntity {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false, insertable = false, updatable = false)
+    @JoinColumn(name = "member_id", nullable = false)
     private MemberEntity member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_id", nullable = false, insertable = false, updatable = false)
+    @JoinColumn(name = "team_id", nullable = false)
     private TeamEntity team;
 
     @Column(nullable = false)
     private int view;
+
 
     protected AnnouncementEntity() {
     }
