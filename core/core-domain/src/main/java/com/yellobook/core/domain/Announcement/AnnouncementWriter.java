@@ -18,4 +18,12 @@ public class AnnouncementWriter {
     public void increaseView(Long announcementId) {
         announcementRepository.increaseView(announcementId);
     }
+
+    public void deactivateAnnouncementPin(Long announcementId) {
+        announcementRepository.deactivateAnnouncementPin(announcementId);
+    }
+
+    public void activateAnnouncementPin(Long announcementId) {
+        announcementRepository.activateAnnouncementPin(announcementId);
+    }
 }

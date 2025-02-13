@@ -31,4 +31,11 @@ public class AnnouncementAccessManager {
     public void isAbleToRead(Member member, Long teamId) {
         teamValidator.isMemberOfTeam(teamId, member.memberId());
     }
+
+    public void isAbleToUpdateStatus(Member member, Long teamId) {
+        if (!teamRoleManager.readRole(teamId, member.memberId())
+                .equals(TeamMemberRole.SELLER)) {
+            throw new CoreException(CoreErrorType.ONLY_SELLER_CAN_CHANGE_STATUS);
+        }
+    }
 }

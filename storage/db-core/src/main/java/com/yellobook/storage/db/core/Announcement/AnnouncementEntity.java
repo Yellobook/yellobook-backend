@@ -1,11 +1,14 @@
 package com.yellobook.storage.db.core.Announcement;
 
 import com.yellobook.core.domain.Announcement.Announcement;
+import com.yellobook.core.enums.AnnouncementStatus;
 import com.yellobook.storage.db.core.BaseEntity;
 import com.yellobook.storage.db.core.member.MemberEntity;
 import com.yellobook.storage.db.core.team.TeamEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -30,6 +33,10 @@ public class AnnouncementEntity extends BaseEntity {
     @Column(nullable = false)
     private int view;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AnnouncementStatus status;
+
 
     protected AnnouncementEntity() {
     }
@@ -40,6 +47,7 @@ public class AnnouncementEntity extends BaseEntity {
         this.member = member;
         this.team = team;
         this.view = 0;
+        this.status = AnnouncementStatus.INACTIVE;
     }
 
     Announcement toAnnouncement() {
@@ -47,7 +55,8 @@ public class AnnouncementEntity extends BaseEntity {
                 this.getId(),
                 title,
                 content,
-                member.toMember()
+                member.toMember(),
+                view
         );
     }
 
@@ -65,5 +74,13 @@ public class AnnouncementEntity extends BaseEntity {
 
     public TeamEntity getTeam() {
         return team;
+    }
+
+    public int getView() {
+        return view;
+    }
+
+    public AnnouncementStatus getStatus() {
+        return status;
     }
 }

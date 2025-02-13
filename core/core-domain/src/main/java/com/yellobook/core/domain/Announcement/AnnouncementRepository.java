@@ -13,4 +13,10 @@ public interface AnnouncementRepository {
     Optional<Announcement> getAnnouncementById(Long announcementId);
 
     void increaseView(Long announcementId);
+
+    void deactivateAnnouncementPin(Long announcementId);
+
+    void activateAnnouncementPin(Long announcementId);
+
+    Boolean isPinExist(Long teamId);
 }

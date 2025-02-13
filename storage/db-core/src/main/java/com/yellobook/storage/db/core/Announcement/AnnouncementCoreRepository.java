@@ -1,9 +1,11 @@
 package com.yellobook.storage.db.core.Announcement;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yellobook.core.domain.Announcement.Announcement;
 import com.yellobook.core.domain.Announcement.AnnouncementRepository;
 import com.yellobook.core.domain.Announcement.NewAnnouncement;
 import com.yellobook.core.domain.member.Member;
+import com.yellobook.core.enums.AnnouncementStatus;
 import com.yellobook.storage.db.core.member.MemberEntity;
 import com.yellobook.storage.db.core.member.MemberJpaRepository;
 import com.yellobook.storage.db.core.team.TeamEntity;
@@ -17,12 +19,15 @@ public class AnnouncementCoreRepository implements AnnouncementRepository {
     private final AnnouncementJpaRepository announcementJpaRepository;
     private final MemberJpaRepository memberJpaRepository;
     private final TeamJpaRepository teamJpaRepository;
+    private final JPAQueryFactory jpaQueryFactory;
 
     public AnnouncementCoreRepository(AnnouncementJpaRepository announcementJpaRepository,
-                                      MemberJpaRepository memberJpaRepository, TeamJpaRepository teamJpaRepository) {
+                                      MemberJpaRepository memberJpaRepository, TeamJpaRepository teamJpaRepository,
+                                      JPAQueryFactory jpaQueryFactory) {
         this.announcementJpaRepository = announcementJpaRepository;
         this.memberJpaRepository = memberJpaRepository;
         this.teamJpaRepository = teamJpaRepository;
+        this.jpaQueryFactory = jpaQueryFactory;
     }
 
     @Override
@@ -52,5 +57,28 @@ public class AnnouncementCoreRepository implements AnnouncementRepository {
     @Override
     public void increaseView(Long announcementId) {
         announcementJpaRepository.increaseView(announcementId);
+    }
+
+    @Override
+    public void deactivateAnnouncementPin(Long announcementId) {
+        announcementJpaRepository.deactivate(announcementId);
+    }
+
+    @Override
+    public void activateAnnouncementPin(Long announcementId) {
+        announcementJpaRepository.activate(announcementId);
+    }
+
+    @Override
+    public Boolean isPinExist(Long teamId) {
+        QAnnouncementEntity announcement = QAnnouncementEntity.announcementEntity;
+        return jpaQueryFactory
+                .selectOne()
+                .from(announcement)
+                .where(
+                        announcement.team.id.eq(teamId)
+                                .and(announcement.status.eq(AnnouncementStatus.ACTIVE))
+                )
+                .fetchFirst() != null;
     }
 }

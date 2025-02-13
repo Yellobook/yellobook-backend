@@ -17,4 +17,10 @@ public class AnnouncementReader {
         return announcementRepository.getAnnouncementById(announcementId)
                 .orElseThrow(() -> new CoreException(CoreErrorType.ANNOUNCEMENT_NOT_FOUND));
     }
+
+    public void isPinExist(Long teamId) {
+        if (announcementRepository.isPinExist(teamId)) {
+            throw new CoreException(CoreErrorType.PINNED_ANNOUNCEMENT_EXIST);
+        }
+    }
 }

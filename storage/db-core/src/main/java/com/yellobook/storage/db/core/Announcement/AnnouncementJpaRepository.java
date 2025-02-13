@@ -9,6 +9,14 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AnnouncementJpaRepository extends JpaRepository<AnnouncementEntity, Long> {
     @Modifying
-    @Query(value = "update AnnouncementEntity a set a.view = a.view +1 where a.id =: announcementId")
+    @Query(value = "update AnnouncementEntity a set a.view = a.view +1 where a.id = :announcementId")
     void increaseView(@Param("announcementId") Long announcementId);
+
+    @Modifying
+    @Query(value = "update AnnouncementEntity a set a.status = 'INACTIVE' where a.id = :announcementId")
+    void deactivate(@Param("announcementId") Long announcementId);
+
+    @Modifying
+    @Query(value = "update AnnouncementEntity a set a.status = 'ACTIVE' where a.id = :announcementId")
+    void activate(@Param("announcementId") Long announcementId);
 }

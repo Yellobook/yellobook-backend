@@ -91,7 +91,11 @@ public enum CoreErrorType {
             CoreErrorLevel.WARN),
     ANNOUNCEMENT_NOT_FOUND(CoreErrorCode.ANNOUNCEMENT03, CoreErrorKind.NOT_FOUND, "존재하지 않는 공지입니다.",
             CoreErrorLevel.WARN),
-    INACTIVE_ANNOUNCEMENT(CoreErrorCode.ANNOUNCEMENT04, CoreErrorKind.FORBIDDEN, "비활성화된 공지입니다.", CoreErrorLevel.WARN),
+    ONLY_SELLER_CAN_CHANGE_STATUS(CoreErrorCode.ANNOUNCEMENT04, CoreErrorKind.FORBIDDEN, "공지 고정여부는 판매자만 수정이 가능합니다",
+            CoreErrorLevel.WARN),
+    PINNED_ANNOUNCEMENT_EXIST(CoreErrorCode.ANNOUNCEMENT05, CoreErrorKind.BAD_REQUEST, "고정된 공지가 이미 존재합니다",
+            CoreErrorLevel.WARN),
+    INACTIVE_ANNOUNCEMENT(CoreErrorCode.ANNOUNCEMENT06, CoreErrorKind.FORBIDDEN, "비활성화된 공지입니다.", CoreErrorLevel.WARN),
     ;
 
 

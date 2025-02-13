@@ -6,6 +6,7 @@ public record Announcement(
         Long announcementId,
         String title,
         String content,
-        Member author
+        Member author,
+        int view
 ) {
 }
