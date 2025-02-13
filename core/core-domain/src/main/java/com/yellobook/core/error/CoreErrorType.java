@@ -95,7 +95,11 @@ public enum CoreErrorType {
             CoreErrorLevel.WARN),
     PINNED_ANNOUNCEMENT_EXIST(CoreErrorCode.ANNOUNCEMENT05, CoreErrorKind.BAD_REQUEST, "고정된 공지가 이미 존재합니다",
             CoreErrorLevel.WARN),
-    INACTIVE_ANNOUNCEMENT(CoreErrorCode.ANNOUNCEMENT06, CoreErrorKind.FORBIDDEN, "비활성화된 공지입니다.", CoreErrorLevel.WARN),
+    ONLY_COMMENTER_CAN_DELETE(CoreErrorCode.ANNOUNCEMENT06, CoreErrorKind.FORBIDDEN, "댓글 작성자가 아닙니다.",
+            CoreErrorLevel.WARN),
+    ONLY_AUTHOR_CAN_DELETE(CoreErrorCode.ANNOUNCEMENT07, CoreErrorKind.FORBIDDEN, "공지 작성자가 아닙니다.",
+            CoreErrorLevel.WARN),
+    INACTIVE_ANNOUNCEMENT(CoreErrorCode.ANNOUNCEMENT08, CoreErrorKind.FORBIDDEN, "비활성화된 공지입니다.", CoreErrorLevel.WARN),
     ;
 
 

@@ -26,4 +26,8 @@ public class AnnouncementWriter {
     public void activateAnnouncementPin(Long announcementId) {
         announcementRepository.activateAnnouncementPin(announcementId);
     }
+
+    public void delete(Long announcementId) {
+        announcementRepository.delete(announcementId);
+    }
 }

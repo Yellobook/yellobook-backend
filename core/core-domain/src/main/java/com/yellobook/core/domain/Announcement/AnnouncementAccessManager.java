@@ -13,12 +13,14 @@ public class AnnouncementAccessManager {
     private final AnnouncementRepository announcementRepository;
     private final TeamRoleManager teamRoleManager;
     private final TeamValidator teamValidator;
+    private final AnnouncementReader announcementReader;
 
     public AnnouncementAccessManager(AnnouncementRepository announcementRepository, TeamRoleManager teamRoleManager,
-                                     TeamValidator teamValidator) {
+                                     TeamValidator teamValidator, AnnouncementReader announcementReader) {
         this.announcementRepository = announcementRepository;
         this.teamRoleManager = teamRoleManager;
         this.teamValidator = teamValidator;
+        this.announcementReader = announcementReader;
     }
 
     public void isAbleToCreate(Member member, Long teamId) {
@@ -36,6 +38,14 @@ public class AnnouncementAccessManager {
         if (!teamRoleManager.readRole(teamId, member.memberId())
                 .equals(TeamMemberRole.SELLER)) {
             throw new CoreException(CoreErrorType.ONLY_SELLER_CAN_CHANGE_STATUS);
+        }
+    }
+
+    public void isAnnouncementAuthor(Member member, Long announcementId) {
+        if (!announcementReader.read(announcementId)
+                .author()
+                .equals(member)) {
+            throw new CoreException(CoreErrorType.ONLY_AUTHOR_CAN_DELETE);
         }
     }
 }

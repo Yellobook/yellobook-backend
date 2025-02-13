@@ -49,4 +49,8 @@ public class AnnouncementCommentEntity extends BaseEntity {
     public AnnouncementEntity getAnnouncement() {
         return announcement;
     }
+
+    public MemberEntity getMember() {
+        return member;
+    }
 }

@@ -22,4 +22,10 @@ public class AnnouncementCommentAccessManager {
             throw new CoreException(CoreErrorType.ONLY_AUTHOR_CAN_COMMENT);
         }
     }
+
+    public void isCommentAuthor(Member member, Long commentId) {
+        if (!announcementCommentRepository.isAnnouncementCommentAuthor(member, commentId)) {
+            throw new CoreException(CoreErrorType.ONLY_COMMENTER_CAN_DELETE);
+        }
+    }
 }

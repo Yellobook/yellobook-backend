@@ -3,6 +3,7 @@ package com.yellobook.storage.db.core.Announcement;
 import com.yellobook.core.domain.Announcement.AnnouncementComment;
 import com.yellobook.core.domain.Announcement.AnnouncementCommentRepository;
 import com.yellobook.core.domain.Announcement.NewAnnouncementComment;
+import com.yellobook.core.domain.member.Member;
 import com.yellobook.storage.db.core.member.MemberEntity;
 import com.yellobook.storage.db.core.member.MemberJpaRepository;
 import java.util.List;
@@ -40,5 +41,23 @@ public class AnnouncementCommentCoreRepository implements AnnouncementCommentRep
                 .stream()
                 .map(AnnouncementCommentEntity::toAnnouncementComment)
                 .toList();
+    }
+
+    @Override
+    public Boolean isAnnouncementCommentAuthor(Member member, Long commentId) {
+        return announcementCommentJpaRepository.getReferenceById(commentId)
+                .getMember()
+                .getId()
+                .equals(member.memberId());
+    }
+
+    @Override
+    public void deleteByAnnouncementId(Long announcementId) {
+        announcementCommentJpaRepository.deleteByAnnouncementId(announcementId);
+    }
+
+    @Override
+    public void deleteByCommentId(Long commentId) {
+        announcementCommentJpaRepository.deleteById(commentId);
     }
 }

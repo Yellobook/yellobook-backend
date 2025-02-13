@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AnnouncementCommentJpaRepository extends JpaRepository<AnnouncementCommentEntity, Long> {
     List<AnnouncementCommentEntity> findByAnnouncementId(Long announcementId);
+
+    void deleteByAnnouncementId(Long announcementId);
 }

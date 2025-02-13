@@ -81,4 +81,9 @@ public class AnnouncementCoreRepository implements AnnouncementRepository {
                 )
                 .fetchFirst() != null;
     }
+
+    @Override
+    public void delete(Long announcementId) {
+        announcementJpaRepository.deleteById(announcementId);
+    }
 }

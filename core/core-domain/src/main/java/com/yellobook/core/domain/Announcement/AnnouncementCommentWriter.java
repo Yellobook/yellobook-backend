@@ -13,4 +13,12 @@ public class AnnouncementCommentWriter {
     public Long createComment(NewAnnouncementComment newAnnounceComment) {
         return announcementCommentRepository.save(newAnnounceComment);
     }
+
+    public void deleteAllCommentsByAnnouncementId(Long announcementId) {
+        announcementCommentRepository.deleteByAnnouncementId(announcementId);
+    }
+
+    public void deleteCommentById(Long commentId) {
+        announcementCommentRepository.deleteByCommentId(commentId);
+    }
 }

@@ -19,4 +19,6 @@ public interface AnnouncementRepository {
     void activateAnnouncementPin(Long announcementId);
 
     Boolean isPinExist(Long teamId);
+
+    void delete(Long announcementId);
 }

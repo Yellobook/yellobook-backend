@@ -1,5 +1,6 @@
 package com.yellobook.core.domain.Announcement;
 
+import com.yellobook.core.domain.member.Member;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -25,5 +26,14 @@ public class AnnouncementCommentService {
 
     public List<AnnouncementComment> getComments(Long announcementId) {
         return announcementCommentReader.getComments(announcementId);
+    }
+
+    public void deleteAllComments(Long announcementId) {
+        announcementCommentWriter.deleteAllCommentsByAnnouncementId(announcementId);
+    }
+
+    public void deleteComment(Member member, Long commentId) {
+        announcementCommentAccessManager.isCommentAuthor(member, commentId);
+        announcementCommentWriter.deleteCommentById(commentId);
     }
 }

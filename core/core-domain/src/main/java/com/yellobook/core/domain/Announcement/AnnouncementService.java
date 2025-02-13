@@ -42,4 +42,10 @@ public class AnnouncementService {
         announcementAccessManager.isAbleToUpdateStatus(member, teamId);
         announcementWriter.deactivateAnnouncementPin(announcementId);
     }
+
+    public Long delete(Member member, Long announcementId) {
+        announcementAccessManager.isAnnouncementAuthor(member, announcementId);
+        announcementWriter.delete(announcementId);
+        return announcementId;
+    }
 }
