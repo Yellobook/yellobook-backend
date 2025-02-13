@@ -138,7 +138,7 @@ public interface OrderApiDocs {
                     )
             )
     })
-    ApiResponse<CursorPageResponse<CustomerOrdersResponse>> getMyOrders(
+    ApiResponse<CursorPageResponse<CustomerOrdersResponse>> getOrdersForCustomer(
             @ModelAttribute CustomerOrdersRequest request,
             @Parameter(description = "가게 ID", example = "10")
             @PathVariable Long storeId,

@@ -100,7 +100,7 @@ public class OrderController implements OrderApiDocs {
     }
 
     @GetMapping("/customer")
-    public ApiResponse<CursorPageResponse<CustomerOrdersResponse>> getMyOrders(
+    public ApiResponse<CursorPageResponse<CustomerOrdersResponse>> getOrdersForCustomer(
             @Valid @ModelAttribute CustomerOrdersRequest request,
             @PathVariable @NotNull @Min(1) Long storeId,
             ApiMember apiMember
