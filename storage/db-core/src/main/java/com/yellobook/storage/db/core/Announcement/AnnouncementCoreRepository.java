@@ -12,6 +12,7 @@ import com.yellobook.storage.db.core.team.TeamEntity;
 import com.yellobook.storage.db.core.team.TeamJpaRepository;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class AnnouncementCoreRepository implements AnnouncementRepository {
@@ -31,6 +32,7 @@ public class AnnouncementCoreRepository implements AnnouncementRepository {
     }
 
     @Override
+    @Transactional
     public Long save(NewAnnouncement newAnnouncement) {
         MemberEntity author = memberJpaRepository.getReferenceById(newAnnouncement.author()
                 .memberId());
@@ -41,6 +43,7 @@ public class AnnouncementCoreRepository implements AnnouncementRepository {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Boolean isAnnouncementAuthor(Member member, Long announcementId) {
         return announcementJpaRepository.getReferenceById(announcementId)
                 .getMember()
@@ -49,27 +52,32 @@ public class AnnouncementCoreRepository implements AnnouncementRepository {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Announcement> getAnnouncementById(Long announcementId) {
         return announcementJpaRepository.findById(announcementId)
                 .map(AnnouncementEntity::toAnnouncement);
     }
 
     @Override
+    @Transactional
     public void increaseView(Long announcementId) {
         announcementJpaRepository.increaseView(announcementId);
     }
 
     @Override
+    @Transactional
     public void deactivateAnnouncementPin(Long announcementId) {
         announcementJpaRepository.deactivate(announcementId);
     }
 
     @Override
+    @Transactional
     public void activateAnnouncementPin(Long announcementId) {
         announcementJpaRepository.activate(announcementId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Boolean isPinExist(Long teamId) {
         QAnnouncementEntity announcement = QAnnouncementEntity.announcementEntity;
         return jpaQueryFactory
@@ -83,6 +91,7 @@ public class AnnouncementCoreRepository implements AnnouncementRepository {
     }
 
     @Override
+    @Transactional
     public void delete(Long announcementId) {
         announcementJpaRepository.deleteById(announcementId);
     }

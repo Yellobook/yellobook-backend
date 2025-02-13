@@ -8,6 +8,7 @@ import com.yellobook.storage.db.core.member.MemberEntity;
 import com.yellobook.storage.db.core.member.MemberJpaRepository;
 import java.util.List;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class AnnouncementCommentCoreRepository implements AnnouncementCommentRepository {
@@ -25,6 +26,7 @@ public class AnnouncementCommentCoreRepository implements AnnouncementCommentRep
     }
 
     @Override
+    @Transactional
     public Long save(NewAnnouncementComment newAnnounceComment) {
         AnnouncementEntity announcementEntity = announcementJpaRepository.getReferenceById(
                 newAnnounceComment.announcementId());
@@ -36,6 +38,7 @@ public class AnnouncementCommentCoreRepository implements AnnouncementCommentRep
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<AnnouncementComment> findByAnnouncementId(Long announcementId) {
         return announcementCommentJpaRepository.findByAnnouncementId(announcementId)
                 .stream()
@@ -44,6 +47,7 @@ public class AnnouncementCommentCoreRepository implements AnnouncementCommentRep
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Boolean isAnnouncementCommentAuthor(Member member, Long commentId) {
         return announcementCommentJpaRepository.getReferenceById(commentId)
                 .getMember()
@@ -52,11 +56,13 @@ public class AnnouncementCommentCoreRepository implements AnnouncementCommentRep
     }
 
     @Override
+    @Transactional
     public void deleteByAnnouncementId(Long announcementId) {
         announcementCommentJpaRepository.deleteByAnnouncementId(announcementId);
     }
 
     @Override
+    @Transactional
     public void deleteByCommentId(Long commentId) {
         announcementCommentJpaRepository.deleteById(commentId);
     }
