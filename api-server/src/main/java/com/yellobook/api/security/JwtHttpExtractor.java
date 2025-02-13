@@ -12,7 +12,7 @@ public class JwtHttpExtractor {
     private static final String BEARER_PREFIX = "Bearer ";
 
     private JwtHttpExtractor() {
-        throw new AssertionError();
+        throw new IllegalStateException("Utility class");
     }
 
     public static String extractAccessToken(HttpServletRequest request) {

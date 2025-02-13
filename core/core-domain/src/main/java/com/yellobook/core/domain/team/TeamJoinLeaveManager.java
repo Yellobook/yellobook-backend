@@ -2,8 +2,8 @@ package com.yellobook.core.domain.team;
 
 import com.yellobook.core.domain.team.dto.InvitationInfo;
 import com.yellobook.core.enums.TeamMemberRole;
-import com.yellobook.core.error.CoreErrorType;
-import com.yellobook.core.error.CoreException;
+import com.yellobook.core.support.error.CoreErrorType;
+import com.yellobook.core.support.error.CoreException;
 import org.springframework.stereotype.Component;
 
 @Component

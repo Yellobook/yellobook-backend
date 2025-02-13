@@ -1,6 +1,6 @@
 package com.yellobook.storage.db.core.order;
 
-import com.yellobook.core.domain.order.OrderStatus;
+import com.yellobook.core.enums.OrderStatus;
 import com.yellobook.storage.db.core.BaseEntity;
 import com.yellobook.storage.db.core.inventory.ProductEntity;
 import com.yellobook.storage.db.core.member.MemberEntity;

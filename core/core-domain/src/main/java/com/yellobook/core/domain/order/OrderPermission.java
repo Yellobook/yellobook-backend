@@ -1,12 +1,12 @@
 //package com.yellobook.core.domain.order;
 //
-//import static com.yellobook.core.error.CoreErrorType.ONLY_ORDERER_CAN_ORDER;
-//import static com.yellobook.core.error.CoreErrorType.ORDER_ACCESS_DENIED;
-//import static com.yellobook.core.error.CoreErrorType.ORDER_CREATION_NOT_ALLOWED;
+//import static com.yellobook.core.support.error.CoreErrorType.ONLY_ORDERER_CAN_ORDER;
+//import static com.yellobook.core.support.error.CoreErrorType.ORDER_ACCESS_DENIED;
+//import static com.yellobook.core.support.error.CoreErrorType.ORDER_CREATION_NOT_ALLOWED;
 //
 //import com.yellobook.core.domain.common.TeamMemberRole;
 //import com.yellobook.core.domain.team.TeamRoleVerifier;
-//import com.yellobook.core.error.CoreException;
+//import com.yellobook.core.support.error.CoreException;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.stereotype.Component;
 //

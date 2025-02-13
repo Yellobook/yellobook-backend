@@ -3,9 +3,10 @@ package com.yellobook.api.support.response;
 import com.yellobook.api.security.error.AuthErrorType;
 import com.yellobook.api.support.error.ApiErrorMessage;
 import com.yellobook.api.support.error.ApiErrorType;
-import com.yellobook.core.error.CoreErrorType;
+import com.yellobook.core.support.error.CoreErrorType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "공통 응답 및 에러")
 public class ApiResponse<S> {
     @Schema(description = "응답 결과 상태 (SUCCESS 또는 ERROR)", example = "SUCCESS")
     private final ResultType result;

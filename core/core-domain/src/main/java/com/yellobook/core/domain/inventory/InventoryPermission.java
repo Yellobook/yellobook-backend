@@ -1,10 +1,10 @@
 //package com.yellobook.core.domain.inventory;
 //
-//import static com.yellobook.core.error.CoreErrorType.ONLY_ADMIN_CAN_MANIPULATE_INVENTORY;
-//import static com.yellobook.core.error.CoreErrorType.VIEWER_CANT_ACCESS_INVENTORY;
+//import static com.yellobook.core.support.error.CoreErrorType.ONLY_ADMIN_CAN_MANIPULATE_INVENTORY;
+//import static com.yellobook.core.support.error.CoreErrorType.VIEWER_CANT_ACCESS_INVENTORY;
 //
 //import com.yellobook.core.domain.common.TeamMemberRole;
-//import com.yellobook.core.error.CoreException;
+//import com.yellobook.core.support.error.CoreException;
 //import org.springframework.stereotype.Component;
 //
 //@Component

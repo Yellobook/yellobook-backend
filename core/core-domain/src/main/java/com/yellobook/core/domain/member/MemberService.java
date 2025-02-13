@@ -1,7 +1,7 @@
 package com.yellobook.core.domain.member;
 
-import com.yellobook.core.error.CoreErrorType;
-import com.yellobook.core.error.CoreException;
+import com.yellobook.core.support.error.CoreErrorType;
+import com.yellobook.core.support.error.CoreException;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -48,7 +48,7 @@ public class MemberService {
         memberWriter.delete(member);
     }
 
-    public List<JoinedTeamResult> getMemberJoinedTeams(Member member) {
+    public List<JoinedTeamResult> getMemberJoinedStores(Member member) {
         return joinedTeamReader.read(member);
     }
 }

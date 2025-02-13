@@ -1,13 +1,13 @@
 //package com.yellobook.core.domain.order;
 //
-//import static com.yellobook.core.error.CoreErrorType.ORDER_AMOUNT_EXCEED;
-//import static com.yellobook.core.error.CoreErrorType.ORDER_CANT_CANCEL;
-//import static com.yellobook.core.error.CoreErrorType.ORDER_CONFIRMED_CANT_MODIFY;
-//import static com.yellobook.core.error.CoreErrorType.ORDER_PENDING_MODIFY_CANT_CONFIRM;
+//import static com.yellobook.core.support.error.CoreErrorType.ORDER_AMOUNT_EXCEED;
+//import static com.yellobook.core.support.error.CoreErrorType.ORDER_CANT_CANCEL;
+//import static com.yellobook.core.support.error.CoreErrorType.ORDER_CONFIRMED_CANT_MODIFY;
+//import static com.yellobook.core.support.error.CoreErrorType.ORDER_PENDING_MODIFY_CANT_CONFIRM;
 //
 //import com.yellobook.core.domain.inventory.ProductReader;
 //import com.yellobook.core.domain.inventory.ProductWriter;
-//import com.yellobook.core.error.CoreException;
+//import com.yellobook.core.support.error.CoreException;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.stereotype.Component;
 //

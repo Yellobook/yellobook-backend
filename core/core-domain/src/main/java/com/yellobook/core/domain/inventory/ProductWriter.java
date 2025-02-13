@@ -1,10 +1,10 @@
 //package com.yellobook.core.domain.inventory;
 //
-//import static com.yellobook.core.error.CoreErrorType.ORDER_RELATED;
+//import static com.yellobook.core.support.error.CoreErrorType.ORDER_RELATED;
 //
 //import com.yellobook.core.domain.inventory.dto.CreateProductCommend;
 //import com.yellobook.core.domain.order.OrderReader;
-//import com.yellobook.core.error.CoreException;
+//import com.yellobook.core.support.error.CoreException;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.stereotype.Component;
 //

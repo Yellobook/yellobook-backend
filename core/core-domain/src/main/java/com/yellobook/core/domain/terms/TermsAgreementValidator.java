@@ -1,8 +1,8 @@
 package com.yellobook.core.domain.terms;
 
 import com.yellobook.core.domain.member.Member;
-import com.yellobook.core.error.CoreErrorType;
-import com.yellobook.core.error.CoreException;
+import com.yellobook.core.support.error.CoreErrorType;
+import com.yellobook.core.support.error.CoreException;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -1,9 +1,9 @@
 package com.yellobook.core.domain.team;
 
-import static com.yellobook.core.error.CoreErrorType.EXIST_STORE_NAME;
-import static com.yellobook.core.error.CoreErrorType.STORE_NOT_FOUND;
+import static com.yellobook.core.support.error.CoreErrorType.EXIST_STORE_NAME;
+import static com.yellobook.core.support.error.CoreErrorType.STORE_NOT_FOUND;
 
-import com.yellobook.core.error.CoreException;
+import com.yellobook.core.support.error.CoreException;
 import java.util.List;
 import org.springframework.stereotype.Component;
 

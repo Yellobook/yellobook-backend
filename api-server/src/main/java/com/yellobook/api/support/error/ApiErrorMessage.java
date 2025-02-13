@@ -1,7 +1,7 @@
 package com.yellobook.api.support.error;
 
 import com.yellobook.api.security.error.AuthErrorType;
-import com.yellobook.core.error.CoreErrorType;
+import com.yellobook.core.support.error.CoreErrorType;
 
 public record ApiErrorMessage(
         String code,

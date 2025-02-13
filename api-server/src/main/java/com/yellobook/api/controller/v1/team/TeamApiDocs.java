@@ -11,22 +11,21 @@ import com.yellobook.api.controller.v1.team.dto.response.GetTeamsResponse;
 import com.yellobook.api.controller.v1.team.dto.response.GetTeamsResponse.GetTeamResponse;
 import com.yellobook.api.support.ApiMember;
 import com.yellobook.api.support.response.ApiResponse;
-import com.yellobook.support.api.docs.SwaggerResponse;
-import com.yellobook.support.api.docs.SwaggerResponses;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.SchemaProperty;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(name = "STORE API", description = "가게")
+@Tag(name = "STORE API", description = "Store Endpoints")
 public interface TeamApiDocs {
 
     @Operation(summary = "가게 만들기 API", description = "새로운 가게을 생성하는 API 입니다.")
-    @SwaggerResponses({
-            @SwaggerResponse(responseCode = "200",
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
                     content = @Content(
                             mediaType = "application/json",
                             schemaProperties = {
@@ -40,8 +39,8 @@ public interface TeamApiDocs {
 
 
     @Operation(summary = "공개 가게 검색 API", description = "공개 가게을 검색할 수 있는 API 입니다.")
-    @SwaggerResponses({
-            @SwaggerResponse(responseCode = "200",
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
                     content = @Content(
                             mediaType = "application/json",
                             schemaProperties = {
@@ -54,8 +53,8 @@ public interface TeamApiDocs {
                                                    ApiMember apiMember);
 
     @Operation(summary = "특정 가게 검색 API", description = "특정 가게를 검색할 수 있는 API 입니다.")
-    @SwaggerResponses({
-            @SwaggerResponse(responseCode = "200",
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
                     content = @Content(
                             mediaType = "application/json",
                             schemaProperties = {
@@ -63,7 +62,7 @@ public interface TeamApiDocs {
                                     @SchemaProperty(name = "data", schema = @Schema(implementation = GetTeamResponse.class))
                             }
                     )),
-            @SwaggerResponse(responseCode = "403", content = @Content(mediaType = "application/json", examples = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "가입하지 않은 비공개 가게를 조회하려고 한 경우", value = """
                             {
                                 "result" : "ERROR",
@@ -76,7 +75,7 @@ public interface TeamApiDocs {
                             }
                             """),
             })),
-            @SwaggerResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "존재하지 않는 storeId인 경우", value = """
                             {
                                 "result" : "ERROR",
@@ -94,8 +93,8 @@ public interface TeamApiDocs {
                                           @Parameter(hidden = true) ApiMember apiMember);
 
     @Operation(summary = "가입 요청 API", description = "가게에 가입 요청을 보낼 수 있는 API 입니다.")
-    @SwaggerResponses({
-            @SwaggerResponse(responseCode = "200",
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
                     content = @Content(
                             mediaType = "application/json",
                             schemaProperties = {
@@ -103,7 +102,7 @@ public interface TeamApiDocs {
                                     @SchemaProperty(name = "data", schema = @Schema(example = "null", implementation = Void.class))
                             }
                     )),
-            @SwaggerResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "존재하지 않는 storeId인 경우", value = """
                             {
                                 "result" : "ERROR",
@@ -116,7 +115,7 @@ public interface TeamApiDocs {
                             }
                             """),
             })),
-            @SwaggerResponse(responseCode = "409", content = @Content(mediaType = "application/json", examples = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "이미 가게에 가입했을 경우", value = """
                             {
                                 "result" : "ERROR",
@@ -134,8 +133,8 @@ public interface TeamApiDocs {
                                       @Parameter(hidden = true) ApiMember apiMember);
 
     @Operation(summary = "가입 요청 수락&거절 API", description = "가입 요청을 수락 또는 거절하는 API 입니다.")
-    @SwaggerResponses({
-            @SwaggerResponse(responseCode = "200",
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
                     content = @Content(
                             mediaType = "application/json",
                             schemaProperties = {
@@ -143,7 +142,7 @@ public interface TeamApiDocs {
                                     @SchemaProperty(name = "data", schema = @Schema(example = "null", implementation = Void.class))
                             }
                     )),
-            @SwaggerResponse(responseCode = "403", content = @Content(mediaType = "application/json", examples = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "가입 요청을 수락&거절하는 사용자가 가게에 가입하지 않은 경우", value = """
                             {
                                 "result" : "ERROR",
@@ -167,7 +166,7 @@ public interface TeamApiDocs {
                             }
                             """),
             })),
-            @SwaggerResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "가입 요청이 존재하지 않는 경우", value = """
                             {
                                 "result" : "ERROR",
@@ -180,7 +179,7 @@ public interface TeamApiDocs {
                             }
                             """),
             })),
-            @SwaggerResponse(responseCode = "409", content = @Content(mediaType = "application/json", examples = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "이미 가게에 가입했을 경우", value = """
                             {
                                 "result" : "ERROR",
@@ -200,8 +199,8 @@ public interface TeamApiDocs {
                                             @Parameter(hidden = true) ApiMember apiMember);
 
     @Operation(summary = "가게 초대 코드 생성 API", description = "가게 초대 코드를 생성하는 API 입니다.")
-    @SwaggerResponses({
-            @SwaggerResponse(responseCode = "200",
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
                     content = @Content(
                             mediaType = "application/json",
                             schemaProperties = {
@@ -209,7 +208,7 @@ public interface TeamApiDocs {
                                     @SchemaProperty(name = "data", schema = @Schema(implementation = GenerateInvitationCodeResponse.class))
                             }
                     )),
-            @SwaggerResponse(responseCode = "403", content = @Content(mediaType = "application/json", examples = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "초대 코드를 생성하는 사용자가 가게에 가입하지 않은 경우", value = """
                             {
                                 "result" : "ERROR",
@@ -251,8 +250,8 @@ public interface TeamApiDocs {
 
     // TODO : Return storeId
     @Operation(summary = "코드로 가게 참가 API", description = "코드로 가게에 참가할 수 있는 API 입니다.")
-    @SwaggerResponses({
-            @SwaggerResponse(responseCode = "200",
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
                     content = @Content(
                             mediaType = "application/json",
                             schemaProperties = {
@@ -260,7 +259,7 @@ public interface TeamApiDocs {
                                     @SchemaProperty(name = "data", schema = @Schema(example = "null", implementation = Void.class))
                             }
                     )),
-            @SwaggerResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "존재하지 않는 초대 코드인 경우", value = """
                             {
                                 "result" : "ERROR",
@@ -273,7 +272,7 @@ public interface TeamApiDocs {
                             }
                             """)
             })),
-            @SwaggerResponse(responseCode = "409", content = @Content(mediaType = "application/json", examples = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "가게에 이미 가입했을 경우", value = """
                             {
                                 "result" : "ERROR",
@@ -291,8 +290,8 @@ public interface TeamApiDocs {
                                      @Parameter(hidden = true) ApiMember apiMember);
 
     @Operation(summary = "뷰어 -> 주문자로 권한 변경 요청 API", description = "뷰어 -> 주문자로의 권한 변경을 요청하는 API 입니다.")
-    @SwaggerResponses({
-            @SwaggerResponse(responseCode = "200",
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
                     content = @Content(
                             mediaType = "application/json",
                             schemaProperties = {
@@ -300,7 +299,7 @@ public interface TeamApiDocs {
                                     @SchemaProperty(name = "data", schema = @Schema(example = "null", implementation = Void.class))
                             }
                     )),
-            @SwaggerResponse(responseCode = "403", content = @Content(mediaType = "application/json", examples = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "권한 변경을 요청하는 사용자가 가게에 가입하지 않은 경우", value = """
                             {
                                 "result" : "ERROR",
@@ -329,8 +328,8 @@ public interface TeamApiDocs {
                                                @Parameter(hidden = true) ApiMember apiMember);
 
     @Operation(summary = "뷰어 -> 주문자로 권한 변경 요청 수락&거절 API", description = "뷰어 -> 주문자로의 권한 변경 요청을 수락 또는 거절하는 API 입니다.")
-    @SwaggerResponses({
-            @SwaggerResponse(responseCode = "200",
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
                     content = @Content(
                             mediaType = "application/json",
                             schemaProperties = {
@@ -338,7 +337,7 @@ public interface TeamApiDocs {
                                     @SchemaProperty(name = "data", schema = @Schema(example = "null", implementation = Void.class))
                             }
                     )),
-            @SwaggerResponse(responseCode = "403", content = @Content(mediaType = "application/json", examples = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "요청을 수락&거절하는 사용자가 가게에 가입하지 않은 경우", value = """
                             {
                                 "result" : "ERROR",
@@ -380,8 +379,8 @@ public interface TeamApiDocs {
                                           @Parameter(hidden = true) ApiMember apiMember);
 
     @Operation(summary = "가게의 검색 가능 여부 수정 API", description = "가게의 검색 가능 여부를 수정하는 API 입니다.")
-    @SwaggerResponses({
-            @SwaggerResponse(responseCode = "200",
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
                     content = @Content(
                             mediaType = "application/json",
                             schemaProperties = {
@@ -389,7 +388,7 @@ public interface TeamApiDocs {
                                     @SchemaProperty(name = "data", schema = @Schema(example = "null", implementation = Void.class))
                             }
                     )),
-            @SwaggerResponse(responseCode = "403", content = @Content(mediaType = "application/json", examples = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "수정을 요청한 사용자가 가게에 가입하지 않은 경우", value = """
                             {
                                 "result" : "ERROR",
@@ -419,8 +418,8 @@ public interface TeamApiDocs {
                                       @Parameter(hidden = true) ApiMember apiMember);
 
     @Operation(summary = "가게 나가기 API", description = "가게을 탈퇴하는 API 입니다.")
-    @SwaggerResponses({
-            @SwaggerResponse(responseCode = "200",
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
                     content = @Content(
                             mediaType = "application/json",
                             schemaProperties = {
@@ -428,7 +427,7 @@ public interface TeamApiDocs {
                                     @SchemaProperty(name = "data", schema = @Schema(example = "null"))
                             }
                     )),
-            @SwaggerResponse(responseCode = "403", content = @Content(mediaType = "application/json", examples = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "탈퇴를 요청한 사용자가 가게에 가입한 사용자가 아닌 경우", value = """
                             {
                                 "result" : "ERROR",
@@ -452,7 +451,7 @@ public interface TeamApiDocs {
                             }
                             """),
             })),
-            @SwaggerResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "존재하지 않는 TeamId인 경우", value = """
                             {
                                 "result" : "ERROR",
@@ -470,8 +469,8 @@ public interface TeamApiDocs {
                                 @Parameter(hidden = true) ApiMember apiMember);
 
     @Operation(summary = "가게에 가입한 사용자 전체 조회 API", description = "가게에 가입한 사용자 모두를 조회하는 API 입니다.")
-    @SwaggerResponses({
-            @SwaggerResponse(responseCode = "200",
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200",
                     content = @Content(
                             mediaType = "application/json",
                             schemaProperties = {
@@ -479,7 +478,7 @@ public interface TeamApiDocs {
                                     @SchemaProperty(name = "data", schema = @Schema(implementation = GetParticipantsResponse.class))
                             }
                     )),
-            @SwaggerResponse(responseCode = "403", content = @Content(mediaType = "application/json", examples = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "조회를 요청한 사용자가 가게의 가입한 사용자가 아닌 경우", value = """
                             {
                                 "result" : "ERROR",

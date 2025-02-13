@@ -7,7 +7,6 @@ import com.yellobook.api.controller.member.dto.response.ProfileResponse;
 import com.yellobook.api.support.ApiMember;
 import com.yellobook.api.support.response.ApiResponse;
 import com.yellobook.core.domain.member.MemberService;
-import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,7 +31,6 @@ public class MemberController implements MemberApiDocs {
 
 
     @PatchMapping("/my/profile/nickname")
-    @Operation(summary = "닉네임 변경", description = "사용자의 닉네임 변경 API")
     public ApiResponse<?> updateNickname(
             ApiMember apiMember,
             @RequestBody UpdateNicknameRequest request
@@ -42,7 +40,6 @@ public class MemberController implements MemberApiDocs {
     }
 
     @PatchMapping("/my/profile/bio")
-    @Operation(summary = "한줄 소개 변경", description = "사용자의 한줄소개 변경 API")
     public ApiResponse<?> updateBio(
             ApiMember apiMember,
             @RequestBody UpdateBioRequest request
@@ -51,12 +48,11 @@ public class MemberController implements MemberApiDocs {
         return ApiResponse.success();
     }
 
-    @GetMapping("/my/teams")
-    @Operation(summary = "소속된 팀 목록 조회", description = "사용자가 소속된 팀 목록 조회 API")
+    @GetMapping("/my/stores")
     public ApiResponse<JoinedTeamsResponse> getMemberJoinedTeams(
             ApiMember apiMember
     ) {
-        var result = memberService.getMemberJoinedTeams(apiMember.toMember());
+        var result = memberService.getMemberJoinedStores(apiMember.toMember());
         return ApiResponse.success(JoinedTeamsResponse.of(apiMember.toMember(), result));
     }
 }

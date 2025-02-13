@@ -1,7 +1,7 @@
 //package com.yellobook.core.domain.inventory;
 //
-//import com.yellobook.core.error.CoreErrorType;
-//import com.yellobook.core.error.CoreException;
+//import com.yellobook.core.support.error.CoreErrorType;
+//import com.yellobook.core.support.error.CoreException;
 //import java.util.List;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.stereotype.Component;

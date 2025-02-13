@@ -1,6 +1,6 @@
 package com.yellobook.storage.db.core.order;
 
-import com.yellobook.core.domain.order.OrderStatus;
+import com.yellobook.core.enums.OrderStatus;
 import com.yellobook.storage.db.core.inventory.ProductEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

@@ -2,10 +2,10 @@ package com.yellobook.api.support;
 
 import com.yellobook.api.support.error.ApiErrorType;
 import com.yellobook.api.support.error.ApiException;
-import com.yellobook.api.support.error.ValidationError;
+import com.yellobook.api.support.error.ApiValidationError;
 import com.yellobook.api.support.response.ApiResponse;
-import com.yellobook.core.error.CoreErrorKind;
-import com.yellobook.core.error.CoreException;
+import com.yellobook.core.support.error.CoreErrorKind;
+import com.yellobook.core.support.error.CoreException;
 import jakarta.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Map;
@@ -79,10 +79,10 @@ public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
                                                                   HttpHeaders headers, HttpStatusCode status,
                                                                   WebRequest request) {
         ApiErrorType errorType = ApiErrorType.INVALID_REQUEST;
-        List<ValidationError> data = e.getBindingResult()
+        List<ApiValidationError> data = e.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(fieldError -> new ValidationError(fieldError.getField(), fieldError.getDefaultMessage()))
+                .map(fieldError -> new ApiValidationError(fieldError.getField(), fieldError.getDefaultMessage()))
                 .collect(Collectors.toList());
         log.info("Validation Exception : {}", data, e);
         return new ResponseEntity<>(ApiResponse.error(errorType, data), errorType.getStatus());
@@ -101,9 +101,9 @@ public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = ConstraintViolationException.class)
     protected ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException e) {
         ApiErrorType errorType = ApiErrorType.INVALID_REQUEST;
-        List<ValidationError> data = e.getConstraintViolations()
+        List<ApiValidationError> data = e.getConstraintViolations()
                 .stream()
-                .map(violation -> new ValidationError(violation.getPropertyPath()
+                .map(violation -> new ApiValidationError(violation.getPropertyPath()
                         .toString(), violation.getMessage()))
                 .collect(Collectors.toList());
         log.info("Validation Exception : {}", data, e);

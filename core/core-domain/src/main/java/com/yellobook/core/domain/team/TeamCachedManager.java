@@ -2,8 +2,8 @@
 //
 //import com.yellobook.core.domain.common.TeamMemberRole;
 //import com.yellobook.core.domain.team.dto.InvitationCodeInfo;
-//import com.yellobook.core.error.CoreErrorType;
-//import com.yellobook.core.error.CoreException;
+//import com.yellobook.core.support.error.CoreErrorType;
+//import com.yellobook.core.support.error.CoreException;
 //import java.util.UUID;
 //import java.util.concurrent.TimeUnit;
 //import org.springframework.beans.factory.annotation.Value;
