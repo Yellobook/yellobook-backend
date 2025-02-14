@@ -82,7 +82,25 @@ public enum CoreErrorType {
     ACTIVE_TERMS_NOT_FOUND(CoreErrorCode.TERMS02, CoreErrorKind.NOT_FOUND, "해당 약관은 존재하지 않습니다.", CoreErrorLevel.WARN),
     TERMS_ALREADY_AGREED(CoreErrorCode.TERMS03, CoreErrorKind.BAD_REQUEST, "이미 해당 약관에 동의하였습니다.", CoreErrorLevel.WARN),
     REQUIRED_TERMS_NOT_AGREED(CoreErrorCode.TERMS04, CoreErrorKind.BAD_REQUEST, "필수 동의 항목이 누락되었습니다.",
-            CoreErrorLevel.WARN);
+            CoreErrorLevel.WARN),
+
+    // Announcement
+    ONLY_SELLER_CAN_CREATE_ANNOUNCEMENT(CoreErrorCode.ANNOUNCEMENT01, CoreErrorKind.FORBIDDEN, "판매자만 공지를 작성할 수 있습니다.",
+            CoreErrorLevel.WARN),
+    ONLY_AUTHOR_CAN_COMMENT(CoreErrorCode.ANNOUNCEMENT02, CoreErrorKind.FORBIDDEN, "공지 작성자만 댓글을 달 수 있습니다.",
+            CoreErrorLevel.WARN),
+    ANNOUNCEMENT_NOT_FOUND(CoreErrorCode.ANNOUNCEMENT03, CoreErrorKind.NOT_FOUND, "존재하지 않는 공지입니다.",
+            CoreErrorLevel.WARN),
+    ONLY_SELLER_CAN_CHANGE_STATUS(CoreErrorCode.ANNOUNCEMENT04, CoreErrorKind.FORBIDDEN, "공지 고정여부는 판매자만 수정이 가능합니다",
+            CoreErrorLevel.WARN),
+    PINNED_ANNOUNCEMENT_EXIST(CoreErrorCode.ANNOUNCEMENT05, CoreErrorKind.BAD_REQUEST, "고정된 공지가 이미 존재합니다",
+            CoreErrorLevel.WARN),
+    ONLY_COMMENTER_CAN_DELETE(CoreErrorCode.ANNOUNCEMENT06, CoreErrorKind.FORBIDDEN, "댓글 작성자가 아닙니다.",
+            CoreErrorLevel.WARN),
+    ONLY_AUTHOR_CAN_DELETE(CoreErrorCode.ANNOUNCEMENT07, CoreErrorKind.FORBIDDEN, "공지 작성자가 아닙니다.",
+            CoreErrorLevel.WARN),
+    INACTIVE_ANNOUNCEMENT(CoreErrorCode.ANNOUNCEMENT08, CoreErrorKind.FORBIDDEN, "비활성화된 공지입니다.", CoreErrorLevel.WARN),
+    ;
 
 
     private final CoreErrorCode code;
