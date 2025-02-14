@@ -1,6 +1,6 @@
-package com.yellobook.storage.db.core.Announcement;
+package com.yellobook.storage.db.core.StoreAnnouncement;
 
-import com.yellobook.core.domain.Announcement.Announcement;
+import com.yellobook.core.domain.StoreAnnouncement.StoreAnnouncement;
 import com.yellobook.core.enums.AnnouncementStatus;
 import com.yellobook.storage.db.core.BaseEntity;
 import com.yellobook.storage.db.core.member.MemberEntity;
@@ -15,8 +15,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "announcements")
-public class AnnouncementEntity extends BaseEntity {
+@Table(name = "store_announcements")
+public class StoreAnnouncementEntity extends BaseEntity {
     private String title;
 
     @Column(length = 200)
@@ -38,10 +38,10 @@ public class AnnouncementEntity extends BaseEntity {
     private AnnouncementStatus status;
 
 
-    protected AnnouncementEntity() {
+    protected StoreAnnouncementEntity() {
     }
 
-    public AnnouncementEntity(String title, String content, MemberEntity member, TeamEntity team) {
+    public StoreAnnouncementEntity(String title, String content, MemberEntity member, TeamEntity team) {
         this.title = title;
         this.content = content;
         this.member = member;
@@ -50,8 +50,8 @@ public class AnnouncementEntity extends BaseEntity {
         this.status = AnnouncementStatus.INACTIVE;
     }
 
-    Announcement toAnnouncement() {
-        return new Announcement(
+    StoreAnnouncement toStoreAnnouncement() {
+        return new StoreAnnouncement(
                 this.getId(),
                 title,
                 content,

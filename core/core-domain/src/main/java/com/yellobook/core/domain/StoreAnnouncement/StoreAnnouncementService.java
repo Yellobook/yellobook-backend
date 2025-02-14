@@ -1,19 +1,20 @@
-package com.yellobook.core.domain.Announcement;
+package com.yellobook.core.domain.StoreAnnouncement;
 
 import com.yellobook.core.domain.member.Member;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AnnouncementService {
-    private final AnnouncementAccessManager announcementAccessManager;
-    private final AnnouncementWriter announceWriter;
-    private final AnnouncementReader announceReader;
-    private final AnnouncementWriter announcementWriter;
-    private final AnnouncementReader announcementReader;
+public class StoreAnnouncementService {
+    private final StoreAnnouncementAccessManager announcementAccessManager;
+    private final StoreAnnouncementWriter announceWriter;
+    private final StoreAnnouncementReader announceReader;
+    private final StoreAnnouncementWriter announcementWriter;
+    private final StoreAnnouncementReader announcementReader;
 
-    public AnnouncementService(AnnouncementAccessManager announcementAccessManager, AnnouncementWriter announceWriter,
-                               AnnouncementReader announceReader, AnnouncementWriter announcementWriter,
-                               AnnouncementReader announcementReader) {
+    public StoreAnnouncementService(StoreAnnouncementAccessManager announcementAccessManager,
+                                    StoreAnnouncementWriter announceWriter,
+                                    StoreAnnouncementReader announceReader, StoreAnnouncementWriter announcementWriter,
+                                    StoreAnnouncementReader announcementReader) {
         this.announcementAccessManager = announcementAccessManager;
         this.announceWriter = announceWriter;
         this.announceReader = announceReader;
@@ -21,12 +22,12 @@ public class AnnouncementService {
         this.announcementReader = announcementReader;
     }
 
-    public Long create(NewAnnouncement newAnnouncement) {
+    public Long create(NewStoreAnnouncement newAnnouncement) {
         announcementAccessManager.isAbleToCreate(newAnnouncement.author(), newAnnouncement.teamId());
         return announceWriter.create(newAnnouncement);
     }
 
-    public Announcement read(Member member, Long teamId, Long announcementId) {
+    public StoreAnnouncement read(Member member, Long teamId, Long announcementId) {
         announcementAccessManager.isAbleToRead(member, teamId);
         announcementWriter.increaseView(announcementId);
         return announceReader.read(announcementId);

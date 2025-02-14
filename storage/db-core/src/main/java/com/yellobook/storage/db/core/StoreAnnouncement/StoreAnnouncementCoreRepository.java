@@ -1,11 +1,12 @@
-package com.yellobook.storage.db.core.Announcement;
+package com.yellobook.storage.db.core.StoreAnnouncement;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.yellobook.core.domain.Announcement.Announcement;
-import com.yellobook.core.domain.Announcement.AnnouncementRepository;
-import com.yellobook.core.domain.Announcement.NewAnnouncement;
+import com.yellobook.core.domain.StoreAnnouncement.NewStoreAnnouncement;
+import com.yellobook.core.domain.StoreAnnouncement.StoreAnnouncement;
+import com.yellobook.core.domain.StoreAnnouncement.StoreAnnouncementRepository;
 import com.yellobook.core.domain.member.Member;
 import com.yellobook.core.enums.AnnouncementStatus;
+import com.yellobook.storage.db.core.Announcement.QAnnouncementEntity;
 import com.yellobook.storage.db.core.member.MemberEntity;
 import com.yellobook.storage.db.core.member.MemberJpaRepository;
 import com.yellobook.storage.db.core.team.TeamEntity;
@@ -15,16 +16,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-public class AnnouncementCoreRepository implements AnnouncementRepository {
+public class StoreAnnouncementCoreRepository implements StoreAnnouncementRepository {
 
-    private final AnnouncementJpaRepository announcementJpaRepository;
+    private final StoreAnnouncementJpaRepository announcementJpaRepository;
     private final MemberJpaRepository memberJpaRepository;
     private final TeamJpaRepository teamJpaRepository;
     private final JPAQueryFactory jpaQueryFactory;
 
-    public AnnouncementCoreRepository(AnnouncementJpaRepository announcementJpaRepository,
-                                      MemberJpaRepository memberJpaRepository, TeamJpaRepository teamJpaRepository,
-                                      JPAQueryFactory jpaQueryFactory) {
+    public StoreAnnouncementCoreRepository(StoreAnnouncementJpaRepository announcementJpaRepository,
+                                           MemberJpaRepository memberJpaRepository, TeamJpaRepository teamJpaRepository,
+                                           JPAQueryFactory jpaQueryFactory) {
         this.announcementJpaRepository = announcementJpaRepository;
         this.memberJpaRepository = memberJpaRepository;
         this.teamJpaRepository = teamJpaRepository;
@@ -33,7 +34,7 @@ public class AnnouncementCoreRepository implements AnnouncementRepository {
 
     @Override
     @Transactional
-    public Long save(NewAnnouncement newAnnouncement) {
+    public Long save(NewStoreAnnouncement newAnnouncement) {
         MemberEntity author = memberJpaRepository.getReferenceById(newAnnouncement.author()
                 .memberId());
         TeamEntity team = teamJpaRepository.getReferenceById(newAnnouncement.teamId());
@@ -53,9 +54,9 @@ public class AnnouncementCoreRepository implements AnnouncementRepository {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Announcement> getAnnouncementById(Long announcementId) {
+    public Optional<StoreAnnouncement> getAnnouncementById(Long announcementId) {
         return announcementJpaRepository.findById(announcementId)
-                .map(AnnouncementEntity::toAnnouncement);
+                .map(StoreAnnouncementEntity::toStoreAnnouncement);
     }
 
     @Override

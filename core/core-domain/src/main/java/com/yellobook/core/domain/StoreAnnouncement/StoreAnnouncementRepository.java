@@ -1,16 +1,16 @@
-package com.yellobook.core.domain.Announcement;
+package com.yellobook.core.domain.StoreAnnouncement;
 
 import com.yellobook.core.domain.member.Member;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AnnouncementRepository {
-    Long save(NewAnnouncement newAnnouncement);
+public interface StoreAnnouncementRepository {
+    Long save(NewStoreAnnouncement newAnnouncement);
 
     Boolean isAnnouncementAuthor(Member member, Long announcementId);
 
-    Optional<Announcement> getAnnouncementById(Long announcementId);
+    Optional<StoreAnnouncement> getAnnouncementById(Long announcementId);
 
     void increaseView(Long announcementId);
 

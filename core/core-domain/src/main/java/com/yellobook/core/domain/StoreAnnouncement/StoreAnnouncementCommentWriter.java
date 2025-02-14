@@ -1,16 +1,16 @@
-package com.yellobook.core.domain.Announcement;
+package com.yellobook.core.domain.StoreAnnouncement;
 
 import org.springframework.stereotype.Component;
 
 @Component
-public class AnnouncementCommentWriter {
-    private final AnnouncementCommentRepository announcementCommentRepository;
+public class StoreAnnouncementCommentWriter {
+    private final StoreAnnouncementCommentRepository announcementCommentRepository;
 
-    public AnnouncementCommentWriter(AnnouncementCommentRepository announcementCommentRepository) {
+    public StoreAnnouncementCommentWriter(StoreAnnouncementCommentRepository announcementCommentRepository) {
         this.announcementCommentRepository = announcementCommentRepository;
     }
 
-    public Long createComment(NewAnnouncementComment newAnnounceComment) {
+    public Long createComment(NewStoreAnnouncementComment newAnnounceComment) {
         return announcementCommentRepository.save(newAnnounceComment);
     }
 

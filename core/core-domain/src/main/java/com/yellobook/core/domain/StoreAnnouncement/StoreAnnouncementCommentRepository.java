@@ -1,14 +1,14 @@
-package com.yellobook.core.domain.Announcement;
+package com.yellobook.core.domain.StoreAnnouncement;
 
 import com.yellobook.core.domain.member.Member;
 import java.util.List;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AnnouncementCommentRepository {
-    Long save(NewAnnouncementComment newAnnounceComment);
+public interface StoreAnnouncementCommentRepository {
+    Long save(NewStoreAnnouncementComment newAnnounceComment);
 
-    List<AnnouncementComment> findByAnnouncementId(Long announcementId);
+    List<StoreAnnouncementComment> findByAnnouncementId(Long announcementId);
 
     Boolean isAnnouncementCommentAuthor(Member member, Long commentId);
 

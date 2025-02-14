@@ -1,19 +1,19 @@
-package com.yellobook.core.domain.Announcement;
+package com.yellobook.core.domain.StoreAnnouncement;
 
 import com.yellobook.core.error.CoreErrorType;
 import com.yellobook.core.error.CoreException;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AnnouncementReader {
+public class StoreAnnouncementReader {
 
-    private final AnnouncementRepository announcementRepository;
+    private final StoreAnnouncementRepository announcementRepository;
 
-    public AnnouncementReader(AnnouncementRepository announcementRepository) {
+    public StoreAnnouncementReader(StoreAnnouncementRepository announcementRepository) {
         this.announcementRepository = announcementRepository;
     }
 
-    public Announcement read(Long announcementId) {
+    public StoreAnnouncement read(Long announcementId) {
         return announcementRepository.getAnnouncementById(announcementId)
                 .orElseThrow(() -> new CoreException(CoreErrorType.ANNOUNCEMENT_NOT_FOUND));
     }

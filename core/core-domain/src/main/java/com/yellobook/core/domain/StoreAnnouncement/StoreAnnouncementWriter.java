@@ -1,17 +1,17 @@
-package com.yellobook.core.domain.Announcement;
+package com.yellobook.core.domain.StoreAnnouncement;
 
 import org.springframework.stereotype.Component;
 
 @Component
-public class AnnouncementWriter {
+public class StoreAnnouncementWriter {
 
-    private final AnnouncementRepository announcementRepository;
+    private final StoreAnnouncementRepository announcementRepository;
 
-    public AnnouncementWriter(AnnouncementRepository announcementRepository) {
+    public StoreAnnouncementWriter(StoreAnnouncementRepository announcementRepository) {
         this.announcementRepository = announcementRepository;
     }
 
-    public Long create(NewAnnouncement newAnnouncement) {
+    public Long create(NewStoreAnnouncement newAnnouncement) {
         return announcementRepository.save(newAnnouncement);
     }
 

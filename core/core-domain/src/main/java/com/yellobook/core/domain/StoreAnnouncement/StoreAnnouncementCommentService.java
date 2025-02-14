@@ -1,30 +1,30 @@
-package com.yellobook.core.domain.Announcement;
+package com.yellobook.core.domain.StoreAnnouncement;
 
 import com.yellobook.core.domain.member.Member;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AnnouncementCommentService {
-    private final AnnouncementCommentWriter announcementCommentWriter;
-    private final AnnouncementCommentAccessManager announcementCommentAccessManager;
-    private final AnnouncementCommentReader announcementCommentReader;
+public class StoreAnnouncementCommentService {
+    private final StoreAnnouncementCommentWriter announcementCommentWriter;
+    private final StoreAnnouncementCommentAccessManager announcementCommentAccessManager;
+    private final StoreAnnouncementCommentReader announcementCommentReader;
 
-    public AnnouncementCommentService(AnnouncementCommentWriter announcementCommentWriter,
-                                      AnnouncementCommentAccessManager announcementCommentAccessManager,
-                                      AnnouncementCommentReader announcementCommentReader) {
+    public StoreAnnouncementCommentService(StoreAnnouncementCommentWriter announcementCommentWriter,
+                                           StoreAnnouncementCommentAccessManager announcementCommentAccessManager,
+                                           StoreAnnouncementCommentReader announcementCommentReader) {
         this.announcementCommentWriter = announcementCommentWriter;
         this.announcementCommentAccessManager = announcementCommentAccessManager;
         this.announcementCommentReader = announcementCommentReader;
     }
 
-    public Long createComment(NewAnnouncementComment newAnnounceComment) {
+    public Long createComment(NewStoreAnnouncementComment newAnnounceComment) {
         announcementCommentAccessManager.isAbleToCreateComment(newAnnounceComment.member(),
                 newAnnounceComment.announcementId());
         return announcementCommentWriter.createComment(newAnnounceComment);
     }
 
-    public List<AnnouncementComment> getComments(Long announcementId) {
+    public List<StoreAnnouncementComment> getComments(Long announcementId) {
         return announcementCommentReader.getComments(announcementId);
     }
 

@@ -1,4 +1,4 @@
-package com.yellobook.core.domain.Announcement;
+package com.yellobook.core.domain.StoreAnnouncement;
 
 import com.yellobook.core.domain.member.Member;
 import com.yellobook.core.error.CoreErrorType;
@@ -6,13 +6,13 @@ import com.yellobook.core.error.CoreException;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AnnouncementCommentAccessManager {
+public class StoreAnnouncementCommentAccessManager {
 
-    private final AnnouncementRepository announcementRepository;
-    private final AnnouncementCommentRepository announcementCommentRepository;
+    private final StoreAnnouncementRepository announcementRepository;
+    private final StoreAnnouncementCommentRepository announcementCommentRepository;
 
-    public AnnouncementCommentAccessManager(AnnouncementRepository announcementRepository,
-                                            AnnouncementCommentRepository announcementCommentRepository) {
+    public StoreAnnouncementCommentAccessManager(StoreAnnouncementRepository announcementRepository,
+                                                 StoreAnnouncementCommentRepository announcementCommentRepository) {
         this.announcementRepository = announcementRepository;
         this.announcementCommentRepository = announcementCommentRepository;
     }

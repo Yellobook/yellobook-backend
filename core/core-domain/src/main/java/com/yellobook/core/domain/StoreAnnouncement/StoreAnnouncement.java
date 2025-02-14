@@ -1,8 +1,8 @@
-package com.yellobook.core.domain.Announcement;
+package com.yellobook.core.domain.StoreAnnouncement;
 
 import com.yellobook.core.domain.member.Member;
 
-public record Announcement(
+public record StoreAnnouncement(
         Long announcementId,
         String title,
         String content,

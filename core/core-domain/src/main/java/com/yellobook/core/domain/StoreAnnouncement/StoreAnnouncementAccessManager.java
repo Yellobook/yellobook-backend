@@ -1,4 +1,4 @@
-package com.yellobook.core.domain.Announcement;
+package com.yellobook.core.domain.StoreAnnouncement;
 
 import com.yellobook.core.domain.member.Member;
 import com.yellobook.core.domain.team.TeamRoleManager;
@@ -9,14 +9,15 @@ import com.yellobook.core.error.CoreException;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AnnouncementAccessManager {
-    private final AnnouncementRepository announcementRepository;
+public class StoreAnnouncementAccessManager {
+    private final StoreAnnouncementRepository announcementRepository;
     private final TeamRoleManager teamRoleManager;
     private final TeamValidator teamValidator;
-    private final AnnouncementReader announcementReader;
+    private final StoreAnnouncementReader announcementReader;
 
-    public AnnouncementAccessManager(AnnouncementRepository announcementRepository, TeamRoleManager teamRoleManager,
-                                     TeamValidator teamValidator, AnnouncementReader announcementReader) {
+    public StoreAnnouncementAccessManager(StoreAnnouncementRepository announcementRepository,
+                                          TeamRoleManager teamRoleManager,
+                                          TeamValidator teamValidator, StoreAnnouncementReader announcementReader) {
         this.announcementRepository = announcementRepository;
         this.teamRoleManager = teamRoleManager;
         this.teamValidator = teamValidator;
